@@ -202,14 +202,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import {
   PersonCircle,
   Cube,
   Ribbon,
-  Home,
   Settings
 } from '@vicons/ionicons5'
 
@@ -221,19 +220,19 @@ const featuresSection = ref(null)
 const featureCards = ref([
   {
     id: 1,
-    icon: PersonCircle,
+    icon: markRaw(PersonCircle),
     title: '角色管理',
     description: '统一管理游戏角色'
   },
   {
     id: 2,
-    icon: Cube,
+    icon: markRaw(Cube),
     title: '任务系统',
     description: '自动化日常任务'
   },
   {
     id: 3,
-    icon: Ribbon,
+    icon: markRaw(Ribbon),
     title: '数据统计',
     description: '全面的数据分析'
   }
@@ -243,25 +242,25 @@ const featureCards = ref([
 const features = ref([
   {
     id: 1,
-    icon: PersonCircle,
+    icon: markRaw(PersonCircle),
     title: '角色管理',
     description: '轻松管理多个游戏角色，统一查看角色信息、等级进度和装备状态'
   },
   {
     id: 2,
-    icon: Cube,
+    icon: markRaw(Cube),
     title: '任务自动化',
     description: '智能日常任务系统，自动完成重复性任务，节省您的宝贵时间'
   },
   {
     id: 3,
-    icon: Ribbon,
+    icon: markRaw(Ribbon),
     title: '数据分析',
     description: '详细的数据统计和分析报告，帮助您更好地了解游戏进度'
   },
   {
     id: 4,
-    icon: Settings,
+    icon: markRaw(Settings),
     title: '个性化设置',
     description: '灵活的配置选项，根据您的需求定制最适合的管理方案'
   }
