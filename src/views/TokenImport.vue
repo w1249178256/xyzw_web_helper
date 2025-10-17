@@ -453,6 +453,18 @@
         >
           <n-input v-model:value="editForm.name" />
         </n-form-item>
+        <n-form-item
+          label="Token字符串"
+          path="token"
+        >
+          <n-input
+            v-model:value="editForm.token"
+            type="textarea"
+            :rows="3"
+            placeholder="粘贴Token字符串..."
+            clearable
+          />
+        </n-form-item>
         <n-form-item label="服务器">
           <n-input v-model:value="editForm.server" />
         </n-form-item>
@@ -547,6 +559,7 @@ const urlForm = reactive({
 // 编辑表单
 const editForm = reactive({
   name: '',
+  token: '',
   server: '',
   wsUrl: ''
 })
@@ -574,6 +587,9 @@ const urlRules = {
 const editRules = {
   name: [
     { required: true, message: '请输入Token名称', trigger: 'blur' }
+  ],
+  token: [
+    { required: true, message: '请输入Token字符串', trigger: 'blur' }
   ]
 }
 
@@ -960,8 +976,9 @@ const editToken = (token) => {
   editingToken.value = token
   Object.assign(editForm, {
     name: token.name,
+    token: token.token,
     server: token.server || '',
-    wsUrl: token.wsUrl || ''
+    wsUrl: token.wsUrl || '',
   })
   showEditModal.value = true
 }
@@ -974,6 +991,7 @@ const saveEdit = async () => {
 
     tokenStore.updateToken(editingToken.value.id, {
       name: editForm.name,
+      token: editForm.token,
       server: editForm.server,
       wsUrl: editForm.wsUrl
     })
