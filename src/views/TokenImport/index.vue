@@ -86,7 +86,7 @@
         <div class="tokens-grid">
           <a-card v-for="token in tokenStore.gameTokens" :key="token.id" :class="{
             'token-card': true,
-            active: selectedTokenId.value === token.id
+            active: selectedTokenId === token.id
           }" @click="selectToken(token)">
             <template #title>
               <a-space class="token-name">

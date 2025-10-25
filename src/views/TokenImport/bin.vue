@@ -1,12 +1,12 @@
 <template>
   <!-- 手动输入表单 -->
-  <n-form ref="importFormRef" :model="importForm" :rules="importRules" :label-placement="'top'" :size="'large'"
+  <n-form :model="importForm" :label-placement="'top'" :size="'large'"
     :show-label="true">
-    <n-form-item :label="'游戏角色名称'" :path="'name'" :show-label="true">
+    <n-form-item :label="'游戏角色名称'" :show-label="true">
       <n-input v-model:value="importForm.name" placeholder="例如：主号战士" clearable />
     </n-form-item>
 
-    <n-form-item :label="'bin文件'" :path="'base64Token'" :show-label="true">
+    <n-form-item :label="'bin文件'" :show-label="true">
       <a-upload multiple accept="*.bin,*.dmp" @before-upload="uploadBin" draggable dropzone placeholder="粘贴Token字符串..."
         clearable>
         <!-- <div class="dropzone-content">
@@ -18,8 +18,8 @@
       <a-list-item v-for="(role, index) in roleList" :key="index">
         <div>
           <strong>角色名称:</strong> {{ role.name || '未命名角色' }}<br />
-          <strong>服务器:</strong> {{ role.server || '未指定' }}<br />
-          <strong>Token:</strong> <span style="word-break: break-all;">{{ role.base64Token }}</span>
+          <strong>Token:</strong> <span style="word-break: break-all;">{{ role.token }}</span><br />
+          <strong>服务器:</strong> {{ role.server || '未指定' }}
         </div>
       </a-list-item>
     </a-list>
@@ -71,31 +71,19 @@ import PQueue from 'p-queue';
 const $emit = defineEmits(['cancel', 'ok']);
 
 const cancel = () => {
+  roleList.value = [];
   $emit('cancel');
 };
 
 const tokenStore = useTokenStore();
 const message = useMessage();
-const importFormRef = ref();
 const isImporting = ref(false);
 const importForm = reactive({
   name: '',
-  base64Token: '',
   server: '',
   wsUrl: ''
 });
-const roleList = ref<Array<{ name: string; base64Token: string; server: string; wsUrl: string }>>([]);
-
-const importRules = {
-  name: [
-    { required: true, message: '请输入角色名称', trigger: 'blur' },
-    { min: 2, max: 20, message: '名称长度应在2到20个字符之间', trigger: 'blur' }
-  ],
-  base64Token: [
-    { required: true, message: '请粘贴Token字符串', trigger: 'blur' },
-    { min: 50, message: 'Token字符串长度过短', trigger: 'blur' }
-  ]
-};
+const roleList = ref<Array<{ name: string; token: string; server: string; wsUrl: string }>>([]);
 
 const tQueue = new PQueue({ concurrency: 1, interval: 1000, });
 
@@ -146,7 +134,12 @@ const initName = (fileName: string) => {
       roleName: binRes[4]
     };
   }
-  return {}
+  return {
+    server: '',
+    roleIndex: '',
+    roleId: '',
+    roleName: importForm.name || ''
+  }
 }
 
 const uploadBin = (binFile: File) => {
@@ -157,12 +150,17 @@ const uploadBin = (binFile: File) => {
     reader.onload = async (e) => {
       const userToken = e.target?.result as ArrayBuffer;
       const roleToken = await transformToken(userToken);
+      const roleName = roleMeta.roleName || binFile.name.split('.')?.[0] || ''
+      // 上传列表中发现已存在的重复名称，提示消息
+      if (roleList.value.some(role => role.name === roleName)) {
+        message.error('上传列表中已存在同名角色! ');
+        return;
+      }
       message.success('Token读取成功，请检查角色名称等信息后提交');
-
       roleList.value.push({
-        name: roleMeta.roleName || '',
+        name: roleName,
         token: roleToken,
-        server: roleMeta.server + '-' + roleMeta.roleIndex || '',
+        server: roleMeta.server + '' + roleMeta.roleIndex || '',
         wsUrl: importForm.wsUrl || ''
       });
     };
@@ -175,7 +173,18 @@ const uploadBin = (binFile: File) => {
 };
 
 const handleImport = async () => {
+  if (roleList.value.length === 0) {
+    message.error('请先上传bin文件！');
+    return;
+  }
+
   roleList.value.forEach(role => {
+    // tokenStore.gameTokens中发现已存在的重复名称，则移出token后重新添加
+    const gameToken = tokenStore.gameTokens.find(t => t.name === role.name);
+    if(gameToken) {
+      console.log('移除同名token:', gameToken);
+      tokenStore.removeToken(gameToken.id);
+    }
     tokenStore.addToken({
       ...role
     });
