@@ -8,6 +8,7 @@
             <n-tab-pane name="daily" tab="日常" />
             <n-tab-pane name="club" tab="俱乐部" />
             <n-tab-pane name="activity" tab="活动" />
+            <n-tab-pane v-if="ENABLE_TOOLS_TAB" name="tools" tab="工具" />
         </n-tabs>
 
         <!-- 阵容（仅日常） -->
@@ -24,6 +25,9 @@
 
         <!-- 挂机状态（提取组件） -->
         <HangUpStatusCard v-show="activeSection === 'daily'" />
+
+        <!-- 挂机状态（提取组件） -->
+        <BoxHelperCard v-show="activeSection === 'tools'" />
 
         <!-- 俱乐部排位（暂时隐藏） -->
         <div class="status-card legion-match" v-if="ENABLE_LEGION_MATCH && activeSection === 'club'">
@@ -96,6 +100,7 @@ import { useTokenStore } from "@/stores/tokenStore";
 import { useMessage } from "naive-ui";
 import { preloadQuestions, getQuestionCount } from "@/utils/studyQuestionsFromJSON.js";
 import BottleHelperCard from "./cards/BottleHelperCard.vue";
+import BoxHelperCard from "./cards/BoxHelperCard.vue";
 import HangUpStatusCard from "./cards/HangUpStatusCard.vue";
 import MonthlyTasksCard from "./cards/MonthlyTasksCard.vue";
 import StudyChallengeCard from "./cards/StudyChallengeCard.vue";
@@ -379,6 +384,7 @@ const claimHangUpReward = async () => {
 // 功能开关：暂时隐藏俱乐部排位与旧签到卡片
 const ENABLE_LEGION_MATCH = false;
 const ENABLE_LEGION_SIGNIN_CARD = false;
+const ENABLE_TOOLS_TAB = true; // 工具分区开关
 
 // 盐场战绩入口已移动至俱乐部信息模块
 

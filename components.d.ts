@@ -22,6 +22,7 @@ declare module 'vue' {
     ATag: typeof import('@arco-design/web-vue')['Tag']
     AUpload: typeof import('@arco-design/web-vue')['Upload']
     BottleHelperCard: typeof import('./src/components/cards/BottleHelperCard.vue')['default']
+    BoxHelperCard: typeof import('./src/components/cards/BoxHelperCard.vue')['default']
     CarTaskCard: typeof import('./src/components/CarTaskCard.vue')['default']
     ChangelogCard: typeof import('./src/components/ChangelogCard.vue')['default']
     ClubBattleRecords: typeof import('./src/components/Club/ClubBattleRecords.vue')['default']
