@@ -160,7 +160,7 @@
               </div>
             </template>
             <template #actions>
-              <n-button type="primary" size="large" block :loading="connectingTokens.has(token.id)"
+              <n-button v-if="getTokenStyle(token.id) === 'success'" type="primary" size="large" block :loading="connectingTokens.has(token.id)"
                 @click="startTaskManagement(token)">
                 <template #icon>
                   <n-icon>
@@ -169,17 +169,34 @@
                 </template>
                 开始任务管理
               </n-button>
+              <n-button v-else type="primary" size="large" block :loading="connectingTokens.has(token.id)"
+                @click="startTaskManagement(token)">
+                开始链接
+              </n-button>
             </template>
           </a-card>
         </div>
       </div>
 
       <!-- 空状态 -->
-      <a-empty v-if="!tokenStore.hasTokens && !showImportForm">
+      <a-empty v-if="!tokenStore.hasTokens && !showImportForm" class="empty-state">
         <template #image>
-          <i class="mdi:bed-empty"></i>
+          <n-icon size="128" color="var(--text-tertiary)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+            </svg>
+          </n-icon>
         </template>
-        还没有导入任何Token
+        <span class="empty-title">还没有导入任何 Token</span>
+        <span class="empty-desc">点击下方按钮，快速添加您的第一个游戏 Token</span>
+        <n-button type="primary" size="large" @click="showImportForm = true" class="empty-btn">
+          <template #icon>
+            <n-icon>
+              <Add />
+            </n-icon>
+          </template>
+          添加 Token
+        </n-button>
       </a-empty>
     </div>
 
