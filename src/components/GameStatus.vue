@@ -34,6 +34,9 @@
 
         <!-- 招募助手（提取组件） -->
         <RecruitHelperCard v-show="activeSection === 'tools'" />
+        
+        <!-- 升星助手（提取组件） -->
+        <StarUpgradeCard v-show="activeSection === 'tools'" />
         <!-- 俱乐部排位（暂时隐藏） -->
         <div class="status-card legion-match" v-if="ENABLE_LEGION_MATCH && activeSection === 'club'">
             <div class="card-header">
@@ -108,6 +111,7 @@ import BottleHelperCard from "./cards/BottleHelperCard.vue";
 import BoxHelperCard from "./cards/BoxHelperCard.vue";
 import FishHelperCard from "./cards/FishHelperCard.vue";
 import RecruitHelperCard from "./cards/RecruitHelperCard.vue";
+import StarUpgradeCard from "./cards/StarUpgradeCard.vue";
 import HangUpStatusCard from "./cards/HangUpStatusCard.vue";
 import MonthlyTasksCard from "./cards/MonthlyTasksCard.vue";
 import StudyChallengeCard from "./cards/StudyChallengeCard.vue";

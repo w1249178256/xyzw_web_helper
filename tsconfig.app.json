@@ -4,6 +4,9 @@
     "types": ["unplugin-vue-router/client"],
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "allowJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,

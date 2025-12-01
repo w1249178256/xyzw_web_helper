@@ -186,6 +186,11 @@ export function registerDefaultCommands(reg) {
     .register("presetteam_saveteam", { teamId: 1 })
     .register("role_gettargetteam")
 
+    // 升星相关
+    .register("hero_heroupgradestar")
+    .register("book_upgrade")
+    .register("book_claimpointreward")
+
     // 排名相关
     .register("rank_getroleinfo")
 
@@ -205,13 +210,28 @@ export function registerDefaultCommands(reg) {
     if (params?.targetId === undefined || params?.targetId === null) {
       throw new Error("fight_startareaarena requires targetId in params")
     }
-    const payload = { ...params }
+    const payload = { battleVersion: 240475, ...params }
     const body = registry.encoder?.bon?.encode
       ? registry.encoder.bon.encode(payload)
       : payload
 
     return {
       cmd: "fight_startareaarena",
+      ack,
+      seq,
+      time: Date.now(),
+      body
+    }
+  })
+
+  registry.commands.set("fight_startpvp", (ack = 0, seq = 0, params = {}) => {
+    const payload = { battleVersion: 240475, ...params }
+    const body = registry.encoder?.bon?.encode
+      ? registry.encoder.bon.encode(payload)
+      : payload
+
+    return {
+      cmd: "fight_startpvp",
       ack,
       seq,
       time: Date.now(),
@@ -772,6 +792,10 @@ export class XyzwWebSocketClient {
       'system_getdatabundleverresp': 'system_getdatabundlever',
       'tower_claimrewardresp': 'tower_claimreward',
       'fight_starttowerresp': 'fight_starttower',
+      // 升星相关响应映射
+      'hero_heroupgradestarresp': 'hero_heroupgradestar',
+      'book_upgraderesp': 'book_upgrade',
+      'book_claimpointrewardresp': 'book_claimpointreward',
       // 军团信息
       'legion_getinforesp': 'legion_getinfo',
       'legion_getinforresp': 'legion_getinfo',

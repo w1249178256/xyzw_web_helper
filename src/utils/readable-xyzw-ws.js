@@ -323,6 +323,7 @@ const gameMessageTemplates = {
         return {
             ack: ack,
             body: client.bon.encode({
+                battleVersion: 240475,
                 ...params
             }),
             c: undefined,
