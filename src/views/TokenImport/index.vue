@@ -26,12 +26,12 @@
         <div class="card-header">
           <!-- 导入方式选择 -->
           <n-radio-group v-model:value="importMethod" class="import-method-tabs" size="small">
-            <n-radio-button value="manual">
+            <!-- <n-radio-button value="manual">
               手动输入
             </n-radio-button>
             <n-radio-button value="url">
               URL获取
-            </n-radio-button>
+            </n-radio-button> -->
             <n-radio-button value="bin">
               BIN获取
             </n-radio-button>
@@ -278,7 +278,7 @@ const importFormRef = ref(null)
 const urlFormRef = ref(null)
 const editFormRef = ref(null)
 const editingToken = ref(null)
-const importMethod = ref('manual')
+const importMethod = ref('bin')
 const refreshingTokens = ref(new Set())
 const connectingTokens = ref(new Set())
 

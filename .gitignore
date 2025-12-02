@@ -21,6 +21,7 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env.oss
 
 # IDE
 # 同步vscode工作空间的配置
