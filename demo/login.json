@@ -1,0 +1,37 @@
+{
+    "meta": {
+        "errCode": 0,
+        "errMsg": "success"
+    },
+    "data": {
+        "combUser": {
+            "encryptCombUser": "wd1XL1mWJJslCa/BG7fW2LOdlr/sRRedLUUznwWDhJo7wm3+3hosWAWJHEVC/WWEDWVw7zJESttmpi7WFEt73GMNST9IW+Q8onY33dUHfubIGQuQhlaZWiiBfjgjwzrVURug+nksmkCB54bMopflu6pe9ok3O7VhKeHwSeSzgm+/FnM09hHt/CQmGC+bADjWd1KsneNUHUJyr8qvVSpgOLiOUvuLfRdP/w6EuMebQE3OBGxJPPZhATw80vWksXPaiVPnVwes6ZH25MDhZoqme4Y4NxPFClBXp695BQle5eQ5O1/gCOCypEAizjL9NrqVQLKiD8IPR5kvZQCIR4R0fIlkgEJIIOow1SO2tGqL+/kpIJ1lHfi3wh19SSixnnqiuL00OuNmrpmdG/sZBIVqLmhhjW/fcgL2FDy+GTCFDedxsHRr0kV09sm6e83fRHz4/oHghiF8D6g9EK63Cpv1P3bjUjw4jbemI4JwSe+3wbxGLePdeMWme5Si2j8MbGaB46BOYuiHVQHbUmQX0HuIqO70bj6K3glbSBfQh6bVJxoj5PonrzStWBa7CH4kkaJq2d5uuBomPrtoNLHsjYPFUJJt0VJKT1gjjmKp8IaNKUt+OXjOZadqo946b8HZeOjuUgpYadHlDvSt228viv+pSOMykOiJBdQ68OscD5VHgMH9sjWT8je7LReJTwPVn419WciZlDPPQlII89v4/JiVOxhmJWQB38sYEQ8X1bt/aKRRpWEkQfoEai6RIOleJwrR5ytAZGfrkGmYTyFz19EAU6I/HRbSbytyKGnMTVg5FgGh5byWNmIwbooo3BEUBoBC7RVhKlGGfiV/WNPlAynoyLp4RYZPU19zFT0GzlOMFSgGOCXX2OOqQUyBNFPjHw5okKYU6yhcUl4vPj+ss67YZTpwrCn/g1Toi8mZSekrfW4=",
+            "timestamp": 1764830612,
+            "sign": "4161a09c1a8fd31033daa869461880f2"
+        },
+        "combSdkInfo": {
+            "isAuth": false,
+            "hasUserInfo": true,
+            "userId": "oIRDe5YPatQ1QaszShcMaaSY5wps",
+            "uniqueId": "0878a5ab3af1522c75e1dd4c0176c2a7",
+            "channel": "hortor",
+            "origChannel": "c98541",
+            "h_shareCode": "5295cf64755e3b49e51d37ab614d0938",
+            "sex": 0,
+            "name": "無畏",
+            "isNewUser": false,
+            "createdAt": 1660491665,
+            "alias": "xyzwprod_entry"
+        },
+        "envCombSdkInfo": {
+            "isNewUser": false,
+            "isRealName": true,
+            "birthday": "19960810",
+            "channel": "android",
+            "h_shareCode": "a0f4fe46d38c5552946b0c4a18064ad8",
+            "loginTp": "app-we",
+            "alias": "xyzw_wx",
+            "uniqueId": "53d4b8c1b2a61b0c80e3a612caee3837"
+        }
+    }
+}

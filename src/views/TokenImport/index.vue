@@ -32,6 +32,9 @@
             <n-radio-button value="url">
               URL获取
             </n-radio-button> -->
+            <n-radio-button value="wxQrcode">
+              微信扫码获取
+            </n-radio-button>
             <n-radio-button value="bin">
               BIN获取
             </n-radio-button>
@@ -42,6 +45,8 @@
             v-if="importMethod === 'manual'" />
           <url-token-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
             v-if="importMethod === 'url'" />
+          <wx-qrcode-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
+            v-if="importMethod === 'wxQrcode'" />
           <bin-token-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
             v-if="importMethod === 'bin'" />
         </div>
@@ -236,6 +241,7 @@
 import ManualTokenForm from './manual.vue'
 import UrlTokenForm from './url.vue'
 import BinTokenForm from './bin.vue'
+import WxQrcodeForm from './wxqrcode.vue'
 
 import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
 import {
