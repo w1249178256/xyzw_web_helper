@@ -6,7 +6,7 @@
       <ol class="flow-steps">
         <li>点击下方按钮获取微信登录二维码</li>
         <li>使用微信扫码并确认登录</li>
-        <li>系统将自动获取并保存Token信息</li>
+        <li>系统将获取<strong color="red">最近一次登录</strong>的角色Token信息</li>
       </ol>
     </div>
 
@@ -383,18 +383,8 @@ const getEncryptedData = async (code) => {
     },
     { decrypt: dm.lz4XorDecode, encrypt: dm.lz4XorEncode }
   );
-  console.log('encryptedBuffer:', encryptedBuffer)
-  try {
-    console.log("decMsg:",dm.decMsg(encryptedBuffer, { decrypt: dm.lz4XorDecode, encrypt: dm.lz4XorEncode }))
-  } catch (err) {
-    console.error('解密失败:', err)
-  }
 
-  const hex = [...new Uint8Array(encryptedBuffer)]
-    .map(n => n.toString(16).padStart(2, "0"))
-    .join("");
-  console.log('hex:', hex)
-  return hex;
+  return new Uint8Array(encryptedBuffer);
 
 }
 
@@ -496,18 +486,21 @@ const dealWithString = (src, key, shift) => {
 /**
  * 保存账号
  */
-const saveAccount = async (hex, nickname = '') => {
+const saveAccount = async (arrBuf, nickname = '') => {
   let name = accountName.value?.trim()
-
-  // 如果没有输入账号名称，使用nickname作为默认值
-  if (!name) {
-    name = nickname || '微信账号_' + new Date().getTime()
-  }
+ 
   console.log('name:', name)
 
-  const bin = convertBin(hex)
+  const bin = new Uint8Array(arrBuf)
   console.log('bin:', bin)
   const roleToken = await transformToken(bin.buffer);
+  const roleTokenJson = JSON.parse(roleToken)
+  console.log('roleTokenJson.roleId:', roleTokenJson.roleId)
+   // 如果没有输入账号名称，使用nickname作为默认值
+   if (!name) {
+    name = nickname || '微信账号_' + new Date().getTime()
+    name += "-" + roleTokenJson.roleId;
+  }
   const roleName = name
   const role = {
     name: roleName,
