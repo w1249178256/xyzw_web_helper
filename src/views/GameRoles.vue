@@ -391,9 +391,10 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .game-roles-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-secondary);
   padding: var(--spacing-xl) 0;
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
 }
 
 .container {
@@ -430,7 +431,7 @@ onMounted(async () => {
 
 .roles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
 }
 

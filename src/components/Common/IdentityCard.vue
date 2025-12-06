@@ -28,11 +28,16 @@
         </div>
       </div>
 
-      <div class="resources" v-if="hasRole">
+      <div class="resources" :class="{ collapsed: !isExpanded }" v-if="hasRole">
         <div v-for="res in resList" :key="res.label" class="res-item">
           <span class="label">{{ res.label }}</span>
           <span class="value">{{ res.value }}</span>
         </div>
+      </div>
+      <div v-if="hasRole && showExpand" class="resources-toggle">
+        <n-button text @click="isExpanded = !isExpanded">
+          {{ isExpanded ? '收起' : '展开全部' }}
+        </n-button>
       </div>
       <div v-else class="loading">正在获取角色信息...</div>
     </div>
@@ -85,6 +90,7 @@ const tokenStore = useTokenStore();
 
 const props = defineProps<{ visible?: boolean; embedded?: boolean }>();
 const emit = defineEmits(["close"]);
+const isExpanded = ref(false)
 
 const wsStatus = computed(() => {
   if (!tokenStore.selectedToken) return "disconnected";
@@ -195,7 +201,7 @@ const recruitFromItems = computed(() => getItemCount(items.value, 1001));
 const ironFromItems = computed(() => getItemCount(items.value, 1006));
 const jadeFromItems = computed(() => getItemCount(items.value, 1023));
 const advanceStoneFromItems = computed(() => getItemCount(items.value, 1003));
-//10002蓝玉 10003红玉 10101四圣碎片 
+//10002蓝玉 10003红玉 10101四圣碎片
 const blueJadeFromItems = computed(() => getItemCount(items.value, 10002));
 const redJadeFromItems = computed(() => getItemCount(items.value, 10003));
 const fourSaintFragmentFromItems = computed(() => getItemCount(items.value, 10101));
@@ -226,6 +232,8 @@ const resList = computed(() => [
   { label: "红玉", value: display(redJadeFromItems.value as any) },
   { label: "四圣碎片", value: display(fourSaintFragmentFromItems.value as any) }
 ]);
+
+const showExpand = computed(() => resList.value.length > 6);
 
 const initializeAvatar = () => {
   if (roleInfo.value && (roleInfo.value as any).headImg) {
@@ -293,7 +301,6 @@ watch(() => roleInfo.value, initializeAvatar, { deep: true });
 .identity-card {
   position: fixed;
   top: 0;
-  right: 16px;
   width: 360px;
   background: var(--bg-primary);
   border-radius: var(--border-radius-xl);
@@ -436,6 +443,24 @@ watch(() => roleInfo.value, initializeAvatar, { deep: true });
   font-weight: var(--font-weight-semibold);
 }
 
+@media (max-width: 768px) {
+  .card-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .role-profile-content {
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .rank-section {
+    margin-left: 0;
+    justify-content: center;
+  }
+}
+
 .glow-border {
   position: absolute;
   inset: 0;
@@ -504,6 +529,12 @@ watch(() => roleInfo.value, initializeAvatar, { deep: true });
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
   margin-top: 10px;
+  --res-item-height: 44px;
+}
+
+.resources.collapsed {
+  max-height: calc((var(--res-item-height) + 8px) * 2 + 8px);
+  overflow: hidden;
 }
 
 .res-item {
@@ -511,9 +542,17 @@ watch(() => roleInfo.value, initializeAvatar, { deep: true });
   border: 1px solid var(--border-light);
   border-radius: 10px;
   padding: 8px 10px;
+  min-height: var(--res-item-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.resources-toggle {
+  margin-top: var(--spacing-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .res-item .label {

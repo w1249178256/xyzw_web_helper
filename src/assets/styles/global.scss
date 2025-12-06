@@ -312,3 +312,31 @@ img {
     font-size: var(--font-size-xl);
   }
 }
+
+// Arco Modal 移动端适配
+@media (max-width: 768px) {
+  .arco-modal {
+    width: auto !important;
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+  }
+
+  .arco-modal-content {
+    padding: var(--spacing-sm) !important;
+    border-radius: var(--border-radius-medium) !important;
+  }
+
+  .arco-modal-header {
+    padding: var(--spacing-sm) var(--spacing-sm) !important;
+  }
+
+  .arco-modal-title {
+    font-size: var(--font-size-lg) !important;
+    line-height: 1.4 !important;
+  }
+
+  .arco-modal-body {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+}

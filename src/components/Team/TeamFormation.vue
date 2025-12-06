@@ -489,15 +489,56 @@ watch(
     color: var(--text-secondary);
 }
 .hero-name {
-    font-size: 12px;
-    color: var(--text-secondary);
-    text-align: center;
-    min-width: 90px;
-    max-width: 140px;
-    white-space: nowrap;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  min-width: 90px;
+  max-width: 140px;
+  white-space: nowrap;
 }
 .empty-team {
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+
+  .team-selector {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .heroes-container {
+    padding: var(--spacing-sm);
+  }
+
+  .heroes-inline {
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    justify-content: center;
+  }
+
+  .hero-item {
+    min-width: 45px;
+  }
+
+  .hero-circle {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hero-name {
+    font-size: 10px;
+    min-width: 0;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 </style>

@@ -1058,6 +1058,10 @@ onMounted(async () => {
 .header-actions {
   display: flex;
   gap: var(--spacing-md);
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
 }
 
 .tokens-grid {

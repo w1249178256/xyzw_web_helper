@@ -100,3 +100,29 @@
   --border-medium: #6b7280;
   --border-dark: #9ca3af;
 }
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-md: 15px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 22px;
+    --font-size-3xl: 28px;
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --font-size-md: 14px;
+    --spacing-md: 10px;
+  }
+}

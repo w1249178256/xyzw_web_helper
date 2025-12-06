@@ -747,7 +747,7 @@ watch(() => gameRolesStore.selectedRole, (newRole) => {
 
 .tasks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
 }
 
@@ -760,9 +760,9 @@ watch(() => gameRolesStore.selectedRole, (newRole) => {
 }
 
 // 响应式设计
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .tasks-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 

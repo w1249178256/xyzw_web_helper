@@ -13,6 +13,14 @@
             <span class="brand-text">XYZW 游戏管理系统</span>
           </div>
 
+          <div class="mobile-menu-button">
+            <n-button text @click="isMobileMenuOpen = true">
+              <n-icon>
+                <Menu />
+              </n-icon>
+            </n-button>
+          </div>
+
           <div class="nav-actions">
             <template v-if="!authStore.isAuthenticated">
               <n-button
@@ -44,6 +52,35 @@
         </div>
       </div>
     </nav>
+
+    <n-drawer v-model:show="isMobileMenuOpen" placement="left" style="width: 260px">
+      <div class="drawer-menu">
+        <router-link to="/" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon><Ribbon /></n-icon>
+          <span>首页</span>
+        </router-link>
+        <router-link to="/admin/dashboard" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon><Settings /></n-icon>
+          <span>控制台</span>
+        </router-link>
+        <router-link to="/admin/game-features" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon><Cube /></n-icon>
+          <span>游戏功能</span>
+        </router-link>
+        <router-link to="/tokens" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon><PersonCircle /></n-icon>
+          <span>Token管理</span>
+        </router-link>
+        <router-link to="/changelog" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon><Ribbon /></n-icon>
+          <span>更新日志</span>
+        </router-link>
+        <div class="drawer-actions">
+          <n-button type="primary" block @click="router.push('/login'); isMobileMenuOpen = false">登录</n-button>
+          <n-button type="primary" block @click="router.push('/register'); isMobileMenuOpen = false">注册</n-button>
+        </div>
+      </div>
+    </n-drawer>
 
     <!-- 主要内容 -->
     <main class="main-content">
@@ -209,12 +246,14 @@ import {
   PersonCircle,
   Cube,
   Ribbon,
-  Settings
+  Settings,
+  Menu
 } from '@vicons/ionicons5'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const featuresSection = ref(null)
+const isMobileMenuOpen = ref(false)
 
 // 功能卡片数据
 const featureCards = ref([
@@ -291,10 +330,40 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .home-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow-x: hidden;
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+}
+
+.drawer-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.drawer-item.router-link-active {
+  background: var(--primary-color-light);
+  color: var(--primary-color);
+}
+
+.drawer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
 // 导航栏
@@ -313,6 +382,10 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.mobile-menu-button {
+  display: none;
 }
 
 .nav-brand {
@@ -393,7 +466,7 @@ onMounted(() => {
 // 功能卡片
 .feature-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-md);
 }
 
@@ -516,7 +589,7 @@ onMounted(() => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-xl);
 }
 
@@ -591,6 +664,15 @@ onMounted(() => {
   .hero-content {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex;
+    margin-left: auto;
+  }
+
+  .nav-actions {
+    display: none;
   }
 
   .hero-title {
