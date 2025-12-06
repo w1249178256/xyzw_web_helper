@@ -5,6 +5,7 @@
       <div class="inline-header">
         <div class="inline-title">俱乐部盐场战绩</div>
         <div class="header-actions">
+          <a-date-picker v-model:value="queryDate" @change="fetchBattleRecordsByDate" valueFormat="YYYY/MM/DD" :disabled-date="disabledDate"/>
           <n-button size="small" :disabled="loading" @click="handleRefresh">
             <template #icon>
               <n-icon>
@@ -33,7 +34,7 @@
         </div>
 
         <!-- 战绩列表 -->
-        <div v-else-if="battleRecords && battleRecords.roleDetailsList" class="records-list">
+        <div v-else-if="battleRecords && battleRecords.roleDetailsList" ref="exportDom" class="records-list">
           <div class="records-info">
             <n-tag type="info">查询日期: {{ queryDate }}</n-tag>
             <n-tag type="success">总成员: {{ battleRecords.roleDetailsList.length }}</n-tag>
@@ -51,6 +52,7 @@
                 <span class="stat-inline win">击杀 {{ member.winCnt || 0 }}</span>
                 <span class="stat-inline loss">死亡 {{ member.loseCnt || 0 }}</span>
                 <span class="stat-inline siege">攻城 {{ member.buildingCnt || 0 }}</span>
+                <span class="stat-inline KD">K/D {{ parseFloat((member.winCnt/member.loseCnt)||0).toFixed(2)  }}</span>
               </div>
               <n-button text size="small" class="details-button" @click="toggleMemberDetails(member.roleId)">
                 <template #icon>
@@ -115,6 +117,7 @@
       @after-leave="handleClose">
       <template #header-extra>
         <div class="header-actions">
+          <a-date-picker v-model:value="queryDate" @change="fetchBattleRecordsByDate" valueFormat="YYYY/MM/DD" :disabled-date="disabledDate"/>
           <n-button size="small" :disabled="loading" @click="handleRefresh">
             <template #icon>
               <n-icon>
@@ -143,7 +146,7 @@
         </div>
 
         <!-- 战绩列表 -->
-        <div v-else-if="battleRecords && battleRecords.roleDetailsList" class="records-list">
+        <div v-else-if="battleRecords && battleRecords.roleDetailsList" ref="exportDom" class="records-list">
           <div class="records-info">
             <n-tag type="info">查询日期: {{ queryDate }}</n-tag>
             <n-tag type="success">总成员: {{ battleRecords.roleDetailsList.length }}</n-tag>
@@ -161,6 +164,7 @@
                 <span class="stat-inline win">击杀 {{ member.winCnt || 0 }}</span>
                 <span class="stat-inline loss">死亡 {{ member.loseCnt || 0 }}</span>
                 <span class="stat-inline siege">攻城 {{ member.buildingCnt || 0 }}</span>
+                <span class="stat-inline KD">K/D {{ parseFloat((member.winCnt/member.loseCnt)||0).toFixed(2)  }}</span>
               </div>
               <n-button text size="small" class="details-button" @click="toggleMemberDetails(member.roleId)">
                 <template #icon>
@@ -226,6 +230,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useTokenStore } from '@/stores/tokenStore'
+import html2canvas from 'html2canvas';
 import {
   Trophy,
   Refresh,
@@ -254,6 +259,8 @@ const props = defineProps({
   }
 })
 
+
+const exportDom = ref(null);
 const emit = defineEmits(['update:visible'])
 
 const message = useMessage()
@@ -316,6 +323,20 @@ const handleImageError = (event) => {
   event.target.style.display = 'none'
 }
 
+const disabledDate = (current)=>{
+  return current.getDay()!=6 || current>Date.now();
+}
+
+//日期选择时调用查询战绩方法
+const fetchBattleRecordsByDate = (val)=>{
+  if(undefined != val){
+    queryDate.value = val
+  }else{
+    queryDate.value = getLastSaturday();
+  }
+  fetchBattleRecords();
+} 
+
 // 查询战绩
 const fetchBattleRecords = async () => {
   if (!tokenStore.selectedToken) {
@@ -333,7 +354,6 @@ const fetchBattleRecords = async () => {
   }
 
   loading.value = true
-  queryDate.value = getLastSaturday()
 
   try {
     const result = await tokenStore.sendMessageWithPromise(
@@ -377,12 +397,46 @@ const handleExport = async () => {
       queryDate.value
     )
     await copyToClipboard(exportText)
+    exportToImage()
     message.success('战绩已复制到剪贴板')
   } catch (error) {
     console.error('导出失败:', error)
     message.error('导出失败，请重试')
   }
 }
+
+const exportToImage = async () => {
+  // 校验：确保DOM已正确绑定
+  if (!exportDom.value) {
+    alert('未找到要导出的DOM元素');
+    return;
+  }
+
+  try {
+    // 5. 用html2canvas渲染DOM为Canvas
+    const canvas = await html2canvas(exportDom.value, {
+      scale: 2, // 放大2倍，解决图片模糊问题
+      useCORS: true, // 允许跨域图片（若DOM内有远程图片，需开启）
+      backgroundColor: '#ffffff', // 避免透明背景（默认透明）
+      logging: false // 关闭控制台日志
+    });
+
+    // 6. Canvas转图片链接（支持PNG/JPG）
+    const imgUrl = canvas.toDataURL('image/png'); // 若要JPG，改为'image/jpeg'
+
+    // 7. 创建下载链接，触发浏览器下载
+    const link = document.createElement('a');
+    link.href = imgUrl;
+    console.log()
+    link.download = queryDate.value.replace("/",'月').replace("/",'日')+'盐场战报.png'; // 下载文件名
+    document.body.appendChild(link);
+    link.click(); // 触发点击下载
+    document.body.removeChild(link); // 下载后清理DOM
+  } catch (err) {
+    console.error('DOM转图片失败：', err);
+    alert('导出图片失败，请重试');
+  }
+};
 
 // 关闭弹窗
 const handleClose = () => {
@@ -397,6 +451,7 @@ defineExpose({
 // Inline 模式：挂载后自动拉取
 onMounted(() => {
   if (props.inline) {
+    queryDate.value = getLastSaturday()
     fetchBattleRecords()
   }
 })
@@ -444,6 +499,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .records-info {
@@ -550,6 +607,11 @@ onMounted(() => {
   &.siege {
     background: rgba(245, 158, 11, 0.1);
     color: #d97706;
+  }
+  
+  &.KD {
+    background: rgba(151, 151, 151, 0.1);
+    color: #858585;
   }
 }
 

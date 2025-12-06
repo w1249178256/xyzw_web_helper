@@ -20,6 +20,7 @@
     "@vueuse/core": "^13.9.0",
     "axios": "^1.12.2",
     "event-emitter3": "^1.0.4",
+    "html2canvas": "^1.4.1",
     "idb": "^8.0.3",
     "lz4js": "^0.2.0",
     "moment": "^2.30.1",

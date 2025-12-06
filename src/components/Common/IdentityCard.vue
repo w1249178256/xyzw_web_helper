@@ -187,7 +187,7 @@ const items = computed(() => {
   return (roleInfo.value as any).items;
 });
 
-// 参考表：1011 普通鱼竿，1012 金鱼竿；补充：1013 珍珠、1001 招募令、1006 精铁、1023 彩玉、1003 进阶石
+// 参考表：1011 普通鱼竿，1012 金鱼竿；补充：1013 珍珠、1001 招募令、1006 精铁、1023 彩玉、1003 进阶石、1017复活丹
 const normalRodFromItems = computed(() => getItemCount(items.value, 1011));
 const goldRodFromItems = computed(() => getItemCount(items.value, 1012));
 const pearlFromItems = computed(() => getItemCount(items.value, 1013));
@@ -195,6 +195,7 @@ const recruitFromItems = computed(() => getItemCount(items.value, 1001));
 const ironFromItems = computed(() => getItemCount(items.value, 1006));
 const jadeFromItems = computed(() => getItemCount(items.value, 1023));
 const advanceStoneFromItems = computed(() => getItemCount(items.value, 1003));
+const DanFromItems = computed(() => getItemCount(items.value, 1017));
 //10002蓝玉 10003红玉 10101四圣碎片 
 const blueJadeFromItems = computed(() => getItemCount(items.value, 10002));
 const redJadeFromItems = computed(() => getItemCount(items.value, 10003));
@@ -218,6 +219,7 @@ const resList = computed(() => [
   { label: "普通鱼竿", value: display(normalRod.value as any) },
   { label: "金鱼竿", value: display(goldRod.value as any) },
   { label: "珍珠", value: display(pearlFromItems.value as any) },
+  { label: "复活丹", value: display(DanFromItems.value as any) },
   { label: "招募令", value: display(recruitFromItems.value as any) },
   { label: "精铁", value: display(ironFromItems.value as any) },
   { label: "彩玉", value: display(jadeFromItems.value as any) },

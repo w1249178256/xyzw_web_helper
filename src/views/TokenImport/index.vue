@@ -180,6 +180,7 @@
           <i class="mdi:bed-empty"></i>
         </template>
         还没有导入任何Token
+        <a-button type="link" @click="openshowImportForm">打开Tokeng管理</a-button>
       </a-empty>
     </div>
 
@@ -290,6 +291,13 @@ const bulkOptions = [
   { label: '断开所有连接', key: 'disconnect' },
   { label: '清除所有Token', key: 'clear' }
 ]
+
+/**
+ * 手动打开Token管理卡片
+ */
+const openshowImportForm = ()=>{
+  showImportForm.value = true
+}
 
 // 刷新Token
 const refreshToken = async (token) => {
