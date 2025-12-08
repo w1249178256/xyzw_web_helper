@@ -198,12 +198,13 @@ const handleRegister = async () => {
 
 <style scoped lang="scss">
 .register-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
 }
 
 /* 深色主题下背景 */

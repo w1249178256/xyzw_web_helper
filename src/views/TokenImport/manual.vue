@@ -7,7 +7,20 @@
     </n-form-item>
 
     <n-form-item :label="'Token字符串'" :path="'base64Token'" :show-label="true">
-      <n-input v-model:value="importForm.base64Token" type="textarea" :rows="3" placeholder="粘贴Token字符串..." clearable />
+      <n-input v-model:value="importForm.base64Token" type="textarea" :rows="3" placeholder="粘贴Token字符串..." clearable>
+        <template #suffix>
+          <n-popover :overlap="overlap" placement="right" trigger="hover">
+            <template #trigger>
+              <n-icon :depth="1">
+                 <AlertCircleOutline/>
+              </n-icon>
+            </template>
+            <div class="large-text">
+              输入格式为：{"roleToken":"****","sessId":***,"connId":***,"isRestore":***}
+            </div>
+          </n-popover>
+        </template>
+      </n-input>
     </n-form-item>
 
     <!-- 角色详情 -->
@@ -15,7 +28,7 @@
       <n-collapse-item title="角色详情 (可选)" name="optional">
         <div class="optional-fields">
           <n-form-item label="服务器">
-            <n-input v-model:value="importForm.server" placeholder="服务器名称" />
+              <n-input v-model:value="importForm.server" placeholder="服务器名称" />
           </n-form-item>
 
           <n-form-item label="自定义连接地址">
@@ -44,7 +57,7 @@
 </template>
 <script lang="ts" setup>
 import { useTokenStore } from '@/stores/tokenStore';
-import { CloudUpload } from '@vicons/ionicons5';
+import { CloudUpload,AlertCircleOutline } from '@vicons/ionicons5';
 import { NButton, NCollapse, NCollapseItem, NForm, NFormItem, NIcon, NInput, useMessage } from 'naive-ui';
 import { reactive, ref } from 'vue';
 

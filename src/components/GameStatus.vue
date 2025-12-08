@@ -452,7 +452,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 .game-status-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
 
@@ -465,13 +465,18 @@ onUnmounted(() => {
 
   // 在中等屏幕上确保有足够空间
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 
   // 在较小屏幕上使用单列布局
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--spacing-md);
   }
 }
 

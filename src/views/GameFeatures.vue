@@ -295,7 +295,7 @@ watch(
 // 初始化游戏数据
 const initializeGameData = async () => {
   if (!tokenStore.selectedToken) return
-  
+
   try {
     const tokenId = tokenStore.selectedToken.id
     // 获取初始化数据（静默）
@@ -314,8 +314,9 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .game-features-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
 }
 
 /* 深色主题下背景 */
@@ -334,6 +335,16 @@ onUnmounted(() => {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+
+  .page-header {
+    display: none;
+  }
 }
 
 .header-content {
@@ -394,7 +405,7 @@ onUnmounted(() => {
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
 }
 
@@ -592,7 +603,7 @@ onUnmounted(() => {
 // 响应式设计
 @media (max-width: 1024px) {
   .features-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 

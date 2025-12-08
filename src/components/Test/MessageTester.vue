@@ -20,6 +20,29 @@
             🔓 测试BON解码
           </n-button>
         </div>
+        
+        <!-- 预设消息测试 -->
+        <n-divider title-placement="left">
+          bin文件消息测试
+          <n-popover  placement="right" trigger="hover">
+            <template #trigger>
+              <n-icon :depth="1">
+                 <AlertCircleOutline/>
+              </n-icon>
+            </template>
+            <div class="large-text">
+              用于方便抓包后分析bin文件
+            </div>
+          </n-popover>
+        </n-divider>
+        <div class="grid grid-cols-2 gap-2">
+          <input 
+            type="file"
+            id="binFileInput"
+            accept=".bin"
+            @change="handleChange"
+          />
+        </div>
 
         <!-- 预设消息测试 -->
         <n-divider title-placement="left">
@@ -248,6 +271,7 @@
 import { ref, computed, watch } from 'vue'
 import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
+import { AlertCircleOutline } from '@vicons/ionicons5';
 
 const tokenStore = useTokenStore()
 const message = useMessage()
@@ -256,6 +280,7 @@ const message = useMessage()
 const customCmd = ref('')
 const customBody = ref('{}')
 const messageHistory = ref([])
+const fileList = ref(0);
 const lastProcessedMessage = ref(null) // 追踪最后处理的消息
 
 const extractPacketMeta = (data) => {
@@ -330,6 +355,35 @@ const connectWebSocket = () => {
   } else {
     message.error('找不到选中的token')
   }
+}
+
+const handleChange = async (e)=>{
+  // 导入BON协议
+  const { g_utils } = await import('../../utils/bonProtocol.js')
+  const file = e.target.files[0]; // 获取选中的文件
+  if (!file) return; // 未选择文件则退出
+
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  reader.onload = (e) => {
+    const arrayBuffer = event.target.result; // 得到ArrayBuffer
+    // 转换为Uint8Array（便于按字节查看/处理，每个元素是0-255的字节值）
+    const uint8Array = new Uint8Array(arrayBuffer);
+    const decode = g_utils.bon.decode(uint8Array);
+    const respont = g_utils.parse(uint8Array)
+    const result = g_utils.bon.decode(respont.body);
+    // console.log(respont,result)
+    // 添加测试结果到历史
+    addToHistory(respont.cmd, {
+        testType: 'BIN文件解码',
+        input: Array.from(result),
+        output: result,
+        status: 'success'
+      }, respont.cmd)
+  };
+  reader.onerror = () => {
+    message.error('读取文件失败，请重试');
+  };
 }
 
 const testBONDecoding = async () => {

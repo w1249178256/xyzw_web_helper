@@ -192,16 +192,8 @@
             </svg>
           </n-icon>
         </template>
-        <span class="empty-title">还没有导入任何 Token</span>
-        <span class="empty-desc">点击下方按钮，快速添加您的第一个游戏 Token</span>
-        <n-button type="primary" size="large" @click="showImportForm = true" class="empty-btn">
-          <template #icon>
-            <n-icon>
-              <Add />
-            </n-icon>
-          </template>
-          添加 Token
-        </n-button>
+        还没有导入任何Token
+        <a-button type="link" @click="openshowImportForm">打开Tokeng管理</a-button>
       </a-empty>
     </div>
 
@@ -313,6 +305,13 @@ const bulkOptions = [
   { label: '断开所有连接', key: 'disconnect' },
   { label: '清除所有Token', key: 'clear' }
 ]
+
+/**
+ * 手动打开Token管理卡片
+ */
+const openshowImportForm = ()=>{
+  showImportForm.value = true
+}
 
 // 刷新Token
 const refreshToken = async (token) => {
@@ -1081,6 +1080,10 @@ onMounted(async () => {
 .header-actions {
   display: flex;
   gap: var(--spacing-md);
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
 }
 
 .tokens-grid {

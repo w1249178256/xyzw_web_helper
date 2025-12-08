@@ -296,9 +296,10 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .profile-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg-secondary);
   padding: var(--spacing-xl) 0;
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
 }
 
 .container {

@@ -230,13 +230,14 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .login-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
 }
 
 /* 深色主题下背景 */
