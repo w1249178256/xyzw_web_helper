@@ -138,6 +138,14 @@ export function registerDefaultCommands(reg) {
     .register("legion_signin")
     .register("legion_getwarrank")
     .register("legionwar_getdetails")
+	
+	//盐场
+	.register("legion_getinfobyid")
+    .register("legion_getarearank")
+	.register("saltroad_getsaltroadwartotalrank")
+    .register("legionwar_getgoldmonthwarrank")
+    .register("legion_getopponent")
+    .register("legion_getbattlefield")
 
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
@@ -197,8 +205,14 @@ export function registerDefaultCommands(reg) {
 
     // 梦魇相关
     .register("nightmare_getroleinfo")
+	.register("dungeon_selecthero")
+    .register("bosstower_gethelprank")
     // 活动/任务
     .register("activity_get")
+	
+	// 珍宝阁相关
+    .register("collection_claimfreereward")
+    .register("collection_goodslist")
 
     // 车辆相关
     .register("car_getrolecar")
@@ -773,6 +787,11 @@ export class XyzwWebSocketClient {
     // 命令到响应的映射 - 处理响应命令与原始命令不匹配的情况
     const responseToCommandMap = {
       // 1:1 响应映射（优先级高）
+	  'collection_goodslistresp': 'collection_goodslist',
+	  'collection_claimfreerewardresp': 'collection_claimfreereward',
+	  'bosstower_gethelprankresp': 'bosstower_gethelprank',
+	  'legion_getarearankresp': 'legion_getarearank',
+	  'legionwar_getgoldmonthwarrankresp': 'legionwar_getgoldmonthwarrank',
       'studyresp': 'study_startgame',
       'role_getroleinforesp': 'role_getroleinfo',
       'hero_recruitresp': 'hero_recruit',
@@ -816,7 +835,7 @@ export class XyzwWebSocketClient {
       // 同步响应映射（优先级低）
       'syncresp': ['system_mysharecallback', 'task_claimdailypoint'],
       'syncrewardresp': ['system_buygold', 'discount_claimreward', 'card_claimreward',
-        'artifact_lottery', 'genie_sweep', 'genie_buysweep', 'system_signinreward']
+        'artifact_lottery', 'genie_sweep', 'genie_buysweep', 'system_signinreward','dungeon_selecthero']
     }
 
     // 获取原始命令名（支持一对一和一对多映射）
