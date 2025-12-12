@@ -9,6 +9,7 @@
       <n-tab-pane name="club" tab="俱乐部" />
       <n-tab-pane name="activity" tab="活动" />
       <n-tab-pane v-if="ENABLE_TOOLS_TAB" name="tools" tab="工具" />
+	  <n-tab-pane name="warrank" tab="盐场" />
     </n-tabs>
 
     <!-- 阵容（仅日常） -->
@@ -99,6 +100,8 @@
 
     <!-- 咸鱼大冲关（提取组件） -->
     <StudyChallengeCard v-show="activeSection === 'activity'" />
+	
+	<ClubWarrank v-if="activeSection === 'warrank'" />
   </div>
 </template>
 
@@ -115,6 +118,7 @@ import StarUpgradeCard from "./cards/StarUpgradeCard.vue";
 import HangUpStatusCard from "./cards/HangUpStatusCard.vue";
 import MonthlyTasksCard from "./cards/MonthlyTasksCard.vue";
 import StudyChallengeCard from "./cards/StudyChallengeCard.vue";
+import ClubWarrank from './Club/ClubWarrank.vue';
 
 const tokenStore = useTokenStore();
 const message = useMessage();
