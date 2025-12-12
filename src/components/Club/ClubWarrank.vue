@@ -142,7 +142,8 @@ const handleImageError = (event) => {
   event.target.style.display = 'none'
 }
 
-const disabledDate = current => {
+
+const disabledDate = current => {
     return (current.getDay() != 6 && current.getDay() != 0) || current > Date.now()
 }
 
@@ -333,7 +334,8 @@ const handleExport1 = async () => {
   }
 }
 
-const exportToImage = async () => {
+
+const exportToImage = async () => {
     // 校验：确保DOM已正确绑定
     if (!exportDom.value) {
         alert("未找到要导出的DOM元素")
