@@ -205,10 +205,10 @@ export class GameCommands {
     if (params?.targetId === undefined || params?.targetId === null) {
       throw new Error("fight_startareaarena requires targetId in params")
     }
+    // battleVersion 应该由调用方通过 params 传入
     return {
       ack,
       body: this.g_utils.bon.encode({
-        battleVersion: 240475,
         ...params
       }),
       cmd: "fight_startareaarena",
@@ -666,21 +666,21 @@ export class GameCommands {
 
 // 三国答题题库（基于mirror代码中的题目）
 export const studyQuestions = [
-  {name: "", value: 2},
-  {name: "《三国演义》中，「大意失街亭」的是马谩？", value: 1},
-  {name: "《三国演义》中，「挥泪斩马谩」的是孙权？", value: 2},
-  {name: "《三国演义》中，「火烧博望坡」的是庞统？", value: 2},
-  {name: "《三国演义》中，「火烧藤甲兵」的是徐庶？", value: 2},
-  {name: "《三国演义》中，「千里走单骑」的是赵云？", value: 2},
-  {name: "《三国演义》中，「温酒斩华雄」的是张飞？", value: 2},
-  {name: "《三国演义》中，关羽在长坂坡「七进七出」？", value: 2},
-  {name: "《三国演义》中，刘备三顾茅庐请诸葛亮出山？", value: 1},
-  {name: "《三国演义》中，孙权与曹操「煮酒论英雄」？", value: 2},
-  {name: "《三国演义》中，提出「隆中对」的是诸葛亮？", value: 1},
-  {name: "《三国演义》中，夏侯杰在当阳桥被张飞吓死？", value: 1},
-  {name: "《三国演义》中，张飞在当阳桥厉吼吓退曹军？", value: 1},
-  {name: "《三国演义》中，赵云参与了「三英战吕布」？", value: 2},
-  {name: "《三国演义》中，赵云参与了「桃园三结义」？", value: 2}
+  { name: "", value: 2 },
+  { name: "《三国演义》中，「大意失街亭」的是马谩？", value: 1 },
+  { name: "《三国演义》中，「挥泪斩马谩」的是孙权？", value: 2 },
+  { name: "《三国演义》中，「火烧博望坡」的是庞统？", value: 2 },
+  { name: "《三国演义》中，「火烧藤甲兵」的是徐庶？", value: 2 },
+  { name: "《三国演义》中，「千里走单骑」的是赵云？", value: 2 },
+  { name: "《三国演义》中，「温酒斩华雄」的是张飞？", value: 2 },
+  { name: "《三国演义》中，关羽在长坂坡「七进七出」？", value: 2 },
+  { name: "《三国演义》中，刘备三顾茅庐请诸葛亮出山？", value: 1 },
+  { name: "《三国演义》中，孙权与曹操「煮酒论英雄」？", value: 2 },
+  { name: "《三国演义》中，提出「隆中对」的是诸葛亮？", value: 1 },
+  { name: "《三国演义》中，夏侯杰在当阳桥被张飞吓死？", value: 1 },
+  { name: "《三国演义》中，张飞在当阳桥厉吼吓退曹军？", value: 1 },
+  { name: "《三国演义》中，赵云参与了「三英战吕布」？", value: 2 },
+  { name: "《三国演义》中，赵云参与了「桃园三结义」？", value: 2 }
   // 更多题目可以从原始数据中添加...
 ]
 

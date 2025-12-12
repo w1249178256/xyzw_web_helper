@@ -31,7 +31,7 @@
                 <n-avatar :size="48" :src="club.logo || '/icons/xiaoyugan.png'" />
                 <div class="meta">
                   <div class="name">{{ club.name }}</div>
-                  <div class="sub">ID {{ club.id }} · Lv.{{ club.level }} · 服务器 {{ club.serverId }}</div>
+                  <div class="sub">ID {{ club.id }} · Lv.{{ club.level }} · 服务器 {{ club.serverId -27 }}</div>
                 </div>
               </div>
               <div class="overview-actions">
@@ -47,17 +47,18 @@
                   <div class="value">{{ formatNumber(clubOverview.power) }}</div>
                 </div>
                 <div class="item">
-                  <div class="label">段位</div>
-                  <div class="value">{{ clubOverview.dan }}</div>
-                </div>
-                <div class="item">
                   <div class="label">成员数</div>
                   <div class="value">{{ memberCount }}</div>
                 </div>
                 <div class="item">
-                  <div class="label">红粹数量</div>
+                  <div class="label">红粹</div>
                   <div class="value">{{ clubOverview.redQuench }}</div>
                 </div>
+                <div class="item">
+                  <div class="label">Boss血量</div>
+                  <div class="value">{{ clubOverview.currentHP }}</div>
+                </div>
+
 
               </div>
               <div v-if="club.announcement" class="announcement">
@@ -84,18 +85,18 @@
                   </div>
                   <div class="right">
                     <span class="power">{{ formatNumber(m.power || m.custom?.s_power || 0) }}</span>
+                    <span class="red-quench">{{ redQuenchlabel(m.custom?.red_quench_cnt || 0) }}</span>
                     <span class="tag">{{ jobLabel(m.job) }}</span>
                   </div>
                 </div>
               </div>
-              <div v-if="memberCount > topMembers.length" class="hint">仅显示前 {{ topMembers.length }} 名(按战力)</div>
             </div>
           </n-tab-pane>
 
           <n-tab-pane name="records" tab="盐场战绩" display-directive="show:lazy">
             <ClubBattleRecords inline />
           </n-tab-pane>
-
+          
           <n-tab-pane name="history" tab="俱乐部历史战绩" display-directive="show:lazy">
             <ClubHistoryRecords inline />
           </n-tab-pane>
@@ -133,7 +134,7 @@ const leader = computed(() => {
 const topMembers = computed(() => {
   return [...members.value]
     .sort((a, b) => (Number(b.power || b.custom?.s_power || 0) - Number(a.power || a.custom?.s_power || 0)))
-    .slice(0, 20)
+    .slice(0, 30)
 })
 
 const activeTab = ref('overview')
@@ -160,6 +161,7 @@ const signInLegion = () => {
 const clubOverview = computed(() => {
   const i = info.value || {}
   const base = i.info || {}
+  const boss = base.currentBoss || {}
   const stats = i.statistics || i.stat || {}
 
   const power = Number(
@@ -174,7 +176,9 @@ const clubOverview = computed(() => {
   )
   const noApply = Boolean(base.noApply ?? i.noApply)
 
-  return { power, dan: dan ?? '-', redQuench, lastWarRank, noApply }
+  const currentHP = formatNumber(boss.currentHP || 0)
+
+  return { power, dan: dan ?? '-', redQuench, lastWarRank, noApply, currentHP }
 })
 
 const refreshClub = () => {
@@ -189,8 +193,13 @@ const jobLabel = (job) => {
   return '成员'
 }
 
+const redQuenchlabel = (redQuenchl) => {
+  return redQuenchl + '红'
+}
+
 const formatNumber = (num) => {
   const n = Number(num || 0)
+  if (n >= 1e12) return (n / 1e12).toFixed(2) + '兆';
   if (n >= 1e8) return (n / 1e8).toFixed(2) + '亿'
   if (n >= 1e4) return (n / 1e4).toFixed(2) + '万'
   return String(n)
@@ -309,6 +318,7 @@ const formatNumber = (num) => {
     font-feature-settings: 'tnum' 1;
     font-variant-numeric: tabular-nums;
   }
+  .member-row .red-quench {font-feature-settings: 'tnum' 1; font-variant-numeric: tabular-nums; }
 
   .hint {
     margin-top: 8px;

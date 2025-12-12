@@ -661,6 +661,20 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
       execute: () => executeGameCommand(tokenId, reward.cmd, reward.params || {}, reward.name)
     })
   })
+  
+  // 珍宝阁免费礼包
+  taskList.push(
+    {
+      name: '开始领取珍宝阁礼包',
+      execute: () => executeGameCommand(tokenId, 'collection_goodslist', {}, '开始领取珍宝阁礼包')
+    }
+  )
+  taskList.push(
+    {
+      name: '领取珍宝阁免费礼包',
+      execute: () => executeGameCommand(tokenId, 'collection_claimfreereward', {}, '领取珍宝阁免费礼包')
+    }
+  )
 
   // 5. 免费活动
   // 免费钓鱼
@@ -699,6 +713,26 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
     taskList.push({
       name: '黑市购买1次物品',
       execute: () => executeGameCommand(tokenId, 'store_purchase', { goodsId: 1 }, '黑市购买1次物品')
+    })
+  }
+  
+  // 咸王梦境领取
+  const mengyandayOfWeek = new Date().getDay()
+  if (mengyandayOfWeek === 0 | mengyandayOfWeek === 1 | mengyandayOfWeek === 3 | mengyandayOfWeek === 4)
+  {
+  const mjbattleTeam = { "0": 107 }
+  taskList.push({
+      name: '咸王梦境',
+      execute: () => executeGameCommand(tokenId, 'dungeon_selecthero', { battleTeam: mjbattleTeam }, '咸王梦境')
+    })
+  }
+  
+  // 深海灯神领取
+  if (mengyandayOfWeek === 1 && isTodayAvailable(statisticsTime[`genie:daily:free:5`]))
+  {
+  taskList.push({
+      name: '深海灯神',
+      execute: () => executeGameCommand(tokenId, 'genie_sweep', { genieId: 5, sweepCnt: 1 }, '深海灯神')
     })
   }
 

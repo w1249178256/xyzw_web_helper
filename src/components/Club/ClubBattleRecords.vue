@@ -51,7 +51,8 @@
                                 <span class="stat-inline win">击杀 {{ member.winCnt || 0 }}</span>
                                 <span class="stat-inline loss">死亡 {{ member.loseCnt || 0 }}</span>
                                 <span class="stat-inline siege">攻城 {{ member.buildingCnt || 0 }}</span>
-                                <span class="stat-inline KD">K/D {{ parseFloat(member.winCnt / member.loseCnt || 0).toFixed(2) }}</span>
+                                <span class="stat-inline Resurrectio">K/D {{ parseFloat(member.winCnt / member.loseCnt || 0).toFixed(2) }}</span>
+                                <span class="stat-inline Sscore">复活丹 {{ Math.max(member.loseCnt - 6, 0) || 0 }}</span>
                             </div>
                             <n-button text size="small" class="details-button" @click="toggleMemberDetails(member.roleId)">
                                 <template #icon>
@@ -172,7 +173,8 @@
                                 <span class="stat-inline win">击杀 {{ member.winCnt || 0 }}</span>
                                 <span class="stat-inline loss">死亡 {{ member.loseCnt || 0 }}</span>
                                 <span class="stat-inline siege">攻城 {{ member.buildingCnt || 0 }}</span>
-                                <span class="stat-inline KD">K/D {{ parseFloat(member.winCnt / member.loseCnt || 0).toFixed(2) }}</span>
+                                <span class="stat-inline Resurrectio">K/D {{ parseFloat(member.winCnt / member.loseCnt || 0).toFixed(2) }}</span>
+                                <span class="stat-inline alliance">复活丹 {{ Math.max(member.loseCnt - 6, 0) || 0 }}</span>
                             </div>
                             <n-button text size="small" class="details-button" @click="toggleMemberDetails(member.roleId)">
                                 <template #icon>
@@ -314,6 +316,39 @@ const getBattleClass = battle => {
     return classes.join(" ");
 };
 
+
+const legionWarTypesw = (legionWarType) => {
+  switch(legionWarType) {
+    case 15:
+      return '灰岩岛'
+    case 16:
+      return '进阶周赛'
+    case 17:
+      return '进阶月赛'
+    case 18:
+      return '青铜周赛'
+    case 19:
+      return '青铜月赛'
+    case 20:
+      return '秘蓝周赛'
+    case 21:
+      return '秘蓝月赛'
+    case 22:
+      return '月宫周赛'
+    case 23:
+      return '月宫月赛'
+    case 24:
+      return '天宫周赛'
+    case 25:
+      return '天宫月赛'
+    case 6:
+      return '夺旗赛'
+    default:
+      return '伟大航路'
+  }
+};
+
+
 // 切换成员详情展开状态
 const toggleMemberDetails = roleId => {
     if (expandedMembers.value.has(roleId)) {
@@ -329,7 +364,7 @@ const handleImageError = event => {
 };
 
 const disabledDate = current => {
-    return current.getDay() != 6 || current > Date.now();
+    return (current.getDay() != 6 && current.getDay() != 0) || current > Date.now();
 };
 
 //日期选择时调用查询战绩方法
@@ -367,7 +402,6 @@ const fetchBattleRecords = async () => {
             battleRecords.value.roleDetailsList = result.roleDetailsList.sort((a, b) => {
                 return b.winCnt - a.winCnt;
             });
-            console.log("🚀 ~ fetchBattleRecords ~ battleRecords.value:", battleRecords.value);
             message.success("战绩加载成功");
         } else {
             battleRecords.value = null;
@@ -428,7 +462,7 @@ const exportToImage = async () => {
         const link = document.createElement("a");
         link.href = imgUrl;
         console.log();
-        link.download = queryDate.value.replace("/", "月").replace("/", "日") + "盐场战报.png"; // 下载文件名
+        link.download = queryDate.value.replace("/", "年").replace("/", "月") + "日盐场战报.png"; // 下载文件名
         document.body.appendChild(link);
         link.click(); // 触发点击下载
         document.body.removeChild(link); // 下载后清理DOM
@@ -613,9 +647,34 @@ onMounted(() => {
         color: #d97706;
     }
 
+    &.Resurrectio {
+    background: rgba(0, 204, 221, 0.1);
+    color: #00BFFF;
+    }
+
     &.KD {
         background: rgba(151, 151, 151, 0.1);
         color: #858585;
+    }
+
+    &.rednumber {
+    background: rgba(0, 204, 221, 0.1);
+    color: #00BFFF;
+    }
+    
+    &.alliance {
+    background: rgba(166, 211, 248, 0.1);
+    color: #7AC1F9;
+    }
+    
+    &.tipsgg {
+    background: rgba(194, 166, 248, 0.1);
+    color: #AE86F9;
+    }
+    
+    &.Sscore {
+    background: rgba(244, 162, 216, 0.1);
+    color: #FA79CE;
     }
 }
 

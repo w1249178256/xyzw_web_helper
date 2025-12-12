@@ -70,6 +70,7 @@ export const useTokenStore = defineStore('tokens', () => {
     roleInfo: null,
     legionInfo: null,
     presetTeam: null,
+    battleVersion: null as number | null, // 战斗版本号
     studyStatus: {
       isAnswering: false,
       questionCount: 0,
@@ -77,7 +78,7 @@ export const useTokenStore = defineStore('tokens', () => {
       status: '', // '', 'starting', 'answering', 'claiming_rewards', 'completed'
       timestamp: null
     },
-    lastUpdated: null
+    lastUpdated: null as string | null
   })
 
   // 获取当前选中token的角色信息
@@ -289,11 +290,11 @@ export const useTokenStore = defineStore('tokens', () => {
 
           const gameToken = gameTokens.value.find(t => t.id === tokenId)
           console.log(gameToken)
-          if(gameToken) {
+          if (gameToken) {
             console.log('getArrayBuffer', await getArrayBuffer('小鱼'));
             const userToken: ArrayBuffer | null = await getArrayBuffer(gameToken.name)
-            console.log('读取到的ArrayBuffer:',gameToken.name, userToken)
-            if(userToken) {
+            console.log('读取到的ArrayBuffer:', gameToken.name, userToken)
+            if (userToken) {
               const token = await transformToken(userToken)
               updateToken(tokenId, { ...gameToken, token })
               console.log(gameToken)
@@ -773,6 +774,14 @@ export const useTokenStore = defineStore('tokens', () => {
       return Promise.reject(new Error(`WebSocket客户端不存在 [${tokenId}]`))
     }
 
+    // 为战斗相关命令自动注入 battleVersion
+    const battleCommands = ['fight_startareaarena', 'fight_startpvp', 'fight_starttower', 'fight_startboss', 'fight_startlegionboss', 'fight_startdungeon']
+    if (battleCommands.includes(cmd)) {
+      const battleVersion = gameData.value.battleVersion
+      params = { battleVersion, ...params }
+      wsLogger.info(`⚔️ [战斗命令] 注入 battleVersion: ${battleVersion} [${cmd}]`)
+    }
+
     try {
       const result = await client.sendWithPromise(cmd, params, timeout)
 
@@ -1133,6 +1142,14 @@ export const useTokenStore = defineStore('tokens', () => {
     setupCrossTabListener()
     tokenLogger.info('Token Store 初始化完成，连接监控已启动')
   }
+  const setBattleVersion = (version: number | null) => {
+    gameData.value.battleVersion = version
+    gameData.value.lastUpdated = new Date().toISOString()
+  }
+
+  const getBattleVersion = () => {
+    return gameData.value.battleVersion
+  }
 
   return {
     // 状态
@@ -1184,6 +1201,10 @@ export const useTokenStore = defineStore('tokens', () => {
     // 塔信息方法
     getCurrentTowerLevel,
     getTowerInfo,
+
+    // battleVersion
+    setBattleVersion,
+    getBattleVersion,
 
     // 调试工具方法
     validateToken,

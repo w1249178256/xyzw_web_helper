@@ -29,9 +29,7 @@
                     <div v-for="(member, index) in battleRecords.warMap" :key="member.warDate" class="member-card">
                         <div class="member-header">
                             <div class="member-info">
-                                <span class="member-name">{{
-                                    member.legionWarType == "1" ? "盐场争霸赛" : member.legionWarType == "15" ? "伟大航路" : "夺旗赛"
-                                }}</span>
+                                <span class="member-name">{{ legionWarTypesw(member.legionWarType) }}</span>
                             </div>
                             <div class="member-stats-inline">
                                 <span class="stat-inline win">比赛日期 {{ member.warDate }}</span>
@@ -82,9 +80,7 @@
                     <div v-for="(member, index) in battleRecords.warMap" :key="member.warDate" class="member-card">
                         <div class="member-header">
                             <div class="member-info">
-                                <span class="member-name">{{
-                                    member.legionWarType == "1" ? "盐场争霸赛" : member.legionWarType == "15" ? "伟大航路" : "夺旗赛"
-                                }}</span>
+                                <span class="member-name">{{ legionWarTypesw(member.legionWarType) }}</span>
                             </div>
                             <div class="member-stats-inline">
                                 <span class="stat-inline win">比赛日期 {{ member.warDate }}</span>
@@ -172,6 +168,37 @@ const getBattleClass = battle => {
         classes.push("battle-defend");
     }
     return classes.join(" ");
+};
+
+const legionWarTypesw = (legionWarType) => {
+  switch(legionWarType) {
+    case 15:
+      return '灰岩岛'
+    case 16:
+      return '进阶周赛'
+    case 17:
+      return '进阶月赛'
+    case 18:
+      return '青铜周赛'
+    case 19:
+      return '青铜月赛'
+    case 20:
+      return '秘蓝周赛'
+    case 21:
+      return '秘蓝月赛'
+    case 22:
+      return '月宫周赛'
+    case 23:
+      return '月宫月赛'
+    case 24:
+      return '天宫周赛'
+    case 25:
+      return '天宫月赛'
+    case 6:
+      return '夺旗赛'
+    default:
+      return '伟大航路'
+  }
 };
 
 // 切换成员详情展开状态
