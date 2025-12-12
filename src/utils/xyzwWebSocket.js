@@ -121,11 +121,13 @@ export function registerDefaultCommands(reg) {
     .register("friend_batch", { friendId: 0 })
     .register("hero_recruit", { byClub: false, recruitNumber: 1, recruitType: 3 })
     .register("item_openbox", { itemId: 2001, number: 10 })
+	.register("item_batchclaimboxpointreward")
 
     // 竞技场
     .register("arena_startarea")
     .register("fight_startlevel") // 获取 battleVersion
     .register("arena_getareatarget", { refresh: false })
+	.register("arena_getarearank")
 
     // 商店
     .register("store_goodslist", { storeId: 1 })
@@ -209,6 +211,7 @@ export function registerDefaultCommands(reg) {
     .register("bosstower_gethelprank")
     // 活动/任务
     .register("activity_get")
+	.register("activity_recyclewarorderrewardclaim")
 	
 	// 珍宝阁相关
     .register("collection_claimfreereward")
@@ -220,6 +223,13 @@ export function registerDefaultCommands(reg) {
     .register("car_claim", { carId: 0 })
     .register("car_send", { carId: 0, helperId: 0, text: "" })
     .register("car_getmemberhelpingcnt")
+
+	// 咸王宝库
+    .register("matchteam_getroleteaminfo")
+    .register("bosstower_getinfo")
+    .register("bosstower_startboss")
+    .register("bosstower_startbox")
+    .register("discount_getdiscountinfo")
 
   registry.commands.set("fight_startareaarena", (ack = 0, seq = 0, params = {}) => {
     if (params?.targetId === undefined || params?.targetId === null) {
@@ -787,17 +797,19 @@ export class XyzwWebSocketClient {
     // 命令到响应的映射 - 处理响应命令与原始命令不匹配的情况
     const responseToCommandMap = {
       // 1:1 响应映射（优先级高）
-	  'collection_goodslistresp': 'collection_goodslist',
-	  'collection_claimfreerewardresp': 'collection_claimfreereward',
-	  'bosstower_gethelprankresp': 'bosstower_gethelprank',
-	  'legion_getarearankresp': 'legion_getarearank',
-	  'legionwar_getgoldmonthwarrankresp': 'legionwar_getgoldmonthwarrank',
+	  'fight_startpvpresp': 'fight_startpvp',
+      'activity_getresp': 'activity_get',
+      'collection_goodslistresp': 'collection_goodslist',
+      'collection_claimfreerewardresp': 'collection_claimfreereward',
+      'legion_getarearankresp': 'legion_getarearank',
+      'legionwar_getgoldmonthwarrankresp': 'legionwar_getgoldmonthwarrank',
+      'nightmare_getroleinforesp': 'nightmare_getroleinfo',
       'studyresp': 'study_startgame',
       'role_getroleinforesp': 'role_getroleinfo',
       'hero_recruitresp': 'hero_recruit',
       'friend_batchresp': 'friend_batch',
       'system_claimhanguprewardresp': 'system_claimhangupreward',
-      'item_openboxresp': 'item_openbox',
+      'item_openboxresp': ['item_openbox', 'item_batchclaimboxpointreward'],
       'bottlehelper_claimresp': 'bottlehelper_claim',
       'bottlehelper_startresp': 'bottlehelper_start',
       'bottlehelper_stopresp': 'bottlehelper_stop',
@@ -807,6 +819,7 @@ export class XyzwWebSocketClient {
       'fight_startareaarenaresp': 'fight_startareaarena',
       'arena_startarearesp': 'arena_startarea',
       'arena_getareatargetresp': 'arena_getareatarget',
+      'arena_getarearankresp': 'arena_getarearank',
       'presetteam_saveteamresp': 'presetteam_saveteam',
       'presetteam_getinforesp': 'presetteam_getinfo',
       'mail_claimallattachmentresp': 'mail_claimallattachment',
@@ -814,6 +827,14 @@ export class XyzwWebSocketClient {
       'system_getdatabundleverresp': 'system_getdatabundlever',
       'tower_claimrewardresp': 'tower_claimreward',
       'fight_starttowerresp': 'fight_starttower',
+      'evotowerinforesp': 'evotower_getinfo',
+      'evotower_fightresp': 'evotower_fight',
+      // 咸王宝库
+      'matchteam_getroleteaminforesp': 'matchteam_getroleteaminfo',
+      'bosstower_getinforesp': 'bosstower_getinfo',
+      'bosstower_startbossreso': 'bosstower_startboss',
+      'bosstower_startboxresp': 'bosstower_startbox',
+      'discount_getdiscountinforesp': 'discount_getdiscountinfo',
       // 升星相关响应映射
       'hero_heroupgradestarresp': 'hero_heroupgradestar',
       'book_upgraderesp': 'book_upgrade',
@@ -828,6 +849,9 @@ export class XyzwWebSocketClient {
       'car_sendresp': 'car_send',
       'car_getmemberhelpingcntresp': 'car_getmemberhelpingcnt',
       'role_gettargetteamresp': 'role_gettargetteam',
+      'activity_warorderclaimresp': 'activity_recyclewarorderrewardclaim',
+      'arena_getarearankresp': 'arena_getarearank',
+      'bosstower_gethelprankresp': 'bosstower_gethelprank',
       // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
       'task_claimdailyrewardresp': 'task_claimdailyreward',
       'task_claimweekrewardresp': 'task_claimweekreward',
@@ -835,7 +859,7 @@ export class XyzwWebSocketClient {
       // 同步响应映射（优先级低）
       'syncresp': ['system_mysharecallback', 'task_claimdailypoint'],
       'syncrewardresp': ['system_buygold', 'discount_claimreward', 'card_claimreward',
-        'artifact_lottery', 'genie_sweep', 'genie_buysweep', 'system_signinreward','dungeon_selecthero']
+                        'artifact_lottery', 'genie_sweep', 'genie_buysweep','system_signinreward','dungeon_selecthero']
     }
 
     // 获取原始命令名（支持一对一和一对多映射）
