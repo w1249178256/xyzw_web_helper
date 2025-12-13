@@ -58,8 +58,8 @@
                                 <span class="stat-inline rednumber">红粹2 {{ member.redno2 || 0 }}</span>
                                 <span class="stat-inline rednumber">红粹3 {{ member.redno3 || 0 }}</span>
                                 <span class="stat-inline Sscore">积分 {{ formatScore(member.sRScore) || 0 }}</span>
-                                <span class="stat-inline alliance">所属联盟 {{ allianceincludes(member.announcement) || '' }}</span>
-                                <span class="stat-inline tipsgg">公告 {{ member.announcement || '' }}</span>
+                                <span class="stat-inline alliance">所属联盟: {{ allianceincludes(member.announcement) || '' }}</span>
+                                <span class="stat-inline tipsgg">公告: {{ member.announcement || '' }}</span>
                             </div>
                         </div>
                     </div>
@@ -142,8 +142,9 @@ const handleImageError = (event) => {
   event.target.style.display = 'none'
 }
 
-const disabledDate = current => {
-    return (current.getDay() != 6 && current.getDay() != 0) || current > Date.now()
+
+const disabledDate = current => {
+    return (current.getDay() != 6) || current > Date.now()
 }
 
 //日期选择时调用查询战绩方法
@@ -175,8 +176,12 @@ const fetchBattleRecordsByDate = val => {
         loading1.value = true
         queryDate.value = formatTimestamp1(inputDate1.value)
 
+        if(gettoday() == queryDate.value&&new Date().getHours()<18){
+          message.error('盐场日18点之前无法获取数据')
+          return
+        }
 
-         if (gettoday() == queryDate.value) {
+         if (gettoday() == queryDate.value && new Date().getHours()<20) {
             const getbattlefield = await tokenStore.sendMessageWithPromise(tokenId, 'legion_getbattlefield', {}, 10000)
             if (!getbattlefield.info) {
                 battleRecords1.value = null;
@@ -333,7 +338,8 @@ const handleExport1 = async () => {
   }
 }
 
-const exportToImage = async () => {
+
+const exportToImage = async () => {
     // 校验：确保DOM已正确绑定
     if (!exportDom.value) {
         alert("未找到要导出的DOM元素")

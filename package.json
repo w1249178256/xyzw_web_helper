@@ -29,7 +29,8 @@
     "pinia": "^2.3.1",
     "vue": "^3.5.22",
     "vue-i18n": "^11.1.12",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@iconify-json/mdi": "^1.2.3",
