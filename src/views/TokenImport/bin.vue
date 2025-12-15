@@ -133,6 +133,11 @@ const uploadBin = (binFile: File) => {
         message.error('上传列表中已存在同名角色! ');
         return;
       }
+      // 检查待上传的角色是否已在tokenStore中存在
+      const existingToken = tokenStore.gameTokens.find(t => t.name === roleName);
+      if (existingToken) {
+        message.warning(`角色"${roleName}"已存在，将更新该角色的Token`);
+      }
       message.success('Token读取成功，请检查角色名称等信息后提交');
       roleList.value.push({
         name: roleName,
