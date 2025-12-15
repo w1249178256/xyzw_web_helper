@@ -56,6 +56,9 @@ importers:
       vue-router:
         specifier: ^4.6.3
         version: 4.6.3(vue@3.5.22(typescript@5.9.3))
+      xlsx:
+        specifier: ^0.18.5
+        version: 0.18.5
     devDependencies:
       '@iconify-json/mdi':
         specifier: ^1.2.3
@@ -4768,3 +4771,5 @@ snapshots:
   yaml@2.8.1: {}
 
   yocto-queue@0.1.0: {}
+
+  xlsx@0.18.5: {}
