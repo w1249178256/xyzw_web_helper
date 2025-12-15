@@ -1,5 +1,5 @@
 <template>
-  <div class="game-status-container">
+  <div class="game-status-container" :class="activeSection === 'fightPvp'?'full-grid':''">
     <!-- 身份牌常驻（嵌入式，Tabs 上方） -->
     <IdentityCard embedded />
 
@@ -9,10 +9,11 @@
       <n-tab-pane name="club" tab="俱乐部" />
       <n-tab-pane name="activity" tab="活动" />
       <n-tab-pane v-if="ENABLE_TOOLS_TAB" name="tools" tab="工具" />
-	  <n-tab-pane name="warrank" tab="盐场" />
-	  <n-tab-pane name="toprank" tab="巅峰榜" />
-	  <n-tab-pane name="topclubrank" tab="俱乐部榜" />
-	  <n-tab-pane name="goldclubrank" tab="黄金积分榜" />
+      <n-tab-pane name="warrank" tab="盐场" />
+      <n-tab-pane name="toprank" tab="巅峰榜" />
+      <n-tab-pane name="topclubrank" tab="俱乐部榜" />
+      <n-tab-pane name="goldclubrank" tab="黄金积分榜" />
+      <n-tab-pane name="fightPvp" tab="切磋" />
     </n-tabs>
 
     <!-- 阵容（仅日常） -->
@@ -115,6 +116,9 @@
 
     <!-- 黄金积分（提取组件） -->
     <GoldClubList v-if="activeSection === 'goldclubrank'" />
+    
+    <!-- 切磋（提取组件） -->
+    <fightPvp v-if="activeSection === 'fightPvp'"  />
   </div>
 </template>
 
@@ -135,6 +139,7 @@ import ClubWarrank from './Club/ClubWarrank.vue';
 import TopRankList from './cards/TopRankListPageCard.vue';
 import TopClubList from './cards/TopClubListPageCard.vue';
 import GoldClubList from './cards/GoldRankListPageCard.vue';
+import FightPvp from './cards/FightPvp.vue';
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -498,6 +503,9 @@ onUnmounted(() => {
     grid-template-columns: minmax(0, 1fr);
     padding: var(--spacing-md);
   }
+}
+.full-grid{
+    grid-template-columns: repeat(1, 1fr);     
 }
 
 .section-header {

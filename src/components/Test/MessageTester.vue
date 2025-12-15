@@ -372,7 +372,7 @@ const handleChange = async (e)=>{
     const decode = g_utils.bon.decode(uint8Array);
     const respont = g_utils.parse(uint8Array)
     const result = g_utils.bon.decode(respont.body);
-    // console.log(respont,result)
+    console.log(respont,result)
     // 添加测试结果到历史
     addToHistory(respont.cmd, {
         testType: 'BIN文件解码',

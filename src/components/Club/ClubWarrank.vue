@@ -54,12 +54,12 @@
                                 <span class="stat-inline win">区服 {{ member.serverId || 0 }}</span>
                                 <span class="stat-inline siege">战力 {{ formatPower(member.power) || 0 }}</span>
                                 <span class="stat-inline Resurrectio">总红粹 {{ member.redQuench || 0 }}</span>
-                                <span class="stat-inline rednumber">红粹1 {{ member.redno1 || 0 }}</span>
-                                <span class="stat-inline rednumber">红粹2 {{ member.redno2 || 0 }}</span>
-                                <span class="stat-inline rednumber">红粹3 {{ member.redno3 || 0 }}</span>
-                                <span class="stat-inline Sscore">积分 {{ formatScore(member.sRScore) || 0 }}</span>
-                                <span class="stat-inline alliance">所属联盟 {{ allianceincludes(member.announcement) || '' }}</span>
-                                <span class="stat-inline tipsgg">公告 {{ member.announcement || '' }}</span>
+                                <span class="stat-inline rednumber">车头1 {{ member.redno1 || 0 }}/{{ member.hb1 }}四圣</span>
+                                <span class="stat-inline rednumber">车头2 {{ member.redno2 || 0 }}/{{ member.hb2 }}四圣</span>
+                                <span class="stat-inline rednumber">车头3 {{ member.redno3 || 0 }}/{{ member.hb3 }}四圣</span>
+                                <!-- <span class="stat-inline Sscore">积分 {{ formatScore(member.sRScore) || 0 }}</span> -->
+                                <span class="stat-inline alliance">所属联盟: {{ allianceincludes(member.announcement) || '' }}</span>
+                                <span class="stat-inline tipsgg">公告: {{ member.announcement || '' }}</span>
                             </div>
                         </div>
                     </div>
@@ -142,7 +142,8 @@ const handleImageError = (event) => {
   event.target.style.display = 'none'
 }
 
-const disabledDate = current => {
+
+const disabledDate = current => {
     return (current.getDay() != 6 && current.getDay() != 0) || current > Date.now()
 }
 
@@ -176,7 +177,7 @@ const fetchBattleRecordsByDate = val => {
         queryDate.value = formatTimestamp1(inputDate1.value)
 
 
-         if (gettoday() == queryDate.value) {
+         if (gettoday() == queryDate.value && new Date().getHours()<20) {
             const getbattlefield = await tokenStore.sendMessageWithPromise(tokenId, 'legion_getbattlefield', {}, 10000)
             if (!getbattlefield.info) {
                 battleRecords1.value = null;
@@ -213,6 +214,8 @@ const fetchBattleRecordsByDate = val => {
                                 redQuenchCounts.push(memberData.custom.red_quench_cnt + "红");
                             }
                         }
+
+
                         return {
                             ...club,
                             redQuench: detail?.legionData?.quenchNum || 0,
@@ -254,7 +257,6 @@ const fetchBattleRecordsByDate = val => {
                 { date: queryDate.value },
                 10000
             )
-
             if (!result?.legionRankList) {
                 battleRecords1.value = null;
                 message.warning('未查询到盐场匹配数据');
@@ -269,10 +271,26 @@ const fetchBattleRecordsByDate = val => {
                         5000
                     );
                     const redQuenchCounts = [];
+                        const HolyBeastNum = [];
                     for (const [memberId, memberData] of Object.entries(detail?.legionData?.members)) {
                         if (memberData.custom?.red_quench_cnt !== undefined) {
                             redQuenchCounts.push(memberData.custom.red_quench_cnt + "红");
                         }
+                        
+                        const tempRoleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'rank_getroleinfo',
+                          {
+                              bottleType: 0,
+                              includeBottleTeam: false,
+                              isSearch: false,
+                              roleId: memberId
+                          }, 5000)
+                          let holyBeast = 0;
+                          for (const [heroId, heroData] of Object.entries(tempRoleInfo?.roleInfo?.heroes)) {
+                            if(heroData.hB?.active !== undefined){
+                              holyBeast++;
+                            }
+                          }
+                          HolyBeastNum.push(holyBeast)
                     }
                     return {
                         ...club,
@@ -282,7 +300,10 @@ const fetchBattleRecordsByDate = val => {
                         redno: redQuenchCounts || 0,
                         redno1: redQuenchCounts[0] || 0,
                         redno2: redQuenchCounts[1] || 0,
-                        redno3: redQuenchCounts[2] || 0
+                        redno3: redQuenchCounts[2] || 0,
+                        hb1:HolyBeastNum[0]||0,
+                        hb2:HolyBeastNum[1]||0,
+                        hb3:HolyBeastNum[2]||0,
                     };
                 } catch (error) {
                     console.error(`查询俱乐部${club.id}详情失败:`, error);
@@ -333,7 +354,8 @@ const handleExport1 = async () => {
   }
 }
 
-const exportToImage = async () => {
+
+const exportToImage = async () => {
     // 校验：确保DOM已正确绑定
     if (!exportDom.value) {
         alert("未找到要导出的DOM元素")
@@ -356,7 +378,6 @@ const handleExport1 = async () => {
         // 7. 创建下载链接，触发浏览器下载
         const link = document.createElement("a")
         link.href = imgUrl
-        console.log()
         link.download = queryDate.value.replace("/", "年").replace("/", "月") + "日盐场匹配信息.png"
         document.body.appendChild(link)
         link.click()
