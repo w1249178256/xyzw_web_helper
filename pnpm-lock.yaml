@@ -4772,4 +4772,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  xlsx@0.18.5: {}
+  xlsx@0.18.5:
+    resolution: {integrity: sha512-xim8+Hr4SyBfM5H7VkVo+QXl0F+WCLaT8r8f1XzD+m1pJxIEhVpPYBMf2xFUVl4g5L76jPaVajczKEF7s2MQ==}
+    hasBin: true
