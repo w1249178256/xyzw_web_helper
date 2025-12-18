@@ -601,10 +601,16 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
     })
   }
 
-  // 3. BOSS战斗
+  // 3. 俱乐部BOSS战斗
   if (settings.bossTimes > 0) {
     // 军团BOSS
-    const alreadyLegionBoss = statistics['legion:boss'] ?? 0
+    let alreadyLegionBoss = statistics['legion:boss'] ?? 0
+
+    // 如果上次挑战时间不是今天，说明今天还没打过，视为0次
+    if (isTodayAvailable(statisticsTime['legion:boss'])) {
+      alreadyLegionBoss = 0
+    }
+
     const remainingLegionBoss = Math.max(settings.bossTimes - alreadyLegionBoss, 0)
 
     if (remainingLegionBoss > 0) {
@@ -621,24 +627,21 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
         })
       }
     }
+  }
 
-    // 每日BOSS
-    const todayBossId = getTodayBossId()
-    if (remainingLegionBoss === 0) {
-      // 如果没有军团BOSS，为每日BOSS切换阵容
-      taskList.push({
-        name: '每日BOSS阵容检查',
-        execute: () => switchToFormationIfNeeded(tokenId, settings.bossFormation, 'BOSS阵容', logFn)
-      })
-    }
-
-    for (let i = 0; i < 3; i++) {
-      taskList.push({
-        name: `每日BOSS ${i + 1}/3`,
-        execute: () => executeGameCommand(tokenId, 'fight_startboss',
-          { bossId: todayBossId }, `每日BOSS ${i + 1}`, 12000)
-      })
-    }
+  // 日常BOSS
+  const todayBossId = getTodayBossId()
+  // 为每日BOSS切换阵容
+  taskList.push({
+    name: '每日BOSS阵容检查',
+    execute: () => switchToFormationIfNeeded(tokenId, settings.bossFormation, 'BOSS阵容', logFn)
+  })
+  for (let i = 0; i < 3; i++) {
+    taskList.push({
+      name: `每日BOSS ${i + 1}/3`,
+      execute: () => executeGameCommand(tokenId, 'fight_startboss',
+        { bossId: todayBossId }, `每日BOSS ${i + 1}`, 12000)
+    })
   }
 
   // 4. 固定奖励领取
@@ -661,7 +664,7 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
       execute: () => executeGameCommand(tokenId, reward.cmd, reward.params || {}, reward.name)
     })
   })
-  
+
   // 珍宝阁免费礼包
   taskList.push(
     {
@@ -715,22 +718,20 @@ const executeDailyTasks = async (roleInfoResp, logFn, progressFn) => {
       execute: () => executeGameCommand(tokenId, 'store_purchase', { goodsId: 1 }, '黑市购买1次物品')
     })
   }
-  
+
   // 咸王梦境领取
   const mengyandayOfWeek = new Date().getDay()
-  if (mengyandayOfWeek === 0 | mengyandayOfWeek === 1 | mengyandayOfWeek === 3 | mengyandayOfWeek === 4)
-  {
-  const mjbattleTeam = { "0": 107 }
-  taskList.push({
+  if (mengyandayOfWeek === 0 | mengyandayOfWeek === 1 | mengyandayOfWeek === 3 | mengyandayOfWeek === 4) {
+    const mjbattleTeam = { "0": 107 }
+    taskList.push({
       name: '咸王梦境',
       execute: () => executeGameCommand(tokenId, 'dungeon_selecthero', { battleTeam: mjbattleTeam }, '咸王梦境')
     })
   }
-  
+
   // 深海灯神领取
-  if (mengyandayOfWeek === 1 && isTodayAvailable(statisticsTime[`genie:daily:free:5`]))
-  {
-  taskList.push({
+  if (mengyandayOfWeek === 1 && isTodayAvailable(statisticsTime[`genie:daily:free:5`])) {
+    taskList.push({
       name: '深海灯神',
       execute: () => executeGameCommand(tokenId, 'genie_sweep', { genieId: 5, sweepCnt: 1 }, '深海灯神')
     })
