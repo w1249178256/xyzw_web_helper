@@ -1,20 +1,20 @@
 <template>
   <a-card>
     <template #extra>
-      <a-space>
+      <div class="header-actions">
         <n-button size="small" @click="refreshTokens">
           <template #icon>
             <n-icon>
               <Refresh />
             </n-icon>
           </template>
-          刷新
+          <span class="btn-text">刷新</span>
         </n-button>
         <n-button size="small" type="warning" @click="exportTokens">
           <template #icon>
             <i class="i-mdi:download"></i>
           </template>
-          导出
+          <span class="btn-text">导出</span>
         </n-button>
         <n-upload :show-file-list="false" accept=".json" @change="importTokens">
           <n-button size="small" type="info">
@@ -23,10 +23,10 @@
                 <CloudUpload />
               </n-icon>
             </template>
-            导入
+            <span class="btn-text">导入</span>
           </n-button>
         </n-upload>
-      </a-space>
+      </div>
     </template>
     <template #default>
       <!-- 用户Token -->
@@ -649,7 +649,22 @@ const clearAllTokens = () => {
   border-top: 1px solid var(--border-light);
 }
 
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .btn-text {
+    display: none;
+  }
+
   .header {
     flex-direction: column;
     gap: var(--spacing-md);

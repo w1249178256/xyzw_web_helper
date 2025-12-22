@@ -3,15 +3,15 @@
     <!-- 顶部导航 -->
     <nav class="dashboard-nav">
       <div class="nav-container">
-      <div class="nav-brand">
-        <img src="/icons/xiaoyugan.png" alt="XYZW" class="brand-logo">
-        <div class="brand-toggle" @click="isMobileMenuOpen = true">
-          <n-icon>
-            <Menu />
-          </n-icon>
-          <span class="brand-text">XYZW 控制台</span>
+        <div class="nav-brand">
+          <img src="/icons/xiaoyugan.png" alt="XYZW" class="brand-logo">
+          <div class="brand-toggle" @click="isMobileMenuOpen = true">
+            <n-icon>
+              <Menu />
+            </n-icon>
+            <span class="brand-text">XYZW 控制台</span>
+          </div>
         </div>
-      </div>
 
         <div class="nav-menu">
           <router-link to="/admin/dashboard" class="nav-item" active-class="active">
@@ -37,6 +37,12 @@
               <Settings />
             </n-icon>
             <span>任务管理</span>
+          </router-link>
+          <router-link to="/admin/batch-daily-tasks" class="nav-item" active-class="active">
+            <n-icon>
+              <Layers />
+            </n-icon>
+            <span>批量日常</span>
           </router-link>
           <router-link to="/admin/message-test" class="nav-item" active-class="active">
             <n-icon>
@@ -71,27 +77,45 @@
     <n-drawer v-model:show="isMobileMenuOpen" placement="left" style="width: 260px">
       <div class="drawer-menu">
         <router-link to="/admin/dashboard" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Home /></n-icon>
+          <n-icon>
+            <Home />
+          </n-icon>
           <span>首页</span>
         </router-link>
         <router-link to="/admin/game-features" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Cube /></n-icon>
+          <n-icon>
+            <Cube />
+          </n-icon>
           <span>游戏功能</span>
         </router-link>
         <router-link to="/tokens" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><PersonCircle /></n-icon>
+          <n-icon>
+            <PersonCircle />
+          </n-icon>
           <span>Token管理</span>
         </router-link>
         <router-link to="/admin/daily-tasks" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Settings /></n-icon>
+          <n-icon>
+            <Settings />
+          </n-icon>
           <span>任务管理</span>
         </router-link>
+        <router-link to="/admin/batch-daily-tasks" class="drawer-item" @click="isMobileMenuOpen = false">
+          <n-icon>
+            <Layers />
+          </n-icon>
+          <span>批量日常</span>
+        </router-link>
         <router-link to="/admin/message-test" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><ChatbubbleEllipsesSharp /></n-icon>
+          <n-icon>
+            <ChatbubbleEllipsesSharp />
+          </n-icon>
           <span>消息测试</span>
         </router-link>
         <router-link to="/admin/profile" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Settings /></n-icon>
+          <n-icon>
+            <Settings />
+          </n-icon>
           <span>个人设置</span>
         </router-link>
       </div>
@@ -112,7 +136,8 @@ import {
   Settings,
   ChevronDown,
   ChatbubbleEllipsesSharp,
-  Menu
+  Menu,
+  Layers
 } from '@vicons/ionicons5'
 
 

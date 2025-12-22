@@ -5,11 +5,7 @@
       <div class="container">
         <div class="nav-content">
           <div class="nav-brand">
-            <img
-              src="/icons/xiaoyugan.png"
-              alt="XYZW"
-              class="brand-logo"
-            >
+            <img src="/icons/xiaoyugan.png" alt="XYZW" class="brand-logo">
             <span class="brand-text">XYZW 游戏管理系统</span>
           </div>
 
@@ -23,28 +19,15 @@
 
           <div class="nav-actions">
             <template v-if="!authStore.isAuthenticated">
-              <n-button
-                text
-                type="primary"
-                size="large"
-                @click="router.push('/login')"
-              >
+              <n-button text type="primary" size="large" @click="router.push('/login')">
                 登录
               </n-button>
-              <n-button
-                type="primary"
-                size="large"
-                @click="router.push('/register')"
-              >
+              <n-button type="primary" size="large" @click="router.push('/register')">
                 注册
               </n-button>
             </template>
             <template v-else>
-              <n-button
-                type="primary"
-                size="large"
-                @click="router.push('/admin/dashboard')"
-              >
+              <n-button type="primary" size="large" @click="router.push('/admin/dashboard')">
                 进入控制台
               </n-button>
             </template>
@@ -56,23 +39,33 @@
     <n-drawer v-model:show="isMobileMenuOpen" placement="left" style="width: 260px">
       <div class="drawer-menu">
         <router-link to="/" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Ribbon /></n-icon>
+          <n-icon>
+            <Ribbon />
+          </n-icon>
           <span>首页</span>
         </router-link>
         <router-link to="/admin/dashboard" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Settings /></n-icon>
+          <n-icon>
+            <Settings />
+          </n-icon>
           <span>控制台</span>
         </router-link>
         <router-link to="/admin/game-features" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Cube /></n-icon>
+          <n-icon>
+            <Cube />
+          </n-icon>
           <span>游戏功能</span>
         </router-link>
         <router-link to="/tokens" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><PersonCircle /></n-icon>
+          <n-icon>
+            <PersonCircle />
+          </n-icon>
           <span>Token管理</span>
         </router-link>
         <router-link to="/changelog" class="drawer-item" @click="isMobileMenuOpen = false">
-          <n-icon><Ribbon /></n-icon>
+          <n-icon>
+            <Ribbon />
+          </n-icon>
           <span>更新日志</span>
         </router-link>
         <div class="drawer-actions">
@@ -96,21 +89,11 @@
                 让游戏变得更简单，让管理变得更高效
               </p>
               <div class="hero-actions">
-                <n-button
-                  type="primary"
-                  size="large"
-                  class="hero-button"
-                  @click="router.push(authStore.isAuthenticated ? '/admin/dashboard' : '/register')"
-                >
+                <n-button type="primary" size="large" class="hero-button"
+                  @click="router.push(authStore.isAuthenticated ? '/admin/dashboard' : '/register')">
                   {{ authStore.isAuthenticated ? '进入控制台' : '立即开始' }}
                 </n-button>
-                <n-button
-                  text
-                  type="primary"
-                  size="large"
-                  class="hero-button"
-                  @click="scrollToFeatures"
-                >
+                <n-button text type="primary" size="large" class="hero-button" @click="scrollToFeatures">
                   了解更多
                 </n-button>
               </div>
@@ -118,11 +101,7 @@
 
             <div class="hero-visual">
               <div class="feature-cards">
-                <div
-                  v-for="card in featureCards"
-                  :key="card.id"
-                  class="feature-card"
-                >
+                <div v-for="card in featureCards" :key="card.id" class="feature-card">
                   <div class="card-icon">
                     <component :is="card.icon" />
                   </div>
@@ -138,10 +117,7 @@
       </section>
 
       <!-- 功能特性 -->
-      <section
-        ref="featuresSection"
-        class="features-section"
-      >
+      <section ref="featuresSection" class="features-section">
         <div class="container">
           <div class="section-header">
             <h2 class="section-title">
@@ -153,11 +129,7 @@
           </div>
 
           <div class="features-grid">
-            <div
-              v-for="feature in features"
-              :key="feature.id"
-              class="feature-item"
-            >
+            <div v-for="feature in features" :key="feature.id" class="feature-item">
               <div class="feature-icon">
                 <component :is="feature.icon" />
               </div>
@@ -176,11 +148,7 @@
       <section class="stats-section">
         <div class="container">
           <div class="stats-grid">
-            <div
-              v-for="stat in stats"
-              :key="stat.id"
-              class="stat-item"
-            >
+            <div v-for="stat in stats" :key="stat.id" class="stat-item">
               <div class="stat-number">
                 {{ stat.number }}
               </div>
@@ -198,36 +166,17 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-brand">
-            <img
-              src="/icons/xiaoyugan.png"
-              alt="XYZW"
-              class="footer-logo"
-            >
+            <img src="/icons/xiaoyugan.png" alt="XYZW" class="footer-logo">
             <span class="footer-text">XYZW 游戏管理系统</span>
           </div>
           <div class="footer-links">
-            <router-link
-              to="/changelog"
-              class="footer-link"
-            >
+            <router-link to="/changelog" class="footer-link">
               更新日志
             </router-link>
-            <a
-              href="#"
-              class="footer-link"
-            >关于我们</a>
-            <a
-              href="#"
-              class="footer-link"
-            >隐私政策</a>
-            <a
-              href="#"
-              class="footer-link"
-            >服务条款</a>
-            <a
-              href="#"
-              class="footer-link"
-            >联系我们</a>
+            <a href="#" class="footer-link">关于我们</a>
+            <a href="#" class="footer-link">隐私政策</a>
+            <a href="#" class="footer-link">服务条款</a>
+            <a href="#" class="footer-link">联系我们</a>
           </div>
         </div>
         <div class="footer-bottom">
@@ -582,6 +531,7 @@ onMounted(() => {
   padding: var(--spacing-2xl) 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
+
 /* 深色主题下统计区背景 */
 [data-theme="dark"] .stats-section {
   background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
@@ -691,6 +641,11 @@ onMounted(() => {
   .nav-actions {
     flex-direction: column;
     gap: var(--spacing-xs);
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: var(--spacing-md);
   }
 }
 </style>

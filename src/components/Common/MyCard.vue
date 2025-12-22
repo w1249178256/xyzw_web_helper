@@ -253,4 +253,25 @@ const $props = defineProps<{
         }
     }
 }
+
+@media (max-width: 768px) {
+    .status-card {
+        padding: var(--spacing-md);
+        min-height: auto;
+    }
+
+    .card-header {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+        margin-bottom: var(--spacing-md);
+
+        .status-title {
+            min-width: 100px;
+        }
+        
+        .status-badge {
+            margin-left: auto;
+        }
+    }
+}
 </style>

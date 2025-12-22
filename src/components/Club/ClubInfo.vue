@@ -31,7 +31,7 @@
                 <n-avatar :size="48" :src="club.logo || '/icons/xiaoyugan.png'" />
                 <div class="meta">
                   <div class="name">{{ club.name }}</div>
-                  <div class="sub">ID {{ club.id }} · Lv.{{ club.level }} · 服务器 {{ club.serverId -27 }}</div>
+                  <div class="sub">ID {{ club.id }} · Lv.{{ club.level }} · 服务器 {{ club.serverId - 27 }}</div>
                 </div>
               </div>
               <div class="overview-actions">
@@ -96,12 +96,12 @@
           <n-tab-pane name="records" tab="盐场战绩" display-directive="show:lazy">
             <ClubBattleRecords inline />
           </n-tab-pane>
-          
+
           <n-tab-pane name="history" tab="俱乐部历史战绩" display-directive="show:lazy">
             <ClubHistoryRecords inline />
           </n-tab-pane>
 
-          
+
         </n-tabs>
       </div>
     </template>
@@ -249,6 +249,25 @@ const formatNumber = (num) => {
     gap: var(--spacing-md);
   }
 
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-sm);
+    }
+
+    .member-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .member-row .right {
+      width: 100%;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+  }
+
   .item {
     background: var(--bg-tertiary);
     border-radius: var(--border-radius-medium);
@@ -318,7 +337,11 @@ const formatNumber = (num) => {
     font-feature-settings: 'tnum' 1;
     font-variant-numeric: tabular-nums;
   }
-  .member-row .red-quench {font-feature-settings: 'tnum' 1; font-variant-numeric: tabular-nums; }
+
+  .member-row .red-quench {
+    font-feature-settings: 'tnum' 1;
+    font-variant-numeric: tabular-nums;
+  }
 
   .hint {
     margin-top: 8px;
@@ -346,8 +369,17 @@ const formatNumber = (num) => {
 
 .status-info {
   flex: 1;
-  h3 { margin: 0; font-size: var(--font-size-lg); }
-  p { margin: 0; color: var(--text-secondary); font-size: var(--font-size-sm); }
+
+  h3 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+  }
 }
 
 .status-badge {

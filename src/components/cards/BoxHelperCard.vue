@@ -1,7 +1,7 @@
 <template>
   <MyCard class="bottle-helper" :statusClass="{ active: state.isRunning }">
     <template #icon>
-      <img src="/box/zsbx.png" alt="宝箱图标" />
+      <img :src="iconPath" alt="宝箱图标" />
     </template>
     <template #title>
       <h3>宝箱助手</h3>
@@ -47,28 +47,31 @@ import MyCard from "../Common/MyCard.vue";
 const tokenStore = useTokenStore();
 const message = useMessage();
 
+const iconPath = computed(() => import.meta.env.BASE_URL + 'box/zsbx.png');
+
 const roleInfo = computed(() => tokenStore.gameData?.roleInfo || null);
 
 const boxDataList = computed(() => {
+  const getImgPath = (path) => import.meta.env.BASE_URL + path.replace(/^\//, '');
   return [
     {
       type: "木质宝箱",
-      img: "/box/mzbx.png",
+      img: getImgPath("/box/mzbx.png"),
       count: roleInfo.value?.role?.items?.[2001]?.quantity || 0,
     },
     {
       type: "青铜宝箱",
-      img: "/box/qtbx.png",
+      img: getImgPath("/box/qtbx.png"),
       count: roleInfo.value?.role?.items?.[2002]?.quantity || 0,
     },
     {
       type: "黄金宝箱",
-      img: "/box/hjbx.png",
+      img: getImgPath("/box/hjbx.png"),
       count: roleInfo.value?.role?.items?.[2003]?.quantity || 0,
     },
     {
       type: "铂金宝箱",
-      img: "/box/bjbx.png",
+      img: getImgPath("/box/bjbx.png"),
       count: roleInfo.value?.role?.items?.[2004]?.quantity || 0,
     },
   ];

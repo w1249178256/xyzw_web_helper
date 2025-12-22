@@ -81,6 +81,15 @@ const my_routes = [
           requiresToken: true
         }
       },
+      {
+        path: 'batch-daily-tasks',
+        name: 'BatchDailyTasks',
+        component: () => import('@/views/BatchDailyTasks.vue'),
+        meta: {
+          title: '批量日常',
+          requiresToken: true
+        }
+      },
       // 增加自动路由引用
       ...generatedRoutes,
     ]

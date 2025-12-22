@@ -180,7 +180,7 @@
           <i class="mdi:bed-empty"></i>
         </template>
         还没有导入任何Token
-        <a-button type="link" @click="openshowImportForm">打开Tokeng管理</a-button>
+        <a-button type="link" @click="openshowImportForm">打开Token管理</a-button>
       </a-empty>
     </div>
 
@@ -295,7 +295,7 @@ const bulkOptions = [
 /**
  * 手动打开Token管理卡片
  */
-const openshowImportForm = ()=>{
+const openshowImportForm = () => {
   showImportForm.value = true
 }
 
