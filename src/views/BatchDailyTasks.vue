@@ -15,19 +15,28 @@
 
     <!-- Token Selection -->
     <n-card title="账号列表" class="token-list-card">
-      <template #header-extra>
-        <n-space>
-          <n-button size="small" @click="claimHangUpRewards" :disabled="isRunning || selectedTokens.length === 0">
-            领取挂机
-          </n-button>
-          <n-button size="small" @click="resetBottles" :disabled="isRunning || selectedTokens.length === 0">
-            重置罐子
-          </n-button>
-          <n-button size="small" @click="climbTower" :disabled="isRunning || selectedTokens.length === 0">
-            一键爬塔
-          </n-button>
-        </n-space>
-      </template>
+      <n-space style="margin-bottom: 12px">
+        <n-button size="small" @click="claimHangUpRewards" :disabled="isRunning || selectedTokens.length === 0">
+          领取挂机
+        </n-button>
+        <n-button size="small" @click="resetBottles" :disabled="isRunning || selectedTokens.length === 0">
+          重置罐子
+        </n-button>
+        <n-button size="small" @click="climbTower" :disabled="isRunning || selectedTokens.length === 0">
+          一键爬塔
+        </n-button>
+        <n-button size="small" @click="batchStudy" :disabled="isRunning || selectedTokens.length === 0">
+          一键答题
+        </n-button>
+        <n-button size="small" @click="batchSmartSendCar"
+          :disabled="isRunning || selectedTokens.length === 0 || !isCarActivityOpen">
+          智能发车
+        </n-button>
+        <n-button size="small" @click="batchClaimCars"
+          :disabled="isRunning || selectedTokens.length === 0 || !isCarActivityOpen">
+          一键收车
+        </n-button>
+      </n-space>
       <n-space vertical>
         <n-checkbox :checked="isAllSelected" :indeterminate="isIndeterminate" @update:checked="handleSelectAll">
           全选
@@ -117,6 +126,7 @@
 import { ref, computed, nextTick, reactive } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { DailyTaskRunner } from '@/utils/dailyTaskRunner'
+import { preloadQuestions } from '@/utils/studyQuestionsFromJSON.js'
 import { useMessage } from 'naive-ui'
 import { Settings } from '@vicons/ionicons5'
 
@@ -125,6 +135,11 @@ const message = useMessage()
 const runner = new DailyTaskRunner(tokenStore)
 
 const tokens = computed(() => tokenStore.gameTokens)
+const isCarActivityOpen = computed(() => {
+  const day = new Date().getDay()
+  // 1=Mon, 2=Tue, 3=Wed
+  return day >= 1 && day <= 3
+})
 const selectedTokens = ref([])
 const tokenStatus = ref({}) // { tokenId: 'waiting' | 'running' | 'completed' | 'failed' }
 const isRunning = ref(false)
@@ -366,36 +381,48 @@ const ensureConnection = async (tokenId) => {
 
   // 1. Check current status
   let status = tokenStore.getWebSocketStatus(tokenId)
+  let connected = status === 'connected'
 
   // 2. If not connected, try to connect
-  if (status !== 'connected') {
+  if (!connected) {
     addLog({ time: new Date().toLocaleTimeString(), message: `正在连接...`, type: 'info' })
     tokenStore.createWebSocketConnection(tokenId, latestToken.token, latestToken.wsUrl)
-    const connected = await waitForConnection(tokenId)
-    if (connected) return true
+    connected = await waitForConnection(tokenId)
 
-    // First attempt failed
-    addLog({ time: new Date().toLocaleTimeString(), message: `连接超时，尝试重连...`, type: 'warning' })
-  } else {
-    // Already connected...
-    return true
+    if (!connected) {
+      // First attempt failed
+      addLog({ time: new Date().toLocaleTimeString(), message: `连接超时，尝试重连...`, type: 'warning' })
+
+      // 3. Retry connection (Force reconnect)
+      tokenStore.closeWebSocketConnection(tokenId)
+      await new Promise(r => setTimeout(r, 2000)) // Wait longer for cleanup
+
+      addLog({ time: new Date().toLocaleTimeString(), message: `正在重连...`, type: 'info' })
+
+      // Re-fetch token again just in case it was updated during the wait
+      const refreshedToken = tokens.value.find(t => t.id === tokenId)
+      tokenStore.createWebSocketConnection(tokenId, refreshedToken.token, refreshedToken.wsUrl)
+
+      connected = await waitForConnection(tokenId)
+    }
   }
-
-  // 3. Retry connection (Force reconnect)
-  // Close existing if any
-  tokenStore.closeWebSocketConnection(tokenId)
-  await new Promise(r => setTimeout(r, 2000)) // Wait longer for cleanup
-
-  addLog({ time: new Date().toLocaleTimeString(), message: `正在重连...`, type: 'info' })
-
-  // Re-fetch token again just in case it was updated during the wait
-  const refreshedToken = tokens.value.find(t => t.id === tokenId)
-  tokenStore.createWebSocketConnection(tokenId, refreshedToken.token, refreshedToken.wsUrl)
-
-  const connected = await waitForConnection(tokenId)
 
   if (!connected) {
     throw new Error('连接失败 (重试后仍超时)')
+  }
+
+  // Initialize Game Data (Critical for Battle Version and Session)
+  try {
+    // Fetch Role Info first (Standard flow)
+    await tokenStore.sendMessageWithPromise(tokenId, "role_getroleinfo", {}, 5000);
+
+    // Fetch Battle Version
+    const res = await tokenStore.sendMessageWithPromise(tokenId, "fight_startlevel", {}, 5000);
+    if (res?.battleData?.version) {
+      tokenStore.setBattleVersion(res.battleData.version);
+    }
+  } catch (e) {
+    addLog({ time: new Date().toLocaleTimeString(), message: `初始化数据失败: ${e.message}`, type: 'warning' })
   }
 
   return true
@@ -428,6 +455,8 @@ const climbTower = async () => {
       await ensureConnection(tokenId)
 
       // Initial check
+      // 模仿 TowerStatus.vue 的逻辑，同时请求 tower_getinfo 和 role_getroleinfo
+      await tokenStore.sendMessageWithPromise(tokenId, 'tower_getinfo', {}, 5000).catch(() => { })
       let roleInfo = await tokenStore.sendGetRoleInfo(tokenId)
       let energy = roleInfo?.role?.tower?.energy || 0
       addLog({ time: new Date().toLocaleTimeString(), message: `初始体力: ${energy}`, type: 'info' })
@@ -445,11 +474,17 @@ const climbTower = async () => {
           consecutiveFailures = 0
           addLog({ time: new Date().toLocaleTimeString(), message: `爬塔第 ${count} 次`, type: 'info' })
 
-          await new Promise(r => setTimeout(r, 1500))
+          // 增加等待时间，确保服务器数据更新
+          await new Promise(r => setTimeout(r, 2000))
 
-          // Refresh energy
+          // Refresh energy - 同时发送 tower_getinfo 以确保数据最新
+          tokenStore.sendMessage(tokenId, 'tower_getinfo')
           roleInfo = await tokenStore.sendGetRoleInfo(tokenId)
-          energy = roleInfo?.role?.tower?.energy || 0
+
+          // 优先从 store 中获取最新的（虽然 sendGetRoleInfo 返回的也是最新的，但双重保险）
+          const storeRoleInfo = tokenStore.gameData?.roleInfo
+          energy = storeRoleInfo?.role?.tower?.energy ?? roleInfo?.role?.tower?.energy ?? 0
+
         } catch (err) {
           // Check for specific error code indicating no energy/attempts left
           if (err.message && err.message.includes('200400')) {
@@ -493,6 +528,386 @@ const climbTower = async () => {
   isRunning.value = false
   currentRunningTokenId.value = null
   message.success('批量爬塔结束')
+}
+
+const batchStudy = async () => {
+  if (selectedTokens.value.length === 0) return
+
+  isRunning.value = true
+  shouldStop.value = false
+  logs.value = []
+
+  // Reset status
+  selectedTokens.value.forEach(id => {
+    tokenStatus.value[id] = 'waiting'
+  })
+
+  // Preload questions
+  addLog({ time: new Date().toLocaleTimeString(), message: `正在加载题库...`, type: 'info' })
+  await preloadQuestions()
+
+  for (const tokenId of selectedTokens.value) {
+    if (shouldStop.value) break
+
+    currentRunningTokenId.value = tokenId
+    tokenStatus.value[tokenId] = 'running'
+    currentProgress.value = 0
+
+    const token = tokens.value.find(t => t.id === tokenId)
+
+    try {
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== 开始答题: ${token.name} ===`, type: 'info' })
+
+      await ensureConnection(tokenId)
+
+      // Reset local study status
+      tokenStore.gameData.studyStatus = {
+        isAnswering: false,
+        questionCount: 0,
+        answeredCount: 0,
+        status: '',
+        timestamp: null
+      }
+
+      // Send start command
+      await tokenStore.sendMessageWithPromise(tokenId, 'study_startgame', {}, 5000)
+
+      // Wait for completion
+      let maxWait = 90 // 90 seconds timeout
+      let completed = false
+      let lastStatus = ''
+
+      while (maxWait > 0) {
+        if (shouldStop.value) break
+
+        const status = tokenStore.gameData.studyStatus
+
+        if (status.status !== lastStatus) {
+          lastStatus = status.status
+          if (status.status === 'answering') {
+            addLog({ time: new Date().toLocaleTimeString(), message: `开始答题...`, type: 'info' })
+          } else if (status.status === 'claiming_rewards') {
+            addLog({ time: new Date().toLocaleTimeString(), message: `正在领取奖励...`, type: 'info' })
+          }
+        }
+
+        if (status.status === 'answering' && status.questionCount > 0) {
+          // Update progress log occasionally or just rely on final success
+          // addLog({ time: new Date().toLocaleTimeString(), message: `进度: ${status.answeredCount}/${status.questionCount}`, type: 'info' })
+        }
+
+        if (status.status === 'completed') {
+          completed = true
+          break
+        }
+
+        await new Promise(r => setTimeout(r, 1000))
+        maxWait--
+      }
+
+      if (completed) {
+        tokenStatus.value[tokenId] = 'completed'
+        addLog({ time: new Date().toLocaleTimeString(), message: `=== ${token.name} 答题完成 ===`, type: 'success' })
+      } else {
+        if (shouldStop.value) {
+          addLog({ time: new Date().toLocaleTimeString(), message: `已停止`, type: 'warning' })
+        } else {
+          tokenStatus.value[tokenId] = 'failed'
+          addLog({ time: new Date().toLocaleTimeString(), message: `答题超时或未开始`, type: 'error' })
+        }
+      }
+
+    } catch (error) {
+      console.error(error)
+      tokenStatus.value[tokenId] = 'failed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `答题失败: ${error.message}`, type: 'error' })
+    }
+
+    currentProgress.value = 100
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  isRunning.value = false
+  currentRunningTokenId.value = null
+  message.success('批量答题结束')
+}
+
+// --- Car Helper Functions ---
+const normalizeCars = (raw) => {
+  const r = raw || {}
+  const body = r.body || r
+  const roleCar = body.roleCar || body.rolecar || {}
+
+  // 优先从 roleCar.carDataMap 解析（id -> info）
+  const carMap = roleCar.carDataMap || roleCar.cardatamap
+  if (carMap && typeof carMap === 'object') {
+    return Object.entries(carMap).map(([id, info], idx) => ({ key: idx, id, ...(info || {}) }))
+  }
+
+  // 兜底
+  let arr = body.cars || body.list || body.data || body.carList || body.vehicles || []
+  if (!Array.isArray(arr) && typeof arr === 'object' && arr !== null) arr = Object.values(arr)
+  if (Array.isArray(body) && arr.length === 0) arr = body
+  return (Array.isArray(arr) ? arr : []).map((it, idx) => ({ key: idx, ...it }))
+}
+
+const gradeLabel = (color) => {
+  const map = { 1: '绿·普通', 2: '蓝·稀有', 3: '紫·史诗', 4: '橙·传说', 5: '红·神话', 6: '金·传奇' }
+  return map[color] || '未知'
+}
+
+const isBigPrize = (rewards) => {
+  const bigPrizes = [
+    { type: 3, itemId: 3201, value: 10 },
+    { type: 3, itemId: 1001, value: 10 },
+    { type: 3, itemId: 1022, value: 2000 },
+    { type: 2, itemId: 0, value: 2000 },
+    { type: 3, itemId: 1023, value: 5 },
+    { type: 3, itemId: 1022, value: 2500 },
+    { type: 3, itemId: 1001, value: 12 }
+  ]
+  if (!Array.isArray(rewards)) return false
+  return bigPrizes.some(p => rewards.find(r => r.type === p.type && r.itemId === p.itemId && Number(r.value || 0) >= p.value))
+}
+
+const countRacingRefreshTickets = (rewards) => {
+  if (!Array.isArray(rewards)) return 0
+  return rewards.reduce((acc, r) => acc + ((r.type === 3 && r.itemId === 35002) ? Number(r.value || 0) : 0), 0)
+}
+
+const shouldSendCar = (car, tickets) => {
+  const color = Number(car?.color || 0)
+  const rewards = Array.isArray(car?.rewards) ? car.rewards : []
+  const racingTickets = countRacingRefreshTickets(rewards)
+  if (tickets >= 6) {
+    return color >= 5 || racingTickets >= 4 || isBigPrize(rewards)
+  }
+  return color >= 4 || racingTickets >= 2 || isBigPrize(rewards)
+}
+
+const FOUR_HOURS_MS = 4 * 60 * 60 * 1000
+const canClaim = (car) => {
+  const t = Number(car?.sendAt || 0)
+  if (!t) return false
+  const tsMs = t < 1e12 ? t * 1000 : t
+  return Date.now() - tsMs >= FOUR_HOURS_MS
+}
+
+const batchSmartSendCar = async () => {
+  if (selectedTokens.value.length === 0) return
+
+  isRunning.value = true
+  shouldStop.value = false
+  logs.value = []
+
+  // Reset status
+  selectedTokens.value.forEach(id => {
+    tokenStatus.value[id] = 'waiting'
+  })
+
+  for (const tokenId of selectedTokens.value) {
+    if (shouldStop.value) break
+
+    currentRunningTokenId.value = tokenId
+    tokenStatus.value[tokenId] = 'running'
+    currentProgress.value = 0
+
+    const token = tokens.value.find(t => t.id === tokenId)
+
+    try {
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== 开始智能发车: ${token.name} ===`, type: 'info' })
+
+      await ensureConnection(tokenId)
+
+      // 1. Fetch Car Info
+      addLog({ time: new Date().toLocaleTimeString(), message: `获取车辆信息...`, type: 'info' })
+      const res = await tokenStore.sendMessageWithPromise(tokenId, 'car_getrolecar', {}, 10000)
+      let carList = normalizeCars(res?.body ?? res)
+
+      // 2. Fetch Tickets
+      let refreshTickets = 0
+      try {
+        const roleRes = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {}, 10000)
+        const qty = roleRes?.role?.items?.[35002]?.quantity
+        refreshTickets = Number(qty || 0)
+        addLog({ time: new Date().toLocaleTimeString(), message: `剩余车票: ${refreshTickets}`, type: 'info' })
+      } catch (_) { }
+
+      // 3. Process Cars
+      for (const car of carList) {
+        if (shouldStop.value) break
+
+        if (Number(car.sendAt || 0) !== 0) continue // Already sent
+
+        // Check if we should send immediately
+        if (shouldSendCar(car, refreshTickets)) {
+          addLog({ time: new Date().toLocaleTimeString(), message: `车辆[${gradeLabel(car.color)}]满足条件，直接发车`, type: 'info' })
+          await tokenStore.sendMessageWithPromise(tokenId, 'car_send', {
+            carId: String(car.id),
+            helperId: 0,
+            text: '',
+            isUpgrade: false
+          }, 10000)
+          await new Promise(r => setTimeout(r, 500))
+          continue
+        }
+
+        // Try to refresh
+        let shouldRefresh = false
+        const free = Number(car.refreshCount ?? 0) === 0
+        if (refreshTickets >= 6) shouldRefresh = true
+        else if (free) shouldRefresh = true
+        else {
+          // No tickets and not free, just send
+          addLog({ time: new Date().toLocaleTimeString(), message: `车辆[${gradeLabel(car.color)}]不满足条件且无刷新次数，直接发车`, type: 'warning' })
+          await tokenStore.sendMessageWithPromise(tokenId, 'car_send', {
+            carId: String(car.id),
+            helperId: 0,
+            text: '',
+            isUpgrade: false
+          }, 10000)
+          await new Promise(r => setTimeout(r, 500))
+          continue
+        }
+
+        // Refresh loop
+        while (shouldRefresh) {
+          if (shouldStop.value) break
+
+          addLog({ time: new Date().toLocaleTimeString(), message: `车辆[${gradeLabel(car.color)}]尝试刷新...`, type: 'info' })
+          const resp = await tokenStore.sendMessageWithPromise(tokenId, 'car_refresh', { carId: String(car.id) }, 10000)
+          const data = resp?.car || resp?.body?.car || resp
+
+          // Update local car info
+          if (data && typeof data === 'object') {
+            if (data.color != null) car.color = Number(data.color)
+            if (data.refreshCount != null) car.refreshCount = Number(data.refreshCount)
+            if (data.rewards != null) car.rewards = data.rewards
+          }
+
+          // Update tickets
+          try {
+            const roleRes = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {}, 5000)
+            refreshTickets = Number(roleRes?.role?.items?.[35002]?.quantity || 0)
+          } catch (_) { }
+
+          // Check if good enough now
+          if (shouldSendCar(car, refreshTickets)) {
+            addLog({ time: new Date().toLocaleTimeString(), message: `刷新后车辆[${gradeLabel(car.color)}]满足条件，发车`, type: 'success' })
+            await tokenStore.sendMessageWithPromise(tokenId, 'car_send', {
+              carId: String(car.id),
+              helperId: 0,
+              text: '',
+              isUpgrade: false
+            }, 10000)
+            await new Promise(r => setTimeout(r, 500))
+            break
+          }
+
+          // Check if can continue refreshing
+          const freeNow = Number(car.refreshCount ?? 0) === 0
+          if (refreshTickets >= 6) shouldRefresh = true
+          else if (freeNow) shouldRefresh = true
+          else {
+            addLog({ time: new Date().toLocaleTimeString(), message: `刷新后车辆[${gradeLabel(car.color)}]仍不满足条件且无刷新次数，发车`, type: 'warning' })
+            await tokenStore.sendMessageWithPromise(tokenId, 'car_send', {
+              carId: String(car.id),
+              helperId: 0,
+              text: '',
+              isUpgrade: false
+            }, 10000)
+            await new Promise(r => setTimeout(r, 500))
+            break
+          }
+
+          await new Promise(r => setTimeout(r, 1000))
+        }
+      }
+
+      tokenStatus.value[tokenId] = 'completed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== ${token.name} 智能发车完成 ===`, type: 'success' })
+
+    } catch (error) {
+      console.error(error)
+      tokenStatus.value[tokenId] = 'failed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `智能发车失败: ${error.message}`, type: 'error' })
+    }
+
+    currentProgress.value = 100
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  isRunning.value = false
+  currentRunningTokenId.value = null
+  message.success('批量智能发车结束')
+}
+
+const batchClaimCars = async () => {
+  if (selectedTokens.value.length === 0) return
+
+  isRunning.value = true
+  shouldStop.value = false
+  logs.value = []
+
+  // Reset status
+  selectedTokens.value.forEach(id => {
+    tokenStatus.value[id] = 'waiting'
+  })
+
+  for (const tokenId of selectedTokens.value) {
+    if (shouldStop.value) break
+
+    currentRunningTokenId.value = tokenId
+    tokenStatus.value[tokenId] = 'running'
+    currentProgress.value = 0
+
+    const token = tokens.value.find(t => t.id === tokenId)
+
+    try {
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== 开始一键收车: ${token.name} ===`, type: 'info' })
+
+      await ensureConnection(tokenId)
+
+      // 1. Fetch Car Info
+      addLog({ time: new Date().toLocaleTimeString(), message: `获取车辆信息...`, type: 'info' })
+      const res = await tokenStore.sendMessageWithPromise(tokenId, 'car_getrolecar', {}, 10000)
+      let carList = normalizeCars(res?.body ?? res)
+
+      // 2. Claim Cars
+      let claimedCount = 0
+      for (const car of carList) {
+        if (canClaim(car)) {
+          try {
+            await tokenStore.sendMessageWithPromise(tokenId, 'car_claim', { carId: String(car.id) }, 10000)
+            claimedCount++
+            addLog({ time: new Date().toLocaleTimeString(), message: `收车成功: ${gradeLabel(car.color)}`, type: 'success' })
+          } catch (e) {
+            addLog({ time: new Date().toLocaleTimeString(), message: `收车失败: ${e.message}`, type: 'warning' })
+          }
+          await new Promise(r => setTimeout(r, 300))
+        }
+      }
+
+      if (claimedCount === 0) {
+        addLog({ time: new Date().toLocaleTimeString(), message: `没有可收取的车辆`, type: 'info' })
+      }
+
+      tokenStatus.value[tokenId] = 'completed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== ${token.name} 收车完成，共收取 ${claimedCount} 辆 ===`, type: 'success' })
+
+    } catch (error) {
+      console.error(error)
+      tokenStatus.value[tokenId] = 'failed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `收车失败: ${error.message}`, type: 'error' })
+    }
+
+    currentProgress.value = 100
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  isRunning.value = false
+  currentRunningTokenId.value = null
+  message.success('批量一键收车结束')
 }
 
 const startBatch = async () => {

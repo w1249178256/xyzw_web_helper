@@ -25,6 +25,9 @@
     <!-- 咸将塔状态 -->
     <TowerStatus v-show="activeSection === 'daily' && isShowTowerStatus" />
 
+    <!-- 怪异塔状态 -->
+    <WeirdTowerStatus v-show="activeSection === 'daily'" />
+
     <!-- 盐罐机器人状态（提取组件） -->
     <BottleHelperCard v-show="activeSection === 'daily'" />
 
@@ -42,9 +45,12 @@
 
     <!-- 升星助手（提取组件） -->
     <StarUpgradeCard v-if="activeSection === 'tools'" />
-	
+    	
 	<!-- 竞技场助手（提取组件） -->
     <FightHelperCard v-if="activeSection === 'tools'" />
+    	
+	<!-- 梦境助手（提取组件） -->
+    <DreamHelperCard v-if="activeSection === 'tools'" />
 	
     <!-- 俱乐部排位（暂时隐藏） -->
     <div class="status-card legion-match" v-if="ENABLE_LEGION_MATCH && activeSection === 'club'">
@@ -145,6 +151,9 @@ import TopClubList from './cards/TopClubListPageCard.vue';
 import GoldClubList from './cards/GoldRankListPageCard.vue';
 import FightPvp from './cards/FightPvp.vue';
 import FightHelperCard from './cards/FightHelperCard.vue';
+import DreamHelperCard from './cards/DreamHelperCard.vue';
+import TowerStatus from './Tower/TowerStatus.vue';
+import WeirdTowerStatus from './Tower/WeirdTowerStatus.vue';
 const tokenStore = useTokenStore();
 const message = useMessage();
 

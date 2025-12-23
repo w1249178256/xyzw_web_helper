@@ -9,17 +9,18 @@
     <n-form-item :label="'Token字符串'" :path="'base64Token'" :show-label="true">
       <n-input v-model:value="importForm.base64Token" type="textarea" :rows="3" placeholder="粘贴Token字符串..." clearable>
         <template #suffix>
-          <n-popover :overlap="overlap" placement="right" trigger="hover">
+          <n-popover  placement="right" trigger="hover">
             <template #trigger>
               <n-icon :depth="1">
                  <AlertCircleOutline/>
-              </n-icon>
+              </n-icon> 
             </template>
             <div class="large-text">
               输入格式为：{"roleToken":"****","sessId":***,"connId":***,"isRestore":***}
             </div>
           </n-popover>
         </template>
+        
       </n-input>
     </n-form-item>
 

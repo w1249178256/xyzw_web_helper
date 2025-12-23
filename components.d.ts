@@ -33,6 +33,7 @@ declare module 'vue' {
     ClubWarrank: typeof import('./src/components/Club/ClubWarrank.vue')['default']
     DailyTaskCard: typeof import('./src/components/Daily/DailyTaskCard.vue')['default']
     DailyTaskStatus: typeof import('./src/components/Daily/DailyTaskStatus.vue')['default']
+    FightHelperCard: typeof import('./src/components/cards/FightHelperCard.vue')['default']
     FightPvp: typeof import('./src/components/cards/FightPvp.vue')['default']
     FishHelperCard: typeof import('./src/components/cards/FishHelperCard.vue')['default']
     GameStatus: typeof import('./src/components/GameStatus.vue')['default']

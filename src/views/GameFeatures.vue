@@ -278,6 +278,7 @@ const initializeGameData = async () => {
     // 获取初始化数据（静默）
     tokenStore.sendMessage(tokenId, "role_getroleinfo");
     tokenStore.sendMessage(tokenId, "tower_getinfo");
+    tokenStore.sendMessage(tokenId, "evotower_getinfo");
     tokenStore.sendMessage(tokenId, "presetteam_getinfo");
     const res = await tokenStore.sendMessageWithPromise(tokenId, "fight_startlevel");
     tokenStore.setBattleVersion(res?.battleData?.version);

@@ -152,6 +152,8 @@ export function registerDefaultCommands(reg) {
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
     .register("mail_claimallattachment", { category: 0 })
+    .register("mail_getmtlinfo" ) 
+    .register("mail_getmtlshortinfo" ) 
 
     // 学习问答
     .register("study_startgame")

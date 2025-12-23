@@ -81,7 +81,7 @@
                 <div v-for="m in topMembers" :key="m.roleId" class="member-row">
                   <div class="left">
                     <n-avatar :size="28" :src="m.headImg || '/icons/xiaoyugan.png'" />
-                    <span class="name">{{ m.name }}</span>
+                    <span class="name">{{ m.name }}(ID:{{ m.roleId }})</span>
                   </div>
                   <div class="right">
                     <span class="power">{{ formatNumber(m.power || m.custom?.s_power || 0) }}</span>

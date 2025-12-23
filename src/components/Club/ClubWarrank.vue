@@ -209,11 +209,26 @@ const fetchBattleRecordsByDate = val => {
                             5000
                         );
                         const redQuenchCounts = [];
+                        const HolyBeastNum = [];
                         for (const [memberId, memberData] of Object.entries(detail?.legionData?.members)) {
                             if (memberData.custom?.red_quench_cnt !== undefined) {
                                 redQuenchCounts.push(memberData.custom.red_quench_cnt + "红");
                             }
                         }
+                        const tempRoleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'rank_getroleinfo',
+                          {
+                              bottleType: 0,
+                              includeBottleTeam: false,
+                              isSearch: false,
+                              roleId: memberId
+                          }, 5000)
+                          let holyBeast = 0;
+                          for (const [heroId, heroData] of Object.entries(tempRoleInfo?.roleInfo?.heroes)) {
+                            if(heroData.hB?.active !== undefined){
+                              holyBeast++;
+                            }
+                          }
+                          HolyBeastNum.push(holyBeast)
 
 
                         return {
@@ -224,7 +239,10 @@ const fetchBattleRecordsByDate = val => {
                             redno: redQuenchCounts || 0,
                             redno1: redQuenchCounts[0] || '0红',
                             redno2: redQuenchCounts[1] || '0红',
-                            redno3: redQuenchCounts[2] || '0红'
+                            redno3: redQuenchCounts[2] || '0红',
+                            hb1:HolyBeastNum[0]||0,
+                            hb2:HolyBeastNum[1]||0,
+                            hb3:HolyBeastNum[2]||0
                         };
                     } catch (error) {
                         console.error(`查询俱乐部${club.id}详情失败:`, error);
@@ -271,7 +289,7 @@ const fetchBattleRecordsByDate = val => {
                         5000
                     );
                     const redQuenchCounts = [];
-                        const HolyBeastNum = [];
+                    const HolyBeastNum = [];
                     for (const [memberId, memberData] of Object.entries(detail?.legionData?.members)) {
                         if (memberData.custom?.red_quench_cnt !== undefined) {
                             redQuenchCounts.push(memberData.custom.red_quench_cnt + "红");
@@ -303,7 +321,7 @@ const fetchBattleRecordsByDate = val => {
                         redno3: redQuenchCounts[2] || 0,
                         hb1:HolyBeastNum[0]||0,
                         hb2:HolyBeastNum[1]||0,
-                        hb3:HolyBeastNum[2]||0,
+                        hb3:HolyBeastNum[2]||0
                     };
                 } catch (error) {
                     console.error(`查询俱乐部${club.id}详情失败:`, error);
@@ -342,11 +360,13 @@ const handleExport1 = async () => {
   }
 
   try {
-    const exportText = formatWarrankRecordsForExport(
-      battleRecords1.value.legionRankList,
-      queryDate.value
-    )
-    exportToImage()
+    //导出图片
+    exportToImage() 
+    //导出excel,俩种方式自选一种吧
+    // const exportText = formatWarrankRecordsForExport(
+    //   battleRecords1.value.legionRankList,
+    //   queryDate.value
+    // )
     message.success('导出成功')
   } catch (error) {
     console.error('导出失败:', error)

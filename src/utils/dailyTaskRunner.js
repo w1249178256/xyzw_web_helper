@@ -81,6 +81,11 @@ export class DailyTaskRunner {
 
       this.log(`检查${formationName}配置...`)
       const teamInfo = await this.executeGameCommand(tokenId, 'presetteam_getinfo', {}, '获取阵容信息')
+
+      if (!teamInfo || !teamInfo.presetTeamInfo) {
+        this.log(`阵容信息异常: ${JSON.stringify(teamInfo)}`, 'warning')
+      }
+
       const currentFormation = teamInfo?.presetTeamInfo?.useTeamId
       this.log(`当前阵容: ${currentFormation}`)
 

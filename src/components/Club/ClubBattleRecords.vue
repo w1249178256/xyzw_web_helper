@@ -392,11 +392,13 @@ const handleExport = async () => {
   }
 
   try {
-    const exportText = formatBattleRecordsForExport(
-      battleRecords.value.roleDetailsList,
-      queryDate.value
-    )
-    await copyToClipboard(exportText)
+    //导出成excel
+    // const exportText = formatBattleRecordsForExport(
+    //   battleRecords.value.roleDetailsList,
+    //   queryDate.value
+    // )
+    // await copyToClipboard(exportText)
+    //导出成图片,两种方式自选一吧
     exportToImage()
     message.success('战绩已复制到剪贴板')
   } catch (error) {
