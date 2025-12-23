@@ -167,6 +167,10 @@ export function registerDefaultCommands(reg) {
     .register("fight_startdungeon")
     .register("fight_startpvp")
 
+    // 怪异咸将塔
+    .register("evotower_getinfo")
+    .register("evotower_fight")
+
     // 瓶子机器人
     .register("bottlehelper_claim")
     .register("bottlehelper_start", { bottleType: -1 })

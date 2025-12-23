@@ -84,7 +84,7 @@ import MyCard from "../Common/MyCard.vue";
 const tokenStore = useTokenStore();
 const message = useMessage();
 
-const iconPath = computed(() => import.meta.env.BASE_URL + 'dream.png');
+const iconPath = computed(() => import.meta.env.BASE_URL + '174061875626614.png');
 
 // 状态管理
 const isRunning = ref(false);

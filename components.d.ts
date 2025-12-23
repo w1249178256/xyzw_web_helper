@@ -33,6 +33,7 @@ declare module 'vue' {
     ClubWarrank: typeof import('./src/components/Club/ClubWarrank.vue')['default']
     DailyTaskCard: typeof import('./src/components/Daily/DailyTaskCard.vue')['default']
     DailyTaskStatus: typeof import('./src/components/Daily/DailyTaskStatus.vue')['default']
+    DreamHelperCard: typeof import('./src/components/cards/DreamHelperCard.vue')['default']
     FightHelperCard: typeof import('./src/components/cards/FightHelperCard.vue')['default']
     FightPvp: typeof import('./src/components/cards/FightPvp.vue')['default']
     FishHelperCard: typeof import('./src/components/cards/FishHelperCard.vue')['default']
@@ -59,5 +60,6 @@ declare module 'vue' {
     TopRankListPageCard: typeof import('./src/components/cards/TopRankListPageCard.vue')['default']
     TowerStatus: typeof import('./src/components/Tower/TowerStatus.vue')['default']
     WebSocketTester: typeof import('./src/components/Test/WebSocketTester.vue')['default']
+    WeirdTowerStatus: typeof import('./src/components/Tower/WeirdTowerStatus.vue')['default']
   }
 }

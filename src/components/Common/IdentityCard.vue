@@ -206,6 +206,42 @@ const blueJadeFromItems = computed(() => getItemCount(items.value, 10002));
 const redJadeFromItems = computed(() => getItemCount(items.value, 10003));
 const fourSaintFragmentFromItems = computed(() => getItemCount(items.value, 10101));
 
+// 新增资源
+const goldBagFromItems = computed(() => getItemCount(items.value, 3001)); // 金币袋子
+const diamondBagFromItems = computed(() => getItemCount(items.value, 3002)); // 金砖袋子
+const purpleFragmentFromItems = computed(() => getItemCount(items.value, 3005)); // 紫色随机碎片
+const orangeFragmentFromItems = computed(() => getItemCount(items.value, 3006)); // 橙色随机碎片
+const redFragmentFromItems = computed(() => getItemCount(items.value, 3007)); // 红色随机碎片
+const ironBagFromItems = computed(() => getItemCount(items.value, 3008)); // 精铁袋子
+const advanceBagFromItems = computed(() => getItemCount(items.value, 3009)); // 进阶袋子
+const nightmareBagFromItems = computed(() => getItemCount(items.value, 3010)); // 梦魇袋子
+const whiteJadeBagFromItems = computed(() => getItemCount(items.value, 3011)); // 白玉袋子
+const wrenchBagFromItems = computed(() => getItemCount(items.value, 3012)); // 扳手袋子
+const treasureBowlFromItems = computed(() => getItemCount(items.value, 3020)); // 聚宝盆
+const luxuryTreasureBowlFromItems = computed(() => getItemCount(items.value, 3021)); // 豪华聚宝盆
+const redUniversalFragmentFromItems = computed(() => getItemCount(items.value, 3201)); // 红色万能碎片
+const orangeUniversalFragmentFromItems = computed(() => getItemCount(items.value, 3302)); // 橙色万能碎片
+const indigoFromItems = computed(() => getItemCount(items.value, 1019)); // 盐靛
+const crystalFromItems = computed(() => getItemCount(items.value, 1016)); // 晶石
+const skinCoinFromItems = computed(() => getItemCount(items.value, 1020)); // 皮肤币
+const sweepCarpetFromItems = computed(() => getItemCount(items.value, 1021)); // 扫荡魔毯
+const shellFromItems = computed(() => getItemCount(items.value, 1033)); // 贝壳
+const goldIndigoFromItems = computed(() => getItemCount(items.value, 1035)); // 金盐靛
+const arenaTicketFromItems = computed(() => getItemCount(items.value, 1007)); // 竞技场门票
+const woodChestFromItems = computed(() => getItemCount(items.value, 2001)); // 木制宝箱
+const bronzeChestFromItems = computed(() => getItemCount(items.value, 2002)); // 青铜宝箱
+const goldChestFromItems = computed(() => getItemCount(items.value, 2003)); // 黄金宝箱
+const platinumChestFromItems = computed(() => getItemCount(items.value, 2004)); // 铂金宝箱
+const diamondChestFromItems = computed(() => getItemCount(items.value, 2005)); // 钻石宝箱
+const refreshCouponFromItems = computed(() => getItemCount(items.value, 35002)); // 刷新券
+const partsFromItems = computed(() => getItemCount(items.value, 35009)); // 零件
+const woodTorchFromItems = computed(() => getItemCount(items.value, 1008)); // 木柴火把
+const bronzeTorchFromItems = computed(() => getItemCount(items.value, 1009)); // 青铜火把
+const godTorchFromItems = computed(() => getItemCount(items.value, 1010)); // 咸神火把
+const legionCoinFromItems = computed(() => getItemCount(items.value, 1014)); // 军团币
+const wrenchFromItems = computed(() => getItemCount(items.value, 1026)); // 扳手
+const cheerCoinFromItems = computed(() => getItemCount(items.value, 2101)); // 助威币
+
 // 兼容旧字段（fishing.*）作为回退
 const normalRod = computed(() => {
   const fromItems = normalRodFromItems.value;
@@ -218,22 +254,66 @@ const goldRod = computed(() => {
   return (roleInfo.value as any)?.fishing?.goldRod ?? (roleInfo.value as any)?.fishing?.vipRod ?? null;
 });
 const display = (n: number | null | undefined) => (n == null ? "-" : formatNumber(Number(n)));
-const resList = computed(() => [
-  { label: "金币", value: formatNumber(gold.value) },
-  { label: "金砖", value: formatNumber(diamond.value) },
-  { label: "普通鱼竿", value: display(normalRod.value as any) },
-  { label: "金鱼竿", value: display(goldRod.value as any) },
-  { label: "珍珠", value: display(pearlFromItems.value as any) },
-  { label: "复活丹", value: display(DanFromItems.value as any) },
-  { label: "招募令", value: display(recruitFromItems.value as any) },
-  { label: "精铁", value: display(ironFromItems.value as any) },
-  { label: "白玉", value: display(whiteJadeFromItems.value as any) },
-  { label: "彩玉", value: display(jadeFromItems.value as any) },
-  { label: "进阶石", value: display(advanceStoneFromItems.value as any) },
-  { label: "蓝玉", value: display(blueJadeFromItems.value as any) },
-  { label: "红玉", value: display(redJadeFromItems.value as any) },
-  { label: "四圣碎片", value: display(fourSaintFragmentFromItems.value as any) },
-]);
+const getRawValue = (n: number | null | undefined) => (n == null ? 0 : Number(n));
+const resList = computed(() => {
+  const allResources = [
+    { label: "金币", value: formatNumber(gold.value), raw: gold.value },
+    { label: "金砖", value: formatNumber(diamond.value), raw: diamond.value },
+    { label: "普通鱼竿", value: display(normalRod.value as any), raw: getRawValue(normalRod.value as any) },
+    { label: "金鱼竿", value: display(goldRod.value as any), raw: getRawValue(goldRod.value as any) },
+    { label: "珍珠", value: display(pearlFromItems.value as any), raw: getRawValue(pearlFromItems.value as any) },
+    { label: "复活丹", value: display(DanFromItems.value as any), raw: getRawValue(DanFromItems.value as any) },
+    { label: "招募令", value: display(recruitFromItems.value as any), raw: getRawValue(recruitFromItems.value as any) },
+    { label: "精铁", value: display(ironFromItems.value as any), raw: getRawValue(ironFromItems.value as any) },
+    { label: "彩玉", value: display(jadeFromItems.value as any), raw: getRawValue(jadeFromItems.value as any) },
+    { label: "进阶石", value: display(advanceStoneFromItems.value as any), raw: getRawValue(advanceStoneFromItems.value as any) },
+    { label: "蓝玉", value: display(blueJadeFromItems.value as any), raw: getRawValue(blueJadeFromItems.value as any) },
+    { label: "红玉", value: display(redJadeFromItems.value as any), raw: getRawValue(redJadeFromItems.value as any) },
+    { label: "四圣宝珠碎片", value: display(fourSaintFragmentFromItems.value as any), raw: getRawValue(fourSaintFragmentFromItems.value as any) },
+    { label: "金币袋子", value: display(goldBagFromItems.value as any), raw: getRawValue(goldBagFromItems.value as any) },
+    { label: "金砖袋子", value: display(diamondBagFromItems.value as any), raw: getRawValue(diamondBagFromItems.value as any) },
+    { label: "紫色随机碎片", value: display(purpleFragmentFromItems.value as any), raw: getRawValue(purpleFragmentFromItems.value as any) },
+    { label: "橙色随机碎片", value: display(orangeFragmentFromItems.value as any), raw: getRawValue(orangeFragmentFromItems.value as any) },
+    { label: "红色随机碎片", value: display(redFragmentFromItems.value as any), raw: getRawValue(redFragmentFromItems.value as any) },
+    { label: "精铁袋子", value: display(ironBagFromItems.value as any), raw: getRawValue(ironBagFromItems.value as any) },
+    { label: "进阶袋子", value: display(advanceBagFromItems.value as any), raw: getRawValue(advanceBagFromItems.value as any) },
+    { label: "梦魇袋子", value: display(nightmareBagFromItems.value as any), raw: getRawValue(nightmareBagFromItems.value as any) },
+    { label: "白玉袋子", value: display(whiteJadeBagFromItems.value as any), raw: getRawValue(whiteJadeBagFromItems.value as any) },
+    { label: "扳手袋子", value: display(wrenchBagFromItems.value as any), raw: getRawValue(wrenchBagFromItems.value as any) },
+    { label: "聚宝盆", value: display(treasureBowlFromItems.value as any), raw: getRawValue(treasureBowlFromItems.value as any) },
+    { label: "豪华聚宝盆", value: display(luxuryTreasureBowlFromItems.value as any), raw: getRawValue(luxuryTreasureBowlFromItems.value as any) },
+    { label: "红色万能碎片", value: display(redUniversalFragmentFromItems.value as any), raw: getRawValue(redUniversalFragmentFromItems.value as any) },
+    { label: "橙色万能碎片", value: display(orangeUniversalFragmentFromItems.value as any), raw: getRawValue(orangeUniversalFragmentFromItems.value as any) },
+    { label: "盐靛", value: display(indigoFromItems.value as any), raw: getRawValue(indigoFromItems.value as any) },
+    { label: "晶石", value: display(crystalFromItems.value as any), raw: getRawValue(crystalFromItems.value as any) },
+    { label: "皮肤币", value: display(skinCoinFromItems.value as any), raw: getRawValue(skinCoinFromItems.value as any) },
+    { label: "扫荡魔毯", value: display(sweepCarpetFromItems.value as any), raw: getRawValue(sweepCarpetFromItems.value as any) },
+    { label: "白玉", value: display(whiteJadeFromItems.value as any), raw: getRawValue(whiteJadeFromItems.value as any) },
+    { label: "贝壳", value: display(shellFromItems.value as any), raw: getRawValue(shellFromItems.value as any) },
+    { label: "金盐靛", value: display(goldIndigoFromItems.value as any), raw: getRawValue(goldIndigoFromItems.value as any) },
+    { label: "竞技场门票", value: display(arenaTicketFromItems.value as any), raw: getRawValue(arenaTicketFromItems.value as any) },
+    { label: "木制宝箱", value: display(woodChestFromItems.value as any), raw: getRawValue(woodChestFromItems.value as any) },
+    { label: "青铜宝箱", value: display(bronzeChestFromItems.value as any), raw: getRawValue(bronzeChestFromItems.value as any) },
+    { label: "黄金宝箱", value: display(goldChestFromItems.value as any), raw: getRawValue(goldChestFromItems.value as any) },
+    { label: "铂金宝箱", value: display(platinumChestFromItems.value as any), raw: getRawValue(platinumChestFromItems.value as any) },
+    { label: "钻石宝箱", value: display(diamondChestFromItems.value as any), raw: getRawValue(diamondChestFromItems.value as any) },
+    { label: "刷新券", value: display(refreshCouponFromItems.value as any), raw: getRawValue(refreshCouponFromItems.value as any) },
+    { label: "零件", value: display(partsFromItems.value as any), raw: getRawValue(partsFromItems.value as any) },
+    { label: "木柴火把", value: display(woodTorchFromItems.value as any), raw: getRawValue(woodTorchFromItems.value as any) },
+    { label: "青铜火把", value: display(bronzeTorchFromItems.value as any), raw: getRawValue(bronzeTorchFromItems.value as any) },
+    { label: "咸神火把", value: display(godTorchFromItems.value as any), raw: getRawValue(godTorchFromItems.value as any) },
+    { label: "军团币", value: display(legionCoinFromItems.value as any), raw: getRawValue(legionCoinFromItems.value as any) },
+    { label: "扳手", value: display(wrenchFromItems.value as any), raw: getRawValue(wrenchFromItems.value as any) },
+    { label: "助威币", value: display(cheerCoinFromItems.value as any), raw: getRawValue(cheerCoinFromItems.value as any) },
+  ];
+
+  // 分组：非零资源和零资源
+  const nonZero = allResources.filter(res => res.raw > 0);
+  const zero = allResources.filter(res => res.raw === 0);
+
+  // 非零资源在前，零资源在后
+  return [...nonZero, ...zero];
+});
 
 const showExpand = computed(() => resList.value.length > 6);
 
