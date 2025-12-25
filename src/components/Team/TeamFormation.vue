@@ -33,13 +33,26 @@
       </div>
 
       <div class="heroes-container">
-        <div v-if="!loading" class="heroes-inline">
-          <div v-for="hero in currentTeamHeroes" :key="hero.id || hero.name" class="hero-item">
-            <div class="hero-circle">
-              <img v-if="hero.avatar" :src="hero.avatar" :alt="hero.name" class="hero-avatar" />
-              <div v-else class="hero-placeholder">{{ hero.name?.substring(0, 2) || "?" }}</div>
+        <div v-if="!loading" class="heroes-formation">
+          <!-- 前排 2个 -->
+          <div class="formation-row front-row">
+            <div v-for="hero in currentTeamHeroes.slice(0, 2)" :key="hero.id || hero.name" class="hero-item">
+              <div class="hero-circle">
+                <img v-if="hero.avatar" :src="hero.avatar" :alt="hero.name" class="hero-avatar" />
+                <div v-else class="hero-placeholder">{{ hero.name?.substring(0, 2) || "?" }}</div>
+              </div>
+              <span class="hero-name">{{ hero.name || "未知" }}</span>
             </div>
-            <span class="hero-name">{{ hero.name || "未知" }}</span>
+          </div>
+          <!-- 后排 3个 -->
+          <div class="formation-row back-row">
+            <div v-for="hero in currentTeamHeroes.slice(2)" :key="hero.id || hero.name" class="hero-item">
+              <div class="hero-circle">
+                <img v-if="hero.avatar" :src="hero.avatar" :alt="hero.name" class="hero-avatar" />
+                <div v-else class="hero-placeholder">{{ hero.name?.substring(0, 2) || "?" }}</div>
+              </div>
+              <span class="hero-name">{{ hero.name || "未知" }}</span>
+            </div>
           </div>
         </div>
 
@@ -456,7 +469,7 @@ watch(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
 }
 
 .card-content .label {
@@ -473,17 +486,26 @@ watch(
 .heroes-container {
   background: var(--bg-tertiary);
   border-radius: var(--border-radius-medium);
-  padding: var(--spacing-md);
-  min-height: 80px;
+  padding: var(--spacing-sm);
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.heroes-inline {
+.heroes-formation {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-sm);
   align-items: center;
+  width: 100%;
+}
+
+.formation-row {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  width: 100%;
 }
 
 .hero-item {
@@ -495,8 +517,8 @@ watch(
 }
 
 .hero-circle {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--bg-primary);
   display: flex;
@@ -549,10 +571,12 @@ watch(
     padding: var(--spacing-sm);
   }
 
-  .heroes-inline {
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-    justify-content: center;
+  .heroes-formation {
+    gap: var(--spacing-sm);
+  }
+
+  .formation-row {
+    gap: var(--spacing-sm);
   }
 
   .hero-item {

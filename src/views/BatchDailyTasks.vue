@@ -19,6 +19,9 @@
         <n-button size="small" @click="claimHangUpRewards" :disabled="isRunning || selectedTokens.length === 0">
           领取挂机
         </n-button>
+        <n-button size="small" @click="batchAddHangUpTime" :disabled="isRunning || selectedTokens.length === 0">
+          一键加钟
+        </n-button>
         <n-button size="small" @click="resetBottles" :disabled="isRunning || selectedTokens.length === 0">
           重置罐子
         </n-button>
@@ -353,9 +356,12 @@ const claimHangUpRewards = async () => {
       await tokenStore.sendMessageWithPromise(tokenId, 'system_claimhangupreward', {}, 5000)
       await new Promise(r => setTimeout(r, 500))
 
-      // 3. Add time 1 more time
-      addLog({ time: new Date().toLocaleTimeString(), message: `挂机加钟 5/5`, type: 'info' })
-      await tokenStore.sendMessageWithPromise(tokenId, 'system_mysharecallback', { isSkipShareCard: true, type: 2 }, 5000)
+      // 3. Add time 4 more time
+      for (let i = 0; i < 4; i++) {
+        addLog({ time: new Date().toLocaleTimeString(), message: `挂机加钟 ${i + 1}/4`, type: 'info' })
+        await tokenStore.sendMessageWithPromise(tokenId, 'system_mysharecallback', { isSkipShareCard: true, type: 2 }, 5000)
+        await new Promise(r => setTimeout(r, 500))
+      }
 
       tokenStatus.value[tokenId] = 'completed'
       addLog({ time: new Date().toLocaleTimeString(), message: `=== ${token.name} 领取完成 ===`, type: 'success' })
@@ -373,6 +379,57 @@ const claimHangUpRewards = async () => {
   isRunning.value = false
   currentRunningTokenId.value = null
   message.success('批量领取挂机结束')
+}
+
+const batchAddHangUpTime = async () => {
+  if (selectedTokens.value.length === 0) return
+
+  isRunning.value = true
+  shouldStop.value = false
+  logs.value = []
+
+  // Reset status
+  selectedTokens.value.forEach(id => {
+    tokenStatus.value[id] = 'waiting'
+  })
+
+  for (const tokenId of selectedTokens.value) {
+    if (shouldStop.value) break
+
+    currentRunningTokenId.value = tokenId
+    tokenStatus.value[tokenId] = 'running'
+    currentProgress.value = 0
+
+    const token = tokens.value.find(t => t.id === tokenId)
+
+    try {
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== 开始一键加钟: ${token.name} ===`, type: 'info' })
+
+      await ensureConnection(tokenId)
+
+      for (let i = 0; i < 4; i++) {
+        if (shouldStop.value) break
+        addLog({ time: new Date().toLocaleTimeString(), message: `执行加钟 ${i + 1}/4`, type: 'info' })
+        await tokenStore.sendMessageWithPromise(tokenId, 'system_mysharecallback', { isSkipShareCard: true, type: 2 }, 5000)
+        await new Promise(r => setTimeout(r, 500))
+      }
+
+      tokenStatus.value[tokenId] = 'completed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `=== ${token.name} 加钟完成 ===`, type: 'success' })
+
+    } catch (error) {
+      console.error(error)
+      tokenStatus.value[tokenId] = 'failed'
+      addLog({ time: new Date().toLocaleTimeString(), message: `加钟失败: ${error.message || '未知错误'}`, type: 'error' })
+    }
+
+    currentProgress.value = 100
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  isRunning.value = false
+  currentRunningTokenId.value = null
+  message.success('批量加钟结束')
 }
 
 const ensureConnection = async (tokenId) => {

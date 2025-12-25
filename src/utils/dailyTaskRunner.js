@@ -365,7 +365,7 @@ export class DailyTaskRunner {
     )
 
     // 5. 免费活动
-    if (isTodayAvailable(statisticsTime['artifact:normal:lottery:time'])) {
+    if (isTodayAvailable(statistics['artifact:normal:lottery:time'])) {
       for (let i = 0; i < 3; i++) {
         taskList.push({
           name: `免费钓鱼 ${i + 1}/3`,
