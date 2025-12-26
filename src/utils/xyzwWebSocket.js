@@ -121,13 +121,13 @@ export function registerDefaultCommands(reg) {
     .register("friend_batch", { friendId: 0 })
     .register("hero_recruit", { byClub: false, recruitNumber: 1, recruitType: 3 })
     .register("item_openbox", { itemId: 2001, number: 10 })
-	.register("item_batchclaimboxpointreward")
+    .register("item_batchclaimboxpointreward")
 
     // 竞技场
     .register("arena_startarea")
     .register("fight_startlevel") // 获取 battleVersion
     .register("arena_getareatarget", { refresh: false })
-	.register("arena_getarearank")
+    .register("arena_getarearank")
 
     // 商店
     .register("store_goodslist", { storeId: 1 })
@@ -140,11 +140,11 @@ export function registerDefaultCommands(reg) {
     .register("legion_signin")
     .register("legion_getwarrank")
     .register("legionwar_getdetails")
-	
-	//盐场
-	.register("legion_getinfobyid")
+
+    //盐场
+    .register("legion_getinfobyid")
     .register("legion_getarearank")
-	.register("saltroad_getsaltroadwartotalrank")
+    .register("saltroad_getsaltroadwartotalrank")
     .register("legionwar_getgoldmonthwarrank")
     .register("legion_getopponent")
     .register("legion_getbattlefield")
@@ -152,8 +152,8 @@ export function registerDefaultCommands(reg) {
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
     .register("mail_claimallattachment", { category: 0 })
-    .register("mail_getmtlinfo" ) 
-    .register("mail_getmtlshortinfo" ) 
+    .register("mail_getmtlinfo")
+    .register("mail_getmtlshortinfo")
 
     // 学习问答
     .register("study_startgame")
@@ -203,6 +203,10 @@ export function registerDefaultCommands(reg) {
     .register("presetteam_saveteam", { teamId: 1 })
     .register("role_gettargetteam")
 
+    // 武将升级相关
+    .register("hero_heroupgradelevel") //武将升级
+    .register("hero_heroupgradeorder") //武将进阶
+
     // 升星相关
     .register("hero_heroupgradestar")
     .register("book_upgrade")
@@ -213,13 +217,14 @@ export function registerDefaultCommands(reg) {
 
     // 梦魇相关
     .register("nightmare_getroleinfo")
-	.register("dungeon_selecthero")
+    .register("dungeon_selecthero")
     .register("bosstower_gethelprank")
+    .register("dungeon_buymerchant")
     // 活动/任务
     .register("activity_get")
-	.register("activity_recyclewarorderrewardclaim")
-	
-	// 珍宝阁相关
+    .register("activity_recyclewarorderrewardclaim")
+
+    // 珍宝阁相关
     .register("collection_claimfreereward")
     .register("collection_goodslist")
 
@@ -230,7 +235,7 @@ export function registerDefaultCommands(reg) {
     .register("car_send", { carId: 0, helperId: 0, text: "" })
     .register("car_getmemberhelpingcnt")
 
-	// 咸王宝库
+    // 咸王宝库
     .register("matchteam_getroleteaminfo")
     .register("bosstower_getinfo")
     .register("bosstower_startboss")
@@ -803,7 +808,7 @@ export class XyzwWebSocketClient {
     // 命令到响应的映射 - 处理响应命令与原始命令不匹配的情况
     const responseToCommandMap = {
       // 1:1 响应映射（优先级高）
-	  'fight_startpvpresp': 'fight_startpvp',
+      'fight_startpvpresp': 'fight_startpvp',
       'activity_getresp': 'activity_get',
       'collection_goodslistresp': 'collection_goodslist',
       'collection_claimfreerewardresp': 'collection_claimfreereward',
@@ -865,7 +870,7 @@ export class XyzwWebSocketClient {
       // 同步响应映射（优先级低）
       'syncresp': ['system_mysharecallback', 'task_claimdailypoint'],
       'syncrewardresp': ['system_buygold', 'discount_claimreward', 'card_claimreward',
-                        'artifact_lottery', 'genie_sweep', 'genie_buysweep','system_signinreward','dungeon_selecthero']
+        'artifact_lottery', 'genie_sweep', 'genie_buysweep', 'system_signinreward', 'dungeon_selecthero']
     }
 
     // 获取原始命令名（支持一对一和一对多映射）

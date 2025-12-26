@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div class="status-card club-warrank">
+  <div class="status-card club-warrank">
       <div class="card-header">
         <img src="/icons/Ob7pyorzmHiJcbab2c25af264d0758b527bc1b61cc3b.png" alt="队伍图标" class="status-icon">
         <div class="status-info">
@@ -32,209 +31,190 @@
           </template>导出</n-button>
       </div>
 
-      <div v-if="memberData" class="member-card">
-        <div class="member-header">
-          <div class="member-stats-inline">
-            <div class="member-info">
-              <n-avatar round :size="60" :src="memberData.headImg" />
+      <div v-if="memberData" class="battle-records-content">
+        <div ref="exportDom" class="content">
+          <div class="member-card">
+            <div class="member-header">
+              <div class="player-info-section">
+                <n-avatar round :size="60" :src="memberData.headImg" />
+                <div class="player-details">
+                  <div class="info-row">
+                    <span>游戏名: {{ memberData.name }}</span>
+                    <span>区服: {{ memberData.serverName }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span>战力: {{ memberData.power }}</span>
+                    <span>当前阵容红数/孔数: <span style="color: red;font-weight: bolder;">{{ memberData.red }}</span>/<span
+                        style="color: green;font-weight: bolder;">{{ memberData.hole }}</span></span>
+                  </div>
+                  <div class="info-row">
+                    <span>俱乐部名: {{ memberData.legionName }}</span>
+                    <span>俱乐部历史最高战力: {{ memberData.MaxPower }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span>俱乐部当前红数: {{ memberData.legionRed }}</span>
+                    <span>俱乐部历史最高红数: {{ memberData.legionMaxRed }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="member-stats-inline">
+                <div v-for="hero in memberData.heroList" :key="hero.heloId || hero.heroName" class="hero-item" @click="selectHeroInfo(hero)">
+                  <div class="hero-circle">
+                    <img v-if="hero.heroAvate" :src="hero.heroAvate" :alt="hero.heroName" class="hero-avatar" />
+                    <div v-else class="hero-placeholder">{{ hero.heroName?.substring(0, 2) || "?" }}</div>
+                  </div>
+                  <span class="hero-name">武将:{{ hero.heroName || "未知" }}</span>
+                  <span class="hero-name">战力:{{ hero.power || "未知" }}</span>
+                  <span class="hero-name">星级:{{ hero.star || "未知" }}/
+                    <n-tag :type="hero.HolyBeast?'success':'error'" size="small">
+                      {{hero.HolyBeast?'已开四圣':'未开四圣'}}
+                    </n-tag>
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="inline-container">
-                <n-input v-model:value="targetId" type="text" placeholder="切磋对手ID" class="inputOrSelectWidth" />
-                <n-button size="small" :disabled="loading1" @click="getTargetInfo">
-                    <template #icon>
-                        <n-icon>
-                            <Refresh />
-                        </n-icon>
-                    </template>查询
-                </n-button>
-                <n-select v-model:value="fightNum" :options="options" class="inputOrSelectWidth" />
-                <n-button size="small" :disabled="loading1 || !targetId" @click="fightPVPRefresh">
-                    <template #icon>
-                        <n-icon>
-                            <Refresh />
-                        </n-icon>
-                    </template>切磋
-                </n-button>
-                <n-button type="primary" size="small" :disabled="!memberData || loading1" @click="handleExport1">
-                    <template #icon>
-                        <n-icon>
-                            <Copy />
-                        </n-icon>
-                    </template>导出</n-button>
-            </div>
+          </div>
 
-            <div class="battle-records-content">
-                <div ref="exportDom" class="content">
-                    <div v-if="memberData" class="member-card"  >
-                        <div class="member-header">
-                            <div class="member-stats-inline">
-                                <div class="member-info">
-                                    <n-avatar round :size="60" :src="memberData.headImg" />
-                                </div>
-                                <div class="member-right">
-                                    <div class="member-row">
-                                        <span>游戏名: {{ memberData.name }}</span>
-                                        <span>区服: {{ memberData.serverName }}</span>
-                                    </div>
-                                    <div class="member-row">
-                                        <span>战力: {{ memberData.power }}</span>
-                                        <span>当前阵容红数/孔数: <span style="color: red;font-weight: bolder;">{{ memberData.red }}</span>/<span
-                                                style="color: green;font-weight: bolder;">{{ memberData.hole }}</span></span>
-                                    </div>
-                                    <div class="member-row">
-                                        <span>俱乐部名: {{ memberData.legionName }}</span>
-                                        <span>俱乐部历史最高战力: {{ memberData.MaxPower }}</span>
-                                    </div>
-                                    <div class="member-row">
-                                        <span>俱乐部当前红数: {{ memberData.legionRed }}</span>
-                                        <span>俱乐部历史最高红数: {{ memberData.legionMaxRed }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="member-stats-inline">
-                                <div v-for="hero in memberData.heroList" :key="hero.heloId || hero.heroName" class="hero-item" @click="selectHeroInfo(hero)">
-                                    <div class="hero-circle">
-                                        <img v-if="hero.heroAvate" :src="hero.heroAvate" :alt="hero.heroName" class="hero-avatar" />
-                                        <div v-else class="hero-placeholder">{{ hero.heroName?.substring(0, 2) || "?" }}</div>
-                                    </div>
-                                    <span class="hero-name">武将:{{ hero.heroName || "未知" }}</span>
-                                    <span class="hero-name">战力:{{ hero.power || "未知" }}</span>
-                                    <span class="hero-name">星级:{{ hero.star || "未知" }}/
-                                        <n-tag :type="hero.HolyBeast?'success':'error'" size="small">
-                                            {{hero.HolyBeast?'已开四圣':'未开四圣'}}
-                                        </n-tag>
-                                    </span>
-                                </div>
-                                <n-modal
-                                    v-model:show="showHeroModal"
-                                    class="custom-card"
-                                    preset="card"
-                                    :style="bodyStyle"
-                                    title="武将信息"
-                                    size="huge"
-                                    :bordered="false"
-                                    :segmented="segmented"
-                                >
-                                    <template #header-extra>
-                                     武将编号:{{ heroModealTemp.heroId }}
-                                    </template>
-                                    <n-grid x-gap="12" :cols="1">
-                                        <n-gi>
-                                            <div style="text-align:center;">
-                                                <img v-if="heroModealTemp.heroAvate" :src="heroModealTemp.heroAvate" :alt="heroModealTemp.heroName" style="border-radius:50%"/>
-                                            </div>
-                                        </n-gi>
-                                    </n-grid>
-                                    <n-descriptions label-placement="left">
-                                        <n-descriptions-item label="武将名称">
-                                        {{ heroModealTemp.heroName }}
-                                        </n-descriptions-item>
-                                        <n-descriptions-item label="武将战力">
-                                        {{ heroModealTemp.power }}
-                                        </n-descriptions-item>
-                                        <n-descriptions-item label="武将等级">
-                                        {{ heroModealTemp.level }}
-                                        </n-descriptions-item>
-                                        <n-descriptions-item label="武将星级">
-                                        {{ heroModealTemp.star }}
-                                        </n-descriptions-item>
-                                        <n-descriptions-item label="武将孔数">
-                                        {{ heroModealTemp.hole }}
-                                        </n-descriptions-item>
-                                        <n-descriptions-item label="武将红数">
-                                        {{ heroModealTemp.red }}
-                                        </n-descriptions-item>
-                                    </n-descriptions>
-                                    <template #footer>
-                                        <n-grid :x-gap="12" :y-gap="8" :cols="2">
-                                            <n-gi >
-                                                武器：
-                                                <div v-for="item in Object.values(Object.values(heroModealTemp.equipment)[0].quenches)" 
-                                                style="width: 12px;height: 12px;transform: rotate(45deg);border: 1px solid rgb(167 167 167);display: inline-block;margin-right: 10px;" 
-                                                :style="'background-color:'+ (item.colorId==6?'red':'white') ">    
-                                                </div>
-                                            </n-gi>
-                                            <n-gi>
-                                                衣服：
-                                                <div v-for="item in Object.values(Object.values(heroModealTemp.equipment)[1].quenches)" 
-                                                style="width: 12px;height: 12px;transform: rotate(45deg);border: 1px solid rgb(167 167 167);display: inline-block;margin-right: 10px;" 
-                                                :style="'background-color:'+ (item.colorId==6?'red':'white') ">    
-                                                </div>
-                                            </n-gi>
-                                            <n-gi>
-                                                头盔：
-                                                <div v-for="item in Object.values(Object.values(heroModealTemp.equipment)[2].quenches)" 
-                                                style="width: 12px;height: 12px;transform: rotate(45deg);border: 1px solid rgb(167 167 167);display: inline-block;margin-right: 10px;" 
-                                                :style="'background-color:'+ (item.colorId==6?'red':'white') ">    
-                                                </div>
-                                            </n-gi>
-                                            <n-gi>
-                                                坐骑：
-                                                <div v-for="item in Object.values(Object.values(heroModealTemp.equipment)[3].quenches)" 
-                                                style="width: 12px;height: 12px;transform: rotate(45deg);border: 1px solid rgb(167 167 167);display: inline-block;margin-right: 10px;" 
-                                                :style="'background-color:'+ (item.colorId==6?'red':'white') ">    
-                                                </div>
-                                            </n-gi>
-                                        </n-grid>
-                                    </template>
-                                </n-modal>
-                            </div>
-                        </div>
-                    </div>
+          <!-- 加载状态 -->
+          <div v-if="loading1" class="loading-state">
+            <n-spin size="large">
+              <template #description>
+                正在加载俱乐部数据...
+              </template>
+            </n-spin>
+          </div>
 
-                    <div >
-                        <!-- 加载状态 -->
-                        <div v-if="loading1" class="loading-state">
-                            <n-spin size="large">
-                                <template #description>
-                                    正在加载俱乐部数据...
-                                </template>
-                            </n-spin>
-                        </div>
-                        <div v-else-if="fightResult" class="member-card">
-                            <div v-if="fightResult.resultCount && fightResult.resultCount.length > 0" >
-                                <div class="result-Count">
-                                    <div>
-                                        胜率:{{ ((fightResult.winCount/fightNum)*100).toFixed(2) }}%
-                                    </div>
-                                    <div>
-                                        掉将率:{{ ((fightResult.dieHeroGameCount/fightNum)*100).toFixed(2) }}%
-                                    </div>
-                                </div>
-                                <div v-for="(battle, index) in fightResult.resultCount" :key="index" 
-                                    :class="getBattleClass(battle)" class="fight-content">
-                                    <div class="fight-card">
-                                        <div class="fight-left">
-                                            <div class="fight-avatar">
-                                                <n-avatar round :size="24" :src="battle.leftheadImg" />
-                                                <n-ellipsis >名称:{{ battle.leftName || '未知' }}</n-ellipsis>
-                                                <n-ellipsis >战力:{{ battle.leftpower || '0' }}</n-ellipsis>
-                                                <n-ellipsis >掉将数:{{ battle.leftDieHero || '0' }}</n-ellipsis>
-                                            </div>
-                                        </div>
-                                        <div class="battle-vs">
-                                            <n-tag :type="battle.isWin ? 'success' : 'error'" size="small">{{ battle.isWin?'胜利':'失败' }}</n-tag>
-                                        </div>
-                                        <div class="fight-left">
-                                            <div class="fight-avatar">
-                                                <n-avatar round :size="24" :src="battle.rightheadImg" />
-                                                <n-ellipsis >名称:{{ battle.rightName || '未知' }}</n-ellipsis>
-                                                <n-ellipsis >战力:{{ battle.rightpower || '0' }}</n-ellipsis>
-                                                <n-ellipsis >掉将数:{{ battle.rightDieHero || '0' }}</n-ellipsis>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+          <!-- 战斗结果 -->
+          <div v-else-if="fightResult" class="member-card">
+            <div v-if="fightResult.resultCount && fightResult.resultCount.length > 0">
+              <div class="result-Count">
+                <div>
+                  胜率:{{ ((fightResult.winCount/fightNum)*100).toFixed(2) }}%
+                </div>
+                <div>
+                  掉将率:{{ ((fightResult.dieHeroGameCount/fightNum)*100).toFixed(2) }}%
+                </div>
+              </div>
+              <div v-for="(battle, index) in fightResult.resultCount" :key="index"
+                :class="getBattleClass(battle)" class="fight-content">
+                <div class="fight-card">
+                  <div class="fight-left">
+                    <div class="fight-avatar">
+                      <n-avatar round :size="24" :src="battle.leftheadImg" />
+                      <n-ellipsis>名称:{{ battle.leftName || '未知' }}</n-ellipsis>
+                      <n-ellipsis>战力:{{ battle.leftpower || '0' }}</n-ellipsis>
+                      <n-ellipsis>掉将数:{{ battle.leftDieHero || '0' }}</n-ellipsis>
                     </div>
+                  </div>
+                  <div class="battle-vs">
+                    <n-tag :type="battle.isWin ? 'success' : 'error'" size="small">{{ battle.isWin?'胜利':'失败' }}</n-tag>
+                  </div>
+                  <div class="fight-left">
+                    <div class="fight-avatar">
+                      <n-avatar round :size="24" :src="battle.rightheadImg" />
+                      <n-ellipsis>名称:{{ battle.rightName || '未知' }}</n-ellipsis>
+                      <n-ellipsis>战力:{{ battle.rightpower || '0' }}</n-ellipsis>
+                      <n-ellipsis>掉将数:{{ battle.rightDieHero || '0' }}</n-ellipsis>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- 武将详情模态框 -->
+      <n-modal
+        v-model:show="showHeroModal"
+        class="custom-card"
+        preset="card"
+        :style="bodyStyle"
+        title="武将信息"
+        size="huge"
+        :auto-focus="false"
+        :bordered="false"
+        :segmented="segmented"
+      >
+        <template #header-extra>
+          武将编号:{{ heroModealTemp?.heroId }}
+        </template>
+        <n-grid x-gap="12" :cols="1">
+          <n-gi>
+            <div style="text-align:center;">
+              <img v-if="heroModealTemp?.heroAvate" :src="heroModealTemp.heroAvate" :alt="heroModealTemp.heroName" style="border-radius:50%"/>
+            </div>
+          </n-gi>
+        </n-grid>
+        <n-descriptions label-placement="left">
+          <n-descriptions-item label="武将名称">
+            {{ heroModealTemp?.heroName }}
+          </n-descriptions-item>
+          <n-descriptions-item label="武将战力">
+            {{ heroModealTemp?.power }}
+          </n-descriptions-item>
+          <n-descriptions-item label="武将等级">
+            {{ heroModealTemp?.level }}
+          </n-descriptions-item>
+          <n-descriptions-item label="武将星级">
+            {{ heroModealTemp?.star }}
+          </n-descriptions-item>
+          <n-descriptions-item label="武将孔数">
+            {{ heroModealTemp?.hole }}
+          </n-descriptions-item>
+          <n-descriptions-item label="武将红数">
+            {{ heroModealTemp?.red }}
+          </n-descriptions-item>
+          <n-descriptions-item label="鱼灵">
+            {{ heroModealTemp?.PearlInfo?.FishInfo.name !=undefined ? heroModealTemp.PearlInfo?.FishInfo.name:'无' }}
+          </n-descriptions-item>
+          <n-descriptions-item label="鱼灵洗练">
+            <div v-if="heroModealTemp?.PearlInfo?.slotMap?.length>0">
+              <div v-for="item in heroModealTemp.PearlInfo.slotMap" :key="item.id"
+                class="ModalEquipment"
+                :style="'background-color:'+ item.value">
+              </div>
+            </div>
+            <div v-else>无</div>
+          </n-descriptions-item>
+          <n-descriptions-item label="鱼珠技能">
+            {{ heroModealTemp?.PearlInfo?.PearlSkill?.name !=undefined ? heroModealTemp.PearlInfo?.PearlSkill.name:'无' }}
+          </n-descriptions-item>
+        </n-descriptions>
+        <template #footer>
+          <n-grid :x-gap="12" :y-gap="8" :cols="2">
+            <n-gi>
+              武器：
+              <div v-for="item in Object.values(Object.values(heroModealTemp?.equipment || {})[0]?.quenches || {})" :key="item.id"
+                class="ModalEquipment"
+                :style="'background-color:'+ (item.colorId==6?'red':'white')">
+              </div>
+            </n-gi>
+            <n-gi>
+              衣服：
+              <div v-for="item in Object.values(Object.values(heroModealTemp?.equipment || {})[1]?.quenches || {})" :key="item.id"
+                class="ModalEquipment"
+                :style="'background-color:'+ (item.colorId==6?'red':'white')">
+              </div>
+            </n-gi>
+            <n-gi>
+              头盔：
+              <div v-for="item in Object.values(Object.values(heroModealTemp?.equipment || {})[2]?.quenches || {})" :key="item.id"
+                class="ModalEquipment"
+                :style="'background-color:'+ (item.colorId==6?'red':'white')">
+              </div>
+            </n-gi>
+            <n-gi>
+              坐骑：
+              <div v-for="item in Object.values(Object.values(heroModealTemp?.equipment || {})[3]?.quenches || {})" :key="item.id"
+                class="ModalEquipment"
+                :style="'background-color:'+ (item.colorId==6?'red':'white')">
+              </div>
+            </n-gi>
+          </n-grid>
+        </template>
+      </n-modal>
+  </div>
 </template>
 
 <script setup>
@@ -258,6 +238,9 @@ import {
   formatBattleRecordsForExport,
   copyToClipboard
 } from '@/utils/clubBattleUtils'
+import {
+    HeroFillInfo
+} from '@/utils/HeroList'
 import { gettoday, formatWarrankRecordsForExport, allianceincludes } from '@/utils/goldWarrankUtils'
 import html2canvas from 'html2canvas';
 
@@ -559,53 +542,53 @@ const fetchTargetInfo = async () => {
     return
   }
 
-  loading1.value = true
-  queryDate.value = gettoday()
+    loading1.value = true
+    queryDate.value = gettoday()
 
 
-  try {
-    const result = await tokenStore.sendMessageWithPromise(tokenId, 'rank_getroleinfo',
-      {
-        bottleType: 0,
-        includeBottleTeam: false,
-        isSearch: false,
-        roleId: targetId.value
-      }, 5000)
-    if (!result.roleInfo && !result.legionInfo) {
-      memberData.value = null;
-      message.warning('未查询到对手信息');
-      return;
+    try {
+        const result = await tokenStore.sendMessageWithPromise(tokenId, 'rank_getroleinfo',
+            {
+                bottleType: 0,
+                includeBottleTeam: false,
+                isSearch: false,
+                roleId: targetId.value
+            }, 5000)
+        if (!result.roleInfo && !result.legionInfo) {
+            memberData.value = null;
+            message.warning('未查询到对手信息');
+            return;
+        }
+        const teamData = {};
+        const heroAndholdAndRed = getHeroInfo(result.roleInfo);
+        // 俱乐部名称
+        teamData.legionName = result.legionInfo.name;
+        // 俱乐部当前红数
+        teamData.legionRed = result.legionInfo.statistics['battle:red:quench'];
+        // 俱乐部历史最高红数
+        teamData.legionMaxRed = result.legionInfo.statistics['red:quench'];
+        // 俱乐部历史最高战力
+        teamData.MaxPower = formatPower(result.legionInfo.statistics['max:power']);
+        // 切磋对手武将信息
+        teamData.heroList = heroAndholdAndRed.heroList;
+        // 切磋对手玩家头像
+        teamData.headImg = result.roleInfo.headImg;
+        // 切磋对手玩家名称
+        teamData.name = result.roleInfo.name;
+        teamData.power = formatPower(result.roleInfo.power);
+        teamData.serverName = result.roleInfo.serverName;
+        teamData.hole = heroAndholdAndRed.holeCount;
+        teamData.red = heroAndholdAndRed.redCount;
+        memberData.value = teamData;
+        message.success('对手信息加载成功');
+        return teamData;
+
+    } catch (error) {
+        message.error(`查询失败: ${error.message}`);
+        topranklist.value = null;
+    } finally {
+        loading1.value = false;
     }
-    const teamData = {};
-    const heroAndholdAndRed = getHeroInfo(result.roleInfo.heroes);
-    // 俱乐部名称
-    teamData.legionName = result.legionInfo.name;
-    // 俱乐部当前红数
-    teamData.legionRed = result.legionInfo.statistics['battle:red:quench'];
-    // 俱乐部历史最高红数
-    teamData.legionMaxRed = result.legionInfo.statistics['red:quench'];
-    // 俱乐部历史最高战力
-    teamData.MaxPower = formatPower(result.legionInfo.statistics['max:power']);
-    // 切磋对手武将信息
-    teamData.heroList = heroAndholdAndRed.heroList;
-    // 切磋对手玩家头像
-    teamData.headImg = result.roleInfo.headImg;
-    // 切磋对手玩家名称
-    teamData.name = result.roleInfo.name;
-    teamData.power = formatPower(result.roleInfo.power);
-    teamData.serverName = result.roleInfo.serverName;
-    teamData.hole = heroAndholdAndRed.holeCount;
-    teamData.red = heroAndholdAndRed.redCount;
-    memberData.value = teamData;
-    message.success('对手信息加载成功');
-    return teamData;
-
-  } catch (error) {
-    message.error(`查询失败: ${error.message}`);
-    topranklist.value = null;
-  } finally {
-    loading1.value = false;
-  }
 }
 
 /**
@@ -617,14 +600,17 @@ const getHeroInfo = (heroObj) => {
     let redCount = 0;
     let holeCount = 0;
     let heroList = [];
-    Object.values(heroObj).forEach(hero => {
+    const PearlAndFishMap = HeroFillInfo(heroObj);
+    Object.values(heroObj.heroes).forEach(hero => {
         let heroInfo = HERO_DICT[hero.heroId];
+        let PearlInfo = PearlAndFishMap[hero.artifactId]
         let equipmentInfo = getEquipment(hero.equipment);
         let tempObj = {
             heroId: hero.heroId, //英雄ID
             power: formatPower(hero.power), //英雄战力
             star: hero.star, //英雄星级
             equipment:hero.equipment, //英雄具体孔数和红数
+            PearlInfo:PearlInfo, //鱼和鱼珠信息
             heroName: heroInfo.name, //英雄姓名
             heroAvate: heroInfo.avatar,
             level: hero.level, //英雄等级
@@ -756,44 +742,53 @@ onMounted(() => {
         }
     }
 
-    .member-header {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
-        background-color: rgb(241, 241, 241, 0.5);
-        border-radius: 15px;
-        min-height: 120px;
-        max-height: 120px;
-    }
-
   .member-header {
     display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+    flex-direction: column;
+    gap: var(--spacing-md);
     background-color: rgb(241, 241, 241, 0.5);
     border-radius: 15px;
-    min-height: 120px;
-    /* max-height: 120px; Removed fixed height */
+    padding: var(--spacing-md);
+  }
+
+  .player-info-section {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
     padding: var(--spacing-sm);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .player-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    flex: 1;
+  }
+
+  .info-row {
+    display: flex;
+    gap: var(--spacing-md);
+    font-size: 14px;
+    color: #333;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .member-info {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    gap: var(--spacing-sm);
-    min-width: 120px;
-    max-width: 120px;
-    min-height: 120px;
-    /* max-height: 120px; */
-    flex-shrink: 0;
+    gap: var(--spacing-md);
+    width: 100%;
   }
 
   .member-right {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    /* max-height: 120px; */
+    gap: var(--spacing-xs);
+    flex: 1;
   }
 
   .member-row {
@@ -810,12 +805,12 @@ onMounted(() => {
 
   .member-stats-inline {
     display: flex;
-    gap: var(--spacing-xs);
-    align-items: center;
+    gap: var(--spacing-md);
+    align-items: flex-start;
     flex: 1;
     flex-wrap: wrap;
-    /* Allow wrapping */
-    justify-content: center;
+    justify-content: flex-start;
+    width: 100%;
   }
 
 
@@ -845,8 +840,16 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-sm);
-    min-width: 128px;
+    gap: 4px;
+    min-width: 140px;
+    padding: var(--spacing-sm);
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(79, 75, 75, 0.2);
+    }
   }
 
   @media (max-width: 768px) {
@@ -860,26 +863,8 @@ onMounted(() => {
     }
 
     .hero-item {
-      min-width: 80px;
-      width: 45%;
-    }
-
-    .hero-item:hover {
-        background-color: #4f4b4b36;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .hero-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: var(--bg-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      min-width: 120px;
+      width: 48%;
     }
   }
 
@@ -907,12 +892,13 @@ onMounted(() => {
   }
 
   .hero-name {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 13px;
+    color: var(--text-primary);
     text-align: center;
-    min-width: 90px;
-    max-width: 140px;
+    width: 100%;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
 }
@@ -982,6 +968,14 @@ onMounted(() => {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
   }
+}
+.ModalEquipment{
+    width: 12px;
+    height: 12px;
+    transform: rotate(45deg);
+    border: 1px solid rgb(167 167 167);
+    display: inline-block;
+    margin-right: 10px;
 }
 
 .card-header {

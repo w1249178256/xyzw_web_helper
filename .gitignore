@@ -72,3 +72,6 @@ tmp/
 temp/
 
 .github
+*.bat
+*.exe
+node_modules/

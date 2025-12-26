@@ -50,6 +50,7 @@
             <div class="merchant-actions">
               <a-button type="primary" size="small" @click="refreshMerchantList">获取商品</a-button>
               <a-button type="primary" size="small" @click="buyAllGoldItems">一键购买金币商品</a-button>
+              <a-button type="primary" size="small" @click="buyAllGoldFishItems">一键购买高级商人鱼竿</a-button>
             </div>
           </div>
           <div class="merchant-items" v-if="merchantDataLoaded">
@@ -57,8 +58,8 @@
               <div class="merchant-name">{{ merchantConfig[merchantId].name }}</div>
               <div class="items-list">
                 <div class="item" v-for="(item, index) in items" :key="index">
-                  <div class="item-name" :style="{ color: getItemColor(parseInt(merchantId), index) }">
-                    {{ getItemName(parseInt(merchantId), index) }}
+                  <div class="item-name" :style="{ color: getItemColor(parseInt(merchantId), item) }">
+                    {{ getItemName(parseInt(merchantId), item) }}
                   </div>
                 </div>
               </div>
@@ -129,14 +130,14 @@ const heroData = {
 const merchantConfig = {
   1: { name: '初级商人', items: ['进阶石', '精铁', '木质宝箱', '青铜宝箱', '普通鱼竿', '挑战票', '咸神火把'] },
   2: { name: '中级商人', items: ['梦魇晶石', '进阶石', '精铁', '黄金宝箱', '黄金鱼竿', '招募令', '橙将碎片', '紫将碎片'] },
-  3: { name: '高级商人', items: ['梦魇晶石', '铂金宝箱', '黄金鱼竿', '招募令', '红将碎片', '橙将碎片', '红将碎片'] }
+  3: { name: '高级商人', items: ['梦魇晶石', '铂金宝箱', '黄金鱼竿', '招募令', '红将碎片', '橙将碎片', '红将碎片', '普通鱼竿'] }
 };
 
 // 金币购买的商品配置 [商人ID][商品索引]
 const goldItemsConfig = {
   1: [5, 6], // 初级商人: 挑战票, 咸神火把
   2: [6, 7], // 中级商人: 橙将碎片, 紫将碎片
-  3: [5, 6]  // 高级商人: 橙将碎片, 红将碎片(第二个)
+  3: [5, 6, 7]  // 高级商人: 橙将碎片, 红将碎片, 普通鱼竿
 };
 
 // 检查梦境开放时间（周三/周四/周日/周一）
@@ -165,11 +166,12 @@ function getTypeColor(type) {
 // 提取默认队伍信息
 function extractDefaultInfoFromResponse(response) {
   try {
-    if (!response || !response._rawData || !response._rawData.role || !response._rawData.role.battleTeam) {
+    if (!response || !response.presetTeamInfo.presetTeamInfo) {
       return false;
     }
-
-    const battleTeam = response._rawData.role.battleTeam;
+    
+    const useTeamId = response.presetTeamInfo.useTeamId.toString();
+    const battleTeam = response.presetTeamInfo.presetTeamInfo[useTeamId].teamInfo;
     teamHeroes.value = [];
     
     for (let i = 0; i < 5; i++) {
@@ -212,7 +214,7 @@ async function getDefaultTeam() {
   const tokenId = tokenStore.selectedToken.id;
 
   try {
-    const roleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {}, 15000);
+    const roleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'presetteam_getinfo', {}, 15000);
     
     if (roleInfo) {
       const extracted = extractDefaultInfoFromResponse(roleInfo);
@@ -301,7 +303,7 @@ async function startSingleBattle(heroId) {
     }, 15000);
     
     if (response) {
-      const rawData = response._rawData;
+      const rawData = response;
       if (rawData) {
         if (rawData.isWin) {
           console.log(`${heroName} 战斗胜利!`);
@@ -393,7 +395,7 @@ function getItemColor(merchantId, index) {
   }
   
   // 其他商品颜色
-  return '#00ffff';
+  return '#F3BCD6';
 }
 
 // 检查是否为金币商品
@@ -412,15 +414,15 @@ async function getRoleInfo() {
   try {
     const response = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {}, 15000);
     
-    if (response && response._rawData && response._rawData.role) {
+    if (response && response && response.role) {
       // 获取商品列表
-      if (response._rawData.role.dungeon && response._rawData.role.dungeon.merchant) {
-        merchantData.value = response._rawData.role.dungeon.merchant;
+      if (response.role.dungeon && response.role.dungeon.merchant) {
+        merchantData.value = response.role.dungeon.merchant;
       }
       
       // 获取关卡ID
-      if (response._rawData.role.levelId) {
-        levelId.value = response._rawData.role.levelId;
+      if (response.role.levelId) {
+        levelId.value = response.role.levelId;
       }
       
       return { merchantData: merchantData.value, levelId: levelId.value };
@@ -560,6 +562,52 @@ async function buyAllGoldItems() {
   isRunning.value = false;
 }
 
+// 一键购买所有高级商人鱼竿
+async function buyAllGoldFishItems() {
+  if (!isDungeonOpen()) {
+    message.warning('当前不是梦境开放时间（周三/周四/周日/周一）');
+    return;
+  }
+
+  if (levelId.value < 4000) {
+    message.warning('关卡数小于4000，无法购买金币商品');
+    return;
+  }
+
+  isRunning.value = true;
+  let successCount = 0;
+  let failCount = 0;
+
+    const items = merchantData.value[3];
+    // 从后往前购买（pos从大到小）
+    for (let pos = items.length - 1; pos >= 0; pos--) {
+      const index = items[pos];
+      
+      if (index === 2) {
+        try {
+          const success = await buyItem(3, index, pos);
+          if (success) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (error) {
+          failCount++;
+        }
+        
+        // 延迟避免请求过快
+        await delay(0.5);
+      }
+    }
+  
+
+  // 重新获取商品列表更新界面
+  await refreshMerchantList();
+  
+  message.success(`一键购买完成: 成功 ${successCount} 件, 失败 ${failCount} 件`);
+  isRunning.value = false;
+}
+
 // 获取商品列表（包含自动获取阵容）
 async function refreshMerchantList() {
   if (!isDungeonOpen()) {
@@ -577,10 +625,6 @@ async function refreshMerchantList() {
     
     // 第一步：获取默认队伍信息
     const teamSuccess = await getDefaultTeam();
-    if (!teamSuccess) {
-      message.error('获取默认队伍失败，无法继续');
-      return;
-    }
     
     // 第二步：选择梦境阵容
     await selectDreamTeam();
