@@ -34,7 +34,7 @@ const bossTowerInfo = computed(() => {
 })
 const currentTower = computed(() => {
   const tower = bossTowerInfo.value?.bossTower
-  return tower.towerId ?? 1
+  return tower?.towerId ?? 1
 })
 const state = ref({
     isRunning: false,
@@ -74,12 +74,12 @@ const extendbosstower = async () => {
       await tokenStore.sendMessageWithPromise(tokenId, "bosstower_getinfo", {}, 10000)
       message.success('战斗已完成')
       } catch (e) {
-       message.error('战斗失败: ' + (e?.message || '未知错误'))
+        message.error('战斗失败: ' + (e?.message || '未知错误'))
       }
     }
     else
     {
-      message.error('当前层数暂不支持'))
+      message.error('当前层数暂不支持')
     }
   }
   else
