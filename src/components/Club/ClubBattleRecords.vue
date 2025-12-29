@@ -472,6 +472,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .inline-title {
@@ -485,7 +486,7 @@ onMounted(() => {
 
 .battle-records-content {
   min-height: 400px;
-  max-height: 600px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
@@ -501,7 +502,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  padding: 10px;
 }
 
 .records-info {
@@ -531,6 +531,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .member-info {

@@ -119,10 +119,6 @@ const connectstr = (str1,str2,str3) => {
 
 const allianceConfig = [
   {
-    keywords: ['梦盟', '梦想之盟', '梦'], 
-    value: '梦盟'
-  },
-  {
     keywords: ['大联盟'], 
     value: '大联盟'
   },
@@ -133,6 +129,10 @@ const allianceConfig = [
   {
     keywords: ['龙盟', '龍盟'], 
     value: '龙盟'
+  },
+  {
+    keywords: ['梦盟', '梦想之盟'], 
+    value: '梦盟'
   }
 ];
 
@@ -142,17 +142,4 @@ export const allianceincludes = (str1) => {
   });
 
   return matchedItem ? matchedItem.value : "未知";
-	// if (str1.includes("梦盟") || str1.includes("梦想之盟") || str1.includes("梦")){
-	// 	return ("梦盟")
-	// }
-	// else if(str1.includes("大联盟")){
-	// 	return ("大联盟")
-	// }
-	// else if(str1.includes("正义")){
-	// 	return ("正义联盟")
-	// }
-	// else if(str1.includes("龙盟") || str1.includes("龍盟")){
-	// 	return ("龙盟")
-	// }
-	// else { return ("未知") }
 }

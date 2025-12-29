@@ -61,6 +61,7 @@
                     <!-- 分页控件 -->
                     <div class="pagination-container" v-if="totalPages > 1">
                         <n-pagination
+                            class="pagination-item"
                             v-model:page="currentPage"
                             :page-count="totalPages"
                             :page-size="pageSize"
@@ -428,9 +429,20 @@ const exportToImage = async () => {
             flex: 1;
         }
 
-        .details-button {
-            flex-shrink: 0;
-            margin-left: auto;
+        
+        @media (max-width: 768px) {
+        .member-stats-inline {
+            display: flex;
+            gap: var(--spacing-xs);
+            align-items: flex-start;
+            flex: 1;
+            flex-direction: column;
+            .tipsgg {
+            background: rgba(194, 166, 248, 0.1);
+            color: #AE86F9;
+            white-space:normal
+            }
+        }
         }
 
         .stat-inline {
@@ -741,25 +753,7 @@ const exportToImage = async () => {
         }
     }
 
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--bg-tertiary);
-        color: var(--text-secondary);
-
-        &.active {
-            background: rgba(24, 160, 88, 0.12);
-            color: var(--success-color);
-        }
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: currentColor;
+    .pagination-item{
+        flex-wrap: wrap;
     }
 </style>

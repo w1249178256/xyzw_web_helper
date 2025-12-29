@@ -88,6 +88,33 @@ onSome(['legion_getinfo', 'legion_getinforesp', 'legion_getinfor', 'legion_getin
   data.gameData.value.lastUpdated = new Date().toISOString()
 });
 
+onSome(['activity_getresp', 'activity_get'], (data: Session) => {
+  gameLogger.verbose(`收到活动信息事件: ${data.tokenId}`, data);
+  const { body } = data;
+  console.log("🚀 ~ body:", body)
+  if (!body) {
+    gameLogger.debug('活动信息响应为空');
+    return;
+  }
+  // 假设 activity_get 返回的 body 就是活动信息对象，或者包含 activities 字段
+  // 如果 body 是数组，可能需要转换。这里先按原样存储，后续根据实际数据调整
+  data.gameData.value.commonActivityInfo = body;
+  data.gameData.value.lastUpdated = new Date().toISOString()
+});
+
+onSome(['bosstower_getinforesp', 'bosstower_getinfo'], (data: Session) => {
+  gameLogger.verbose(`收到咸王宝库信息事件: ${data.tokenId}`, data);
+  const { body } = data;
+  console.log("🚀 ~ body:", body)
+  if (!body) {
+    gameLogger.debug('咸王宝库响应为空');
+    return;
+  }
+
+  data.gameData.value.bossTowerInfo = body;
+  data.gameData.value.lastUpdated = new Date().toISOString()
+});
+
 onSome([
   'team_getteaminfo',
   'team_getteaminforesp',

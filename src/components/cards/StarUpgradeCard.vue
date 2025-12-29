@@ -34,7 +34,7 @@
       </div>
     </template>
   </MyCard>
-  <n-modal v-model:show="state.showConfirm" preset="dialog" title="确认执行" content="将对预设英雄执行升星、图鉴升星并领取奖励。" positive-text="开始" negative-text="取消" @positive-click="confirmStart" />
+  <n-modal v-model:show="state.showConfirm" preset="dialog" title="确认执行" content="将对预设英雄执行升星、图鉴升星并领取奖励。" positive-text="开始" negative-text="取消"  />
 </template>
 
 <script setup>

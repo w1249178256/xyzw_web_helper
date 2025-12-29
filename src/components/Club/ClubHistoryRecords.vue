@@ -320,7 +320,7 @@ onMounted(() => {
 
 .battle-records-content {
     min-height: 400px;
-    max-height: 600px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -371,8 +371,8 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    min-width: 120px;
-    max-width: 120px;
+    min-width: 80px;
+    max-width: 80px;
     flex-shrink: 0;
 }
 

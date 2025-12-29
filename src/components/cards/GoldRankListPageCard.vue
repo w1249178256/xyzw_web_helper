@@ -10,7 +10,7 @@
                 </div>
             </div>
             <div class="inline-container">
-            <n-radio-group v-model:value="selectedGroup" name="group-radiogroup" size="small">
+                <n-radio-group v-model:value="selectedGroup" name="group-radiogroup" size="small" class="radio-group">
                     <n-radio-button value="gold1">1-100</n-radio-button>
                     <n-radio-button value="gold2">101-200</n-radio-button>
                     <n-radio-button value="gold3">201-300</n-radio-button>
@@ -65,6 +65,7 @@
                 <!-- 分页控件 -->
                     <div class="pagination-container" v-if="totalPages > 1">
                         <n-pagination
+                            class="pagination-item"
                             v-model:page="currentPage"
                             :page-count="totalPages"
                             :page-size="pageSize"
@@ -394,11 +395,6 @@ onMounted(() => {
     margin-top: var(--spacing-sm);
   }
 }
-.inline-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 .member-header {
   display: flex;
   align-items: center;
@@ -452,10 +448,21 @@ onMounted(() => {
   align-items: center;
   flex: 1;
 }
-.details-button {
-  flex-shrink: 0;
-  margin-left: auto;
-}
+
+@media (max-width: 768px) {
+  .member-stats-inline {
+      display: flex;
+      gap: var(--spacing-xs);
+      align-items: flex-start;
+      flex: 1;
+      flex-direction: column;
+      .tipsgg {
+      background: rgba(194, 166, 248, 0.1);
+      color: #AE86F9;
+      white-space:normal
+      }
+  }
+  }
 
 .stat-inline {
   font-size: var(--font-size-xs);
@@ -690,10 +697,12 @@ onMounted(() => {
   }
 }
 
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-}
+  .pagination-item{
+    flex-wrap: wrap;
+  }
+  @media (max-width:768px){
+    .radio-group{
+      white-space: normal;
+    }
+  }
 </style>

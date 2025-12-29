@@ -1,19 +1,20 @@
 {
-    "i18n-ally.localesPaths": [
-        "src/locales",
-        "src/locales/languages"
-    ],
-    "i18n-ally.keystyle": "nested",
-    "explorer.fileNesting.enabled": true,
-    "explorer.fileNesting.patterns": {
-        "index.html": "*.md",
-        "vite.config.*": ".env*, vite-env.d.ts, vitest.config.*, uno.config.*, cypress.config.*, .eslint*, eslint.config*, .prettier*, prettier.config.*, playwright.config.*, electron-builder.json5",
-        "tsconfig.json": "jsconfig*, tsconfig.*.json, env.d.ts, components.d.ts, *imports.d.ts",
-        "package.json": "package-lock.json, pnpm*,.npmrc, .yarnrc*, yarn*, .editorconfig"
-    },
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit"
-    },
-    "editor.tabSize": 2,
-    "editor.detectIndentation": false,
+  "i18n-ally.localesPaths": [
+    "src/locales",
+    "src/locales/languages"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "index.html": "*.md",
+    "vite.config.*": ".env*, vite-env.d.ts, vitest.config.*, uno.config.*, cypress.config.*, .eslint*, eslint.config*, .prettier*, prettier.config.*, playwright.config.*, electron-builder.json5",
+    "tsconfig.json": "jsconfig*, tsconfig.*.json, env.d.ts, components.d.ts, *imports.d.ts",
+    "package.json": "package-lock.json, pnpm*,.npmrc, .yarnrc*, yarn*, .editorconfig"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "i18n-ally.sourceLanguage": "zh-CN",
 }

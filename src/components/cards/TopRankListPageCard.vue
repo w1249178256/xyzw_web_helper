@@ -55,6 +55,7 @@
                 <!-- 分页控件 -->
                     <div class="pagination-container" v-if="totalPages > 1">
                         <n-pagination
+                            class="pagination-item"
                             v-model:page="currentPage"
                             :page-count="totalPages"
                             :page-size="pageSize"
@@ -265,7 +266,6 @@ const exportToImage = async () => {
         link.click()
         document.body.removeChild(link)
     } catch (err) {
-        console.error("DOM转图片失败：", err)
         alert("导出图片失败，请重试")
     }
 }
@@ -361,29 +361,6 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.member-avatar-placeholder {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  flex-shrink: 0;
-}
-.member-name {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
 
 .member-stats-inline {
   display: flex;
@@ -391,9 +368,20 @@ onMounted(() => {
   align-items: center;
   flex: 1;
 }
-.details-button {
-  flex-shrink: 0;
-  margin-left: auto;
+
+@media (max-width: 768px) {
+  .member-stats-inline {
+    display: flex;
+    gap: var(--spacing-xs);
+    align-items: flex-start;
+    flex: 1;
+    flex-direction: column;
+    .tipsgg {
+      background: rgba(194, 166, 248, 0.1);
+      color: #AE86F9;
+      white-space:normal
+    }
+  }
 }
 
 .stat-inline {
@@ -442,79 +430,10 @@ onMounted(() => {
 
 }
 
-.battle-details {
-  margin-top: var(--spacing-lg);
-  padding-top: var(--spacing-lg);
-  border-top: 1px solid var(--border-light);
-}
 
-.battles-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  max-height: 400px;
-  overflow-y: auto;
-}
 
-.battle-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md);
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-medium);
-  border-left: 3px solid transparent;
 
-  &.battle-win {
-    border-left-color: #10b981;
-  }
 
-  &.battle-loss {
-    border-left-color: #ef4444;
-  }
-}
-
-.battle-participants {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  flex: 1;
-}
-.participant {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  min-width: 0;
-}
-
-.participant-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.participant-name {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.battle-vs {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  align-items: center;
-}
-
-.battle-time {
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-  white-space: nowrap;
-}
 
 .no-battles {
   padding: var(--spacing-xl);
@@ -577,29 +496,6 @@ onMounted(() => {
   margin-bottom: var(--spacing-md);
 }
 
-.card-content {
-  .time-display {
-    font-size: 1rem; /* text-2xl */
-    font-weight: 600; /* font-bold */
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: var(--spacing-md);
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
-    letter-spacing: 0.1em;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    background: var(--bg-tertiary);
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease-in-out;
-    
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-    }
-  }
-}
 .status-icon {
   width: 32px;
   height: 32px;
@@ -614,25 +510,8 @@ onMounted(() => {
   p { margin: 0; color: var(--text-secondary); font-size: var(--font-size-sm); }
 }
 
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
 
-  &.active {
-    background: rgba(24, 160, 88, 0.12);
-    color: var(--success-color);
-  }
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
+.pagination-item{
+  flex-wrap: wrap;
 }
 </style>

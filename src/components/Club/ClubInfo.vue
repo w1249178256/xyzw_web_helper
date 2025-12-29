@@ -309,7 +309,7 @@ const formatNumber = (num) => {
 
   .member-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     padding: 8px;
     border-radius: 8px;
