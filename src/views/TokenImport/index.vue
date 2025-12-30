@@ -26,11 +26,14 @@
         <div class="card-header">
           <!-- 导入方式选择 -->
           <n-radio-group v-model:value="importMethod" class="import-method-tabs" size="small">
-            <n-radio-button value="manual">
+            <!-- <n-radio-button value="manual">
               手动输入
             </n-radio-button>
             <n-radio-button value="url">
               URL获取
+            </n-radio-button> -->
+            <n-radio-button value="wxQrcode">
+              微信扫码获取
             </n-radio-button>
             <n-radio-button value="bin">
               BIN获取
@@ -42,6 +45,8 @@
             v-if="importMethod === 'manual'" />
           <url-token-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
             v-if="importMethod === 'url'" />
+          <wx-qrcode-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
+            v-if="importMethod === 'wxQrcode'" />
           <bin-token-form @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
             v-if="importMethod === 'bin'" />
         </div>
@@ -50,13 +55,7 @@
       <!-- Token列表 -->
       <div v-if="tokenStore.hasTokens" class="tokens-section">
         <div class="section-header">
-          <n-space align="center">
-            <h2>我的Token列表 ({{ tokenStore.gameTokens.length }}个)</h2>
-            <n-radio-group v-model:value="viewMode" size="small">
-              <n-radio-button value="card">卡片</n-radio-button>
-              <n-radio-button value="list">列表</n-radio-button>
-            </n-radio-group>
-          </n-space>
+          <h2>我的Token列表 ({{ tokenStore.gameTokens.length }}个)</h2>
           <div class="header-actions">
             <n-button v-if="tokenStore.selectedToken" type="success" @click="goToDashboard">
               <template #icon>
@@ -89,7 +88,7 @@
           </div>
         </div>
 
-        <div class="tokens-grid" v-if="viewMode === 'card'">
+        <div class="tokens-grid">
           <a-card v-for="token in tokenStore.gameTokens" :key="token.id" :class="{
             'token-card': true,
             active: selectedTokenId === token.id
@@ -166,7 +165,7 @@
               </div>
             </template>
             <template #actions>
-              <n-button type="primary" size="large" block :loading="connectingTokens.has(token.id)"
+              <n-button v-if="getTokenStyle(token.id) === 'success'" type="primary" size="large" block :loading="connectingTokens.has(token.id)"
                 @click="startTaskManagement(token)">
                 <template #icon>
                   <n-icon>
@@ -175,72 +174,26 @@
                 </template>
                 开始任务管理
               </n-button>
+              <n-button v-else type="primary" size="large" block :loading="connectingTokens.has(token.id)"
+                @click="startTaskManagement(token)">
+                开始链接
+              </n-button>
             </template>
           </a-card>
-        </div>
-
-        <!-- List View -->
-        <div class="tokens-list" v-else>
-          <n-card v-for="token in tokenStore.gameTokens" :key="token.id" size="small" style="margin-bottom: 8px;"
-            hoverable @click="selectToken(token)" :class="{ active: selectedTokenId === token.id }">
-            <n-space justify="space-between" align="center">
-              <!-- Info -->
-              <n-space align="center" :size="24">
-                <div style="min-width: 120px;">
-                  <span style="font-weight: bold; font-size: 1.1em; margin-right: 8px;">{{ token.name }}</span>
-                  <n-tag size="small" type="error" v-if="token.server">{{ token.server }}</n-tag>
-                </div>
-
-                <div style="min-width: 100px;">
-                  <a-badge :status="getTokenStyle(token.id)" :text="getConnectionStatusText(token.id)" />
-                </div>
-
-                <n-tag size="small" :type="token.importMethod === 'url' ? 'success' : 'warning'">
-                  {{ token.importMethod === 'url' ? '长期' : '临时' }}
-                </n-tag>
-              </n-space>
-
-              <!-- Actions -->
-              <n-space>
-                <n-button size="small" type="primary" :loading="connectingTokens.has(token.id)"
-                  @click.stop="startTaskManagement(token)">
-                  <template #icon>
-                    <n-icon>
-                      <Home />
-                    </n-icon>
-                  </template>
-                  管理
-                </n-button>
-                <n-button size="small" @click.stop="refreshToken(token)" :loading="refreshingTokens.has(token.id)">
-                  <template #icon>
-                    <n-icon>
-                      <Refresh />
-                    </n-icon>
-                  </template>
-                  刷新
-                </n-button>
-                <n-dropdown :options="getTokenActions(token)" @select="(key) => handleTokenAction(key, token)">
-                  <n-button size="small" circle @click.stop>
-                    <template #icon>
-                      <n-icon>
-                        <EllipsisHorizontal />
-                      </n-icon>
-                    </template>
-                  </n-button>
-                </n-dropdown>
-              </n-space>
-            </n-space>
-          </n-card>
         </div>
       </div>
 
       <!-- 空状态 -->
-      <a-empty v-if="!tokenStore.hasTokens && !showImportForm">
+      <a-empty v-if="!tokenStore.hasTokens && !showImportForm" class="empty-state">
         <template #image>
-          <i class="mdi:bed-empty"></i>
+          <n-icon size="128" color="var(--text-tertiary)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+            </svg>
+          </n-icon>
         </template>
         还没有导入任何Token
-        <a-button type="link" @click="openshowImportForm">打开Token管理</a-button>
+        <a-button type="link" @click="openshowImportForm">打开Tokeng管理</a-button>
       </a-empty>
     </div>
 
@@ -280,6 +233,7 @@
 import ManualTokenForm from './manual.vue'
 import UrlTokenForm from './url.vue'
 import BinTokenForm from './bin.vue'
+import WxQrcodeForm from './wxqrcode.vue'
 
 import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
 import {
@@ -322,10 +276,9 @@ const importFormRef = ref(null)
 const urlFormRef = ref(null)
 const editFormRef = ref(null)
 const editingToken = ref(null)
-const importMethod = ref('manual')
+const importMethod = ref('bin')
 const refreshingTokens = ref(new Set())
 const connectingTokens = ref(new Set())
-const viewMode = ref('card')
 
 // 编辑表单
 const editForm = reactive({
@@ -356,7 +309,7 @@ const bulkOptions = [
 /**
  * 手动打开Token管理卡片
  */
-const openshowImportForm = () => {
+const openshowImportForm = ()=>{
   showImportForm.value = true
 }
 
