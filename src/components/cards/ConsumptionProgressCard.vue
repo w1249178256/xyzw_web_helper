@@ -69,7 +69,7 @@
                                 {{ step.name }} -> 达到 {{ step.threshold }} (可得 {{ step.delta }} 普通道具, 还需消耗 {{ step.cost }})
                             <div >
                             <div v-if="step.name === '捕获'">
-                                如购买原价鱼竿需要消耗: {{ GoldSpentBuyRod(combo) || 0 }} 金砖
+                                如购买原价鱼竿需要消耗: {{ GoldSpentBuyRod(combo) || 0 }} 金砖购买{{ GoldRodGap(combo) }}根鱼竿
                                 <span style="color:red;" v-if="GoldSpentExceeded(combo)">（超出方案金砖档位）</span>
                             </div>
                             </div>
@@ -619,6 +619,18 @@ const GoldSpentExceeded = (combo) => {
     }
     return false;
 };
+
+const GoldRodGap = (combo) => {
+  if (combo && combo.combo){
+      const rodTarget = combo.combo.find(c => c.name === "捕获")?.threshold || 0;
+      const currentRodConsumed = (progressList.value.find(p => p.name === "捕获")?.current) || 0;
+      const stockRod = roleInfo.value?.role?.items?.[1012]?.quantity || 0;
+      const extraRods = Math.max(0, rodTarget- currentRodConsumed - stockRod);
+      return extraRods;
+    }
+  return 0;
+};
+
 </script>
 
 <style scoped lang="scss">
