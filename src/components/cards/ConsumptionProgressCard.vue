@@ -595,20 +595,15 @@ const feasibleCombos = computed(() => {
     return combos;
 });
 
-// expose display strings for current rods and diamonds
+// 计算购买鱼竿所需金砖数
 const GoldSpentBuyRod = (combo) => {
-    if (combo && combo.combo){
-      const rodTarget = combo.combo.find(c => c.name === "捕获")?.threshold || 0;
-      const currentRodConsumed = (progressList.value.find(p => p.name === "捕获")?.current) || 0;
-      const stockRod = roleInfo.value?.role?.items?.[1012]?.quantity || 0;
-      const extraRods = Math.max(0, rodTarget- currentRodConsumed - stockRod);
-      //原价购买鱼竿金砖估算
-      const godSpent = extraRods*600;
-      return godSpent;
-    }
-  return 0;
+    const extraRods = GoldRodGap(combo);
+    //原价购买鱼竿金砖估算
+    const godSpent = extraRods*600;
+    return godSpent;
 };
 
+//计算是否超出金砖档位
 const GoldSpentExceeded = (combo) => {
     if (combo && combo.combo){
       const rodTarget = combo.combo.find(c => c.name === "捕获")?.threshold || 0;
@@ -620,6 +615,7 @@ const GoldSpentExceeded = (combo) => {
     return false;
 };
 
+//计算金鱼竿缺口数量
 const GoldRodGap = (combo) => {
   if (combo && combo.combo){
       const rodTarget = combo.combo.find(c => c.name === "捕获")?.threshold || 0;
