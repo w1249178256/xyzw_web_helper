@@ -22,11 +22,10 @@ export const emitPlus = (
   event: string | symbol,
   ...args: Array<any>
 ): boolean => {
-  if (events.has(event as string)) {
-    return $emit.emit(event, ...args);
-  } else {
-    return $emit.emit("$any", event, ...args);
-  }
+  // 先触发具体事件，然后触发$any事件
+  const result = $emit.emit(event, ...args);
+  $emit.emit("$any", event, ...args);
+  return result;
 };
 
 export interface Session {
@@ -56,6 +55,11 @@ StudyPlugin({
 });
 
 onSome(["_sys/ack"], (data: Session) => {});
+
+// 俱乐部申请列表响应
+onSome(["legion_applylistresp"], (data: Session) => {
+  gameLogger.debug(`收到俱乐部申请列表响应: ${data.tokenId}`, data.body);
+});
 
 // omail_newmailnotify   邮件
 

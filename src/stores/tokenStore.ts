@@ -892,13 +892,15 @@ export const useTokenStore = defineStore("tokens", () => {
   };
 
   // 发送获取角色信息请求（异步处理）
-  const sendGetRoleInfo = async (tokenId: string, params = {}) => {
+  const sendGetRoleInfo = async (tokenId: string, params = {}, retryCount = 0) => {
     try {
+      // 增加超时时间到15秒，并添加重试机制
+      const timeout = 15000;
       const roleInfo = await sendMessageWithPromise(
         tokenId,
         "role_getroleinfo",
         params,
-        10000,
+        timeout,
       );
 
       // 手动更新游戏数据（因为响应可能不会自动触发消息处理）
@@ -911,6 +913,14 @@ export const useTokenStore = defineStore("tokens", () => {
       return roleInfo;
     } catch (error) {
       gameLogger.error(`获取角色信息失败 [${tokenId}]:`, error.message);
+      
+      // 重试机制：最多重试2次，每次间隔1秒
+      if (retryCount < 2) {
+        gameLogger.info(`正在重试获取角色信息 [${tokenId}]，重试次数: ${retryCount + 1}`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return sendGetRoleInfo(tokenId, params, retryCount + 1);
+      }
+      
       throw error;
     }
   };

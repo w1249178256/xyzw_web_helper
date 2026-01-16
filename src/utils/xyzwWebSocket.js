@@ -149,8 +149,13 @@ export function registerDefaultCommands(reg) {
     .register("legion_getwarrank")
     .register("legionwar_getdetails")
     .register("legion_storebuygoods")
+    .register("legion_kickout")
+    .register("legion_applylist")
+    .register("legion_approveapply")
+    .register("legion_refuseapply")
+    .register("legion_agree")
+    .register("legion_ignore")
 
-    //盐场
     .register("legion_getinfobyid")
     .register("legion_getarearank")
     .register("saltroad_getsaltroadwartotalrank")
@@ -890,6 +895,10 @@ export class XyzwWebSocketClient {
           1300050: "请修改您的采购次数",
           200020: "出了点小问题，请尝试重启游戏解决～",
           200160: "模块未开启",
+          2300190: "未加入俱乐部",
+          2300370: "俱乐部商品购买数量超出上限",
+          400000: "物品不存在",
+          2300070: "未加入俱乐部",
           3500020: "没有可领取的奖励"
         };
         
@@ -1026,6 +1035,7 @@ export class XyzwWebSocketClient {
           1300050: "请修改您的采购次数",
           200020: "出了点小问题，请尝试重启游戏解决～",
           200160: "模块未开启",
+          2300190: "未加入俱乐部",
           3500020: "没有可领取的奖励"
         };
         
