@@ -144,9 +144,9 @@
                   </div>
                   <span class="header-player">{{ player.name }}</span>
                   <span class="player-stat">{{ player.winCnt || 0 }}</span>
-                  <span class="player-stat">{{ Math.max(player.loseCnt - 6, 0) || 0 }}</span>
-                  <span class="player-stat">{{ player.buildingCnt || 0 }}</span>
                   <span class="player-stat">{{ player.loseCnt || 0 }}</span>
+                  <span class="player-stat">{{ player.buildingCnt || 0 }}</span>
+                  <span class="player-stat">{{ Math.max(player.loseCnt - 6, 0) || 0 }}</span>
                   <span class="player-stat">{{ parseFloat((player.winCnt && player.loseCnt ? player.winCnt/player.loseCnt : 0.00)).toFixed(2) }}</span>
                 </div>
               </div>
@@ -304,9 +304,9 @@
                   </div>
                   <span class="player-name">{{ player.name }}</span>
                   <span class="player-stat">{{ player.winCnt || 0 }}</span>
-                  <span class="player-stat">{{ Math.max(player.loseCnt - 6, 0) || 0 }}</span>
-                  <span class="player-stat">{{ player.buildingCnt || 0 }}</span>
                   <span class="player-stat">{{ player.loseCnt || 0 }}</span>
+                  <span class="player-stat">{{ player.buildingCnt || 0 }}</span>
+                  <span class="player-stat">{{ Math.max(player.loseCnt - 6, 0) || 0 }}</span>               
                   <span class="player-stat">{{ parseFloat((player.winCnt && player.loseCnt ? player.winCnt/player.loseCnt : 0.00)).toFixed(2) }}</span>
                 </div>
               </div>

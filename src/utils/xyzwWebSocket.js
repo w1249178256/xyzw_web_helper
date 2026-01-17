@@ -973,12 +973,17 @@ export class XyzwWebSocketClient {
       activity_warorderclaimresp: "activity_recyclewarorderrewardclaim",
       arena_getarearankresp: "arena_getarearank",
       bosstower_gethelprankresp: "bosstower_gethelprank",
+      // 功法相关响应映射
+      legacy_getinforesp: "legacy_getinfo",
+      legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_sendgiftresp: "legacy_sendgift",
+      legacy_getgiftsresp: "legacy_getgifts",
       // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
       task_claimdailyrewardresp: "task_claimdailyreward",
       task_claimweekrewardresp: "task_claimweekreward",
 
       // 同步响应映射（优先级低）
-      syncresp: ["system_mysharecallback", "task_claimdailypoint"],
+      syncresp: ["system_mysharecallback", "task_claimdailypoint", "role_commitpassword"],
       syncrewardresp: [
         "system_buygold",
         "discount_claimreward",
