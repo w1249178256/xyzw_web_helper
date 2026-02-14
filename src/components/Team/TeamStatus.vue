@@ -130,75 +130,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
 import { useMessage, NTag } from "naive-ui";
-
-/**
- * 集成英雄字典（游戏ID -> { name, type }）
- * 你也可以独立出一个 heroDict.ts 后 import；按你的要求，这里整合到同一文件。
- */
-const HERO_DICT = {
-  101: { name: "司马懿", type: "魏国" },
-  102: { name: "郭嘉", type: "魏国" },
-  103: { name: "关羽", type: "蜀国" },
-  104: { name: "诸葛亮", type: "蜀国" },
-  105: { name: "周瑜", type: "吴国" },
-  106: { name: "太史慈", type: "吴国" },
-  107: { name: "吕布", type: "群雄" },
-  108: { name: "华佗", type: "群雄" },
-  109: { name: "甄姬", type: "魏国" },
-  110: { name: "黄月英", type: "蜀国" },
-  111: { name: "孙策", type: "吴国" },
-  112: { name: "贾诩", type: "群雄" },
-  113: { name: "曹仁", type: "魏国" },
-  114: { name: "姜维", type: "蜀国" },
-  115: { name: "孙坚", type: "吴国" },
-  116: { name: "公孙瓒", type: "群雄" },
-  117: { name: "典韦", type: "魏国" },
-  118: { name: "赵云", type: "蜀国" },
-  119: { name: "大乔", type: "吴国" },
-  120: { name: "张角", type: "群雄" },
-  201: { name: "徐晃", type: "魏国" },
-  202: { name: "荀彧", type: "魏国" },
-  203: { name: "典韦", type: "魏国" },
-  204: { name: "张飞", type: "蜀国" },
-  205: { name: "赵云", type: "蜀国" },
-  206: { name: "庞统", type: "蜀国" },
-  207: { name: "鲁肃", type: "吴国" },
-  208: { name: "陆逊", type: "吴国" },
-  209: { name: "甘宁", type: "吴国" },
-  210: { name: "貂蝉", type: "群雄" },
-  211: { name: "董卓", type: "群雄" },
-  212: { name: "张角", type: "群雄" },
-  213: { name: "张辽", type: "魏国" },
-  214: { name: "夏侯惇", type: "魏国" },
-  215: { name: "许褚", type: "魏国" },
-  216: { name: "夏侯渊", type: "魏国" },
-  217: { name: "魏延", type: "蜀国" },
-  218: { name: "黄忠", type: "蜀国" },
-  219: { name: "马超", type: "蜀国" },
-  220: { name: "马岱", type: "蜀国" },
-  221: { name: "吕蒙", type: "吴国" },
-  222: { name: "黄盖", type: "吴国" },
-  223: { name: "蔡文姬", type: "魏国" },
-  224: { name: "小乔", type: "吴国" },
-  225: { name: "袁绍", type: "群雄" },
-  226: { name: "华雄", type: "群雄" },
-  227: { name: "颜良", type: "群雄" },
-  228: { name: "文丑", type: "群雄" },
-  301: { name: "周泰", type: "吴国" },
-  302: { name: "许攸", type: "魏国" },
-  303: { name: "于禁", type: "魏国" },
-  304: { name: "张星彩", type: "蜀国" },
-  305: { name: "关银屏", type: "蜀国" },
-  306: { name: "关平", type: "蜀国" },
-  307: { name: "程普", type: "吴国" },
-  308: { name: "张昭", type: "吴国" },
-  309: { name: "陆绩", type: "吴国" },
-  310: { name: "吕玲绮", type: "群雄" },
-  311: { name: "潘凤", type: "群雄" },
-  312: { name: "邢道荣", type: "群雄" },
-  313: { name: "祝融夫人", type: "群雄" },
-  314: { name: "孟获", type: "群雄" },
-};
+import { HERO_DICT } from "@/utils/HeroList.js";
 
 const tokenStore = useTokenStore();
 const message = useMessage();

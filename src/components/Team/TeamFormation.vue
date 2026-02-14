@@ -113,6 +113,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
 import { useMessage } from "naive-ui";
+import { HERO_DICT } from "@/utils/HeroList.js";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -122,73 +123,7 @@ const switching = ref(false);
 const currentTeam = ref(1);
 const availableTeams = ref<number[]>([1, 2, 3, 4]);
 
-const HERO_DICT: Record<
-  number,
-  { name: string; type: string; avatar?: string }
-> = {
-  101: { name: "司马懿", type: "魏国", avatar: "/team/simayi.png" },
-  102: { name: "郭嘉", type: "魏国", avatar: "/team/guojia.png" },
-  103: { name: "关羽", type: "蜀国", avatar: "/team/guanyu.png" },
-  104: { name: "诸葛亮", type: "蜀国", avatar: "/team/zhugeliang.png" },
-  105: { name: "周瑜", type: "吴国", avatar: "/team/zhouyu.png" },
-  106: { name: "太史慈", type: "吴国", avatar: "/team/taishici.png" },
-  107: { name: "吕布", type: "群雄", avatar: "/team/lvbu.png" },
-  108: { name: "华佗", type: "群雄", avatar: "/team/huatuo.png" },
-  109: { name: "甄姬", type: "魏国", avatar: "/team/zhenji.png" },
-  110: { name: "黄月英", type: "蜀国", avatar: "/team/huangyueying.png" },
-  111: { name: "孙策", type: "吴国", avatar: "/team/sunce.png" },
-  112: { name: "贾诩", type: "群雄", avatar: "/team/jiaxu.png" },
-  113: { name: "曹仁", type: "魏国", avatar: "/team/caoren.png" },
-  114: { name: "姜维", type: "蜀国", avatar: "/team/jiangwei.png" },
-  115: { name: "孙坚", type: "吴国", avatar: "/team/sunjian.png" },
-  116: { name: "公孙瓒", type: "群雄", avatar: "/team/gongsunzan.png" },
-  117: { name: "典韦", type: "魏国", avatar: "/team/dianwei.png" },
-  118: { name: "赵云", type: "蜀国", avatar: "/team/zhaoyun.png" },
-  119: { name: "大乔", type: "吴国", avatar: "/team/daqiao.png" },
-  120: { name: "张角", type: "群雄", avatar: "/team/zhangjiao.png" },
-  201: { name: "徐晃", type: "魏国", avatar: "/team/xuhuang.png" },
-  202: { name: "荀彧", type: "魏国", avatar: "/team/xunyu.png" },
-  203: { name: "典韦", type: "魏国", avatar: "/team/xiaodianwei.png" },
-  204: { name: "张飞", type: "蜀国", avatar: "/team/zhangfei.png" },
-  205: { name: "赵云", type: "蜀国", avatar: "/team/xiaozhaoyun.png" },
-  206: { name: "庞统", type: "蜀国", avatar: "/team/pangtong.png" },
-  207: { name: "鲁肃", type: "吴国", avatar: "/team/lusu.png" },
-  208: { name: "陆逊", type: "吴国", avatar: "/team/luxun.png" },
-  209: { name: "甘宁", type: "吴国", avatar: "/team/ganning.png" },
-  210: { name: "貂蝉", type: "群雄", avatar: "/team/diaochan.png" },
-  211: { name: "董卓", type: "群雄", avatar: "/team/dongzhuo.png" },
-  212: { name: "张角", type: "群雄", avatar: "/team/xiaozhangjiao.png" },
-  213: { name: "张辽", type: "魏国", avatar: "/team/zhangliao.png" },
-  214: { name: "夏侯惇", type: "魏国", avatar: "/team/xiahoudun.png" },
-  215: { name: "许褚", type: "魏国", avatar: "/team/xuzhu.png" },
-  216: { name: "夏侯渊", type: "魏国", avatar: "/team/xiahouyuan.png" },
-  217: { name: "魏延", type: "蜀国", avatar: "/team/weiyan.png" },
-  218: { name: "黄忠", type: "蜀国", avatar: "/team/huangzhong.png" },
-  219: { name: "马超", type: "蜀国", avatar: "/team/machao.png" },
-  220: { name: "马岱", type: "蜀国", avatar: "/team/madai.png" },
-  221: { name: "吕蒙", type: "吴国", avatar: "/team/lvmeng.png" },
-  222: { name: "黄盖", type: "吴国", avatar: "/team/huanggai.png" },
-  223: { name: "蔡文姬", type: "魏国", avatar: "/team/caiwenji.png" },
-  224: { name: "小乔", type: "吴国", avatar: "/team/xiaoqiao.png" },
-  225: { name: "袁绍", type: "群雄", avatar: "/team/yuanshao.png" },
-  226: { name: "华雄", type: "群雄", avatar: "/team/huaxiong.png" },
-  227: { name: "颜良", type: "群雄", avatar: "/team/yanliang.png" },
-  228: { name: "文丑", type: "群雄", avatar: "/team/wenchou.png" },
-  301: { name: "周泰", type: "吴国", avatar: "/team/zhoutai.png" },
-  302: { name: "许攸", type: "魏国", avatar: "/team/xuyou.png" },
-  303: { name: "于禁", type: "魏国", avatar: "/team/yujin.png" },
-  304: { name: "张星彩", type: "蜀国", avatar: "/team/zhangxingcai.png" },
-  305: { name: "关银屏", type: "蜀国", avatar: "/team/guanyinping.png" },
-  306: { name: "关平", type: "蜀国", avatar: "/team/guanping.png" },
-  307: { name: "程普", type: "吴国", avatar: "/team/chengpu.png" },
-  308: { name: "张昭", type: "吴国", avatar: "/team/zhangzhao.png" },
-  309: { name: "陆绩", type: "吴国", avatar: "/team/luji.png" },
-  310: { name: "吕玲绮", type: "群雄", avatar: "/team/lvlingqi.png" },
-  311: { name: "潘凤", type: "群雄", avatar: "/team/panfeng.png" },
-  312: { name: "邢道荣", type: "群雄", avatar: "/team/xingdaorong.png" },
-  313: { name: "祝融夫人", type: "群雄", avatar: "/team/zhurongfuren.png" },
-  314: { name: "孟获", type: "群雄", avatar: "/team/menghuo.png" },
-};
+
 
 const wsStatus = computed(() => {
   if (!tokenStore.selectedToken) return "disconnected";

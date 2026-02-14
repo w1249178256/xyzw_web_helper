@@ -20,6 +20,7 @@ export const HERO_DICT = {
   118: { name: "赵云", type: "蜀国", avatar: "/team/zhaoyun.png" },
   119: { name: "大乔", type: "吴国", avatar: "/team/daqiao.png" },
   120: { name: "张角", type: "群雄", avatar: "/team/zhangjiao.png" },
+  121: { name: "鲁肃", type: "吴国", avatar: "/team/lusu.png" },
   201: { name: "徐晃", type: "魏国", avatar: "/team/xuhuang.png" },
   202: { name: "荀彧", type: "魏国", avatar: "/team/xunyu.png" },
   203: { name: "典韦", type: "魏国", avatar: "/team/xiaodianwei.png" },

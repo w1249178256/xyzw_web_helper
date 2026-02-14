@@ -40,7 +40,7 @@
               @click="selectHero(hero.id)"
             >
               <div class="hero-avatar">
-                <img v-if="getHeroAvatar(hero.id)" :src="getHeroAvatar(hero.id)" :alt="hero.name" />
+                <img v-if="HERO_DICT[hero.id]?.avatar" :src="HERO_DICT[hero.id]?.avatar" :alt="hero.name" />
                 <div v-else class="hero-placeholder">{{ hero.name?.substring(0, 2) || "?" }}</div>
               </div>
               <div class="hero-info">
@@ -261,6 +261,7 @@ import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
 import MyCard from "../Common/MyCard.vue";
+import { HERO_DICT } from "@/utils/HeroList.js";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -468,7 +469,7 @@ const buildHeroList = (teamData, heroData) => {
     const heroDetail = heroData[String(heroId)] || {};
     heroList.push({
       id: heroId,
-      name: getHeroName(heroId),
+      name: HERO_DICT[heroId]?.name || `武将${heroId}`,
       position: Number(position),
       level: hero?.level || heroDetail?.level || 1,
       equipment: heroDetail?.equipment || {},
@@ -481,7 +482,7 @@ const buildHeroList = (teamData, heroData) => {
       if (hero && hero.equipment) {
         heroList.push({
           id: Number(id),
-          name: getHeroName(Number(id)),
+          name: HERO_DICT[Number(id)]?.name || `武将${Number(id)}`,
           position: heroList.length + 1,
           level: hero?.level || 1,
           equipment: hero?.equipment || {},
@@ -493,146 +494,6 @@ const buildHeroList = (teamData, heroData) => {
 
   // 按位置排序
   return heroList.sort((a, b) => a.position - b.position);
-};
-
-// 英雄头像映射
-const heroAvatarMap = {
-  101: "/team/simayi.png",
-  102: "/team/guojia.png",
-  103: "/team/guanyu.png",
-  104: "/team/zhugeliang.png",
-  105: "/team/zhouyu.png",
-  106: "/team/taishici.png",
-  107: "/team/lvbu.png",
-  108: "/team/huatuo.png",
-  109: "/team/zhenji.png",
-  110: "/team/huangyueying.png",
-  111: "/team/sunce.png",
-  112: "/team/jiaxu.png",
-  113: "/team/caoren.png",
-  114: "/team/jiangwei.png",
-  115: "/team/sunjian.png",
-  116: "/team/gongsunzan.png",
-  117: "/team/dianwei.png",
-  118: "/team/zhaoyun.png",
-  119: "/team/daqiao.png",
-  120: "/team/zhangjiao.png",
-  201: "/team/xuhuang.png",
-  202: "/team/xunyu.png",
-  203: "/team/xiaodianwei.png",
-  204: "/team/zhangfei.png",
-  205: "/team/xiaozhaoyun.png",
-  206: "/team/pangtong.png",
-  207: "/team/lusu.png",
-  208: "/team/luxun.png",
-  209: "/team/ganning.png",
-  210: "/team/diaochan.png",
-  211: "/team/dongzhuo.png",
-  212: "/team/xiaozhangjiao.png",
-  213: "/team/zhangliao.png",
-  214: "/team/xiahoudun.png",
-  215: "/team/xuzhu.png",
-  216: "/team/xiahouyuan.png",
-  217: "/team/weiyan.png",
-  218: "/team/huangzhong.png",
-  219: "/team/machao.png",
-  220: "/team/madai.png",
-  221: "/team/lvmeng.png",
-  222: "/team/huanggai.png",
-  223: "/team/caiwenji.png",
-  224: "/team/xiaoqiao.png",
-  225: "/team/yuanshao.png",
-  226: "/team/huaxiong.png",
-  227: "/team/yanliang.png",
-  228: "/team/wenchou.png",
-  301: "/team/zhoutai.png",
-  302: "/team/xuyou.png",
-  303: "/team/yujin.png",
-  304: "/team/zhangxingcai.png",
-  305: "/team/guanyinping.png",
-  306: "/team/guanping.png",
-  307: "/team/chengpu.png",
-  308: "/team/zhangzhao.png",
-  309: "/team/luji.png",
-  310: "/team/lvlingqi.png",
-  311: "/team/panfeng.png",
-  312: "/team/xingdaorong.png",
-  313: "/team/zhurongfuren.png",
-  314: "/team/menghuo.png",
-};
-
-const getHeroAvatar = (heroId) => {
-  return heroAvatarMap[heroId];
-};
-
-// 获取英雄名称
-const heroNameMap = {
-  101: "司马懿",
-  102: "郭嘉",
-  103: "关羽",
-  104: "诸葛亮",
-  105: "周瑜",
-  106: "太史慈",
-  107: "吕布",
-  108: "华佗",
-  109: "甄姬",
-  110: "黄月英",
-  111: "孙策",
-  112: "贾诩",
-  113: "曹仁",
-  114: "姜维",
-  115: "孙坚",
-  116: "公孙瓒",
-  117: "典韦",
-  118: "赵云",
-  119: "大乔",
-  120: "张角",
-  201: "徐晃",
-  202: "荀彧",
-  203: "小典韦",
-  204: "张飞",
-  205: "小赵云",
-  206: "庞统",
-  207: "鲁肃",
-  208: "陆逊",
-  209: "甘宁",
-  210: "貂蝉",
-  211: "董卓",
-  212: "小张角",
-  213: "张辽",
-  214: "夏侯惇",
-  215: "许褚",
-  216: "夏侯渊",
-  217: "魏延",
-  218: "黄忠",
-  219: "马超",
-  220: "马岱",
-  221: "吕蒙",
-  222: "黄盖",
-  223: "蔡文姬",
-  224: "小乔",
-  225: "袁绍",
-  226: "华雄",
-  227: "颜良",
-  228: "文丑",
-  301: "周泰",
-  302: "许攸",
-  303: "于禁",
-  304: "张星彩",
-  305: "关银屏",
-  306: "关平",
-  307: "程普",
-  308: "张昭",
-  309: "陆绩",
-  310: "吕玲绮",
-  311: "潘凤",
-  312: "邢道荣",
-  313: "祝融夫人",
-  314: "孟获",
-};
-
-const getHeroName = (heroId) => {
-  return heroNameMap[heroId] || `武将${heroId}`;
 };
 
 // 选择英雄
