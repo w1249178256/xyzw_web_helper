@@ -219,14 +219,6 @@
           </n-tab-pane>
 
           <n-tab-pane
-            name="records"
-            tab="盐场战绩"
-            display-directive="show:lazy"
-          >
-            <ClubBattleRecords inline />
-          </n-tab-pane>
-
-          <n-tab-pane
             name="history"
             tab="俱乐部历史战绩"
             display-directive="show:lazy"
@@ -259,7 +251,6 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
-import ClubBattleRecords from "./ClubBattleRecords.vue";
 import ClubHistoryRecords from "./ClubHistoryRecords.vue";
 import ClubWeirdTowerInfo from "./ClubWeirdTowerInfo.vue";
 import CarScoreInfo from "./CarScoreInfo.vue";

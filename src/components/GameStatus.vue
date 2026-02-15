@@ -19,6 +19,7 @@
       <n-tab-pane name="activity" tab="活动" />
       <n-tab-pane v-if="ENABLE_TOOLS_TAB" name="tools" tab="工具" />
       <n-tab-pane name="warrank" tab="盐场" />
+      <n-tab-pane name="weekBattle" tab="本周盐场战绩" />
       <n-tab-pane name="monthBattle" tab="本月盐场战绩" />
       <n-tab-pane name="peach" tab="蟠桃园" />
       <n-tab-pane name="serverrank" tab="区服榜" />
@@ -163,6 +164,11 @@
     <!-- 换皮闯关 -->
     <SkinChallengeCard v-show="activeSection === 'activity'" />
 
+    <!-- 周盐场战绩（提取组件） -->
+    <div class="warrank-full-container" v-if="activeSection === 'weekBattle'">
+      <ClubBattleRecords />
+    </div>
+
     <!-- 盐场（提取组件） -->
     <div class="warrank-full-container" v-if="activeSection === 'warrank'">
       <ClubWarrank />
@@ -220,6 +226,7 @@ import StudyChallengeCard from "./cards/StudyChallengeCard.vue";
 import SkinChallengeCard from "./cards/SkinChallengeCard.vue";
 import ClubWarrank from "./Club/ClubWarrank.vue";
 import ClubMonthBattleRecords from "./Club/ClubMonthBattleRecords.vue";
+import ClubBattleRecords from "./Club/ClubBattleRecords.vue";
 import TopRankList from "./cards/TopRankListPageCard.vue";
 import TopClubList from "./cards/TopClubListPageCard.vue";
 import GoldClubList from "./cards/GoldRankListPageCard.vue";

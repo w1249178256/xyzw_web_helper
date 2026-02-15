@@ -300,34 +300,55 @@ const autoMergeItems = async () => {
   isMerging.value = true;
   stopMergeFlag = false;
 
-  // 设置超时保护，30秒后自动重置状态
+  // 设置超时保护，60秒后自动重置状态
   mergeTimeout.value = setTimeout(() => {
     isMerging.value = false;
     mergeTimeout.value = null;
     stopMergeFlag = true;
     message.info("一键合成已超时自动停止");
-  }, 30000);
+  }, 60000);
 
   try {
     const tokenId = tokenStore.selectedToken.id;
-
     message.loading("正在执行一键合成...");
 
-    // 获取当前信息
-    const infoRes = await tokenStore.sendMessageWithPromise(
-      tokenId,
-      "mergebox_getinfo",
-      { actType: 1 },
-      5000
-    );
+    let loopCount = 0;
+    const MAX_LOOPS = 20;
 
-    const isLevel8OrAbove = infoRes.mergeBox && infoRes.mergeBox.taskMap && infoRes.mergeBox.taskMap["251212208"] && infoRes.mergeBox.taskMap["251212208"] !== 0;
+    while (loopCount < MAX_LOOPS && !stopMergeFlag) {
+      loopCount++;
 
-    if (!isLevel8OrAbove) {
-      // 8级以下使用智能合成
-      if (!infoRes.mergeBox) {
+      // 获取当前信息
+      const infoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "mergebox_getinfo",
+        { actType: 1 },
+        5000
+      );
+
+      if (!infoRes || !infoRes.mergeBox) {
          throw new Error("返回数据缺少 mergeBox");
       }
+
+      // 领取合成奖励
+      if (infoRes.mergeBox.taskMap) {
+        const taskMap = infoRes.mergeBox.taskMap;
+        const taskClaimMap = infoRes.mergeBox.taskClaimMap || {};
+
+        for (const taskId in taskMap) {
+          if (stopMergeFlag) break;
+          if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
+             await tokenStore.sendMessageWithPromise(
+               tokenId,
+               "mergebox_claimmergeprogress",
+               { actType: 1, taskId: parseInt(taskId) },
+               2000
+             ).catch(() => {});
+             await new Promise((res) => setTimeout(res, 500));
+          }
+        }
+      }
+
       // 解析 gridMap
       const gridMap = infoRes.mergeBox.gridMap || {};
       const items = [];
@@ -355,69 +376,61 @@ const autoMergeItems = async () => {
         groupedItems[item.id].push(item);
       });
 
-      // 执行合成
-      let hasMergeAction = false;
+      // 检查是否有可合成项
+      let hasPotentialMerge = false;
       for (const id in groupedItems) {
-        if (stopMergeFlag) break;
-        const group = groupedItems[id];
-        // 两两合成
-        while (group.length >= 2) {
+        if (groupedItems[id].length >= 2) {
+          hasPotentialMerge = true;
+          break;
+        }
+      }
+
+      if (!hasPotentialMerge) {
+        if (loopCount === 1) {
+          message.info("当前没有可合成的物品");
+        }
+        break;
+      }
+
+      const isLevel8OrAbove = infoRes.mergeBox.taskMap && infoRes.mergeBox.taskMap["251212208"] && infoRes.mergeBox.taskMap["251212208"] !== 0;
+
+      if (isLevel8OrAbove) {
+        // 8级以上使用智能合成
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "mergebox_automergeitem",
+          { actType: 1 },
+          10000 
+        );
+        await new Promise((res) => setTimeout(res, 1500));
+      } else {
+        // 8级以下手动合成
+        for (const id in groupedItems) {
           if (stopMergeFlag) break;
-          const source = group.shift();
-          const target = group.shift();
+          const group = groupedItems[id];
+          // 两两合成
+          while (group.length >= 2) {
+            if (stopMergeFlag) break;
+            const source = group.shift();
+            const target = group.shift();
 
-          hasMergeAction = true;
-          await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "mergebox_mergeitem",
-            {
-              actType: 1,
-              sourcePos: { gridX: source.x, gridY: source.y },
-              targetPos: { gridX: target.x, gridY: target.y }
-            },
-            1000
-          ).catch(() => {});
-          await new Promise((res) => setTimeout(res, 300));
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "mergebox_mergeitem",
+              {
+                actType: 1,
+                sourcePos: { gridX: source.x, gridY: source.y },
+                targetPos: { gridX: target.x, gridY: target.y }
+              },
+              1000
+            ).catch(() => {});
+            await new Promise((res) => setTimeout(res, 300));
+          }
         }
       }
-
-      if (!hasMergeAction) {
-        message.info("当前没有可合成的物品");
-      }
-    } else {
-       await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "mergebox_automergeitem",
-        { actType: 1 },
-        10000 
-      );
-    }
-
-    // 领取合成奖励
-    // 重新获取信息以获得最新的 taskMap
-    const finalInfoRes = await tokenStore.sendMessageWithPromise(
-      tokenId,
-      "mergebox_getinfo",
-      { actType: 1 },
-      5000
-    );
-    
-    if (finalInfoRes && finalInfoRes.mergeBox && finalInfoRes.mergeBox.taskMap) {
-      const taskMap = finalInfoRes.mergeBox.taskMap;
-      const taskClaimMap = finalInfoRes.mergeBox.taskClaimMap || {};
-
-      for (const taskId in taskMap) {
-        if (stopMergeFlag) break;
-        if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
-           await tokenStore.sendMessageWithPromise(
-             tokenId,
-             "mergebox_claimmergeprogress",
-             { actType: 1, taskId: parseInt(taskId) },
-             2000
-           ).catch(() => {});
-           await new Promise((res) => setTimeout(res, 500));
-        }
-      }
+      
+      // 继续下一轮循环
+      await new Promise((res) => setTimeout(res, 500));
     }
 
     message.success("一键合成操作完成");
@@ -503,6 +516,36 @@ const startTowerClimb = async () => {
 
       // 更新爬塔信息
       await getTowerInfo();
+
+      // 检查并领取每日任务奖励
+      const towerData = evoTowerInfo.value?.evoTower;
+      if (towerData && towerData.taskClaimMap) {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(2);
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const dateKey = `${year}${month}${day}`;
+        
+        const dailyTasks = towerData.taskClaimMap[dateKey] || {};
+        const taskIds = [1, 2, 3];
+        
+        for (const taskId of taskIds) {
+           if (!dailyTasks[taskId]) {
+             await tokenStore.sendMessageWithPromise(
+               tokenId,
+               "evotower_claimtask",
+               { taskId: taskId },
+               2000
+             ).then(() => {
+                message.success(`领取每日任务奖励 ${taskId} 成功`);
+             }).catch(() => {
+                // 失败静默，可能是还没达到条件
+             });
+             // 稍微延时避免请求过快
+             await new Promise(r => setTimeout(r, 200)); 
+           }
+        }
+      }
 
       // 检查是否刚通关10层（即当前层是1-1, 2-1, 3-1等）
       const towerId = currentTowerId.value;

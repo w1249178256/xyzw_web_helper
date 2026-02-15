@@ -1413,6 +1413,15 @@
             <n-button size="tiny" type="error" @click="deleteTask(task.id)">
               删除
             </n-button>
+            <n-button
+              size="tiny"
+              type="info"
+              secondary
+              :loading="executingTaskIds.includes(task.id)"
+              @click="manualExecuteTask(task)"
+            >
+              立即执行
+            </n-button>
           </div>
         </div>
         <div
@@ -2098,6 +2107,31 @@ const cronNextRuns = ref([]);
 // ======================
 // Scheduled Tasks Storage
 // ======================
+
+// Track executing tasks for UI loading state
+const executingTaskIds = ref([]);
+
+// Manual execute task
+const manualExecuteTask = async (task) => {
+  if (executingTaskIds.value.includes(task.id)) return;
+  
+  // Reset stop flag if not running, to allow manual execution
+  if (!isRunning.value && shouldStop.value) {
+    shouldStop.value = false;
+  }
+  
+  executingTaskIds.value.push(task.id);
+  try {
+    message.info(`开始执行任务: ${task.name}`);
+    await executeScheduledTask(task);
+    message.success(`任务 ${task.name} 执行完成`);
+  } catch (e) {
+    console.error(`执行任务 ${task.name} 失败:`, e);
+    message.error(`任务 ${task.name} 执行失败`);
+  } finally {
+    executingTaskIds.value = executingTaskIds.value.filter(id => id !== task.id);
+  }
+};
 
 // Load scheduled tasks from localStorage
 const loadScheduledTasks = () => {

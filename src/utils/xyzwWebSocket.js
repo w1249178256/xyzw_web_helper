@@ -234,6 +234,7 @@ export function registerDefaultCommands(reg) {
     .register("mergebox_mergeitem", { actType: 1 })
     .register("mergebox_claimcostprogress", { actType: 1 })
     .register("mergebox_claimmergeprogress", { actType: 1 })
+    .register("evotower_claimtask", { taskId: 1 })
 
     // 瓶子机器人
     .register("bottlehelper_claim")
@@ -1046,6 +1047,7 @@ export class XyzwWebSocketClient {
       mergebox_mergeitemresp: "mergebox_mergeitem",
       mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
       mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
+      evotower_claimtaskresp: "evotower_claimtask",
       item_openpackresp: "item_openpack",
       equipment_quenchresp: "equipment_quench",
       rank_getserverrankresp: "rank_getserverrank",
