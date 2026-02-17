@@ -205,6 +205,8 @@ export function registerDefaultCommands(reg) {
     .register("legion_getbattlefield")
     .register("legion_claimpayloadtask")
     .register("legion_claimpayloadtaskprogress")
+    .register("saltroad_getwartype")
+    .register("saltroad_getsaltroadwargrouprank")
 
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
@@ -1057,6 +1059,8 @@ export class XyzwWebSocketClient {
       rank_getserverrankresp: "rank_getserverrank",
       legion_claimpayloadtaskresp: "legion_claimpayloadtask",
       legion_claimpayloadtaskprogressresp: "legion_claimpayloadtaskprogress",
+      saltroad_getwartyperesp: "saltroad_getwartype",
+      saltroad_getsaltroadwartotalrankresp: "saltroad_getsaltroadwartotalrank",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",

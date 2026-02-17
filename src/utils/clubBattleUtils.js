@@ -108,6 +108,95 @@ export function formatTimestamp1(timestamp) {
   return `${year}/${month}/${day}`;
 }
 
+/**
+ * 获取本月第一个周六的日期
+ * @returns {string} YYYY/MM/DD
+ */
+export function getFirstSaturdayOfMonth() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-11
+  
+  // Create date for 1st day of month
+  const date = new Date(year, month, 1);
+  const day = date.getDay(); // 0(Sun) - 6(Sat)
+  
+  // Calculate days to add to reach first Saturday (6)
+  const diff = 6 - day; // If day is 6 (Sat), diff is 0. If day is 0 (Sun), diff is 6.
+  
+  date.setDate(date.getDate() + diff);
+  
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  
+  return `${y}/${m}/${d}`;
+}
+
+/**
+ * 获取榜单查询日期 (通常是当月第四周的周日)
+ * 特殊规则: 2026年2月返回 "260301"
+ * @returns {string} YYMMDD
+ */
+export function getRankQueryDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-11
+  
+  // Special case for Feb 2026
+  if (year === 2026 && month === 1) {
+    return "260301";
+  }
+  
+  // Calculate 4th Sunday
+  // First, find the first Sunday
+  const firstDay = new Date(year, month, 1);
+  const dayOfWeek = firstDay.getDay();
+  let firstSundayDate = 1 + (7 - dayOfWeek) % 7;
+  
+  // 4th Sunday is 3 weeks after first Sunday
+  const fourthSundayDate = firstSundayDate + 21;
+  
+  const targetDate = new Date(year, month, fourthSundayDate);
+  
+  const y = String(targetDate.getFullYear()).slice(2);
+  const m = String(targetDate.getMonth() + 1).padStart(2, "0");
+  const d = String(targetDate.getDate()).padStart(2, "0");
+  
+  return `${y}${m}${d}`;
+}
+
+export function getWarTypeName(warType) {
+  switch (warType) {
+    case 15: return "灰岩岛";
+    case 16: return "进阶周赛";
+    case 17: return "进阶月赛";
+    case 18: return "青铜周赛";
+    case 19: return "青铜月赛";
+    case 20: return "秘蓝周赛";
+    case 21: return "秘蓝月赛";
+    case 22: return "月宫周赛";
+    case 23: return "月宫月赛";
+    case 24: return "天宫周赛";
+    case 25: return "天宫月赛";
+    case 6: return "夺旗赛";
+    default: return "伟大航路";
+  }
+}
+
+export function getRankParams(warType) {
+  // Bronze: 18, 19 -> 1-1000
+  if (warType === 18 || warType === 19) return { startRank: 1, endRank: 1000, name: "青铜岛" };
+  // Blue: 20, 21 -> 1-500
+  if (warType === 20 || warType === 21) return { startRank: 1, endRank: 500, name: "秘蓝岛" };
+  // Moon: 22, 23 -> 1-200
+  if (warType === 22 || warType === 23) return { startRank: 1, endRank: 200, name: "紫青月宫" };
+  // Sun: 24, 25 -> 1-80
+  if (warType === 24 || warType === 25) return { startRank: 1, endRank: 80, name: "黄金天宫" };
+  
+  return null;
+}
+
 // 获取战斗情况
 const getBattleWinFlag = (newWinFlag) => {
   if (newWinFlag === 2) {

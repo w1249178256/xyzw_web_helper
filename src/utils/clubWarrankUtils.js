@@ -139,7 +139,7 @@ const formatPower = (power) => {
 };
 
 const formatScore = (score) => {
-  return score.toFixed(0).toString();
+  return (score || 0).toFixed(0).toString();
 };
 
 const connectstr = (str1, str2, str3) => {

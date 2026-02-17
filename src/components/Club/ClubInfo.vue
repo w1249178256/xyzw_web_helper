@@ -167,6 +167,29 @@
                   <div class="label">Boss血量</div>
                   <div class="value">{{ clubOverview.currentHP }}</div>
                 </div>
+                <div
+                  class="item"
+                  v-if="
+                    clubOverview.unfoughtBosses &&
+                    clubOverview.unfoughtBosses.length > 0
+                  "
+                  style="grid-column: 1 / -1"
+                >
+                  <div class="label">
+                    已击杀Boss({{ 150 - clubOverview.unfoughtBosses.length }}) 遗漏Boss ({{ clubOverview.unfoughtBosses.length }})
+                  </div>
+                  <div
+                    class="value"
+                    style="
+                      font-size: 12px;
+                      word-wrap: break-word;
+                      white-space: pre-wrap;
+                      line-height: 1.5;
+                    "
+                  >
+                    {{ clubOverview.unfoughtBosses.join(", ") }}
+                  </div>
+                </div>
               </div>
               <div v-if="club.announcement" class="announcement">
                 <div class="label">公告</div>
@@ -1490,8 +1513,22 @@ const clubOverview = computed(() => {
   const noApply = Boolean(base.noApply ?? i.noApply);
 
   const currentHP = formatNumber(boss.currentHP || 0);
+  const unfoughtBosses = [];
+  for (let k = 1; k <= 150; k++) {
+    if (!tokenStore.gameData?.roleInfo?.role?.statistics[`lb:${k}`]) {
+      unfoughtBosses.push(k);
+    }
+  }
 
-  return { power, dan: dan ?? "-", redQuench, lastWarRank, noApply, currentHP };
+  return {
+    power,
+    dan: dan ?? "-",
+    redQuench,
+    lastWarRank,
+    noApply,
+    currentHP,
+    unfoughtBosses,
+  };
 });
 
 const refreshClub = () => {

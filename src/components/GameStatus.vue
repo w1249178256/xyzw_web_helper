@@ -212,6 +212,7 @@
            <n-tab-pane name="toprank" tab="巅峰榜" />
            <n-tab-pane name="topclubrank" tab="俱乐部榜" />
            <n-tab-pane name="goldclubrank" tab="黄金积分榜" />
+           <n-tab-pane name="greatRouteRank" tab="伟大航路积分榜" />
         </n-tabs>
       </div>
 
@@ -229,6 +230,10 @@
 
       <div class="warrank-full-container" v-if="rankSubTab === 'goldclubrank'">
         <GoldClubList />
+      </div>
+
+      <div class="warrank-full-container" v-if="rankSubTab === 'greatRouteRank'">
+        <GreatRouteRankList />
       </div>
     </div>
     <!-- 切磋（提取组件） -->
@@ -259,6 +264,7 @@ import ClubBattleRecords from "./Club/ClubBattleRecords.vue";
 import PeachBattleRecords from "./Club/PeachBattleRecords.vue";
 import TopRankList from "./cards/TopRankListPageCard.vue";
 import TopClubList from "./cards/TopClubListPageCard.vue";
+import GreatRouteRankList from "./Club/GreatRouteRankListPageCard.vue";
 import GoldClubList from "./cards/GoldRankListPageCard.vue";
 import FightPvp from "./cards/FightPvp.vue";
 import FightHelperCard from "./cards/FightHelperCard.vue";
