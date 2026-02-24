@@ -42,6 +42,8 @@ const errorCodeMap = {
   7900023: "已达到使用次数上限",
   12300040: "没有空格子了",
   12300080: "未达到解锁条件",
+  200330: "无效的ID",
+  1500040: "上座塔的奖励未领取",
 };
 
 // 事件节流定义表，根据实际需要调整命令和节流时间
@@ -202,6 +204,10 @@ export function registerDefaultCommands(reg) {
     .register("legionwar_getgoldmonthwarrank")
     .register("legion_getopponent")
     .register("legion_getbattlefield")
+    .register("legion_claimpayloadtask")
+    .register("legion_claimpayloadtaskprogress")
+    .register("saltroad_getwartype")
+    .register("saltroad_getsaltroadwargrouprank")
 
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
@@ -245,8 +251,9 @@ export function registerDefaultCommands(reg) {
     .register("legionmatch_rolesignup")
     .register("legion_signin")
 
-    // 神器抽奖
+    // 钓鱼
     .register("artifact_lottery", { lotteryNumber: 1, newFree: true, type: 1 })
+    .register("artifact_exchange")
 
     // 灯神相关
     .register("genie_sweep", { genieId: 1 })
@@ -1051,10 +1058,14 @@ export class XyzwWebSocketClient {
       item_openpackresp: "item_openpack",
       equipment_quenchresp: "equipment_quench",
       rank_getserverrankresp: "rank_getserverrank",
+      legion_claimpayloadtaskresp: "legion_claimpayloadtask",
+      legion_claimpayloadtaskprogressresp: "legion_claimpayloadtaskprogress",
+      saltroad_getwartyperesp: "saltroad_getwartype",
+      saltroad_getsaltroadwartotalrankresp: "saltroad_getsaltroadwartotalrank",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",
-      bosstower_startbossreso: "bosstower_startboss",
+      bosstower_startbossresp: "bosstower_startboss",
       bosstower_startboxresp: "bosstower_startbox",
       discount_getdiscountinforesp: "discount_getdiscountinfo",
       // 升星相关响应映射
@@ -1103,6 +1114,7 @@ export class XyzwWebSocketClient {
         "genie_buysweep",
         "system_signinreward",
         "dungeon_selecthero",
+        "artifact_exchange",
       ],
     };
 

@@ -15,14 +15,23 @@ export const LOG_LEVELS = {
 class Logger {
   constructor(namespace = "APP") {
     this.namespace = namespace;
-    this.level = this.getLogLevel();
     this.isDev = import.meta.env.DEV;
-    this.enableVerbose = localStorage.getItem("ws_debug_verbose") === "true";
+
+    // 初始化 enableVerbose
+    const savedVerbose = localStorage.getItem("ws_debug_verbose");
+    if (savedVerbose !== null) {
+      this.enableVerbose = savedVerbose === "true";
+    } else {
+      // 开发环境默认开启详细日志，生产环境默认关闭
+      this.enableVerbose = this.isDev;
+    }
+
+    this.level = this.getLogLevel();
   }
 
   getLogLevel() {
     // 生产环境默认只显示错误和警告
-    if (!import.meta.env.DEV) {
+    if (!this.isDev) {
       return LOG_LEVELS.WARN;
     }
 
@@ -32,7 +41,7 @@ class Logger {
       return parseInt(saved, 10);
     }
 
-    return LOG_LEVELS.INFO; // 开发环境默认显示信息级别
+    return LOG_LEVELS.VERBOSE; // 开发环境默认显示详细级别
   }
 
   setLevel(level) {

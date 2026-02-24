@@ -31,6 +31,7 @@ export function createTasksArena(deps) {
     isTodayAvailable,
     calculateMonthProgress,
     delayConfig,
+    loadSettings,
   } = deps;
 
   /**
@@ -49,6 +50,9 @@ export function createTasksArena(deps) {
       if (shouldStop.value) return;
       tokenStatus.value[tokenId] = "running";
       const token = tokens.value.find((t) => t.id === tokenId);
+      // 加载该Token的独立配置，如果未找到则回退到currentSettings(虽然可能不准确，但作为最后的兜底)
+      const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
+      
       try {
         addLog({
           time: new Date().toLocaleTimeString(),
@@ -57,6 +61,32 @@ export function createTasksArena(deps) {
         });
         await ensureConnection(tokenId);
         if (shouldStop.value) return;
+
+        // 检查咸神门票 (ID: 1007)
+        let role = tokenStore.gameData?.roleInfo?.role;
+        if (!role) {
+          try {
+            const roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+            role = roleInfo?.role;
+          } catch {}
+        }
+        const ticketCount = role?.items?.[1007]?.quantity || 0;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 当前咸神门票: ${ticketCount}`,
+          type: "info",
+        });
+
+        if (ticketCount <= 0) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 咸神门票不足，无法进行竞技场战斗`,
+            type: "warning",
+          });
+          tokenStatus.value[tokenId] = "completed";
+          return;
+        }
+
         const teamInfo = await tokenStore.sendMessageWithPromise(
           tokenId,
           "presetteam_getinfo",
@@ -73,27 +103,37 @@ export function createTasksArena(deps) {
 
         const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
         let Isswitching = false;
-        if (currentFormation === currentSettings.arenaFormation) {
+        if (currentFormation === tokenSettings.arenaFormation) {
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `当前已是阵容${currentSettings.arenaFormation}，无需切换`,
+            message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
             type: "info",
           });
         } else {
           await tokenStore.sendMessageWithPromise(
             tokenId,
             "presetteam_saveteam",
-            { teamId: currentSettings.arenaFormation },
+            { teamId: tokenSettings.arenaFormation },
             5000,
           );
           Isswitching = true;
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `成功切换到阵容${currentSettings.arenaFormation}`,
+            message: `成功切换到阵容${tokenSettings.arenaFormation}`,
             type: "info",
           });
         }
-        for (let i = 0; i < 3; i++) {
+        
+        const fights = Math.min(3, ticketCount);
+        if (fights < 3) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 咸神门票仅剩 ${ticketCount} 张，将执行 ${fights} 次战斗`,
+            type: "warning",
+          });
+        }
+
+        for (let i = 0; i < fights; i++) {
           if (shouldStop.value) break;
           await tokenStore.sendMessageWithPromise(tokenId, "arena_startarea", {});
           let targets;
@@ -331,6 +371,23 @@ export function createTasksArena(deps) {
           type: "info",
         });
 
+        // 检查普通鱼竿 (ID: 1011)
+        const rodCount = role?.items?.[1011]?.quantity || 0;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 当前普通鱼竿: ${rodCount}`,
+          type: "info",
+        });
+
+        if (rodCount < remaining) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 普通鱼竿不足 (${rodCount} < ${remaining})，将仅使用现有鱼竿`,
+            type: "warning",
+          });
+          remaining = rodCount;
+        }
+
         while (remaining > 0 && !shouldStop.value) {
           const batch = Math.min(10, remaining);
           try {
@@ -346,6 +403,33 @@ export function createTasksArena(deps) {
               type: "info",
             });
             remaining -= batch;
+            
+            // 每钓鱼5轮（50次）后，重新获取角色信息，校验鱼竿数量
+            if (remaining > 0 && batch >= 10 && remaining % 50 === 0) {
+                 try {
+                     const roleRes = await tokenStore.sendMessageWithPromise(
+                         tokenId,
+                         "role_getroleinfo",
+                         {},
+                         5000,
+                     );
+                     const currentRole = roleRes?.role || roleRes?.data?.role;
+                     if (currentRole) {
+                         const currentRodCount = currentRole.items?.[1011]?.quantity || 0;
+                         if (currentRodCount < remaining) {
+                             addLog({
+                                 time: new Date().toLocaleTimeString(),
+                                 message: `${token.name} 同步后发现鱼竿不足 (${currentRodCount} < ${remaining})，调整目标`,
+                                 type: "warning",
+                             });
+                             remaining = currentRodCount;
+                         }
+                     }
+                 } catch (e) {
+                     // ignore
+                 }
+            }
+
             await new Promise((r) => setTimeout(r, delayConfig.battle));
           } catch (e) {
             addLog({
@@ -380,6 +464,60 @@ export function createTasksArena(deps) {
             type: "warning",
           });
         }
+        
+        // 自动领取鱼竿累计奖励
+        try {
+           const roleRes = await tokenStore.sendMessageWithPromise(
+             tokenId,
+             "role_getroleinfo",
+             {},
+             5000,
+           );
+           const currentRole = roleRes?.role || roleRes?.data?.role;
+           if (currentRole) {
+              const points = currentRole.statistics?.["artifact:point"] || 0;
+              const exchangeCount = Math.floor(points / 20);
+              
+              if (exchangeCount > 0) {
+                 addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 检测到鱼竿累计使用 ${points}，开始领取 ${exchangeCount} 次累计奖励`,
+                    type: "info",
+                 });
+                 
+                 for (let k = 0; k < exchangeCount && !shouldStop.value; k++) {
+                    try {
+                       await tokenStore.sendMessageWithPromise(
+                         tokenId,
+                         "artifact_exchange",
+                         {},
+                         3000
+                       );
+                       await new Promise((r) => setTimeout(r, 500)); 
+                    } catch (err) {
+                       addLog({
+                          time: new Date().toLocaleTimeString(),
+                          message: `${token.name} 领取累计奖励失败 (第${k+1}次): ${err.message}`,
+                          type: "warning",
+                       });
+                       break;
+                    }
+                 }
+                 addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 累计奖励领取结束`,
+                    type: "success",
+                 });
+              }
+           }
+        } catch (e) {
+           addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 检查累计奖励失败: ${e.message}`,
+              type: "warning",
+           });
+        }
+
         tokenStatus.value[tokenId] = "completed";
       } catch (error) {
         console.error(error);
@@ -421,6 +559,9 @@ export function createTasksArena(deps) {
     const taskPromises = selectedTokens.value.map(async (tokenId) => {
       if (shouldStop.value) return;
       tokenStatus.value[tokenId] = "running";
+      
+      // 加载该Token的独立配置，如果未找到则回退到currentSettings
+      const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
 
       const teamInfo = await tokenStore.sendMessageWithPromise(
         tokenId,
@@ -438,23 +579,23 @@ export function createTasksArena(deps) {
 
       const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
       let Isswitching = false;
-      if (currentFormation === currentSettings.arenaFormation) {
+      if (currentFormation === tokenSettings.arenaFormation) {
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `当前已是阵容${currentSettings.arenaFormation}，无需切换`,
+          message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
           type: "info",
         });
       } else {
         await tokenStore.sendMessageWithPromise(
           tokenId,
           "presetteam_saveteam",
-          { teamId: currentSettings.arenaFormation },
+          { teamId: tokenSettings.arenaFormation },
           5000,
         );
         Isswitching = true;
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `成功切换到阵容${currentSettings.arenaFormation}`,
+          message: `成功切换到阵容${tokenSettings.arenaFormation}`,
           type: "info",
         });
       }
@@ -527,6 +668,42 @@ export function createTasksArena(deps) {
           type: "info",
         });
 
+        // 检查咸神门票 (ID: 1007)
+        let role = tokenStore.gameData?.roleInfo?.role;
+        if (!role) {
+          try {
+            const roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+            role = roleInfo?.role;
+          } catch {}
+        }
+        const ticketCount = role?.items?.[1007]?.quantity || 0;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 当前咸神门票: ${ticketCount}`,
+          type: "info",
+        });
+
+        if (ticketCount < need) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 咸神门票不足 (${ticketCount} < ${need})，将仅使用现有门票`,
+            type: "warning",
+          });
+        }
+
+        let ticketsLeft = ticketCount;
+        let remaining = Math.min(need, ticketsLeft);
+
+        if (remaining <= 0) {
+           addLog({
+             time: new Date().toLocaleTimeString(),
+             message: `${token.name} 没有可用的咸神门票`,
+             type: "warning",
+           });
+           tokenStatus.value[tokenId] = "completed";
+           return;
+        }
+
         try {
           await tokenStore.sendMessageWithPromise(
             tokenId,
@@ -545,19 +722,20 @@ export function createTasksArena(deps) {
         let safetyCounter = 0;
         const safetyMaxFights = 100;
         let round = 1;
-        let remaining = need;
         while (
           remaining > 0 &&
+          ticketsLeft > 0 &&
           safetyCounter < safetyMaxFights &&
           !shouldStop.value
         ) {
-          const planFights = Math.ceil(remaining / 2);
+          const planFights = Math.min(Math.ceil(remaining / 2), ticketsLeft);
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `${token.name} 第${round}轮：计划战斗 ${planFights} 场`,
+            message: `${token.name} 第${round}轮：计划战斗 ${planFights} 场 (剩余门票: ${ticketsLeft})`,
             type: "info",
           });
 
+          let actualFights = 0;
           for (
             let i = 0;
             i < planFights &&
@@ -599,6 +777,8 @@ export function createTasksArena(deps) {
                 { targetId },
                 15000,
               );
+              actualFights++;
+              ticketsLeft--;
               addLog({
                 time: new Date().toLocaleTimeString(),
                 message: `${token.name} 竞技场战斗 ${i + 1}/${planFights} 完成`,
@@ -628,7 +808,35 @@ export function createTasksArena(deps) {
             updatedResult;
           const updatedMyArenaInfo = updatedAct.myArenaInfo || {};
           const updatedArenaNum = Number(updatedMyArenaInfo?.num || 0);
-          remaining = Math.max(0, shouldBe - updatedArenaNum);
+          
+          // Re-calculate remaining needed for target, but don't exceed ticketsLeft
+          const neededForTarget = Math.max(0, shouldBe - updatedArenaNum);
+          
+          // 每轮战斗后重新获取角色信息以更新门票数量
+          try {
+             const roleRes = await tokenStore.sendMessageWithPromise(
+               tokenId,
+               "role_getroleinfo",
+               {},
+               5000,
+             );
+             const currentRole = roleRes?.role || roleRes?.data?.role;
+             if (currentRole) {
+                 const newTickets = currentRole.items?.[1007]?.quantity || 0;
+                 if (newTickets !== ticketsLeft) {
+                    addLog({
+                        time: new Date().toLocaleTimeString(),
+                        message: `${token.name} 同步最新门票数量: ${newTickets} (原记录: ${ticketsLeft})`,
+                        type: "info",
+                    });
+                    ticketsLeft = newTickets;
+                 }
+             }
+          } catch (e) {
+              // ignore error, use local calculation
+          }
+
+          remaining = Math.min(neededForTarget, ticketsLeft);
 
           addLog({
             time: new Date().toLocaleTimeString(),

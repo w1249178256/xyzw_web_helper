@@ -27,28 +27,6 @@
           </div>
         </section>
 
-        <!-- 统计卡片 -->
-        <section class="stats-section">
-          <div class="stats-grid">
-            <div v-for="stat in statistics" :key="stat.id" class="stat-card">
-              <div class="stat-icon" :style="{ color: stat.color }">
-                <component :is="stat.icon" />
-              </div>
-              <div class="stat-content">
-                <div class="stat-number">
-                  {{ stat.value }}
-                </div>
-                <div class="stat-label">
-                  {{ stat.label }}
-                </div>
-                <div class="stat-change" :class="stat.changeType">
-                  {{ stat.change }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <!-- 快速操作 -->
         <section class="quick-actions-section">
           <h2 class="section-title">快速操作</h2>
@@ -67,40 +45,6 @@
                 <p>{{ action.description }}</p>
               </div>
             </div>
-          </div>
-        </section>
-
-        <!-- 最近活动 -->
-        <section class="recent-activity-section">
-          <div class="activity-header">
-            <h2 class="section-title">最近活动</h2>
-            <n-button text type="primary" @click="refreshActivity">
-              刷新
-            </n-button>
-          </div>
-
-          <div v-if="recentActivities.length" class="activity-list">
-            <div
-              v-for="activity in recentActivities"
-              :key="activity.id"
-              class="activity-item"
-            >
-              <div class="activity-icon" :class="activity.type">
-                <component :is="getActivityIcon(activity.type)" />
-              </div>
-              <div class="activity-content">
-                <div class="activity-text">
-                  {{ activity.message }}
-                </div>
-                <div class="activity-time">
-                  {{ formatTime(activity.timestamp) }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="empty-activity">
-            <n-empty description="暂无活动记录" />
           </div>
         </section>
       </div>
@@ -129,7 +73,7 @@ const message = useMessage();
 const tokenStore = useTokenStore();
 
 // 响应式数据
-const recentActivities = ref([]);
+// const recentActivities = ref([]);
 
 // 计算属性
 const currentDate = computed(() => {
@@ -140,45 +84,6 @@ const currentDate = computed(() => {
     weekday: "long",
   });
 });
-
-const statistics = computed(() => [
-  {
-    id: 1,
-    icon: PersonCircle,
-    label: "游戏Token",
-    value: tokenStore.gameTokens.length,
-    change: "+2 本月",
-    changeType: "positive",
-    color: "#18a058",
-  },
-  {
-    id: 2,
-    icon: CheckmarkCircle,
-    label: "已完成任务",
-    value: "156",
-    change: "+12 今日",
-    changeType: "positive",
-    color: "#2080f0",
-  },
-  {
-    id: 3,
-    icon: Time,
-    label: "节省时间",
-    value: "24.5h",
-    change: "+3.2h 本周",
-    changeType: "positive",
-    color: "#f0a020",
-  },
-  {
-    id: 4,
-    icon: TrendingUp,
-    label: "效率提升",
-    value: "85%",
-    change: "+15% 本月",
-    changeType: "positive",
-    color: "#d03050",
-  },
-]);
 
 const quickActions = ref([
   {
@@ -198,9 +103,9 @@ const quickActions = ref([
   {
     id: 3,
     icon: CheckmarkCircle,
-    title: "执行任务",
-    description: "一键执行所有待完成任务",
-    action: "execute-tasks",
+    title: "批量任务",
+    description: "批量执行任务",
+    action: "batch-daily-tasks",
   },
   {
     id: 4,
@@ -208,13 +113,6 @@ const quickActions = ref([
     title: "WebSocket测试",
     description: "测试WebSocket连接和游戏命令",
     action: "websocket-test",
-  },
-  {
-    id: 5,
-    icon: Settings,
-    title: "系统设置",
-    description: "配置个人偏好和系统选项",
-    action: "open-settings",
   },
 ]);
 
@@ -252,34 +150,13 @@ const handleQuickAction = (action) => {
     case "open-settings":
       router.push("/admin/profile");
       break;
+    case "batch-daily-tasks":
+      router.push("/admin/batch-daily-tasks");
+      break;
   }
 };
 
-const refreshActivity = () => {
-  // 模拟刷新活动数据
-  recentActivities.value = [
-    {
-      id: 1,
-      type: "success",
-      message: "成功完成日常任务：每日签到",
-      timestamp: Date.now() - 30 * 60 * 1000,
-    },
-    {
-      id: 2,
-      type: "info",
-      message: "添加了新的游戏角色：剑士小明",
-      timestamp: Date.now() - 2 * 60 * 60 * 1000,
-    },
-    {
-      id: 3,
-      type: "warning",
-      message: "任务执行遇到错误，请检查网络连接",
-      timestamp: Date.now() - 4 * 60 * 60 * 1000,
-    },
-  ];
-  message.success("活动数据已刷新");
-};
-
+/*
 const getActivityIcon = (type) => {
   switch (type) {
     case "success":
@@ -308,6 +185,7 @@ const formatTime = (timestamp) => {
     return "刚刚";
   }
 };
+*/
 
 // 生命周期
 onMounted(async () => {
@@ -319,7 +197,6 @@ onMounted(async () => {
 
   // 初始化Token数据
   tokenStore.initTokenStore();
-  refreshActivity();
 });
 </script>
 

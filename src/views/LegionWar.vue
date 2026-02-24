@@ -815,6 +815,7 @@ onUnmounted(() => {
     .map-container {
       width: 100%;
       height: 100%;
+      min-height: 60vh; /* Ensure map has height on mobile */
       .mapCanvas {
         width: 100%;
         height: 100%;
@@ -858,6 +859,51 @@ onUnmounted(() => {
 
   .status-disconnected {
     color: var(--error-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .legion-war-container {
+    flex-direction: column;
+    margin: 0;
+    
+    .legion-war-map {
+      width: 100%;
+      padding: var(--spacing-xs);
+      margin-bottom: var(--spacing-md);
+      
+      .map-title {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs);
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .map-container {
+        min-height: 50vh;
+      }
+    }
+
+    .legion-war-operation {
+      width: 100%;
+      padding: var(--spacing-xs);
+
+      .legion-war-operation-container {
+        flex-direction: row; /* Horizontal layout for operations on mobile if space allows, or keep column */
+        flex-wrap: wrap;
+        gap: var(--spacing-md);
+
+        .legion-war-operation-item {
+          width: 100%; /* Keep items full width for better touch targets */
+          padding: var(--spacing-xs) 0;
+          border-bottom: 1px solid var(--border-light);
+          
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
+    }
   }
 }
 </style>

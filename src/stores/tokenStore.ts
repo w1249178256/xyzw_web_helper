@@ -23,6 +23,7 @@ declare interface TokenData {
   remark?: string; // 备注信息
   importMethod?: "manual" | "bin" | "url" | "wxQrcode"; // 导入方式：manual（手动）、bin文件或url链接
   sourceUrl?: string; // 当importMethod为url时，存储url链接
+  avatar?: string; // 用户头像URL
   upgradedToPermanent?: boolean; // 是否升级为长期有效
   upgradedAt?: string; // 升级时间
   updatedAt?: string; // 更新时间
@@ -51,6 +52,16 @@ declare interface ConnectLock {
 }
 declare type LockCtx = Record<string, Partial<ConnectLock>>;
 
+// 分组接口定义
+declare interface TokenGroup {
+  id: string;
+  name: string;
+  color: string; // 分组颜色，用于UI显示
+  tokenIds: string[]; // 属于该分组的token ID列表
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export const gameTokens = useLocalStorage<TokenData[]>("gameTokens", []);
 export const hasTokens = computed(() => gameTokens.value.length > 0);
 export const selectedTokenId = useLocalStorage("selectedTokenId", "");
@@ -61,6 +72,9 @@ export const selectedRoleInfo = useLocalStorage<any>("selectedRoleInfo", null);
 
 // 跨标签页连接协调
 const activeConnections = useLocalStorage("activeConnections", {});
+
+// Token分组管理
+export const tokenGroups = useLocalStorage<TokenGroup[]>("tokenGroups", []);
 
 
 /**
@@ -202,6 +216,7 @@ export const useTokenStore = defineStore("tokens", () => {
       // URL获取相关信息
       sourceUrl: tokenData.sourceUrl || null, // Token来源URL（用于刷新）
       importMethod: tokenData.importMethod || "manual", // 导入方式：manual 或 url
+      avatar: tokenData.avatar || "", // 用户头像
     };
 
     gameTokens.value.push(newToken);
@@ -398,6 +413,15 @@ export const useTokenStore = defineStore("tokens", () => {
 
       if (cmd === "role_getroleinforesp") {
         syncRandomSeedFromStatistics(tokenId, body, client);
+        
+        // 更新头像
+        if (body?.role?.headImg) {
+          const token = gameTokens.value.find(t => t.id === tokenId);
+          if (token && token.avatar !== body.role.headImg) {
+            updateToken(tokenId, { avatar: body.role.headImg });
+            wsLogger.debug(`更新头像 [${tokenId}]: ${body.role.headImg}`);
+          }
+        }
       }
 
       emitPlus(cmd, {
@@ -1337,6 +1361,110 @@ export const useTokenStore = defineStore("tokens", () => {
     return gameData.value.battleVersion;
   };
 
+  // =====================
+  // Token分组管理方法
+  // =====================
+
+  /**
+   * 创建新的分组
+   */
+  const createTokenGroup = (name: string, color: string = "#1677ff") => {
+    const group: TokenGroup = {
+      id: "group_" + Date.now() + Math.random().toString(36).slice(2),
+      name,
+      color,
+      tokenIds: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    tokenGroups.value.push(group);
+    return group;
+  };
+
+  /**
+   * 删除分组
+   */
+  const deleteTokenGroup = (groupId: string) => {
+    const index = tokenGroups.value.findIndex((g) => g.id === groupId);
+    if (index !== -1) {
+      tokenGroups.value.splice(index, 1);
+    }
+  };
+
+  /**
+   * 更新分组信息
+   */
+  const updateTokenGroup = (
+    groupId: string,
+    updates: Partial<TokenGroup>
+  ) => {
+    const group = tokenGroups.value.find((g) => g.id === groupId);
+    if (group) {
+      Object.assign(group, updates, {
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  };
+
+  /**
+   * 添加token到分组
+   */
+  const addTokenToGroup = (groupId: string, tokenId: string) => {
+    const group = tokenGroups.value.find((g) => g.id === groupId);
+    if (group && !group.tokenIds.includes(tokenId)) {
+      group.tokenIds.push(tokenId);
+      group.updatedAt = new Date().toISOString();
+    }
+  };
+
+  /**
+   * 从分组移除token
+   */
+  const removeTokenFromGroup = (groupId: string, tokenId: string) => {
+    const group = tokenGroups.value.find((g) => g.id === groupId);
+    if (group) {
+      const index = group.tokenIds.indexOf(tokenId);
+      if (index !== -1) {
+        group.tokenIds.splice(index, 1);
+        group.updatedAt = new Date().toISOString();
+      }
+    }
+  };
+
+  /**
+   * 获取token所属的分组
+   */
+  const getTokenGroups = (tokenId: string): TokenGroup[] => {
+    return tokenGroups.value.filter((g) => g.tokenIds.includes(tokenId));
+  };
+
+  /**
+   * 获取分组中的所有token ID
+   */
+  const getGroupTokenIds = (groupId: string): string[] => {
+    const group = tokenGroups.value.find((g) => g.id === groupId);
+    return group ? group.tokenIds : [];
+  };
+
+  /**
+   * 获取分组中有效的（存在于gameTokens中的）token ID
+   */
+  const getValidGroupTokenIds = (groupId: string): string[] => {
+    const tokenIds = getGroupTokenIds(groupId);
+    const validTokenIds = gameTokens.value.map((t) => t.id);
+    return tokenIds.filter((id) => validTokenIds.includes(id));
+  };
+
+  /**
+   * 移除不存在的token从所有分组
+   */
+  const cleanupInvalidTokens = () => {
+    const validTokenIds = new Set(gameTokens.value.map((t) => t.id));
+    tokenGroups.value.forEach((group) => {
+      group.tokenIds = group.tokenIds.filter((id) => validTokenIds.has(id));
+    });
+  };
+
   return {
     // 状态
     gameTokens,
@@ -1418,6 +1546,18 @@ export const useTokenStore = defineStore("tokens", () => {
     validateConnectionUniqueness,
     connectionMonitor,
     currentSessionId: () => currentSessionId,
+
+    // Token分组管理方法
+    tokenGroups,
+    createTokenGroup,
+    deleteTokenGroup,
+    updateTokenGroup,
+    addTokenToGroup,
+    removeTokenFromGroup,
+    getTokenGroups,
+    getGroupTokenIds,
+    getValidGroupTokenIds,
+    cleanupInvalidTokens,
 
     // 开发者工具
     devTools: {

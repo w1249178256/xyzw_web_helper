@@ -12,8 +12,15 @@
       </a-upload>
     </n-form-item>
 
+    <n-form-item label="角色命名格式" :show-label="true">
+      <n-input v-model:value="importForm.nameTemplate" placeholder="{name}-{index}-{id}" />
+      <template #feedback>
+        支持变量: {name}角色名, {id}角色ID, {index}角色序号, {server}区服
+      </template>
+    </n-form-item>
+
     <n-card v-if="serverListData && serverListData.length > 0" title="服务器角色列表" style="margin-bottom: 16px;">
-      <n-data-table :columns="columns" :data="serverListData" :pagination="{ pageSize: 5 }" />
+      <n-data-table :columns="columns" :data="serverListData" :pagination="{ pageSize: 5 }" :scroll-x="600" />
     </n-card>
 
     <a-list>
@@ -95,6 +102,7 @@ const importForm = reactive({
   server: "",
   wsUrl: "",
   importMethod: "",
+  nameTemplate: "{name}-{index}-{id}",
 });
 const roleList = ref<
   Array<{
@@ -267,13 +275,20 @@ const addSelectedRole = async (roleInfo: any) => {
     }
     const serverNum = sid - 27;
 
+    const template = importForm.nameTemplate || "{name}-{index}-{id}";
+    const finalName = template
+      .replace(/{name}/g, () => roleName)
+      .replace(/{index}/g, () => String(roleIndex))
+      .replace(/{id}/g, () => String(roleInfo.roleId))
+      .replace(/{server}/g, () => String(serverNum) + "服");
+
     // 检查是否已存在相同配置 (根据角色名称和roleId)
     const exists = roleList.value.some(
-      (r) => r.roleId === roleInfo.roleId && r.name === roleName + `_${roleInfo.roleId}`
+      (r) => r.roleId === roleInfo.roleId && r.name === finalName
     );
 
     if (exists) {
-      message.warning(`角色 ${roleName}_${roleInfo.roleId}(${serverNum}服) 已在待添加列表中`);
+      message.warning(`角色 ${finalName} 已在待添加列表中`);
       return;
     }
 
@@ -281,14 +296,14 @@ const addSelectedRole = async (roleInfo: any) => {
       id: tokenId,
       roleId: roleInfo.roleId,
       token: roleToken,
-      name: roleName + `_${roleInfo.roleId}`,
+      name: finalName,
       server: String(serverNum) + "服",
       roleIndex: roleIndex,
       wsUrl: importForm.wsUrl || "",
       importMethod: "bin",
     });
 
-    message.success(`已添加角色: ${roleName + `_${roleInfo.roleId}`}`);
+    message.success(`已添加角色: ${finalName}`);
 
   } catch (e: any) {
     console.error("添加角色失败", e);

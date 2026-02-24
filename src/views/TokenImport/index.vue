@@ -39,7 +39,8 @@
             <n-radio-button value="manual"> 手动输入 </n-radio-button>
             <n-radio-button value="url"> URL获取 </n-radio-button>
             <n-radio-button value="wxQrcode"> 微信扫码获取 </n-radio-button>
-            <n-radio-button value="bin"> BIN获取 </n-radio-button>
+            <n-radio-button value="bin"> BIN多角色获取 </n-radio-button>
+            <n-radio-button value="singlebin"> BIN单角色获取 </n-radio-button>
           </n-radio-group>
         </div>
         <div class="card-body">
@@ -62,6 +63,11 @@
             @cancel="() => (showImportForm = false)"
             @ok="() => (showImportForm = false)"
             v-if="importMethod === 'bin'"
+          />
+          <single-bin-token-form
+            @cancel="() => (showImportForm = false)"
+            @ok="() => (showImportForm = false)"
+            v-if="importMethod === 'singlebin'"
           />
         </div>
       </a-modal>
@@ -154,7 +160,14 @@
             @click="selectToken(token)"
           >
             <template #title>
-              <a-space class="token-name">
+              <a-space class="token-name" align="center">
+                <n-avatar
+                  v-if="token.avatar"
+                  :src="token.avatar"
+                  round
+                  size="small"
+                  fallback-src="/icons/xiaoyugan.png"
+                />
                 {{ token.name }}
                 <a-tag
                   :color="getServerTagColor(token.id)"
@@ -350,6 +363,14 @@
                     :text="getConnectionStatusText(token.id)"
                   />
                 </div>
+                <!-- Avatar -->
+                <n-avatar
+                  v-if="token.avatar"
+                  :src="token.avatar"
+                  round
+                  size="small"
+                  fallback-src="/icons/xiaoyugan.png"
+                />
 
                 <!-- Token基本信息 -->
                 <div style="min-width: 100px">
@@ -584,6 +605,7 @@
 import ManualTokenForm from "./manual.vue";
 import UrlTokenForm from "./url.vue";
 import BinTokenForm from "./bin.vue";
+import singleBinTokenForm from "./singlebin.vue";
 import WxQrcodeForm from "./wxqrcode.vue";
 
 import { useTokenStore, selectedTokenId } from "@/stores/tokenStore";
@@ -660,6 +682,10 @@ const sortConfig = ref(
 
 // 排序后的游戏角色Token列表
 const sortedTokens = computed(() => {
+  if (sortConfig.value.field === 'manual') {
+    return tokenStore.gameTokens;
+  }
+
   return [...tokenStore.gameTokens].sort((tokenA, tokenB) => {
     let valueA, valueB;
 
@@ -734,15 +760,23 @@ const handleDrop = (index, event) => {
   event.preventDefault();
   if (dragIndex.value === null || dragIndex.value === index) return;
 
-  const tokens = [...tokenStore.gameTokens];
-  const draggedItem = tokens[dragIndex.value];
+  // 使用当前显示的列表（sortedTokens）来进行重新排序
+  // 这样可以确保用户看到的顺序就是最终保存的顺序
+  const currentTokens = [...sortedTokens.value];
+  const draggedItem = currentTokens[dragIndex.value];
 
   // 移动元素
-  tokens.splice(dragIndex.value, 1);
-  tokens.splice(index, 0, draggedItem);
+  currentTokens.splice(dragIndex.value, 1);
+  currentTokens.splice(index, 0, draggedItem);
 
   // 更新 store
-  tokenStore.gameTokens = tokens;
+  tokenStore.gameTokens = currentTokens;
+  
+  // 切换到手动排序模式，防止自动排序打乱顺序
+  sortConfig.value.field = 'manual';
+  // 保存排序设置
+  localStorage.setItem("tokenSortConfig", JSON.stringify(sortConfig.value));
+  
   dragIndex.value = null;
   message.success("Token 顺序已更新");
 };

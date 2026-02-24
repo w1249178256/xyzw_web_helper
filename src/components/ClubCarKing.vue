@@ -1,163 +1,183 @@
 <template>
-  <div class="status-card club-car-king" style="min-width: 400px">
-    <div class="card-header">
-      <img class="status-icon" src="/icons/疯狂赛车.png" alt="疯狂赛车" />
-      <div class="status-info">
-        <h3>疯狂赛车</h3>
-        <p>车辆仓库与品阶</p>
-      </div>
-      <div class="status-badge" :class="{ active: carList.length > 0 }">
-        <div class="status-dot" />
-        <span>{{
-          carList.length > 0 ? `共 ${carList.length} 辆` : "暂无数据"
-        }}</span>
-      </div>
-    </div>
-
-    <div class="card-content">
-      <div class="car-toolbar">
+  <n-card class="club-car-king" embedded :bordered="false">
+    <n-thing>
+      <template #avatar>
+        <n-avatar
+          :size="48"
+          src="/icons/疯狂赛车.png"
+          color="transparent"
+          style="background-color: transparent;"
+        />
+      </template>
+      <template #header>
+        <span style="font-size: 18px; font-weight: bold;">疯狂赛车</span>
+      </template>
+      <template #description>
+        <n-space size="small" style="margin-top: 4px;">
+          <n-tag size="small" :bordered="false" type="info">
+            {{ carList.length > 0 ? `共 ${carList.length} 辆` : "暂无数据" }}
+          </n-tag>
+          <n-tag size="small" :bordered="false" :type="hasFreeRefresh ? 'success' : 'default'">
+            {{ hasFreeRefresh ? `有 ${freeCarsCount} 辆可免费刷新` : "无免费刷新" }}
+          </n-tag>
+          <n-tag size="small" :bordered="false" type="warning">
+            <template #icon>
+              <n-icon><Ticket /></n-icon>
+            </template>
+            剩余车票: {{ refreshTickets }}
+          </n-tag>
+        </n-space>
+      </template>
+      <template #header-extra>
         <n-space size="small">
           <n-button
             type="primary"
             size="small"
             :loading="carLoading"
             @click="fetchCarInfo"
-            >{{ carLoading ? "加载中..." : "刷新数据" }}</n-button
           >
+            <template #icon>
+              <n-icon><Refresh /></n-icon>
+            </template>
+            {{ carLoading ? "加载中..." : "刷新数据" }}
+          </n-button>
           <n-button
             size="small"
             secondary
             :disabled="carLoading || !isConnected"
             @click="smartSendCar"
-            >智能发车</n-button
           >
+            <template #icon>
+              <n-icon><Flash /></n-icon>
+            </template>
+            智能发车
+          </n-button>
           <n-button
             size="small"
             secondary
             :disabled="carLoading || !isConnected"
             @click="claimAllCars"
-            >一键收车</n-button
           >
-          <n-tag size="small" :type="hasFreeRefresh ? 'success' : 'default'">
-            {{
-              hasFreeRefresh ? `有 ${freeCarsCount} 辆可免费刷新` : "无免费刷新"
-            }}
-          </n-tag>
-          <n-tag size="small" type="info">剩余车票: {{ refreshTickets }}</n-tag>
+            <template #icon>
+              <n-icon><ArrowUpCircle /></n-icon>
+            </template>
+            一键收车
+          </n-button>
         </n-space>
-      </div>
+      </template>
+    </n-thing>
 
-      <div v-if="!isConnected" class="hint">请先选择 Token 并建立连接</div>
+    <div class="card-content" style="margin-top: 16px;">
+      <div v-if="!isConnected" class="hint">
+        <n-empty description="请先选择 Token 并建立连接" />
+      </div>
       <div v-else-if="carList.length === 0 && !carLoading" class="hint">
-        暂无车辆数据
+        <n-empty description="暂无车辆数据" />
       </div>
 
-      <div v-if="carList.length > 0" class="car-grid">
-        <div v-for="c in carList" :key="c.key" class="car-card">
-          <div class="car-header">
-            <img
-              class="car-brand-icon"
-              :src="gradeIcon(c.color)"
-              :alt="gradeLabel(c.color)"
-            />
-            <div class="car-badge" :class="'grade-' + (c.color || 0)">
-              {{ gradeLabel(c.color) }}
+      <n-grid x-gap="12" y-gap="12" cols="1 600:2 900:3 1200:4" item-responsive v-if="carList.length > 0">
+        <n-gi v-for="c in carList" :key="c.key">
+          <n-card size="small" :bordered="false" class="car-card-item" content-style="padding: 12px;">
+            <div class="car-header">
+              <img
+                class="car-brand-icon"
+                :src="gradeIcon(c.color)"
+                :alt="gradeLabel(c.color)"
+              />
+              <div class="car-info">
+                <div class="car-name">
+                  {{ c.name || c.carName || "车辆 #" + (c.id || c.key) }}
+                </div>
+                <div class="car-badges">
+                  <n-tag size="tiny" :bordered="false" :color="{ color: getGradeColor(c.color), textColor: '#fff' }">
+                    {{ gradeLabel(c.color) }}
+                  </n-tag>
+                  <n-tag v-if="c.level != null" size="tiny" :bordered="false">Lv.{{ c.level }}</n-tag>
+                  <n-tag v-if="c.star != null" size="tiny" :bordered="false">{{ c.star }}星</n-tag>
+                </div>
+              </div>
             </div>
-            <div class="car-name">
-              {{ c.name || c.carName || "车辆 #" + (c.id || c.key) }}
-            </div>
-          </div>
-          <div class="car-meta">
-            <div class="kv">
-              <span class="k">品阶</span
-              ><span class="v"
-                ><span
-                  class="grade-dot"
-                  :class="'grade-' + (c.color || 0)"
-                ></span
-                >{{ gradeLabel(c.color) }}</span
-              >
-            </div>
-            <div class="kv" v-if="c.level != null">
-              <span class="k">等级</span><span class="v">{{ c.level }}</span>
-            </div>
-            <div class="kv" v-if="c.star != null">
-              <span class="k">星级</span><span class="v">{{ c.star }}</span>
-            </div>
-            <div class="kv">
-              <span class="k">状态</span
-              ><span class="v">{{
-                Number(c.sendAt || 0) === 0 ? "未发车" : "已发车"
-              }}</span>
-            </div>
-            <div class="kv">
-              <span class="k">帮手</span
-              ><span class="v">{{
-                Number(c.color || 0) >= 5 ? "可携带" : "—"
-              }}</span>
-            </div>
-            <div class="kv" v-if="isBigPrize(c.rewards)">
-              <span class="k">奖励</span
-              ><span class="v" style="color: #f59e0b">包含大奖</span>
-            </div>
-          </div>
 
-          <div
-            class="car-rewards-full"
-            v-if="c.rewards && c.rewards.length > 0"
-          >
-            <div class="rewards-list">
-              <span
-                v-for="(reward, index) in sortRewards(c.rewards)"
-                :key="index"
-                class="reward-item"
-                :class="getRewardClass(reward)"
-              >
-                {{ formatReward(reward) }}
-              </span>
+            <div class="car-status" style="margin-top: 12px;">
+              <n-grid cols="2" x-gap="8" y-gap="8">
+                <n-gi>
+                  <div class="status-item">
+                    <span class="label">状态</span>
+                    <span class="value" :style="{ color: Number(c.sendAt || 0) === 0 ? '#18a058' : '#f0a020' }">
+                      {{ Number(c.sendAt || 0) === 0 ? "未发车" : "已发车" }}
+                    </span>
+                  </div>
+                </n-gi>
+                <n-gi>
+                  <div class="status-item">
+                    <span class="label">护卫</span>
+                    <span class="value">{{ getCarHelperStatus(c) }}</span>
+                  </div>
+                </n-gi>
+              </n-grid>
             </div>
-          </div>
 
-          <div class="car-actions">
-            <n-button
-              size="small"
-              :type="Number(c.refreshCount ?? 0) === 0 ? 'success' : 'warning'"
-              :disabled="carLoading || Number(c.sendAt || 0) !== 0"
-              @click="refreshCar(c)"
-            >
-              {{
-                Number(c.refreshCount ?? 0) === 0
-                  ? "免费刷新品阶"
-                  : "刷新品阶(需车票)"
-              }}
-            </n-button>
-            <n-button
-              size="small"
-              type="primary"
-              :disabled="carLoading || actionDisabled(c)"
-              @click="handleAction(c)"
-            >
-              {{ actionLabel(c) }}
-            </n-button>
-            <n-button
-              size="small"
-              quaternary
-              :disabled="
-                carLoading ||
-                Number(c.color || 0) < 5 ||
-                Number(c.sendAt || 0) !== 0
-              "
-              @click="openHelperDialog(c)"
-            >
-              护卫
-            </n-button>
-          </div>
-        </div>
-      </div>
+            <div class="car-rewards" v-if="c.rewards && c.rewards.length > 0" style="margin-top: 12px;">
+              <n-space size="small" :wrap="true">
+                <span
+                  v-for="(reward, index) in sortRewards(c.rewards)"
+                  :key="index"
+                  class="reward-tag"
+                  :class="getRewardClass(reward)"
+                >
+                  {{ formatReward(reward) }}
+                </span>
+              </n-space>
+            </div>
+
+            <div class="car-actions" style="margin-top: 16px;">
+              <n-grid cols="3" x-gap="8">
+                <n-gi>
+                  <n-button
+                    size="tiny"
+                    block
+                    :type="Number(c.refreshCount ?? 0) === 0 ? 'success' : 'warning'"
+                    secondary
+                    :disabled="carLoading || Number(c.sendAt || 0) !== 0"
+                    @click="refreshCar(c)"
+                  >
+                    <template #icon><n-icon><Refresh /></n-icon></template>
+                    {{ Number(c.refreshCount ?? 0) === 0 ? "免费刷新" : "刷新品阶(需车票)" }}
+                  </n-button>
+                </n-gi>
+                <n-gi>
+                  <n-button
+                    size="tiny"
+                    block
+                    type="primary"
+                    :disabled="carLoading || actionDisabled(c)"
+                    @click="handleAction(c)"
+                  >
+                    <template #icon><n-icon><CarSport /></n-icon></template>
+                    {{ actionLabel(c) === '发车' ? '发车' : '收车' }}
+                  </n-button>
+                </n-gi>
+                <n-gi>
+                  <n-button
+                    size="tiny"
+                    block
+                    quaternary
+                    :disabled="carLoading || Number(c.color || 0) < 5 || Number(c.sendAt || 0) !== 0"
+                    @click="openHelperDialog(c)"
+                  >
+                    <template #icon><n-icon><Person /></n-icon></template>
+                    护卫
+                  </n-button>
+                </n-gi>
+              </n-grid>
+            </div>
+          </n-card>
+        </n-gi>
+      </n-grid>
     </div>
-  </div>
+  </n-card>
 
-  <!-- 护卫选择弹窗（放置于同一模板中） -->
+  <!-- 护卫选择弹窗 -->
   <n-modal
     v-model:show="helperDialogVisible"
     preset="card"
@@ -180,7 +200,7 @@
       <div class="tips">说明：次数满 4 的成员不可再被选择。</div>
     </div>
     <template #footer>
-      <n-space>
+      <n-space justify="end">
         <n-button @click="cancelHelper">取消</n-button>
         <n-button type="primary" @click="confirmHelper">确定</n-button>
       </n-space>
@@ -190,8 +210,9 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useMessage } from "naive-ui";
+import { useMessage, NCard, NThing, NAvatar, NSpace, NButton, NTag, NGrid, NGi, NIcon, NModal, NSelect, NSpin, NEmpty, NStatistic } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
+import { CarSport, Refresh, Flash, ArrowUpCircle, Person, Ticket } from "@vicons/ionicons5";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -257,7 +278,32 @@ const normalizeCars = (raw) => {
   }));
 };
 
-const carList = computed(() => normalizeCars(carRaw.value));
+const carList = computed(() => {
+  const list = normalizeCars(carRaw.value);
+  return list.sort((a, b) => {
+    // 1. 状态排序：可收车 > 未发车 > 已发车(等待中)
+    const getStatusWeight = (c) => {
+      const isSent = Number(c.sendAt || 0) !== 0;
+      if (isSent) {
+        // 已发车：若可收车则最优先(2)，否则最低优先级(0)
+        return canClaim(c) ? 2 : 0;
+      }
+      // 未发车：次优先(1)
+      return 1;
+    };
+    const weightA = getStatusWeight(a);
+    const weightB = getStatusWeight(b);
+    if (weightA !== weightB) return weightB - weightA; // 降序：2 > 1 > 0
+
+    // 2. 品阶排序：高 > 低
+    const colorA = Number(a.color || 0);
+    const colorB = Number(b.color || 0);
+    if (colorA !== colorB) return colorB - colorA;
+
+    // 3. ID 排序：保持稳定
+    return String(a.id || "").localeCompare(String(b.id || ""));
+  });
+});
 
 // 免费刷新信息：每辆车初次刷新免费（refreshCount === 0 表示可免费）
 const freeCarsCount = computed(
@@ -290,6 +336,18 @@ const gradeIcon = (color) => {
   };
   const path = map[color] || "/icons/大众.svg";
   return import.meta.env.BASE_URL + path.replace(/^\//, "");
+};
+
+const getGradeColor = (color) => {
+  const map = {
+    1: "#22c55e",
+    2: "#3b82f6",
+    3: "#a855f7",
+    4: "#f59e0b",
+    5: "#ef4444",
+    6: "#eab308",
+  };
+  return map[color] || "#999";
 };
 
 // 物品ID映射字典
@@ -534,9 +592,13 @@ const fetchCarInfo = async () => {
 };
 
 // 初次挂载时，若已连接则尝试拉取
-watch(isConnected, (ok) => {
-  if (ok && !carFetched.value) fetchCarInfo();
-});
+watch(
+  isConnected,
+  (ok) => {
+    if (ok && !carFetched.value) fetchCarInfo();
+  },
+  { immediate: true },
+);
 
 // 刷新品阶（单车）
 const refreshCar = async (car) => {
@@ -569,15 +631,37 @@ const refreshCar = async (car) => {
       if (data.color != null) {
         car.color = Number(data.color);
       }
+      if (data.rewards != null) {
+        car.rewards = data.rewards;
+      }
       if (data.refreshCount != null) {
         // 优先按车级别的免费刷新次数
         car.refreshCount = Number(data.refreshCount);
-        // 若服务端用全局刷新次数，也尽量同步到元信息
-        const root = carRaw.value?.body || carRaw.value || {};
-        if (root.roleCar && root.roleCar.refreshCount != null) {
-          root.roleCar.refreshCount = Number(data.refreshCount);
-        }
       }
+
+      // 同步更新底层 carRaw 数据源，确保后续计算一致
+      const root = carRaw.value?.body || carRaw.value || {};
+      if (
+        root.roleCar &&
+        root.roleCar.carDataMap &&
+        root.roleCar.carDataMap[car.id]
+      ) {
+        // 合并更新
+        root.roleCar.carDataMap[car.id] = {
+          ...root.roleCar.carDataMap[car.id],
+          ...data,
+        };
+      }
+
+      // 若服务端用全局刷新次数，也尽量同步到元信息
+      if (
+        data.refreshCount != null &&
+        root.roleCar &&
+        root.roleCar.refreshCount != null
+      ) {
+        root.roleCar.refreshCount = Number(data.refreshCount);
+      }
+
       // 弹出奖励与结果摘要（可按需扩展）
       const newGrade = gradeLabel(car.color);
       message.success(`刷新完成：${newGrade}`);
@@ -789,10 +873,80 @@ const smartSendCar = async () => {
     return message.warning("请先选择 Token 并建立连接");
   try {
     await fetchCarInfo();
+
+    // 预加载护卫数据
+    let helperUsageMap = {};
+    let sortedHelpers = [];
+
+    // 封装获取护卫使用情况的方法
+    const updateHelperUsage = async () => {
+      try {
+        const resp = await tokenStore.sendMessageWithPromise(
+          token.id,
+          "car_getmemberhelpingcnt",
+          {},
+          5000,
+        );
+        helperUsageMap =
+          resp?.body?.memberHelpingCntMap || resp?.memberHelpingCntMap || {};
+      } catch (_) {
+        // 忽略失败
+      }
+    };
+
+    try {
+      await updateHelperUsage();
+      // 预先按红淬排序成员
+      sortedHelpers = (legionMembers.value || [])
+        .filter(
+          (m) =>
+            !currentRoleId.value || String(m.roleId) !== currentRoleId.value,
+        )
+        .map((m) => ({
+          id: String(m.roleId),
+          name: m.name || m.nickname || String(m.roleId),
+          redQuench: m.custom?.red_quench_cnt || 0,
+        }))
+        .sort((a, b) => b.redQuench - a.redQuench);
+    } catch (_) {
+      // 忽略护卫获取失败，降级为不带护卫发车
+    }
+
+    // 自动分配护卫函数
+    const assignHelperIfNeeded = async (car) => {
+      const color = Number(car.color || 0);
+      // 仅红(5)及以上需要护卫
+      if (color < 5) return;
+      // 已有护卫则跳过
+      if (car.helperId) return;
+
+      // 每次分配前刷新护卫状态，避免并发导致的使用次数超标
+      await updateHelperUsage();
+
+      // 寻找可用护卫
+      const bestHelper = sortedHelpers.find((h) => {
+        const used = Number(helperUsageMap[h.id] || 0);
+        return used < 4;
+      });
+
+      if (bestHelper) {
+        car.helperId = bestHelper.id;
+        // 更新本地计数 (乐观更新)
+        helperUsageMap[bestHelper.id] =
+          Number(helperUsageMap[bestHelper.id] || 0) + 1;
+        message.success(
+          `已自动分配护卫：${bestHelper.name} (已助战: ${helperUsageMap[bestHelper.id]}/4)`,
+        );
+      } else {
+        message.warning(`车辆[${gradeLabel(car.color)}]需要护卫，但所有护卫次数已满`);
+      }
+    };
+
     let tickets = Number(refreshTickets.value || 0);
     for (const car of carList.value) {
       if (Number(car.sendAt || 0) !== 0) continue;
       if (shouldSendCar(car, tickets)) {
+        await assignHelperIfNeeded(car);
         await sendCar(car);
         await new Promise((r) => setTimeout(r, 500));
         continue;
@@ -802,6 +956,7 @@ const smartSendCar = async () => {
       if (tickets >= 6) shouldRefresh = true;
       else if (free) shouldRefresh = true;
       else {
+        await assignHelperIfNeeded(car);
         await sendCar(car);
         await new Promise((r) => setTimeout(r, 500));
         continue;
@@ -810,6 +965,7 @@ const smartSendCar = async () => {
         await refreshCar(car);
         tickets = Number(refreshTickets.value || 0);
         if (shouldSendCar(car, tickets)) {
+          await assignHelperIfNeeded(car);
           await sendCar(car);
           await new Promise((r) => setTimeout(r, 500));
           break;
@@ -818,6 +974,7 @@ const smartSendCar = async () => {
         if (tickets >= 6) shouldRefresh = true;
         else if (freeNow) shouldRefresh = true;
         else {
+          await assignHelperIfNeeded(car);
           await sendCar(car);
           await new Promise((r) => setTimeout(r, 500));
           break;
@@ -845,6 +1002,36 @@ const legionMembers = computed(() =>
   Object.values(legionMembersMap.value || {}),
 );
 
+const currentRoleId = computed(() => {
+  const info = tokenStore.gameData?.roleInfo;
+  return info?.role?.roleId ? String(info.role.roleId) : null;
+});
+
+const getHelperName = (helperId) => {
+  if (!helperId) return "";
+  const members = legionMembers.value || [];
+  const m = members.find((m) => String(m.roleId) === String(helperId));
+  return m ? m.name || m.nickname || helperId : helperId;
+};
+
+const getCarHelperStatus = (c) => {
+  // 1. Check for explicit helper objects
+  if (c.helperBattleTeam) {
+    const name = c.helperBattleTeam.name || c.helperBattleTeam.nickname;
+    if (name) return name;
+    if (c.helperBattleTeam.roleId) return getHelperName(c.helperBattleTeam.roleId);
+  }
+
+  // 2. Check for ID fields
+  const id = c.helperId || c.guardId;
+  if (id) return getHelperName(id);
+
+  // 3. Fallback logic
+  if (Number(c.sendAt || 0) !== 0) return "未携带";
+  if (Number(c.color || 0) >= 5) return "可携带";
+  return "—";
+};
+
 const openHelperDialog = async (car) => {
   const token = tokenStore.selectedToken;
   if (!token || !isConnected.value)
@@ -871,17 +1058,24 @@ const openHelperDialog = async (car) => {
       resp?.body?.memberHelpingCntMap || resp?.memberHelpingCntMap || {};
 
     // 生成候选列表（v<4 可选）
-    const opts = legionMembers.value.map((m) => {
-      const mid = String(m.roleId);
-      const cnt = Number(map[mid] ?? 0);
-      const power = formatNumber(m.power || m.custom?.s_power || 0);
-      const redQuench = m.custom?.red_quench_cnt || 0;
-      return {
-        label: `${m.name || m.nickname || mid}（战力: ${power} | 红粹: ${redQuench} | 已护卫 ${cnt}/4）`,
-        value: mid,
-        disabled: cnt >= 4,
-      };
-    });
+    const opts = legionMembers.value
+      .filter(
+        (m) => !currentRoleId.value || String(m.roleId) !== currentRoleId.value,
+      )
+      .map((m) => {
+        const mid = String(m.roleId);
+        const cnt = Number(map[mid] ?? 0);
+        const power = formatNumber(m.power || m.custom?.s_power || 0);
+        const redQuench = m.custom?.red_quench_cnt || 0;
+        return {
+          label: `${m.name || m.nickname || mid}（战力: ${power} | 红粹: ${redQuench} | 已护卫 ${cnt}/4）`,
+          value: mid,
+          disabled: cnt >= 4,
+          redQuench, // 暂存用于排序
+        };
+      })
+      .sort((a, b) => b.redQuench - a.redQuench); // 按红淬降序排序
+
     helperOptions.value = opts;
   } catch (e) {
     message.error("获取护卫数据失败：" + (e.message || "未知错误"));
@@ -893,9 +1087,29 @@ const openHelperDialog = async (car) => {
 
 const confirmHelper = () => {
   if (currentCarForHelper.value) {
-    currentCarForHelper.value.helperId = helperSelection.value
-      ? String(helperSelection.value)
-      : null;
+    const car = currentCarForHelper.value;
+    const newVal = helperSelection.value ? String(helperSelection.value) : null;
+    
+    // 1. Update reactive object
+    car.helperId = newVal;
+    car.helperBattleTeam = null; // Clear stale helper info to ensure ID takes precedence
+
+    // 2. Sync to carRaw to persist across re-computations
+    const root = carRaw.value?.body || carRaw.value || {};
+    const roleCar = root.roleCar || root.rolecar;
+    if (roleCar) {
+       const map = roleCar.carDataMap || roleCar.cardatamap;
+       if (map && map[car.id]) {
+          const target = map[car.id];
+          target.helperId = newVal;
+          // Also clear helperBattleTeam in raw data if it exists
+          if (target.helperBattleTeam) {
+             delete target.helperBattleTeam;
+          }
+          // Force update by re-assigning
+          map[car.id] = { ...target };
+       }
+    }
   }
   helperDialogVisible.value = false;
 };
@@ -906,253 +1120,93 @@ const cancelHelper = () => {
 
 <style scoped lang="scss">
 .club-car-king {
-  /* 与 ClubInfo 卡片格式保持一致（应用到当前根元素上） */
-  background: var(--bg-primary);
-  border-radius: var(--border-radius-xl);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all var(--transition-normal);
-  min-height: 200px;
+  .hint {
+    margin-bottom: 16px;
+  }
+}
 
+.car-card-item {
+  transition: all 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
+}
 
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--spacing-md);
-  }
+.car-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-  .status-icon {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-    flex-shrink: 0;
-    border-radius: var(--border-radius-medium);
-  }
+.car-brand-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 4px;
+}
 
-  .status-info {
-    flex: 1;
-  }
+.car-info {
+  flex: 1;
+  min-width: 0;
+}
 
-  .status-info h3 {
-    margin: 0;
-    font-size: var(--font-size-lg);
-  }
+.car-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .status-info p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-  }
+.car-badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
 
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
-  }
-
-  .status-badge.active {
-    background: rgba(24, 160, 88, 0.12);
-    color: var(--success-color);
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
-  .car-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: var(--spacing-sm);
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-  }
-
-  .car-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--spacing-md);
-  }
-
-  .car-card {
-    background: var(--bg-tertiary);
-    border-radius: var(--border-radius-large);
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .car-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .car-brand-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: var(--border-radius-medium);
-    background: var(--bg-primary);
-  }
-
-  .car-badge {
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    color: #fff;
-  }
-
-  .car-name {
-    font-weight: var(--font-weight-medium);
-  }
-
-  .car-meta {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    font-size: 12px;
-    color: var(--text-secondary);
-  }
-
-  .kv {
-    display: flex;
-    justify-content: space-between;
-    background: var(--bg-primary);
-    border-radius: var(--border-radius-medium);
-    padding: 6px 8px;
-  }
-
-  .k {
+.status-item {
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  .label {
+    font-size: 10px;
     color: var(--text-tertiary);
   }
-
-  .v {
-    color: var(--text-primary);
-  }
-
-  .grade-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-
-  .car-rewards-full {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border-light);
-  }
-
-  .rewards-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
-  }
-
-  .reward-item {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: var(--border-radius-small);
-    background: var(--bg-primary);
+  
+  .value {
     font-size: 12px;
-    line-height: 1.4;
+    font-weight: 500;
   }
+}
 
-  .reward-item.high-value {
+.reward-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  font-size: 11px;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  
+  &.high-value {
     color: #f59e0b;
-    font-weight: var(--font-weight-medium);
     background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
   }
-
-  .reward-item.refresh-ticket,
-  .reward-item.high-value.refresh-ticket {
+  
+  &.refresh-ticket {
     color: #22c55e;
-    font-weight: var(--font-weight-medium);
     background: rgba(34, 197, 94, 0.1);
-  }
-
-  .car-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-  }
-
-  .car-actions > * {
-    flex: 1;
-    min-width: 80px;
-  }
-
-  :deep(.n-button) {
-    border-radius: var(--border-radius-medium);
-  }
-
-  @media (max-width: 768px) {
-    .club-car-king {
-      padding: var(--spacing-md);
-    }
-
-    .card-header {
-      flex-wrap: wrap;
-      gap: var(--spacing-sm);
-    }
-
-    .status-info {
-      min-width: 120px;
-    }
-
-    .status-badge {
-      margin-left: auto;
-    }
-
-    .car-toolbar {
-      justify-content: center;
-    }
-
-    .car-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .grade-1 {
-    background: #22c55e;
-  }
-
-  .grade-2 {
-    background: #3b82f6;
-  }
-
-  .grade-3 {
-    background: #a855f7;
-  }
-
-  .grade-4 {
-    background: #f59e0b;
-  }
-
-  .grade-5 {
-    background: #ef4444;
-  }
-
-  .grade-6 {
-    background: #eab308;
-    color: #000;
+    border-color: rgba(34, 197, 94, 0.2);
   }
 }
 
@@ -1190,12 +1244,6 @@ const cancelHelper = () => {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
-  }
-}
-
-:deep(.n-modal) {
-  .n-modal-body {
-    padding: 24px;
   }
 }
 </style>

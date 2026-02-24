@@ -108,6 +108,83 @@
 
         <!-- Token Selection -->
         <n-card title="账号列表" class="token-list-card">
+          <div style="margin-bottom: 16px">
+            <!-- 分组管理和选择 -->
+            <n-space vertical style="width: 100%">
+              <!-- 分组选择部分 -->
+              <div
+                v-if="tokenGroups.length > 0"
+                class="group-selection-section"
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <label style="font-weight: 500; color: #333">分组选择</label>
+                  <n-button
+                    size="small"
+                    type="error"
+                    text
+                    @click="clearAllGroupSelection"
+                  >
+                    一键清除所有分组
+                  </n-button>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                  <div
+                    v-for="group in tokenGroups"
+                    :key="group.id"
+                    @click="toggleGroupSelection(group.id)"
+                    :style="{
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      backgroundColor: isGroupSelected(group.id)
+                        ? group.color
+                        : 'transparent',
+                      border: `2px solid ${group.color}`,
+                      color: isGroupSelected(group.id) ? 'white' : group.color,
+                      fontWeight: isGroupSelected(group.id) ? '600' : '400',
+                      transition: 'all 0.3s ease',
+                      userSelect: 'none',
+                    }"
+                  >
+                    {{ group.name }} ({{
+                      getValidGroupTokenIds(group.id).length
+                    }})
+                  </div>
+                </div>
+              </div>
+
+              <!-- 分组管理按钮 -->
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <n-button
+                  type="info"
+                  size="small"
+                  @click="showGroupManageModal = true"
+                >
+                  管理分组
+                </n-button>
+                <span
+                  v-if="selectedGroups.length > 0"
+                  style="font-size: 12px; color: #86909c"
+                >
+                  已选择 {{ selectedGroups.length }} 个分组，包含
+                  {{ selectedTokens.length }} 个账号
+                </span>
+              </div>
+            </n-space>
+          </div>
           <n-space style="margin-bottom: 12px">
             <n-button
               size="small"
@@ -372,6 +449,20 @@
             >
               一键换皮闯关
             </n-button>
+            <n-button
+              size="small"
+              @click="batchClaimPeachTasks"
+              :disabled="isRunning || selectedTokens.length === 0"
+            >
+              一键领取蟠桃园任务
+            </n-button>
+            <n-button
+              size="small"
+              @click="batchGenieSweep"
+              :disabled="isRunning || selectedTokens.length === 0"
+            >
+              一键灯神扫荡
+            </n-button>
           </n-space>
           <!-- 排序按钮组 -->
           <div class="sort-buttons" style="margin-bottom: 12px">
@@ -439,6 +530,26 @@
                         >
                           {{ getStatusText(token.id) }}
                         </n-tag>
+                        <!-- 显示token所属的分组 -->
+                        <div
+                          v-if="tokenStore.getTokenGroups(token.id).length > 0"
+                          style="
+                            margin-left: 8px;
+                            display: inline-flex;
+                            gap: 4px;
+                            flex-wrap: wrap;
+                          "
+                        >
+                          <n-tag
+                            v-for="group in tokenStore.getTokenGroups(token.id)"
+                            :key="group.id"
+                            size="small"
+                            :color="{ color: group.color, textColor: 'white' }"
+                            style="font-size: 11px"
+                          >
+                            {{ group.name }}
+                          </n-tag>
+                        </div>
                       </div>
                     </n-checkbox>
                     <n-button
@@ -1513,6 +1624,49 @@
                 </n-button>
               </n-space>
             </div>
+
+            <!-- 分组快速选择 (仅在定时任务中显示) -->
+            <div v-if="tokenGroups.length > 0" style="margin-bottom: 12px">
+              <div style="font-size: 12px; color: #86909c; margin-bottom: 8px">
+                快速选择分组：
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap">
+                <n-button
+                  v-for="group in tokenGroups"
+                  :key="group.id"
+                  size="small"
+                  :type="taskScheduleSelectedGroupIds.includes(group.id) ? 'primary' : 'default'"
+                  @click="
+                    () => {
+                      const index = taskScheduleSelectedGroupIds.indexOf(group.id);
+                      const groupTokenIds = getValidGroupTokenIds(group.id);
+                      
+                      if (index > -1) {
+                        // 取消选择该分组
+                        taskScheduleSelectedGroupIds.splice(index, 1);
+                        taskForm.selectedTokens = taskForm.selectedTokens.filter(
+                          (id) => !groupTokenIds.includes(id),
+                        );
+                      } else {
+                        // 选择该分组
+                        taskScheduleSelectedGroupIds.push(group.id);
+                        groupTokenIds.forEach((id) => {
+                          if (!taskForm.selectedTokens.includes(id)) {
+                            taskForm.selectedTokens.push(id);
+                          }
+                        });
+                      }
+                    }
+                  "
+                  :style="{
+                    borderColor: group.color,
+                  }"
+                >
+                  {{ group.name }}
+                </n-button>
+              </div>
+            </div>
+
             <n-checkbox-group v-model:value="taskForm.selectedTokens">
               <n-grid :cols="2" :x-gap="12" :y-gap="8">
                 <n-grid-item v-for="token in sortedTokens" :key="token.id">
@@ -1606,6 +1760,10 @@
                   size="small"
                   style="width: 100px"
                 />
+              </div>
+              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                <label class="setting-label">车辆强制刷新保底</label>
+                <n-switch v-model:value="batchSettings.useGoldRefreshFallback" size="small" />
               </div>
             </div>
             <n-divider title-placement="left" style="margin: 12px 0 8px 0"
@@ -1706,6 +1864,244 @@
         </div>
       </div>
     </n-modal>
+
+    <!-- Token Group Management Modal -->
+    <n-modal
+      v-model:show="showGroupManageModal"
+      preset="card"
+      title="分组管理"
+      style="width: 90%; max-width: 800px"
+    >
+      <div class="settings-content">
+        <!-- 创建新分组 -->
+        <n-divider title-placement="left" style="margin: 0 0 16px 0">
+          创建新分组
+        </n-divider>
+        <n-space style="margin-bottom: 24px">
+          <n-input
+            v-model:value="newGroupName"
+            placeholder="输入分组名称"
+            style="width: 200px"
+            size="small"
+          />
+          <div style="display: flex; gap: 8px; align-items: center">
+            <span style="font-size: 12px">选择颜色:</span>
+            <div style="display: flex; gap: 6px">
+              <div
+                v-for="color in groupColors"
+                :key="color"
+                :style="{
+                  width: '24px',
+                  height: '24px',
+                  backgroundColor: color,
+                  borderRadius: '4px',
+                  border: newGroupColor === color ? '3px solid #000' : '2px solid #ddd',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                }"
+                @click="newGroupColor = color"
+                @mouseover="$event.target.style.transform = 'scale(1.1)'"
+                @mouseleave="$event.target.style.transform = 'scale(1)'"
+              />
+            </div>
+          </div>
+          <n-button type="primary" size="small" @click="createNewGroup">
+            创建分组
+          </n-button>
+        </n-space>
+
+        <!-- 分组列表 -->
+        <n-divider title-placement="left" style="margin: 0 0 16px 0">
+          分组列表
+        </n-divider>
+        <div
+          style="
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+          "
+        >
+          <div
+            v-for="group in tokenGroups"
+            :key="group.id"
+            style="
+              padding: 12px;
+              border: 1px solid #e5e7eb;
+              border-radius: 6px;
+              margin-bottom: 12px;
+              background: #fafafa;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+              "
+            >
+              <div style="flex: 1">
+                <!-- 编辑模式 -->
+                <div
+                  v-if="editingGroupId === group.id"
+                  style="display: flex; gap: 8px"
+                >
+                  <n-input
+                    v-model:value="editingGroupName"
+                    placeholder="分组名称"
+                    size="small"
+                    style="width: 150px"
+                  />
+                  <div style="display: flex; gap: 6px; align-items: center">
+                    <div
+                      v-for="color in groupColors"
+                      :key="color"
+                      :style="{
+                        width: '20px',
+                        height: '20px',
+                        backgroundColor: color,
+                        borderRadius: '4px',
+                        border: editingGroupColor === color ? '3px solid #000' : '2px solid #ddd',
+                        cursor: 'pointer',
+                      }"
+                      @click="editingGroupColor = color"
+                    />
+                  </div>
+                  <n-button
+                    size="small"
+                    type="primary"
+                    @click="saveEditGroup"
+                    style="width: 60px"
+                  >
+                    保存
+                  </n-button>
+                  <n-button
+                    size="small"
+                    @click="cancelEditGroup"
+                    style="width: 60px"
+                  >
+                    取消
+                  </n-button>
+                </div>
+                <!-- 显示模式 -->
+                <div v-else>
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <div
+                      :style="{
+                        width: '16px',
+                        height: '16px',
+                        backgroundColor: group.color,
+                        borderRadius: '3px',
+                      }"
+                    />
+                    <span style="font-weight: 500; font-size: 14px">
+                      {{ group.name }}
+                    </span>
+                    <n-tag size="small" type="info">
+                      {{ getValidGroupTokenIds(group.id).length }} 个账号
+                    </n-tag>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      gap: 4px;
+                      flex-wrap: wrap;
+                      margin-bottom: 8px;
+                    "
+                  >
+                    <div
+                      v-for="tokenId in getValidGroupTokenIds(group.id)"
+                      :key="tokenId"
+                      style="
+                        padding: 2px 8px;
+                        background: white;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        font-size: 12px;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                      "
+                    >
+                      {{ tokens.find((t) => t.id === tokenId)?.name }}
+                      <n-button
+                        size="tiny"
+                        type="error"
+                        text
+                        @click="removeTokenFromSelectedGroup(group.id, tokenId)"
+                      >
+                        ×
+                      </n-button>
+                    </div>
+                  </div>
+                  <!-- 添加token到分组 -->
+                  <div style="margin-bottom: 8px">
+                    <n-select
+                      placeholder="添加账号到分组"
+                      size="small"
+                      filterable
+                      :options="
+                        tokens
+                          .filter(
+                            (t) =>
+                              !getValidGroupTokenIds(group.id).includes(t.id),
+                          )
+                          .map((t) => ({ label: t.name, value: t.id }))
+                      "
+                      @update:value="
+                        (tokenId) => {
+                          if (tokenId) {
+                            addTokenToSelectedGroup(group.id, tokenId);
+                          }
+                        }
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- 操作按钮 -->
+              <div
+                style="display: flex; gap: 8px"
+                v-if="editingGroupId !== group.id"
+              >
+                <n-button size="small" @click="startEditGroup(group.id)">
+                  编辑
+                </n-button>
+                <n-button
+                  size="small"
+                  type="error"
+                  @click="deleteGroup(group.id)"
+                >
+                  删除
+                </n-button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            v-if="tokenGroups.length === 0"
+            style="text-align: center; padding: 24px; color: #86909c"
+          >
+            暂无分组，请创建一个新分组
+          </div>
+        </div>
+
+        <!-- 关闭按钮 -->
+        <div class="modal-actions" style="margin-top: 20px; text-align: right">
+          <n-button @click="showGroupManageModal = false">关闭</n-button>
+        </div>
+      </div>
+    </n-modal>
   </div>
 </template>
 
@@ -1720,7 +2116,7 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
-import { useTokenStore, gameTokens } from "@/stores/tokenStore";
+import { useTokenStore, gameTokens, tokenGroups } from "@/stores/tokenStore";
 import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
 import { preloadQuestions } from "@/utils/studyQuestionsFromJSON.js";
 import { useMessage } from "naive-ui";
@@ -1921,6 +2317,29 @@ const tokenStatus = ref({}); // { tokenId: 'waiting' | 'running' | 'completed' |
 const isRunning = ref(false);
 const shouldStop = ref(false);
 
+// =====================
+// Token分组管理状态
+// =====================
+const showGroupManageModal = ref(false);
+const showGroupSelectModal = ref(false);
+const selectedGroups = ref([]); // 选中的分组ID列表
+const newGroupName = ref("");
+const newGroupColor = ref("#1677ff");
+const editingGroupId = ref(null);
+const editingGroupName = ref("");
+const editingGroupColor = ref("");
+const taskScheduleSelectedGroupIds = ref([]); // 定时任务中通过分组按钮选中的分组ID列表
+const groupColors = [
+  "#1677ff", // 蓝色
+  "#52c41a", // 绿色
+  "#faad14", // 橙色
+  "#f5222d", // 红色
+  "#722ed1", // 紫色
+  "#13c2c2", // 青色
+  "#eb2f96", // 粉色
+  "#fa8c16", // 赤红色
+];
+
 // Settings Modal State
 const showSettingsModal = ref(false);
 const currentSettingsTokenId = ref(null);
@@ -2014,6 +2433,7 @@ const batchSettings = reactive({
   password: "",
   hideScheduledTasksModule: false,
   tokenListColumns: 2,
+  useGoldRefreshFallback: false,
   // 延迟配置（毫秒）
   commandDelay: 500,        // 命令间延迟
   taskDelay: 500,           // 任务间延迟
@@ -2177,6 +2597,7 @@ const openTaskModal = () => {
     selectedTasks: [],
     enabled: true,
   });
+  taskScheduleSelectedGroupIds.value = [];
   showTaskModal.value = true;
 };
 
@@ -2200,6 +2621,7 @@ const editTask = (task) => {
     );
   }
   Object.assign(taskForm, taskData);
+  taskScheduleSelectedGroupIds.value = [];
   showTaskModal.value = true;
 };
 
@@ -2442,6 +2864,7 @@ const exportConfig = () => {
         longDelay: batchSettings.longDelay,
         maxActive: batchSettings.maxActive,
         tokenListColumns: batchSettings.tokenListColumns,
+        useGoldRefreshFallback: batchSettings.useGoldRefreshFallback,
       },
       tokenSettings: tokenSettings,
     };
@@ -2886,7 +3309,6 @@ onBeforeUnmount(() => {
 });
 
 // Task scheduler - ensure it runs properly
-// 删除旧的scheduleTaskExecution函数，使用组件级别的实现
 const scheduleTaskExecution = () => {
   // Log the start of the scheduler
   addLog({
@@ -2895,223 +3317,17 @@ const scheduleTaskExecution = () => {
     type: "info",
   });
 
-  // Store interval ID for cleanup using ref to persist across component lifecycle
-  let lastTaskExecution = null;
-
-  // Health check for the scheduler
-  const healthCheck = () => {
-    // If interval is not running, restart it
-    if (!intervalId.value) {
-      console.error(
-        `[${new Date().toISOString()}] Task scheduler interval is not running, restarting...`,
-      );
-      startScheduler();
-    }
-
-    // Add a safety mechanism to prevent isRunning from being stuck
-    if (isRunning.value) {
-      const now = Date.now();
-      const tenMinutesAgo = now - 10 * 60 * 1000; // 10 minutes ago
-      if (lastTaskExecution && lastTaskExecution < tenMinutesAgo) {
-        console.error(
-          `[${new Date().toISOString()}] isRunning has been true for more than 10 minutes, resetting to false`,
-        );
-        isRunning.value = false;
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: "=== 检测到任务执行超时，已重置isRunning状态 ===",
-          type: "warning",
-        });
-      }
-    }
-  };
-
-  // Start the scheduler
-  const startScheduler = () => {
-    // Clear any existing interval first
-    if (intervalId.value) {
-      clearInterval(intervalId.value);
-    }
-
-    // Check every 10 seconds instead of 60 seconds for more timely task execution
-    intervalId.value = setInterval(() => {
-      try {
-        const now = new Date();
-        const currentTime = now.toLocaleTimeString("zh-CN", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        });
-
-        // Log the current check time for debugging
-
-        // Add detailed log about scheduler status (commented out for cleaner logs)
-        // addLog({
-        //   time: currentTime,
-        //   message: `=== 定时任务调度服务检查中，isRunning: ${isRunning.value}，任务数量: ${scheduledTasks.value.length} ===`,
-        //   type: "info",
-        // });
-
-        // Don't skip all tasks if isRunning is true, just skip individual task execution if already running
-        const tasksToRun = scheduledTasks.value.filter((task) => task.enabled);
-
-        if (tasksToRun.length === 0) {
-          return;
-        }
-
-        tasksToRun.forEach((task) => {
-          let shouldRun = false;
-          let reason = "";
-
-          if (task.runType === "daily") {
-            // Check if current time matches the scheduled time
-            const taskTime = task.runTime;
-            const nowTime = now.toLocaleTimeString("zh-CN", {
-              hour12: false,
-              hour: "2-digit",
-              minute: "2-digit",
-            });
-            shouldRun = nowTime === taskTime;
-            reason = `currentTime=${nowTime}, taskTime=${taskTime}, match=${shouldRun}`;
-          } else if (task.runType === "cron") {
-            // Improved cron expression parsing
-            try {
-              const cronParts = task.cronExpression.split(" ").filter(Boolean);
-
-              if (cronParts.length < 5) {
-                console.error(
-                  `[${new Date().toISOString()}] Invalid cron expression: ${task.cronExpression}, must have at least 5 parts`,
-                );
-                addLog({
-                  time: currentTime,
-                  message: `=== 定时任务 ${task.name} 的Cron表达式无效: ${task.cronExpression}，必须包含至少5个字段 ===`,
-                  type: "error",
-                });
-                return;
-              }
-
-              const [
-                minuteField,
-                hourField,
-                dayOfMonthField,
-                monthField,
-                dayOfWeekField,
-              ] = cronParts;
-
-              // 使用之前定义的parseCronField函数解析cron字段
-              const possibleMinutes = parseCronField(minuteField, 0, 59);
-              const possibleHours = parseCronField(hourField, 0, 23);
-              const possibleDaysOfMonth = parseCronField(
-                dayOfMonthField,
-                1,
-                31,
-              );
-              const possibleMonths = parseCronField(monthField, 1, 12);
-              const possibleDaysOfWeek = parseCronField(dayOfWeekField, 0, 7);
-
-              // 检查当前时间是否匹配cron表达式
-              const matchesMinute = possibleMinutes.includes(now.getMinutes());
-              const matchesHour = possibleHours.includes(now.getHours());
-              const matchesDayOfMonth = possibleDaysOfMonth.includes(
-                now.getDate(),
-              );
-              const matchesMonth = possibleMonths.includes(now.getMonth() + 1); // months are 0-based in JS
-              const matchesDayOfWeek = possibleDaysOfWeek.includes(
-                now.getDay(),
-              ); // 0是周日
-
-              shouldRun =
-                matchesMinute &&
-                matchesHour &&
-                matchesDayOfMonth &&
-                matchesMonth &&
-                matchesDayOfWeek;
-              reason = `minute=${matchesMinute}, hour=${matchesHour}, dayOfMonth=${matchesDayOfMonth}, month=${matchesMonth}, dayOfWeek=${matchesDayOfWeek}`;
-            } catch (error) {
-              console.error(
-                `[${new Date().toISOString()}] Error parsing cron expression ${task.cronExpression}:`,
-                error,
-              );
-              addLog({
-                time: currentTime,
-                message: `=== 解析定时任务 ${task.name} 的Cron表达式失败: ${error.message} ===`,
-                type: "error",
-              });
-              return;
-            }
-          }
-
-          // Add detailed log about task check result (commented out for cleaner logs)
-
-          // addLog({
-          //   time: currentTime,
-          //   message: `=== 检查任务 ${task.name}: 应该执行=${shouldRun}，原因=${reason} ===`,
-          //   type: shouldRun ? "success" : "info",
-          // });
-
-          if (shouldRun) {
-            // Check if the task was already executed in the last minute to avoid duplicate execution
-            const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
-            const lastExecutionKey = localStorage.getItem(
-              `lastTaskExecution_${task.id}`,
-            );
-
-            if (lastExecutionKey !== taskExecutionKey) {
-              // Update last execution time
-              localStorage.setItem(
-                `lastTaskExecution_${task.id}`,
-                taskExecutionKey,
-              );
-
-              // Execute the task
-
-              lastTaskExecution = Date.now();
-              executeScheduledTask(task);
-            } else {
-              addLog({
-                time: currentTime,
-                message: `=== 任务 ${task.name} 本分钟内已执行，跳过 ===`,
-                type: "info",
-              });
-            }
-          }
-        });
-      } catch (error) {
-        console.error(
-          `[${new Date().toISOString()}] Error in task scheduler:`,
-          error,
-        );
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `=== 定时任务调度服务发生错误: ${error.message} ===`,
-          type: "error",
-        });
-      }
-    }, 10000); // Check every 10 seconds
-  };
-
   // Start the scheduler
   startScheduler();
 
   // Health check every 5 minutes instead of 1 hour for more frequent safety checks
-  setInterval(healthCheck, 5 * 60 * 1000);
+  if (healthCheckInterval) {
+    clearInterval(healthCheckInterval);
+  }
+  healthCheckInterval = setInterval(healthCheck, 5 * 60 * 1000);
 
   // Initial health check
   healthCheck();
-
-  // Cleanup on component unmount
-  onBeforeUnmount(() => {
-    if (intervalId.value) {
-      clearInterval(intervalId.value);
-      intervalId.value = null;
-    }
-    addLog({
-      time: new Date().toLocaleTimeString(),
-      message: "=== 定时任务调度服务已停止 ===",
-      type: "info",
-    });
-  });
 };
 
 // Verify task dependencies - 只验证基础依赖，WebSocket连接由具体任务函数处理
@@ -3916,6 +4132,153 @@ const getStatusText = (tokenId) => {
   return "等待中";
 };
 
+// =====================
+// Token分组管理相关方法
+// =====================
+
+/**
+ * 创建新分组
+ */
+const createNewGroup = () => {
+  if (!newGroupName.value.trim()) {
+    message.warning("请输入分组名称");
+    return;
+  }
+
+  tokenStore.createTokenGroup(newGroupName.value.trim(), newGroupColor.value);
+  message.success("分组创建成功");
+  newGroupName.value = "";
+  newGroupColor.value = "#1677ff";
+};
+
+/**
+ * 删除分组
+ */
+const deleteGroup = (groupId) => {
+  if (confirm("确定要删除这个分组吗？分组中的token不会被删除。")) {
+    tokenStore.deleteTokenGroup(groupId);
+    message.success("分组已删除");
+  }
+};
+
+/**
+ * 保存编辑的分组
+ */
+const saveEditGroup = () => {
+  if (!editingGroupId.value) return;
+
+  if (!editingGroupName.value.trim()) {
+    message.warning("请输入分组名称");
+    return;
+  }
+
+  tokenStore.updateTokenGroup(editingGroupId.value, {
+    name: editingGroupName.value.trim(),
+    color: editingGroupColor.value,
+  });
+
+  message.success("分组已更新");
+  editingGroupId.value = null;
+  editingGroupName.value = "";
+  editingGroupColor.value = "";
+};
+
+/**
+ * 开始编辑分组
+ */
+const startEditGroup = (groupId) => {
+  const group = tokenGroups.value.find((g) => g.id === groupId);
+  if (group) {
+    editingGroupId.value = groupId;
+    editingGroupName.value = group.name;
+    editingGroupColor.value = group.color;
+  }
+};
+
+/**
+ * 取消编辑分组
+ */
+const cancelEditGroup = () => {
+  editingGroupId.value = null;
+  editingGroupName.value = "";
+  editingGroupColor.value = "";
+};
+
+/**
+ * 切换分组选择状态
+ */
+const toggleGroupSelection = (groupId) => {
+  const index = selectedGroups.value.indexOf(groupId);
+  if (index > -1) {
+    selectedGroups.value.splice(index, 1);
+  } else {
+    selectedGroups.value.push(groupId);
+  }
+
+  // 更新selectedTokens
+  updateSelectedTokensFromGroups();
+};
+
+/**
+ * 判断分组是否被选中
+ */
+const isGroupSelected = (groupId) => {
+  return selectedGroups.value.includes(groupId);
+};
+
+/**
+ * 根据选中的分组更新selectedTokens
+ */
+const updateSelectedTokensFromGroups = () => {
+  const tokenIds = new Set();
+
+  selectedGroups.value.forEach((groupId) => {
+    const validTokenIds = tokenStore.getValidGroupTokenIds(groupId);
+    validTokenIds.forEach((id) => tokenIds.add(id));
+  });
+
+  selectedTokens.value = Array.from(tokenIds);
+};
+
+/**
+ * 一键清除所有分组选择
+ */
+const clearAllGroupSelection = () => {
+  selectedGroups.value = [];
+  selectedTokens.value = [];
+};
+
+/**
+ * 添加token到分组
+ */
+const addTokenToSelectedGroup = (groupId, tokenId) => {
+  tokenStore.addTokenToGroup(groupId, tokenId);
+  message.success("已将token添加到分组");
+};
+
+/**
+ * 从分组移除token
+ */
+const removeTokenFromSelectedGroup = (groupId, tokenId) => {
+  tokenStore.removeTokenFromGroup(groupId, tokenId);
+  message.success("已将token从分组移除");
+};
+
+/**
+ * 获取分组中有效的token ID列表（用于模板中展示）
+ */
+const getValidGroupTokenIds = (groupId) => {
+  return tokenStore.getValidGroupTokenIds(groupId);
+};
+
+/**
+ * 获取分组中的token列表
+ */
+const getGroupTokenList = (groupId) => {
+  const tokenIds = tokenStore.getValidGroupTokenIds(groupId);
+  return tokens.value.filter((t) => tokenIds.includes(t.id));
+};
+
 // 注: pickArenaTargetId, FISH_TARGET, ARENA_TARGET, getTodayStartSec, isTodayAvailable, calculateMonthProgress 已从 @/utils/batch 导入
 
 const addLog = (log) => {
@@ -4154,6 +4517,8 @@ const createTaskDeps = () => ({
   getTodayStartSec,
   isTodayAvailable,
   calculateMonthProgress,
+  // 配置加载函数
+  loadSettings,
 });
 
 // 初始化任务模块
@@ -4178,6 +4543,8 @@ const {
   batchHeroUpgrade,
   batchBookUpgrade,
   batchClaimStarRewards,
+  batchClaimPeachTasks,
+  batchGenieSweep,
 } = tasksItem;
 
 const tasksDungeon = createTasksDungeon(createTaskDeps());
@@ -4641,6 +5008,34 @@ const stopBatch = () => {
     100% {
       transform: rotate(360deg);
     }
+  }
+
+  /* Token分组管理样式 */
+  .group-selection-section {
+    padding: 12px;
+    background-color: #f5f7fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .group-tag {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .group-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .group-tag-selected {
+    color: white;
+    font-weight: 600;
   }
 
   /* 响应式设计 */

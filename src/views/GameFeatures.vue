@@ -279,6 +279,15 @@ watch(
     if (cur.status === "error" && cur.lastError) {
       const err = String(cur.lastError.error || "").toLowerCase();
       if (err.includes("token") && err.includes("expired")) {
+        const importMethod = tokenStore.selectedToken?.importMethod;
+        if (
+          importMethod === "url" ||
+          importMethod === "bin" ||
+          importMethod === "wxQrcode"
+        ) {
+          message.warning("Token已过期，正在尝试自动刷新...");
+          return;
+        }
         message.error("当前 Token 已过期，请重新导入后再试");
         router.push("/tokens");
       }

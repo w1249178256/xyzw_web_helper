@@ -200,7 +200,10 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
 
         try {
           // Check if we should send immediately
-          if (shouldSendCar(car, refreshTickets, batchSettings.carMinColor)) {
+          // 当启用金砖保底时，强制使用高票数的判断逻辑（严格模式），避免因票数不足而提前发车
+          const effectiveTickets = batchSettings.useGoldRefreshFallback ? 999 : refreshTickets;
+
+          if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor)) {
             addLog({
               time: new Date().toLocaleTimeString(),
               message: `${token.name} 车辆[${gradeLabel(car.color)}]满足条件，直接发车`,
@@ -224,8 +227,19 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
           // Try to refresh
           let shouldRefresh = false;
           const free = Number(car.refreshCount ?? 0) === 0;
+          // 启用金砖刷新保底：当且仅当设置了保底且无免费次数、无刷新券时，允许继续刷新
+          const useGoldFallback = batchSettings.useGoldRefreshFallback && !free && refreshTickets < 6;
+
           if (refreshTickets >= 6) shouldRefresh = true;
           else if (free) shouldRefresh = true;
+          else if (useGoldFallback) {
+            shouldRefresh = true;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 车辆[${gradeLabel(car.color)}]启用金砖刷新保底`,
+              type: "warning",
+            });
+          }
           else {
             // No tickets and not free, just send
             addLog({
@@ -285,7 +299,7 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
             } catch (_) {}
 
             // Check if good enough now
-            if (shouldSendCar(car, refreshTickets, batchSettings.carMinColor)) {
+            if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor)) {
               addLog({
                 time: new Date().toLocaleTimeString(),
                 message: `${token.name} 刷新后车辆[${gradeLabel(car.color)}]满足条件，发车`,
@@ -306,14 +320,18 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
               break;
             }
 
-            // Check if can continue refreshing
+            // Check if we should continue refreshing
             const freeNow = Number(car.refreshCount ?? 0) === 0;
+            // 金砖保底：如果开启了金砖保底，则允许在无票时继续刷新
+            const useGoldFallbackNow = batchSettings.useGoldRefreshFallback && !freeNow && refreshTickets < 6;
+
             if (refreshTickets >= 6) shouldRefresh = true;
             else if (freeNow) shouldRefresh = true;
+            else if (useGoldFallbackNow) shouldRefresh = true;
             else {
               addLog({
                 time: new Date().toLocaleTimeString(),
-                message: `${token.name} 刷新后车辆[${gradeLabel(car.color)}]仍不满足条件且无刷新次数，发车`,
+                message: `${token.name} 车辆[${gradeLabel(car.color)}]刷新结束（无票），直接发车`,
                 type: "warning",
               });
               await tokenStore.sendMessageWithPromise(
