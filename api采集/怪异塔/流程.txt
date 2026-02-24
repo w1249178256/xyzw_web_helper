@@ -1,0 +1,4243 @@
+咸鱼之王辅助分析
+ 已断开
+方向
+命令
+命令名称
+14:53:17 Receive:
+_sys/ack
+14:53:17 Send:
+_sys/ack
+14:53:16 Receive:
+Discount_GetDiscountInfoResp
+14:53:16 Send:
+discount_getdiscountinfo
+{
+  "ack": 0,
+  "body": {},
+  "cmd": "discount_getdiscountinfo",
+  "seq": 100,
+  "time": 1771051996229
+}
+14:53:12 Receive:
+_sys/ack
+{
+  "ack": 99,
+  "cmd": "_sys/ack",
+  "time": 1771051993538
+}
+14:53:09 Receive:
+System_NewChatMessageNotify
+聊天消息
+{
+  "ack": 0,
+  "body": {
+    "chatMessage": {
+      "avatarFrame": {
+        "expire": -1,
+        "id": 3002
+      },
+      "channel": 1,
+      "createTime": 1771051990,
+      "emojiId": 36,
+      "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/1R7kkC2oiafZbUL52ouQ5ktdA0KAicZxuRB6m2aB4aCBuCNwyzAxkqEK95uaAvRNPpia26bWeic4tjnWUWEYJPvk72WVz2yDUAZGkAmE3lfCSt0/132",
+      "legion": {
+        "id": 844175,
+        "level": 30,
+        "name": "群雄红浪漫",
+        "serverId": 8929
+      },
+      "msgType": 2,
+      "roleId": 111639390,
+      "roleName": "鱼儿园丶芜湖",
+      "serverId": 8953
+    }
+  },
+  "cmd": "System_NewChatMessageNotify",
+  "seq": 0,
+  "time": 1771051990598
+}
+14:53:07 Receive:
+_sys/ack
+{
+  "ack": 99,
+  "cmd": "_sys/ack",
+  "time": 1771051988532
+}
+14:53:07 Send:
+_sys/ack
+{
+  "ack": 100,
+  "cmd": "_sys/ack",
+  "time": 1771051987554
+}
+14:53:07 Receive:
+MergeBox_ClaimMergeProgressResp
+{
+  "ack": 98,
+  "body": {
+    "mergeBox": {
+      "taskClaimMap": {
+        "251212203": 1771051988
+      }
+    },
+    "reward": [
+      {
+        "ext": 0,
+        "itemId": 1001,
+        "type": 3,
+        "value": 2
+      }
+    ],
+    "role": {
+      "items": {
+        "1001": {
+          "quantity": 4517
+        }
+      }
+    }
+  },
+  "cmd": "MergeBox_ClaimMergeProgressResp",
+  "resp": 99,
+  "seq": 111,
+  "time": 1771051988426
+}
+14:53:07 Send:
+mergebox_claimmergeprogress
+{
+  "ack": 110,
+  "body": {
+    "actType": 1,
+    "taskId": "251212203"
+  },
+  "cmd": "mergebox_claimmergeprogress",
+  "seq": 99,
+  "time": 1771051987435
+}
+14:53:07 Receive:
+MergeBox_ClaimMergeProgressResp
+{
+  "ack": 97,
+  "body": {
+    "mergeBox": {
+      "taskClaimMap": {
+        "251212202": 1771051988
+      }
+    },
+    "reward": [
+      {
+        "ext": 0,
+        "itemId": 1012,
+        "type": 3,
+        "value": 2
+      }
+    ],
+    "role": {
+      "items": {
+        "1012": {
+          "quantity": 1000
+        }
+      }
+    }
+  },
+  "cmd": "MergeBox_ClaimMergeProgressResp",
+  "resp": 98,
+  "seq": 110,
+  "time": 1771051988083
+}
+14:53:07 Send:
+mergebox_claimmergeprogress
+{
+  "ack": 109,
+  "body": {
+    "actType": 1,
+    "taskId": "251212202"
+  },
+  "cmd": "mergebox_claimmergeprogress",
+  "seq": 98,
+  "time": 1771051987092
+}
+14:53:06 Receive:
+MergeBox_ClaimMergeProgressResp
+{
+  "ack": 96,
+  "body": {
+    "mergeBox": {
+      "taskClaimMap": {
+        "251212201": 1771051987
+      }
+    },
+    "reward": [
+      {
+        "ext": 0,
+        "itemId": 3007,
+        "type": 3,
+        "value": 10
+      }
+    ],
+    "role": {
+      "items": {
+        "3007": {
+          "quantity": 11
+        }
+      }
+    }
+  },
+  "cmd": "MergeBox_ClaimMergeProgressResp",
+  "resp": 97,
+  "seq": 109,
+  "time": 1771051987741
+}
+14:53:06 Send:
+mergebox_claimmergeprogress
+{
+  "ack": 108,
+  "body": {
+    "actType": 1,
+    "taskId": "251212201"
+  },
+  "cmd": "mergebox_claimmergeprogress",
+  "seq": 97,
+  "time": 1771051986744
+}
+14:53:06 Receive:
+MergeBox_ClaimCostProgressResp
+{
+  "ack": 0,
+  "body": {
+    "mergeBox": {
+      "costClaimCnt": 10
+    },
+    "reward": [
+      {
+        "ext": 0,
+        "itemId": 37001,
+        "type": 55,
+        "value": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_ClaimCostProgressResp",
+  "resp": 96,
+  "seq": 108,
+  "time": 1771051987379
+}
+14:53:06 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 95,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 4
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 107,
+  "time": 1771051987373
+}
+14:53:06 Send:
+mergebox_claimcostprogress
+{
+  "ack": 106,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_claimcostprogress",
+  "seq": 96,
+  "time": 1771051986387
+}
+14:53:06 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 13,
+      "gridMap": {
+        "6": {
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 11
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 12
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 95,
+  "seq": 106,
+  "time": 1771051987016
+}
+14:53:06 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 94,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 0
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 105,
+  "time": 1771051987015
+}
+14:53:06 Send:
+mergebox_openbox
+{
+  "ack": 104,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 95,
+  "time": 1771051986031
+}
+14:53:06 Receive:
+MergeBoxInfoResp
+{
+  "ack": 93,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 12,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100012,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 10
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 3,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 4,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 11,
+          "2": 6,
+          "3": 3,
+          "4": 1
+        },
+        "3": {
+          "100011": 2,
+          "100012": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 6,
+        "251212202": 3,
+        "251212203": 1,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 94,
+  "seq": 104,
+  "time": 1771051986987
+}
+14:53:06 Send:
+mergebox_getinfo
+{
+  "ack": 103,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 94,
+  "time": 1771051986004
+}
+14:53:05 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 92,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      },
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "6": {
+          "4": null
+        },
+        "7": {
+          "4": {
+            "gridItemId": 3
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "3": 3
+        }
+      },
+      "taskMap": {
+        "251212202": 3
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 93,
+  "seq": 103,
+  "time": 1771051986658
+}
+14:53:05 Send:
+mergebox_mergeitem
+{
+  "ack": 102,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 6,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 93,
+  "time": 1771051985677
+}
+14:53:05 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 91,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      },
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "5": {
+          "4": null
+        },
+        "6": {
+          "4": {
+            "gridItemId": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 6
+        }
+      },
+      "taskMap": {
+        "251212201": 6
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 92,
+  "seq": 102,
+  "time": 1771051986331
+}
+14:53:05 Send:
+mergebox_mergeitem
+{
+  "ack": 101,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 5,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 6,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 92,
+  "time": 1771051985349
+}
+14:53:05 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 12,
+      "gridMap": {
+        "5": {
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 10
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 11
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 5,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 91,
+  "seq": 101,
+  "time": 1771051985991
+}
+14:53:05 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 90,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 1
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 100,
+  "time": 1771051985989
+}
+14:53:05 Send:
+mergebox_openbox
+{
+  "ack": 99,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 91,
+  "time": 1771051985009
+}
+14:53:05 Receive:
+MergeBoxInfoResp
+{
+  "ack": 89,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 11,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100012,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 9
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 4,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 10,
+          "2": 5,
+          "3": 2,
+          "4": 1
+        },
+        "3": {
+          "100011": 2,
+          "100012": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 5,
+        "251212202": 2,
+        "251212203": 1,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 90,
+  "seq": 99,
+  "time": 1771051985965
+}
+14:53:04 Send:
+mergebox_getinfo
+{
+  "ack": 98,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 90,
+  "time": 1771051984980
+}
+14:53:04 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 88,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 5,
+        "gridY": 5
+      },
+      {
+        "gridX": 6,
+        "gridY": 5
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "5": {
+          "5": null
+        },
+        "6": {
+          "5": {
+            "gridItemId": 100012
+          }
+        }
+      },
+      "groupItemRecord": {
+        "3": {
+          "100012": 1
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 89,
+  "seq": 98,
+  "time": 1771051985630
+}
+14:53:04 Send:
+mergebox_mergeitem
+{
+  "ack": 97,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 5,
+      "gridY": 5
+    },
+    "targetPos": {
+      "gridX": 6,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 89,
+  "time": 1771051984649
+}
+14:53:04 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 11,
+      "gridMap": {
+        "5": {
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 9
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 10
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 88,
+  "seq": 97,
+  "time": 1771051985290
+}
+14:53:04 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 87,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 2
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 96,
+  "time": 1771051985289
+}
+14:53:04 Send:
+mergebox_openbox
+{
+  "ack": 95,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 88,
+  "time": 1771051984302
+}
+14:53:04 Receive:
+MergeBoxInfoResp
+{
+  "ack": 86,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 10,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 8
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 4,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 9,
+          "2": 5,
+          "3": 2,
+          "4": 1
+        },
+        "3": {
+          "100011": 2
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 5,
+        "251212202": 2,
+        "251212203": 1,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 87,
+  "seq": 95,
+  "time": 1771051985258
+}
+14:53:04 Send:
+mergebox_getinfo
+{
+  "ack": 94,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 87,
+  "time": 1771051984272
+}
+14:53:03 Send:
+mergebox_mergeitem
+{
+  "ack": 93,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 6,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 6,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 86,
+  "time": 1771051983944
+}
+14:53:03 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 0,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      },
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "5": {
+          "4": null
+        },
+        "7": {
+          "4": {
+            "gridItemId": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 5
+        }
+      },
+      "taskMap": {
+        "251212201": 5
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 85,
+  "seq": 93,
+  "time": 1771051984595
+}
+14:53:03 Send:
+mergebox_mergeitem
+{
+  "ack": 92,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 5,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 85,
+  "time": 1771051983615
+}
+14:53:03 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 84,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 10,
+      "gridMap": {
+        "6": {
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 8
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 9
+        },
+        "3": {
+          "100011": 2
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      },
+      {
+        "gridX": 6,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 84,
+  "seq": 92,
+  "time": 1771051984255
+}
+14:53:03 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 83,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 3
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 91,
+  "time": 1771051984253
+}
+14:53:03 Send:
+mergebox_openbox
+{
+  "ack": 90,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 84,
+  "time": 1771051983273
+}
+14:53:03 Receive:
+MergeBoxInfoResp
+{
+  "ack": 82,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 9,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 7
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 4,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 8,
+          "2": 4,
+          "3": 2,
+          "4": 1
+        },
+        "3": {
+          "100011": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 4,
+        "251212202": 2,
+        "251212203": 1,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 83,
+  "seq": 90,
+  "time": 1771051984230
+}
+14:53:03 Send:
+mergebox_getinfo
+{
+  "ack": 89,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 83,
+  "time": 1771051983247
+}
+14:53:02 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 9,
+      "gridMap": {
+        "7": {
+          "3": {
+            "openCnt": 7
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 8
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 82,
+  "seq": 89,
+  "time": 1771051983871
+}
+14:53:02 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 81,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 4
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 88,
+  "time": 1771051983869
+}
+14:53:02 Send:
+mergebox_openbox
+{
+  "ack": 87,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 82,
+  "time": 1771051982889
+}
+14:53:02 Receive:
+MergeBoxInfoResp
+{
+  "ack": 0,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 8,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 6
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 4,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 7,
+          "2": 4,
+          "3": 2,
+          "4": 1
+        },
+        "3": {
+          "100011": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 4,
+        "251212202": 2,
+        "251212203": 1,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 81,
+  "seq": 87,
+  "time": 1771051983845
+}
+14:53:02 Send:
+mergebox_getinfo
+{
+  "ack": 86,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 81,
+  "time": 1771051982858
+}
+14:53:02 Receive:
+_sys/ack
+{
+  "ack": 80,
+  "cmd": "_sys/ack",
+  "time": 1771051983527
+}
+14:53:02 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 79,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      },
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "6": {
+          "4": null
+        },
+        "7": {
+          "5": {
+            "gridItemId": 4
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "4": 1
+        }
+      },
+      "taskMap": {
+        "251212203": 1
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 80,
+  "seq": 86,
+  "time": 1771051983511
+}
+14:53:02 Send:
+mergebox_mergeitem
+{
+  "ack": 85,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 6,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 80,
+  "time": 1771051982531
+}
+14:53:02 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 78,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      },
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "7": {
+          "4": null,
+          "5": {
+            "gridItemId": 3
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "3": 2
+        }
+      },
+      "taskMap": {
+        "251212202": 2
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 79,
+  "seq": 85,
+  "time": 1771051983175
+}
+14:53:02 Send:
+mergebox_mergeitem
+{
+  "ack": 84,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 7,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 79,
+  "time": 1771051982194
+}
+14:53:01 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 77,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 6,
+        "gridY": 5
+      },
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "6": {
+          "5": null
+        },
+        "7": {
+          "4": {
+            "gridItemId": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 4
+        }
+      },
+      "taskMap": {
+        "251212201": 4
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 78,
+  "seq": 84,
+  "time": 1771051982844
+}
+14:53:01 Send:
+mergebox_mergeitem
+{
+  "ack": 83,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 6,
+      "gridY": 5
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 78,
+  "time": 1771051981863
+}
+14:53:01 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 8,
+      "gridMap": {
+        "5": {
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 6
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 7
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 77,
+  "seq": 83,
+  "time": 1771051982492
+}
+14:53:01 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 76,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 5
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 82,
+  "time": 1771051982490
+}
+14:53:01 Send:
+mergebox_openbox
+{
+  "ack": 81,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 77,
+  "time": 1771051981510
+}
+14:53:01 Receive:
+MergeBoxInfoResp
+{
+  "ack": 75,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 7,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 3,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 5
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 6,
+          "2": 3,
+          "3": 1
+        },
+        "3": {
+          "100011": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 3,
+        "251212202": 1,
+        "251212203": 0,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 76,
+  "seq": 81,
+  "time": 1771051982466
+}
+14:53:01 Send:
+mergebox_getinfo
+{
+  "ack": 80,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 76,
+  "time": 1771051981482
+}
+14:53:01 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 7,
+      "gridMap": {
+        "7": {
+          "3": {
+            "openCnt": 5
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 6
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 75,
+  "seq": 80,
+  "time": 1771051982116
+}
+14:53:01 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 74,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 6
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 79,
+  "time": 1771051982114
+}
+14:53:01 Send:
+mergebox_openbox
+{
+  "ack": 78,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 75,
+  "time": 1771051981134
+}
+14:53:01 Receive:
+MergeBoxInfoResp
+{
+  "ack": 73,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 6,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 3,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 4
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 5,
+          "2": 3,
+          "3": 1
+        },
+        "3": {
+          "100011": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 3,
+        "251212202": 1,
+        "251212203": 0,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 74,
+  "seq": 78,
+  "time": 1771051982091
+}
+14:53:01 Send:
+mergebox_getinfo
+{
+  "ack": 77,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 74,
+  "time": 1771051981107
+}
+14:53:00 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 72,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      },
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "7": {
+          "4": null,
+          "5": {
+            "gridItemId": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 3
+        }
+      },
+      "taskMap": {
+        "251212201": 3
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 73,
+  "seq": 77,
+  "time": 1771051981763
+}
+14:53:00 Send:
+mergebox_mergeitem
+{
+  "ack": 76,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 7,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 7,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 73,
+  "time": 1771051980781
+}
+14:53:00 Send:
+mergebox_mergeitem
+{
+  "ack": 75,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 5,
+      "gridY": 5
+    },
+    "targetPos": {
+      "gridX": 6,
+      "gridY": 5
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 72,
+  "time": 1771051980458
+}
+14:53:00 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 6,
+      "gridMap": {
+        "5": {
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 100011,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 4
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 5
+        },
+        "3": {
+          "100011": 1
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 5
+      },
+      {
+        "gridX": 5,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 71,
+  "seq": 75,
+  "time": 1771051981090
+}
+14:53:00 Receive:
+EvoTower_ChangeNotify
+{
+  "ack": 70,
+  "body": {
+    "evoTower": {
+      "lotteryLeftCnt": 7
+    }
+  },
+  "cmd": "EvoTower_ChangeNotify",
+  "seq": 74,
+  "time": 1771051981088
+}
+14:53:00 Send:
+mergebox_openbox
+{
+  "ack": 73,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 71,
+  "time": 1771051980108
+}
+14:53:00 Receive:
+MergeBoxInfoResp
+{
+  "ack": 69,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 5,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 3,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 3
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 4,
+          "2": 2,
+          "3": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 2,
+        "251212202": 1,
+        "251212203": 0,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 70,
+  "seq": 73,
+  "time": 1771051981062
+}
+14:53:00 Send:
+mergebox_getinfo
+{
+  "ack": 72,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 70,
+  "time": 1771051980076
+}
+14:52:59 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 68,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      },
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "5": {
+          "4": null
+        },
+        "6": {
+          "4": {
+            "gridItemId": 3
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "3": 1
+        }
+      },
+      "taskMap": {
+        "251212202": 1
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 69,
+  "seq": 72,
+  "time": 1771051980732
+}
+14:52:59 Send:
+mergebox_mergeitem
+{
+  "ack": 71,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 5,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 6,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 69,
+  "time": 1771051979751
+}
+14:52:59 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 5,
+      "gridMap": {
+        "7": {
+          "3": {
+            "openCnt": 3
+          },
+          "5": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 4
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 5
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 68,
+  "seq": 71,
+  "time": 1771051980390
+}
+
+14:52:59 Send:
+mergebox_openbox
+{
+  "ack": 69,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 68,
+  "time": 1771051979405
+}
+14:52:59 Receive:
+MergeBoxInfoResp
+{
+  "ack": 66,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 4,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 2
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 3,
+          "2": 2
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 2,
+        "251212202": 0,
+        "251212203": 0,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 67,
+  "seq": 69,
+  "time": 1771051980361
+}
+14:52:59 Send:
+mergebox_getinfo
+{
+  "ack": 68,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 67,
+  "time": 1771051979376
+}
+14:52:59 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 4,
+      "gridMap": {
+        "6": {
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "3": {
+            "openCnt": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 2
+        }
+      },
+      "taskMap": {
+        "251212201": 2
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 6,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 66,
+  "seq": 68,
+  "time": 1771051980016
+}
+
+14:52:59 Send:
+mergebox_openbox
+{
+  "ack": 66,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 66,
+  "time": 1771051979032
+}
+14:52:59 Receive:
+MergeBoxInfoResp
+{
+  "ack": 64,
+  "body": {
+    "mergeBox": {
+      "actId": 251212,
+      "actType": 1,
+      "costClaimCnt": 0,
+      "costTotalCnt": 3,
+      "freeEnergy": 6,
+      "freeEnergyRTime": 1771041600,
+      "gridMap": {
+        "1": {
+          "1": {
+            "gridConfId": 251212101,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212108,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212115,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "2": {
+          "1": {
+            "gridConfId": 251212102,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212109,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212116,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "3": {
+          "1": {
+            "gridConfId": 251212103,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212110,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212117,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "4": {
+          "1": {
+            "gridConfId": 251212104,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212111,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212118,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "5": {
+          "1": {
+            "gridConfId": 251212105,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212112,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212119,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 2,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        },
+        "6": {
+          "1": {
+            "gridConfId": 251212106,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212113,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212120,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          }
+        },
+        "7": {
+          "1": {
+            "gridConfId": 251212107,
+            "gridItemId": 7,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "2": {
+            "gridConfId": 251212114,
+            "gridItemId": 4,
+            "gridType": 1,
+            "isLock": true,
+            "openCnt": 0
+          },
+          "3": {
+            "gridConfId": 251212121,
+            "gridItemId": 1,
+            "gridType": 1,
+            "isLock": false,
+            "openCnt": 1
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 3,
+          "2": 1
+        }
+      },
+      "shareReward": {},
+      "taskClaimMap": {},
+      "taskMap": {
+        "251212201": 1,
+        "251212202": 0,
+        "251212203": 0,
+        "251212204": 0,
+        "251212205": 0,
+        "251212206": 0,
+        "251212207": 0,
+        "251212208": 0,
+        "251212209": 0,
+        "251212210": 0,
+        "251212211": 0
+      }
+    }
+  },
+  "cmd": "MergeBoxInfoResp",
+  "resp": 65,
+  "seq": 66,
+  "time": 1771051979989
+}
+14:52:59 Send:
+mergebox_getinfo
+{
+  "ack": 65,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 65,
+  "time": 1771051979005
+}
+14:52:58 Receive:
+MergeBox_MergeItemResp
+{
+  "ack": 63,
+  "body": {
+    "delPosList": [
+      {
+        "gridX": 4,
+        "gridY": 4
+      },
+      {
+        "gridX": 5,
+        "gridY": 4
+      }
+    ],
+    "mergeBox": {
+      "gridMap": {
+        "4": {
+          "4": null
+        },
+        "5": {
+          "4": {
+            "gridItemId": 2
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "2": 1
+        }
+      },
+      "taskMap": {
+        "251212201": 1
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 5,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_MergeItemResp",
+  "resp": 64,
+  "seq": 65,
+  "time": 1771051979659
+}
+14:52:58 Send:
+mergebox_mergeitem
+{
+  "ack": 64,
+  "body": {
+    "actType": 1,
+    "sourcePos": {
+      "gridX": 4,
+      "gridY": 4
+    },
+    "targetPos": {
+      "gridX": 5,
+      "gridY": 4
+    }
+  },
+  "cmd": "mergebox_mergeitem",
+  "seq": 64,
+  "time": 1771051978676
+}
+14:52:58 Receive:
+MergeBox_OpenBoxResp
+{
+  "ack": 0,
+  "body": {
+    "autoUseItemId": -1,
+    "mergeBox": {
+      "costTotalCnt": 3,
+      "gridMap": {
+        "7": {
+          "3": {
+            "openCnt": 1
+          },
+          "4": {
+            "gridConfId": 0,
+            "gridItemId": 1,
+            "gridType": 2,
+            "isLock": false,
+            "openCnt": 0
+          }
+        }
+      },
+      "groupItemRecord": {
+        "1": {
+          "1": 3
+        }
+      }
+    },
+    "newPosList": [
+      {
+        "gridX": 7,
+        "gridY": 4
+      }
+    ]
+  },
+  "cmd": "MergeBox_OpenBoxResp",
+  "resp": 63,
+  "seq": 64,
+  "time": 1771051979307
+}
+
+14:52:58 Send:
+mergebox_openbox
+{
+  "ack": 62,
+  "body": {
+    "actType": 1,
+    "pos": {
+      "gridX": 7,
+      "gridY": 3
+    }
+  },
+  "cmd": "mergebox_openbox",
+  "seq": 63,
+  "time": 1771051978325
+}
+14:52:58 Receive:
+MergeBoxInfoResp
+14:52:58 Send:
+mergebox_getinfo
+{
+  "ack": 61,
+  "body": {
+    "actType": 1
+  },
+  "cmd": "mergebox_getinfo",
+  "seq": 62,
+  "time": 1771051978297
+}
+14:52:58 Receive:
+EvoTowerInfoResp
+{
+  "ack": 0,
+  "body": {
+    "evoTower": {
+      "bindLegionId": 6482137,
+      "energy": 2,
+      "energyRecoveryTime": 1771051767,
+      "legionPrivilege": {
+        "1": 1,
+        "2": 1,
+        "3": 1
+      },
+      "legionTaskClaimMap": {},
+      "legionTaskMap": {
+        "4": 5,
+        "5": 5,
+        "6": 2,
+        "7": 2
+      },
+      "lotteryLeftCnt": 11,
+      "lotterySkipCnt": 0,
+      "orderPassReward": {},
+      "packRecord": {},
+      "plugInTowerId": 0,
+      "rewardTowerId": 16,
+      "serverId": 1008976,
+      "storeMap": {},
+      "taskClaimMap": {
+        "260213": {
+          "1": 1770957691,
+          "2": 1770957717,
+          "3": 1770957733
+        },
+        "260214": {
+          "1": 1771048241,
+          "2": 1771048242,
+          "3": 1771048243
+        }
+      },
+      "taskMap": {
+        "260213": {
+          "1": 3,
+          "2": 6,
+          "3": 10,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0
+        },
+        "260214": {
+          "1": 3,
+          "2": 6,
+          "3": 10,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0
+        }
+      },
+      "towerId": 169,
+      "towerScore": 169
+    }
+  },
+  "cmd": "EvoTowerInfoResp",
+  "resp": 61,
+  "seq": 61,
+  "time": 1771051979253
+}
+14:52:58 Send:
+evotower_getinfo
+{
+  "ack": 0,
+  "body": {},
+  "cmd": "evotower_getinfo",
+  "seq": 61,
+  "time": 1771051978265
+}
+

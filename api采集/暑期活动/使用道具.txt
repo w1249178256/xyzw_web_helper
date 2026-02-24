@@ -1,0 +1,246 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/1/31 14:46:16
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 2
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/31 14:45:59
+服务: ActivityService
+方法: startActEGame
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "seq": 75,
+    "ack": 0,
+    "time": 1769841908749,
+    "resp": 73,
+    "cmd": "activity_takeegamerewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "quantity": 16
+          }
+        }
+      },
+      "actEGame": {
+        "actId": 2601302,
+        "mapId": 507,
+        "gridInfo": [
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 17,
+              "flag": 1
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 4,
+              "flag": 1
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 12,
+              "flag": 1
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 7,
+              "flag": 1
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 0,
+              "flag": 1
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 12,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 8,
+              "flag": 1
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 18,
+              "flag": 1
+            },
+            {
+              "gridType": -1,
+              "awardIndex": 0,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 10,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 2,
+              "flag": 1
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 10,
+              "flag": 1
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 16,
+              "flag": 1
+            },
+            {
+              "gridType": -2,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 15,
+              "flag": 1
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ]
+        ],
+        "curX": 3,
+        "curY": 3,
+        "stageId": 26013021,
+        "stageNum": 1
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1769841959016_mp6j50igi
+

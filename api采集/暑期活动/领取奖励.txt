@@ -1,0 +1,37 @@
+
+服务: ActivityService
+方法: actEGameStageClaim
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "resp": 41,
+    "cmd": "activity_actegamestageclaimresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "itemId": 5264,
+            "quantity": 1,
+            "ext": null
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5264,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "nextStageId": 26013024
+    },
+    "seq": 42,
+    "ack": 0,
+    "time": 1769854510832,
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}

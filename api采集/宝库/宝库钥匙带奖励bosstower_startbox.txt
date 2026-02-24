@@ -1,0 +1,504 @@
+时间: 2026/1/23 19:27:09
+服务: BossTowerService
+方法: startBox
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 92,
+    "ack": 87,
+    "time": 1769167582872,
+    "resp": 88,
+    "cmd": "bosstower_startboxresp",
+    "body": {
+      "battleData": {
+        "id": 71772566825,
+        "mode": 30,
+        "randomSeed": 1646,
+        "version": 240481,
+        "leftTeam": {
+          "roleId": 438166696,
+          "power": 2050783550,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 515740077,
+              "defense": 147349704,
+              "curHp": 4255615468,
+              "hp": 4255615468,
+              "curEnergy": -1,
+              "speed": 4003,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {
+                "51": 1,
+                "53": 0.02,
+                "54": 0.158,
+                "56": 0.306,
+                "57": 0.7,
+                "58": 0.046,
+                "59": 0.4,
+                "60": 0.04,
+                "61": 0.406,
+                "63": 0.006,
+                "65": 0.02,
+                "69": 0.024,
+                "101": 0,
+                "102": 0,
+                "227": 0.1,
+                "228": 0.13,
+                "229": 0.16,
+                "230": 0.15,
+                "231": 0.17
+              },
+              "skill": [
+                206,
+                207,
+                208,
+                111350
+              ],
+              "recordFlag": false
+            },
+            "1": {
+              "id": 116,
+              "type": 0,
+              "index": 1,
+              "level": 700,
+              "attack": 30961640,
+              "defense": 5985060,
+              "curHp": 509509757,
+              "hp": 509509757,
+              "curEnergy": -1,
+              "speed": 363,
+              "color": 3,
+              "star": 29,
+              "order": 5,
+              "skin": 11601,
+              "skinName": "",
+              "activeSkill": 1165,
+              "attribute": {
+                "57": 0.6,
+                "59": 1,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1166,
+                1167,
+                1164
+              ],
+              "recordFlag": false
+            },
+            "2": {
+              "id": 217,
+              "type": 0,
+              "index": 2,
+              "level": 700,
+              "attack": 24384751,
+              "defense": 655208,
+              "curHp": 467115931,
+              "hp": 467115931,
+              "curEnergy": -1,
+              "speed": 482,
+              "color": 2,
+              "star": 15,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 20001,
+              "attribute": {
+                "51": 0.15,
+                "57": 0.4,
+                "59": 0.65,
+                "61": 0.91,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                20002,
+                20003,
+                20004
+              ],
+              "recordFlag": false
+            },
+            "3": {
+              "id": 223,
+              "type": 0,
+              "index": 3,
+              "level": 850,
+              "attack": 23795552,
+              "defense": 126133,
+              "curHp": 458427684,
+              "hp": 458427684,
+              "curEnergy": -1,
+              "speed": 377,
+              "color": 2,
+              "star": 2,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 2231,
+              "attribute": {
+                "51": 0.1,
+                "57": 0.2,
+                "59": 0.4,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                2232,
+                2233,
+                2234
+              ],
+              "recordFlag": false
+            },
+            "4": {
+              "id": 106,
+              "type": 0,
+              "index": 4,
+              "level": 962,
+              "attack": 29593017,
+              "defense": 4838371,
+              "curHp": 526012824,
+              "hp": 526012824,
+              "curEnergy": -1,
+              "speed": 446,
+              "color": 3,
+              "star": 19,
+              "order": 6,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 8000001,
+              "attribute": {
+                "57": 0.45,
+                "59": 0.4,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                8000002,
+                8000003,
+                8000004
+              ],
+              "recordFlag": false
+            }
+          },
+          "name": "影子",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJ073h2p8tKNdEZycuGNN8MPg7ehHicQ3A2dpaYYscQ0E64pdIHB84H1qPYlppYAXsQVW2tspXYeGg/132",
+          "weaponId": 3,
+          "weaponActiveLevelId": 405,
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "28": {
+              "id": 9906,
+              "type": 1,
+              "index": 28,
+              "level": 352001,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 15050851,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "bossTowerId": 3
+        },
+        "outputCode": "cdc9ecbd8f264207c0af3b2b6ade7660",
+        "result": {
+          "id": 71772566825,
+          "isWin": true,
+          "seed": 1646,
+          "totalFrame": 48,
+          "version": 240481,
+          "battleVersion": "c50e166d9b",
+          "memoMode": 3,
+          "inputCode": "29891cb506eea9e3c32c2786add7734b",
+          "outputCode": "cdc9ecbd8f264207c0af3b2b6ade7660",
+          "sponsor": {
+            "roleId": 438166696,
+            "name": "%E5%BD%B1%E5%AD%90",
+            "headImg": "https%3A%2F%2Fthirdwx.qlogo.cn%2Fmmopen%2Fvi_32%2FQ0j4TwGTfTJ073h2p8tKNdEZycuGNN8MPg7ehHicQ3A2dpaYYscQ0E64pdIHB84H1qPYlppYAXsQVW2tspXYeGg%2F132",
+            "power": 2050783550,
+            "teamInfo": [
+              {
+                "heroId": 107,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 100,
+                "club": 4,
+                "slot": 0,
+                "star": 30,
+                "damage": 83549893,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 4255615468,
+                "energy": 100,
+                "skin": 10701,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 83549893,
+                  "3": 83549893,
+                  "4": 83549893
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 116,
+                "color": 3,
+                "level": 700,
+                "order": 5,
+                "index": 1,
+                "rage": 50,
+                "club": 4,
+                "slot": 1,
+                "star": 29,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 509509757,
+                "energy": 50,
+                "skin": 11601,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 217,
+                "color": 2,
+                "level": 700,
+                "order": 5,
+                "index": 2,
+                "rage": 50,
+                "club": 2,
+                "slot": 2,
+                "star": 15,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 467115931,
+                "energy": 50,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 223,
+                "color": 2,
+                "level": 850,
+                "order": 5,
+                "index": 3,
+                "rage": 50,
+                "club": 1,
+                "slot": 3,
+                "star": 2,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 458427684,
+                "energy": 50,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 962,
+                "order": 6,
+                "index": 4,
+                "rage": 50,
+                "club": 3,
+                "slot": 4,
+                "star": 19,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 526012824,
+                "energy": 50,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              }
+            ],
+            "ext": {
+              "curHP": 6216681664
+            }
+          },
+          "accept": {
+            "teamInfo": [
+              {
+                "heroId": 9906,
+                "color": 3,
+                "level": 352001,
+                "order": 0,
+                "index": 28,
+                "rage": 0,
+                "club": 0,
+                "slot": 28,
+                "star": 0,
+                "damage": 0,
+                "takeDamage": 83549893,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 0,
+                "skinName": "",
+                "type": 1,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              }
+            ],
+            "ext": {
+              "curHP": 0
+            }
+          },
+          "type": 30,
+          "round": 1,
+          "memos": []
+        }
+      },
+      "bossTower": {
+        "boxCurHp": 0,
+        "boxFightCnt": 0,
+        "levelInfoMap": {
+          "3": {
+            "rewardList": [
+              {
+                "type": 2,
+                "itemId": 0,
+                "value": 288,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3012,
+                "value": 4,
+                "ext": 0
+              },
+              {
+                "type": 2,
+                "itemId": 0,
+                "value": 188,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3010,
+                "value": 2,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3012,
+                "value": 6,
+                "ext": 0
+              },
+              {
+                "type": 2,
+                "itemId": 0,
+                "value": 888,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3010,
+                "value": 1,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 1001,
+                "value": 5,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3012,
+                "value": 2,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3010,
+                "value": 6,
+                "ext": 0
+              }
+            ],
+            "claimedIdxList": [],
+            "bigIdxList": [
+              5
+            ]
+          }
+        }
+      },
+      "subHp": 471850000
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 53
+}
