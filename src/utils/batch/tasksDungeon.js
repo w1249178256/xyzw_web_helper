@@ -1,4 +1,4 @@
-import { isDungeonOpen, merchantConfig } from "@/utils/dreamConstants";
+import { isDungeonOpen, merchantConfig, goldItemsConfig } from "@/utils/dreamConstants";
 
 /**
  * 宝库、梦境类任务
@@ -260,7 +260,7 @@ export function createTasksDungeon(deps) {
    */
   const batchBuyDreamItems = async () => {
     if (selectedTokens.value.length === 0) return;
-    
+
     if (!isDungeonOpen()) {
       message.warning("当前不是梦境开放时间（周三/周四/周日/周一）");
       return;
@@ -290,7 +290,7 @@ export function createTasksDungeon(deps) {
           type: "info",
         });
         await ensureConnection(tokenId);
-        
+
         // 1. 获取角色信息以获得商店数据
         const roleInfo = await tokenStore.sendMessageWithPromise(
           tokenId,
@@ -300,69 +300,79 @@ export function createTasksDungeon(deps) {
         );
 
         if (!roleInfo || !roleInfo.role || !roleInfo.role.dungeon || !roleInfo.role.dungeon.merchant) {
-           throw new Error("无法获取梦境商店数据");
+          throw new Error("无法获取梦境商店数据");
         }
 
         const merchantData = roleInfo.role.dungeon.merchant;
         const levelId = roleInfo.role.levelId || 0;
         let successCount = 0;
         let failCount = 0;
-        
+
         const operations = [];
 
         for (const itemKey of purchaseList) {
-            const [targetMerchantId, targetItemIndex] = itemKey.split("-").map(Number);
-            
-            const merchantItems = merchantData[targetMerchantId];
-            if (merchantItems) {
-                for (let pos = 0; pos < merchantItems.length; pos++) {
-                    if (merchantItems[pos] === targetItemIndex) {
-                        operations.push({
-                            merchantId: targetMerchantId,
-                            index: targetItemIndex,
-                            pos: pos
-                        });
-                    }
-                }
+          const [targetMerchantId, targetItemIndex] = itemKey.split("-").map(Number);
+
+          const merchantItems = merchantData[targetMerchantId];
+          if (merchantItems) {
+            for (let pos = 0; pos < merchantItems.length; pos++) {
+              if (merchantItems[pos] === targetItemIndex) {
+                operations.push({
+                  merchantId: targetMerchantId,
+                  index: targetItemIndex,
+                  pos: pos
+                });
+              }
             }
+          }
         }
         operations.sort((a, b) => {
-            if (a.merchantId !== b.merchantId) return a.merchantId - b.merchantId;
-            return b.pos - a.pos;
+          if (a.merchantId !== b.merchantId) return a.merchantId - b.merchantId;
+          return b.pos - a.pos;
         });
 
         for (const op of operations) {
-            if (shouldStop.value) break;
-            try {
-                
-                const response = await tokenStore.sendMessageWithPromise(
-                  tokenId,
-                  "dungeon_buymerchant",
-                  {
-                    id: op.merchantId,
-                    index: op.index,
-                    pos: op.pos,
-                  },
-                  5000
-                );
+          if (shouldStop.value) break;
 
-                if (response && response.reward) {
-                    successCount++;
-                    const merchantName = merchantConfig[op.merchantId] ? merchantConfig[op.merchantId].name : `商人${op.merchantId}`;
-                    const itemName = merchantConfig[op.merchantId] && merchantConfig[op.merchantId].items[op.index] ? merchantConfig[op.merchantId].items[op.index] : `商品${op.index}`;
-                    
-                    addLog({
-                        time: new Date().toLocaleTimeString(),
-                        message: `${token.name} 购买成功: ${merchantName} - ${itemName}`,
-                        type: "success",
-                    });
-                } else {
-                    failCount++;
-                }
-            } catch (err) {
-                failCount++;
+          if (levelId < 4000) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 关卡数小于4000，无法购买`,
+              type: "warning",
+            });
+            return;
+          }
+
+          try {
+
+            const response = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "dungeon_buymerchant",
+              {
+                id: op.merchantId,
+                index: op.index,
+                pos: op.pos,
+              },
+              5000
+            );
+
+            if (response && response.reward) {
+              successCount++;
+              const merchantName = merchantConfig[op.merchantId] ? merchantConfig[op.merchantId].name : `商人${op.merchantId}`;
+              const itemName = merchantConfig[op.merchantId] && merchantConfig[op.merchantId].items[op.index] ? merchantConfig[op.merchantId].items[op.index] : `商品${op.index}`;
+
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 购买成功: ${merchantName} - ${itemName}`,
+                type: "success",
+              });
+            } else {
+              failCount++;
             }
-            await new Promise((r) => setTimeout(r, 500));
+          } catch (err) {
+            failCount++;
+          }
+          await new Promise((r) => setTimeout(r, 500));
         }
 
         tokenStatus.value[tokenId] = "completed";

@@ -609,15 +609,6 @@
                 >
                   一键竞技场补齐
                 </n-button>
-                <n-button
-                  size="small"
-                  @click="batchBuyDreamItems"
-                  :disabled="
-                    isRunning || selectedTokens.length === 0 || !ismengjingActivityOpen
-                  "
-                >
-                  一键梦境购买
-                </n-button>
               </n-space>
             </n-tab-pane>
           </n-tabs>
