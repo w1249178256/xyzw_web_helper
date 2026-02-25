@@ -322,7 +322,7 @@ export function registerDefaultCommands(reg) {
     .register("legacy_gift_send", { recipientId: 0, itemId: 0, quantity: 0 })
     .register("legacy_gift_received")
     // 安全密码验证
-    .register("role_commitpassword", { password: 0, passwordType: 1 })
+    .register("role_commitpassword", { password: "", passwordType: 1 })
     // 功法残卷发送
     .register("legacy_sendgift", { itemCnt: 0, legacyUIds: [], targetId: 0 })
 
@@ -387,7 +387,6 @@ export function registerDefaultCommands(reg) {
     .register("matchteam_join", { teamId: "" })
     .register("matchteam_memberprepare", { teamId: "", isPrepare: 1 })
     .register("matchteam_kick")
-    .register("matchteam_setleader")
     .register("matchteam_openteam")
     .register("matchteam_getteaminfo")
 
@@ -1174,7 +1173,6 @@ export class XyzwWebSocketClient {
       matchteam_createresp: "matchteam_create",
       team_setteamresp: "team_setteam",
       matchteam_kickresp: "matchteam_kick",
-      matchteam_setleaderresp: "matchteam_setleader",
       matchteam_openteamresp: "matchteam_openteam",
       matchteam_getteaminforesp: "matchteam_getteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",

@@ -23,7 +23,6 @@ declare interface TokenData {
   remark?: string; // 备注信息
   importMethod?: "manual" | "bin" | "url" | "wxQrcode"; // 导入方式：manual（手动）、bin文件或url链接
   sourceUrl?: string; // 当importMethod为url时，存储url链接
-  originalStorageKey?: string; // 原始存储键（用于刷新token）
   avatar?: string; // 用户头像URL
   upgradedToPermanent?: boolean; // 是否升级为长期有效
   upgradedAt?: string; // 升级时间
@@ -217,7 +216,6 @@ export const useTokenStore = defineStore("tokens", () => {
       // URL获取相关信息
       sourceUrl: tokenData.sourceUrl || null, // Token来源URL（用于刷新）
       importMethod: tokenData.importMethod || "manual", // 导入方式：manual 或 url
-      originalStorageKey: tokenData.originalStorageKey || null, // 原始存储键（用于刷新token）
       avatar: tokenData.avatar || "", // 用户头像
     };
 
@@ -364,43 +362,22 @@ export const useTokenStore = defineStore("tokens", () => {
               gameToken.importMethod === "wxQrcode"
             ) {
               // Bin形式token刷新（兼容新旧两种key格式）
-              // 优先使用originalStorageKey，如果有
-              // 然后使用新的tokenId作为key
-              // 最后尝试旧的name作为key
-              let userToken: ArrayBuffer | null = null;
-              let storageKey = null;
+              // 优先使用新的tokenId作为key，如果失败则尝试旧的name作为key
+              let userToken: ArrayBuffer | null = await getArrayBuffer(
+                tokenId,
+              );
               let usedOldKey = false;
-              
-              // 1. 优先使用originalStorageKey
-              if (gameToken.originalStorageKey) {
-                userToken = await getArrayBuffer(
-                  gameToken.originalStorageKey,
-                );
-                storageKey = gameToken.originalStorageKey;
-              }
-              
-              // 2. 如果没有originalStorageKey或获取失败，使用tokenId
-              if (!userToken) {
-                userToken = await getArrayBuffer(
-                  tokenId,
-                );
-                storageKey = tokenId;
-              }
-              
-              // 3. 如果还是失败，尝试使用name作为key
               if (!userToken) {
                 userToken = await getArrayBuffer(
                   gameToken.name,
                 );
-                storageKey = gameToken.name;
                 usedOldKey = true;
               }
-              
-              console.log("读取到的ArrayBuffer:", storageKey, userToken);
+              console.log("读取到的ArrayBuffer:", tokenId, userToken);
               if (userToken) {
                 const token = await transformToken(userToken);
                 updateToken(tokenId, { ...gameToken, token });
-                // 如果使用旧的key读取成功，则用新的tokenId key重新保存并删除旧数据
+                // 如果使用旧的name key读取成功，则用新的tokenId key重新保存并删除旧数据
                 if (usedOldKey) {
                   await storeArrayBuffer(tokenId, userToken);
                   await deleteArrayBuffer(gameToken.name);
@@ -1098,26 +1075,6 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "legion_getinfo", params);
   };
 
-  // 发送获取盐场对手信息
-  const sendLegionGetOpponent = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "legion_getopponent", params);
-  };
-
-  // 发送获取盐场俱乐部信息
-  const sendLegionGetInfobyid = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "legion_getinfobyid", params);
-  };
-
-  // 发送获取盐场
-  const sendLegionGetBattlefield = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "legion_getbattlefield", params);
-  };
-
-  // 发送盐场入场
-  const sendWarSetBattleTeam = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "war_setbattleteam", params);
-  };
-
   // 发送获取噩梦信息
   const sendNightmareGetRoleInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "nightmare_getroleinfo", params);
@@ -1183,31 +1140,6 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "presetteam_saveteam", params);
   };
 
-  // 发送设置阵容
-  const sendTeamSetTeam = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "team_setteam", params);
-  };
-
-  // 发送加入队伍
-  const sendMatchTeamJoin = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "matchteam_join", params);
-  };
-
-  // 发转让队伍
-  const sendMatchTeamSetLeader = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "matchteam_setleader", params);
-  };
-
-  // 发送队伍成员准备
-  const sendMatchTeamMemberPrepare = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "matchteam_memberprepare", params);
-  };
-
-  // 发送获取队伍信息
-  const sendMatchTeamGetTeamInfo = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "matchteam_getteaminfo", params);
-  };
-
   // 发送开始灯神战斗
   const sendFightStartGenie = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "fight_startgenie", params);
@@ -1221,21 +1153,6 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送英雄交换
   const sendHeroExchange = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_exchange", params);
-  };
-
-  // 发送咸将升级
-  const sendHeroUpgradeLevel = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "hero_heroupgradelevel", params);
-  };
-
-  // 发送咸将模拟
-  const sendHeroSimulation = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "hero_simulation", params);
-  };
-
-  // 发送咸将升阶
-  const sendHeroUpgradeOrder = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "hero_heroupgradeorder", params);
   };
 
   // 发送计算英雄战力
@@ -1266,21 +1183,6 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送获取预设队伍信息
   const sendPresetteamGetInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "presetteam_getinfo", params);
-  };
-
-  // 发送黑市周购买
-  const sendActivityBuyStoreGoods = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "activity_buystoregoods", params);
-  };
-
-  // 发送点击黑市购买
-  const sendStorePurchase = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "store_purchase", params);
-  };
-
-  // 发送设置黑市购买清单
-  const sendStoreSetPurchase = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "store_setpurchase", params);
   };
 
   // 发送获取黑市购买设置
@@ -1321,46 +1223,6 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送五一抽奖活动
   const sendActivityMaydaylottery = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "activity_maydaylottery", params);
-  };
-
-  // 发送使用金鱼助威道具
-  const sendAutumnUseItem = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "autumn_useitem", params);
-  };
-
-  // 发送购买鱼干
-  const sendTowerBuyEnergy = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "tower_buyenergy", params);
-  };
-
-  // 发送神具主动升级
-  const sendLordWeaponUpgradeActiveSkillLevel = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "lordweapon_upgradeactiveskilllevel", params);
-  };
-
-  // 发送神具被动升级
-  const sendLordWeaponUpgradePassiveSkillLevel = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "lordweapon_upgradepassiveskilllevel", params);
-  };
-
-  // 发送水晶升级
-  const sendTrumpUpgrade = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "trump_upgrade", params);
-  };
-
-  // 发送武将升星
-  const sendHeroUpgradeStar = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "hero_heroupgradestar", params);
-  };
-
-  // 发送图鉴升级
-  const sendBookUpgrade = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "book_upgrade", params);
-  };
-
-  // 发送图鉴领取积分奖励
-  const sendBookClaimPointReward = (tokenId: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, "book_claimpointreward", params);
   };
 
   // 发送融合盒领取融合进度
@@ -1940,10 +1802,6 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegacyGetInfo,
     sendLegacyActivate,
     sendLegionGetInfo,
-    sendLegionGetOpponent,
-    sendLegionGetInfobyid,
-    sendLegionGetBattlefield,
-    sendWarSetBattleTeam,
     sendNightmareGetRoleInfo,
     sendNightmareClickTurntable,
     sendNightmareClaimTurnRewardTimes,
@@ -1958,25 +1816,14 @@ export const useTokenStore = defineStore("tokens", () => {
     sendMatchteamLeave,
     sendPresetteamSaveTeam,
     sendPresetteamGetInfo,
-    sendTeamSetTeam,
-    sendMatchTeamJoin,
-    sendMatchTeamSetLeader,
-    sendMatchTeamMemberPrepare,
-    sendMatchTeamGetTeamInfo,
     sendFightStartGenie,
     sendFightStartLevel,
     sendHeroExchange,
-    sendHeroUpgradeLevel,
-    sendHeroSimulation,
-    sendHeroUpgradeOrder,
     sendHeroCalcpowerbyteam,
     sendGenieSweep,
     sendLegionExchangeResearch,
     sendLegionResearch,
     sendLegionResetResearch,
-    sendActivityBuyStoreGoods,
-    sendStorePurchase,
-    sendStoreSetPurchase,
     sendStoreGetPurchase,
     sendItemClaimBoxPointReward,
     sendActivityClaimTaskReward,
@@ -1985,14 +1832,6 @@ export const useTokenStore = defineStore("tokens", () => {
     sendActivityStarteGame,
     sendActivityCommonBuyGoods,
     sendActivityMaydaylottery,
-    sendAutumnUseItem,
-    sendTowerBuyEnergy,
-    sendLordWeaponUpgradeActiveSkillLevel,
-    sendLordWeaponUpgradePassiveSkillLevel,
-    sendTrumpUpgrade,
-    sendHeroUpgradeStar,
-    sendBookUpgrade,
-    sendBookClaimPointReward,
     sendMergeboxClaimMergeProgress,
     sendMergeboxClaimCostProgress,
     sendEvotowerClaimTask,
