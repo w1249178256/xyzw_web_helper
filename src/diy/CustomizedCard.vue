@@ -194,6 +194,29 @@
       clearable
     />
   </div>
+
+  <!-- 模式14：按钮+下拉框 -->
+  <div v-if="mode === 'button-with-select'" class="card-item mode-button-with-select">
+    <n-button 
+      :type="disabled ? 'default' : 'primary'" 
+      size="small" 
+      @click="onButtonClick"
+      :loading="loading"
+      :disabled="disabled"
+      class="n-button-select"
+    >
+      {{ buttonText }}
+    </n-button>
+    <n-select
+      :value="selectValue"
+      @update:value="(value) => emit('update:selectValue', value)"
+      :options="selectOptions"
+      size="small"
+      :placeholder="placeholder"
+      class="n-select-select"
+      clearable
+    />
+  </div>
   </div>
 </template>
 
@@ -205,7 +228,7 @@ const props = defineProps({
   mode: {
     type: String,
     required: true,
-    validator: (value) => ['container', 'name-count', 'name-switch', 'button-placeholder', 'name-input', 'button', 'button-with-input', 'name-range-input', 'button-number-input', 'button-switch', 'execution-range', 'name-select', 'select-only', 'button-count'].includes(value)
+    validator: (value) => ['container', 'name-count', 'name-switch', 'button-placeholder', 'name-input', 'button', 'button-with-input', 'name-range-input', 'button-number-input', 'button-switch', 'execution-range', 'name-select', 'select-only', 'button-count', 'button-with-select'].includes(value)
   },
   
   // 模式1：名称和数量
@@ -344,15 +367,28 @@ const handleNumberInput = (value) => {
   font-weight: 500;
   font-size: var(--font-size-sm);
   background-color: #16a34a;
+  border-color: #16a34a;
   color: #ffffff;
-  padding: 6px 12px;
+  padding: 0 16px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 66%;
-  min-height: 28px;
-  border: none;
+  width: 61%;
+  height: 42px;
+  border: 1px solid #16a34a;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.item-name:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+}
+
+.item-name:active {
+  background-color: #166534;
+  border-color: #166534;
 }
 
 .item-value {
@@ -362,25 +398,25 @@ const handleNumberInput = (value) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 33%;
+  width: 39%;
 }
 
 .placeholder {
   visibility: hidden;
-  width: 33%;
+  width: 39%;
   height: 20px;
 }
 
 .n-switch {
-  width: 33%;
+  width: 39%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .n-button {
-  width: 66%;
-  min-height: 32px;
+  width: 61%;
+  height: 42px;
   background-color: #f59e0b;
   border-color: #f59e0b;
   color: #ffffff;
@@ -388,6 +424,7 @@ const handleNumberInput = (value) => {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .n-button:hover {
@@ -401,20 +438,20 @@ const handleNumberInput = (value) => {
 }
 
 .n-input-number {
-  width: 33%;
+  width: 39%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .button-input-field {
-  width: 66%;
+  width: 39%;
   display: flex;
   align-items: center;
 }
 
 .n-select {
-  width: 33%;
+  width: 39%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -427,6 +464,46 @@ const handleNumberInput = (value) => {
   justify-content: center;
 }
 
+/* 按钮+下拉框模式样式 */
+.mode-button-with-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 50px;
+}
+
+.n-button-select {
+  width: 61%;
+  height: 42px;
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.n-button-select:hover {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+}
+
+.n-button-select:active {
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+.n-select-select {
+  width: 39%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* 执行范围模式样式 */
 .mode-execution-range {
   display: flex;
@@ -434,25 +511,39 @@ const handleNumberInput = (value) => {
   justify-content: space-between;
   gap: 0.5rem;
   width: 100%;
+  min-height: 50px;
 }
 
 .execution-range-name {
   font-weight: 500;
   font-size: var(--font-size-sm);
   background-color: #16a34a;
+  border-color: #16a34a;
   color: #ffffff;
-  padding: 6px 12px;
+  padding: 0 16px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 66%;
-  min-height: 28px;
-  border: none;
+  width: 61%;
+  height: 42px;
+  border: 1px solid #16a34a;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.execution-range-name:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+}
+
+.execution-range-name:active {
+  background-color: #166534;
+  border-color: #166534;
 }
 
 .execution-range-input {
-  width: 33%;
+  width: 39%;
   display: flex;
   align-items: center;
 }
@@ -462,19 +553,43 @@ const handleNumberInput = (value) => {
   font-weight: 500;
   font-size: var(--font-size-sm);
   background-color: #16a34a;
+  border-color: #16a34a;
   color: #ffffff;
-  padding: 6px 12px;
+  padding: 0 16px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 66%;
-  min-height: 28px;
-  border: none;
+  width: 61%;
+  height: 42px;
+  border: 1px solid #16a34a;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.card-name:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+}
+
+.card-name:active {
+  background-color: #166534;
+  border-color: #166534;
 }
 
 .n-input {
-  width: 33%;
+  width: 39%;
   display: flex;
   align-items: center;
-}</style>
+}
+
+/* 其他模式的最小高度 */
+.mode-name-input,
+.mode-name-range-input,
+.mode-button-number-input,
+.mode-button-switch,
+.mode-name-select,
+.mode-button-with-input {
+  min-height: 50px;
+}
+</style>
