@@ -1,0 +1,324 @@
+第一步：十殿7准备
+1.1 查找殿7Token
+
+遍历所有标记为"殿7"的Token
+先检查本地存储枕头数量，如果枕头数量为0，跳过，
+如果不为0，执行：
+连接Token：connectTokenByClick(token, 5)
+获取十殿枕头数量：getPillowCountForToken(token)
+命令：tokenStore.sendGetRoleInfo(token.id)
+找到枕头数量不为0的殿7Token，保存为dian7Token
+1.2 创建房间
+
+Token：dian7Token
+命令：tokenStore.sendGameMessage(dian7Token.id, 'matchteam_createteam', { teamId: 0, extParam: 0 })
+1.3 获取队伍号
+
+Token：dian7Token
+命令：tokenStore.sendMatchteamGetRoleTeamInfo(dian7Token.id, {})
+保存结果：displayTeamId.value = teamInfo.teamId
+第二步：十殿2准备
+2.1 查找殿2Token
+
+遍历所有标记为"殿2"的Token
+先检查本地存储枕头数量，如果枕头数量为0，跳过，
+如果不为0，执行：
+连接Token：connectTokenByClick(token, 5)
+获取十殿枕头数量：getPillowCountForToken(token)
+命令：tokenStore.sendGetRoleInfo(token.id)
+找到枕头数量不为0的殿2Token，保存为dian2Token
+2.2 加入房间
+
+Token：dian2Token
+命令：tokenStore.sendGameMessage(dian2Token.id, 'matchteam_join', { teamId: displayTeamId.value })
+重试3次，失败后等待1秒重试
+2.3 准备
+
+Token：dian2Token
+命令：tokenStore.sendMatchteamGetRoleTeamInfo(dian2Token.id, {})
+如果未准备，执行：tokenStore.sendGameMessage(dian2Token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value })
+第三步：十殿5准备
+3.1 查找殿5Token
+
+遍历所有标记为"殿5"的Token
+先检查本地存储枕头数量，如果枕头数量为0，跳过，
+如果不为0，执行：
+连接Token：connectTokenByClick(token, 5)
+获取十殿枕头数量：getPillowCountForToken(token)
+命令：tokenStore.sendGetRoleInfo(token.id)
+找到枕头数量不为0的殿5Token，保存为dian5Token
+3.2 加入房间
+
+Token：dian5Token
+命令：tokenStore.sendGameMessage(dian5Token.id, 'matchteam_join', { teamId: displayTeamId.value })
+重试3次，失败后等待1秒重试
+3.3 准备
+
+Token：dian5Token
+命令：tokenStore.sendMatchteamGetRoleTeamInfo(dian5Token.id, {})
+如果未准备，执行：tokenStore.sendGameMessage(dian5Token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value })
+第四步：十殿0准备
+4.1 查找殿0Token（重复2次）
+
+遍历所有标记为"殿0"的Token（排除已加入的）
+先检查本地存储枕头数量，如果枕头数量＜5，跳过，
+如果=5，执行：
+连接Token：connectTokenByClick(token, 5)
+获取十殿枕头数量：getPillowCountForToken(token)
+命令：tokenStore.sendGetRoleInfo(token.id)
+如果枕头数量<5，跳过
+如果枕头数量>=5，执行加入房间
+找到枕头数量为5的殿0Token，保存为dian0Token1和dian0Token2
+4.2 加入房间（每个殿0Token）
+
+Token：殿0Token
+命令：tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: displayTeamId.value })
+重试3次，失败后等待1秒重试
+4.3 准备（每个殿0Token）
+
+Token：殿0Token
+命令：tokenStore.sendMatchteamGetRoleTeamInfo(token.id, {})
+如果未准备，执行：tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value })
+4.4 检查结束条件
+
+如果所有殿0枕头数量都小于5，跳出循环
+第五步：开始十殿
+5.1 开始十殿
+
+Token：dian7Token
+命令：tokenStore.sendGameMessage(dian7Token.id, 'matchteam_start', { teamId: displayTeamId.value })
+5.2 等待18秒
+
+5.3 获取房间号
+
+Token：dian7Token
+命令：tokenStore.sendMatchteamGetRoleTeamInfo(dian7Token.id, {})
+保存结果：displayTeamId.value = teamInfo.teamId, displayRoomId.value = teamInfo.roomId
+第六步：殿1执行
+Token：props.selectedTokenId（房主Token）
+
+6.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+6.2 设置出战人员
+使用dian7Token，执行命令：
+命令：tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+命令：tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+
+等待22s
+
+第七步：殿2执行
+Token：props.selectedTokenId（房主Token）
+
+7.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+7.2 殿7出战
+
+使用dian7Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+7.3 殿2出战
+
+使用dian2Token，执行命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+7.4 检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为2，执行殿5出战，如果层数为3跳转第八步，
+
+7.5执行殿5出战,
+
+使用dian5Token，执行命令：命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+
+等待22s
+
+第八步：殿3执行
+Token：props.selectedTokenId（房主Token）
+
+8.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+8.2 殿7出战
+
+使用dian7Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+
+等待22s
+
+第九步：殿4执行
+Token：props.selectedTokenId（房主Token）
+
+9.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+9.2 殿7出战
+
+使用dian7Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+
+等待22s
+
+第十步：殿5执行
+Token：props.selectedTokenId（房主Token）
+
+10.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+10.2 殿5出战
+使用dian5Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+10.3 检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为5，执行殿2出战，如果层数为6，跳转第11步。
+
+
+
+10.4 殿2出战
+使用dian2Token，执行命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+10.5 再次检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为5，执行殿7出战，如果层数为6，跳转第11步。
+10.6 殿7出战
+使用dian7Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+
+等待22s
+10.5 再次检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为5，模拟点击解散十殿按钮。如果层数为6，跳转第11步。
+第十一步：殿6执行
+Token：props.selectedTokenId（房主Token）
+
+11.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+11.2 恢复殿2
+
+使用dian2Token，执行命令：
+命令：tokenStore.sendGameMessage(token.id, 'nightmare_restore', { roomId: displayTeamId.value, roleId: parseInt(tokenRoleIds.value[dian2Token.id]) })
+11.3 恢复殿7
+
+使用dian7Token，执行命令：
+命令：tokenStore.sendGameMessage(token.id, 'nightmare_restore', { roomId: displayTeamId.value, roleId: parseInt(tokenRoleIds.value[dian7Token.id]) })
+11.4 殿2出战
+
+使用dian2Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+11.5检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为6，执行殿5出战
+11.6 殿5出战
+使用dian5Token，执行命令：
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+等待22s
+11.7检查层数
+
+命令：tokenStore.sendGetRoleInfo(token.id)
+命令：tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+如果层数为6，模拟点击解散十殿按钮。如果层数为7，跳转第12步。
+第十二步：殿7执行
+Token：props.selectedTokenId（房主Token）
+
+12.1 检查连接
+
+命令：tokenStore.getWebSocketStatus(token.id)
+如果未连接，执行：tokenStore.selectToken(token.id)
+12.2 恢复殿7
+
+查找标记为"殿7"的Token
+检查是否已记录roleId
+命令：tokenStore.sendGameMessage(token.id, 'nightmare_restore', { roomId: displayTeamId.value, roleId: parseInt(tokenRoleIds.value[dian7Token.id]) })
+12.3 殿7出战
+
+命令：
+tokenStore.sendNightmareSetFighter(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+tokenStore.sendNightmareFight(token.id, { roomId: displayRoomId.value, roleId: parseInt(token.id) })
+12.4模拟点击解散十殿按钮，
+
+第十三步：踢出两个殿0
+13.1 查找殿0Token，dian0Token1和dian0Token2
+13.2 踢出房间，
+
+Token：dian0Token1和dian0Token2
+命令：tokenStore.sendMatchteamKick(token.id, { teamId: displayTeamId.value, kickRoleId: parseInt(tokenRoleIds.value[token.id]) })
+第十四步：处理枕头数量
+14.1 检查殿2枕头数量
+
+Token：dian2Token
+命令：getPillowCountForToken(dian2Token)
+命令：tokenStore.sendGetRoleInfo(dian2Token.id)
+如果枕头数量为0：
+踢出房间：tokenStore.sendMatchteamKick(dian2Token.id, { teamId: displayTeamId.value, kickRoleId: parseInt(tokenRoleIds.value[dian2Token.id]) })
+重新执行第二步
+14.2 检查殿5枕头数量
+
+Token：dian5Token
+命令：getPillowCountForToken(dian5Token)
+命令：tokenStore.sendGetRoleInfo(dian5Token.id)
+如果枕头数量为0：
+踢出房间：tokenStore.sendMatchteamKick(dian5Token.id, { teamId: displayTeamId.value, kickRoleId: parseInt(tokenRoleIds.value[dian5Token.id]) })
+重新执行第三步
+14.3 检查殿7枕头数量
+
+Token：dian7Token
+命令：getPillowCountForToken(dian7Token)
+命令：tokenStore.sendGetRoleInfo(dian7Token.id)
+如果枕头数量为0：dian7Token保存为dian7Token1
+查找其他殿7Token，保存为dian7Token，
+连接新房主Token：connectTokenByClick(newOwnerToken, 5)
+
+14.4 加入房间
+Token：dian7Token
+命令：tokenStore.sendGameMessage(dian2Token.id, 'matchteam_join', { teamId: displayTeamId.value })
+重试3次，失败后等待1秒重试
+14.5模拟点击dian7Token1，
+转让房主：
+参数：dian7Token
+命令：tokenStore.sendMatchteamOpenTeam(newOwnerToken.id, { teamId: displayTeamId.value, extParam: 0 })
+命令：tokenStore.sendGameMessage(newOwnerToken.id, 'matchteam_transferowner', { teamId: displayTeamId.value, newOwnerId: parseInt(tokenRoleIds.value[newOwnerToken.id]) })
+
+14.6模拟点击dian7Token
+参数：dian7Token1
+踢出旧房主：tokenStore.sendMatchteamKick(dian7Token.id, { teamId: displayTeamId.value, kickRoleId: parseInt(tokenRoleIds.value[dian7Token.id]) })
+
+第十五步：跳转到第四步
+跳转到第四步，继续循环

@@ -1,0 +1,242 @@
+
+时间: 2026/1/27 20:53:37
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":6},"targetPos":{"gridX":4,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 153,
+    "ack": 111,
+    "time": 1769518371655,
+    "resp": 112,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "5": {
+              "gridItemId": 2
+            },
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212201": 9
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 9
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        },
+        {
+          "gridX": 4,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518417731_9nw7a6j0a
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/27 20:53:36
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":6},"targetPos":{"gridX":6,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 152,
+    "ack": 110,
+    "time": 1769518370345,
+    "resp": 111,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "6": {
+              "gridItemId": 2
+            }
+          },
+          "7": {
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212201": 8
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 8
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1769518416411_5oxmnwf0f
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/27 20:53:34
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":4},"targetPos":{"gridX":6,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 150,
+    "ack": 108,
+    "time": 1769518368376,
+    "resp": 109,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "4": null
+          },
+          "6": {
+            "4": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 6
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 6
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 4
+        },
+        {
+          "gridX": 6,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518414452_ppi5mngem
+
+记录 #4:
+----------------------------------------
+时间: 2026/1/27 20:53:33
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":4},"targetPos":{"gridX":4,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 149,
+    "ack": 0,
+    "time": 1769518367194,
+    "resp": 108,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "4": null
+          },
+          "4": {
+            "4": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 5
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 5
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 4
+        },
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 65
+}
+异步: 是
+调用ID: call_1769518413270_e6kjcbt93
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

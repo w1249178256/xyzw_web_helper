@@ -93,9 +93,10 @@ export class CommandRegistry {
   }
 
   /** 注册命令 */
-  register(cmd, defaultBody = {}) {
+  register(cmd, defaultBody = {}, actualCmd = null) {
+    const realCmd = actualCmd || cmd;
     this.commands.set(cmd, (ack = 0, seq = 0, params = {}) => ({
-      cmd,
+      cmd: realCmd,
       ack,
       seq,
       time: Date.now(),
@@ -321,7 +322,7 @@ export function registerDefaultCommands(reg) {
     .register("legacy_gift_send", { recipientId: 0, itemId: 0, quantity: 0 })
     .register("legacy_gift_received")
     // 安全密码验证
-    .register("role_commitpassword", { password: "", passwordType: 1 })
+    .register("role_commitpassword", { password: 0, passwordType: 1 })
     // 功法残卷发送
     .register("legacy_sendgift", { itemCnt: 0, legacyUIds: [], targetId: 0 })
 
@@ -360,7 +361,97 @@ export function registerDefaultCommands(reg) {
     .register("towers_fight")
 
     //发送游戏内消息
-    .register("system_sendchatmessage");
+    .register("system_sendchatmessage")
+
+    // 物品相关（新增）
+    .register("item_claimboxpointreward")
+    .register("item_openpack", { itemId: 0, number: 0, index: 0 })
+
+    // 商店相关（新增）
+    .register("store_setpurchase", { purchaseCnt: 2, purchaseItemList: [
+      {itemId: 2002, discount: 4}, {itemId: 2003, discount: 5}, 
+      {itemId: 2004, discount: 8}, {itemId: 1012, discount: 7}
+    ]})
+    .register("store_getpurchase")
+
+    // 爬塔相关（新增）
+    .register("tower_buyenergy", { buyNum: 0 })
+
+    // 功法相关（新增）
+    .register("legacy_claimgift")
+    .register("legacy_getgifts", { typ: 1 })
+
+    // 队伍相关（新增）
+    .register("hero_calcpowerbyteam", { battleTeam: {}, lordWeaponId: 1 })
+    .register("team_setteam", { teamType: 11, battleTeam: {}, lordWeaponId: 3, cCMonsterId: 0 })
+    .register("matchteam_join", { teamId: "" })
+    .register("matchteam_memberprepare", { teamId: "", isPrepare: 1 })
+    .register("matchteam_kick")
+    .register("matchteam_setleader")
+    .register("matchteam_openteam")
+    .register("matchteam_getteaminfo")
+
+    // 活动相关（新增）
+    .register("activity_claimtaskreward", { activityId: 2510031, missionid: 0 })
+    .register("activity_getactegameinfo")
+    .register("activity_actegamestageclaim")
+    .register("activity_startegame")
+    .register("activity_commonbuygoods")
+    .register("activity_maydaylottery")
+    .register("mergebox_claimmergeprogress")
+    .register("mergebox_claimcostprogress")
+    .register("evotower_claimtask")
+    .register("evotower_claimlegionprivilege")
+    .register("mergebox_mergeitem")
+    .register("mergebox_openbox")
+
+    // 塔相关（新增）
+    .register("towers_getinfo")
+    .register("towers_start")
+    .register("towers_fight")
+
+    // 十殿相关（新增）
+    .register("nightmare_claimweekreward")
+    .register("nightmare_clickturntable")
+    .register("nightmare_claimturnrewardtimes")
+    .register("nightmare_buycharm", { charmId: 0, num: 5 })
+    .register("nightmare_claimbook", { roleId: 0 })
+    .register("nightmare_restore")
+    .register("nightmare_fight")
+    .register("nightmare_setfighter")
+    .register("nightmare_dismiss")
+
+    // 咸王宝库（新增）
+    .register("matchteam_create", { teamCfgId: 6, param: 0, setting: { name: "", notice: "", secret: 0, apply: 0, applyList: [] }, custom: { leaderId: "", teamId: "" } })
+    .register("matchteam_create_shidian", { teamCfgId: 1, param: 0, setting: { name: "相符的队伍", notice: "", secret: 1, apply: 0, applyList: [] }, custom: {} }, "matchteam_create")
+    .register("matchteam_create_baoku", { teamCfgId: 6, param: 0, setting: { name: "", notice: "", secret: 0, apply: 0, applyList: [] }, custom: { leaderId: "", teamId: "" } }, "matchteam_create")
+    .register("bosstower_searchteam")
+    .register("bosstower_claimreward")
+    .register("bosstower_boom")
+    .register("charge_createorder")
+
+    // 新增缺失的命令
+    .register("fight_startgenie")
+    .register("legion_applyjoin")
+    .register("war_setbattleteam")
+    .register("activity_buystoregoods")
+    .register("autumn_useitem")
+    .register("lordweapon_upgradeactiveskilllevel")
+    .register("lordweapon_upgradepassiveskilllevel")
+    .register("trump_upgrade")
+    .register("hero_heroupgradestar")
+    .register("hero_heroupgradelevel")
+    .register("hero_simulation")
+    .register("hero_heroupgradeorder")
+    .register("book_upgrade")
+    .register("book_bookupgradestar")
+    .register("book_claimpointreward")
+    .register("nightmare_getroleinfo")
+    .register("hero_exchange", { heroId: 0 })
+    .register("legion_exchangeresearch", { researchId: 0 })
+    .register("legion_research", { researchId: 0 })
+    .register("legion_resetresearch", {})
+    .register("equipment_quench", { equipmentId: 0, quenchType: 1 })
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1018,9 +1109,17 @@ export class XyzwWebSocketClient {
       activity_getresp: "activity_get",
       collection_goodslistresp: "collection_goodslist",
       collection_claimfreerewardresp: "collection_claimfreereward",
+      legion_storebuygoodsresp: "legion_storebuygoods",
       legion_getarearankresp: "legion_getarearank",
       legionwar_getgoldmonthwarrankresp: "legionwar_getgoldmonthwarrank",
       nightmare_getroleinforesp: "nightmare_getroleinfo",
+      nightmare_claimbookresp: "nightmare_claimbook",
+      nightmare_restoreresp: "nightmare_restore",
+      nightmare_fightresp: "nightmare_fight",
+      nightmare_setfighterresp: "nightmare_setfighter",
+      nightmare_clickturntableresp: "nightmare_clickturntable",
+      nightmare_claimturnrewardtimesresp: "nightmare_claimturnrewardtimes",
+      nightmare_dismissresp: "nightmare_dismiss",
       studyresp: "study_startgame",
       role_getroleinforesp: "role_getroleinfo",
       hero_recruitresp: "hero_recruit",
@@ -1044,78 +1143,90 @@ export class XyzwWebSocketClient {
       system_getdatabundleverresp: "system_getdatabundlever",
       tower_claimrewardresp: "tower_claimreward",
       fight_starttowerresp: "fight_starttower",
+      fight_startgenieresp: "fight_startgenie",
+      hero_exchangeresp: "hero_exchange",
+      legion_exchangeresearchresp: "legion_exchangeresearch",
+      store_getpurchaseresp: "store_getpurchase",
+      item_claimboxpointrewardresp: "item_claimboxpointreward",
+      activity_claimtaskrewardresp: "activity_claimtaskreward",
+      activity_getactegameinforesp: "activity_getactegameinfo",
+      activity_actegamestageclaimresp: "activity_actegamestageclaim",
+      activity_startegameresp: "activity_startegame",
+      activity_commonbuygoodsresp: "activity_commonbuygoods",
+      activity_maydaylotteryresp: "activity_maydaylottery",
+      mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
+      mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
+      evotower_claimtaskresp: "evotower_claimtask",
+      evotower_claimlegionprivilegeresp: "evotower_claimlegionprivilege",
+      mergebox_mergeitemresp: "mergebox_mergeitem",
+      mergebox_openboxresp: "mergebox_openbox",
+      towers_startresp: "towers_start",
+      towers_fightresp: "towers_fight",
+      towers_getinforesp: "towers_getinfo",
+      item_openpackresp: "item_openpack",
       evotowerinforesp: "evotower_getinfo",
       evotower_fightresp: "evotower_fight",
-      evotower_getlegionjoinmembersresp: "evotower_getlegionjoinmembers",
+      evotower_readyfightresp: "evotower_readyfight",
+      evotower_claimrewardresp: "evotower_claimreward",
       mergeboxinforesp: "mergebox_getinfo",
       mergebox_claimfreeenergyresp: "mergebox_claimfreeenergy",
-      mergebox_openboxresp: "mergebox_openbox",
       mergebox_automergeitemresp: "mergebox_automergeitem",
-      mergebox_mergeitemresp: "mergebox_mergeitem",
-      mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
-      mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
-      evotower_claimtaskresp: "evotower_claimtask",
-      item_openpackresp: "item_openpack",
-      equipment_quenchresp: "equipment_quench",
-      rank_getserverrankresp: "rank_getserverrank",
-      legion_claimpayloadtaskresp: "legion_claimpayloadtask",
-      legion_claimpayloadtaskprogressresp: "legion_claimpayloadtaskprogress",
-      saltroad_getwartyperesp: "saltroad_getwartype",
-      saltroad_getsaltroadwartotalrankresp: "saltroad_getsaltroadwartotalrank",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
+      matchteam_createresp: "matchteam_create",
+      team_setteamresp: "team_setteam",
+      matchteam_kickresp: "matchteam_kick",
+      matchteam_setleaderresp: "matchteam_setleader",
+      matchteam_openteamresp: "matchteam_openteam",
+      matchteam_getteaminforesp: "matchteam_getteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",
       bosstower_startbossresp: "bosstower_startboss",
       bosstower_startboxresp: "bosstower_startbox",
+      bosstower_searchteamresp: "bosstower_searchteam",
+      bosstower_claimrewardresp: "bosstower_claimreward",
+      bosstower_boomresp: "bosstower_boom",
+      charge_createorderresp: "charge_createorder",
       discount_getdiscountinforesp: "discount_getdiscountinfo",
       // 升星相关响应映射
       hero_heroupgradestarresp: "hero_heroupgradestar",
+      hero_heroupgradelevelresp: "hero_heroupgradelevel",
+      hero_simulationresp: "hero_simulation",
+      hero_heroupgradeorderresp: "hero_heroupgradeorder",
       book_upgraderesp: "book_upgrade",
+      book_bookupgradestarresp: "book_bookupgradestar",
+      book_claimpointrewardresp: "book_claimpointreward",
+      equipment_quenchresp: "equipment_quench",
       book_claimpointrewardresp: "book_claimpointreward",
       // 军团信息
       legion_getinforesp: "legion_getinfo",
       legion_getinforresp: "legion_getinfo",
+      legion_researchresp: "legion_research",
+      legion_resetresearchresp: "legion_resetresearch",
+      // 功法相关响应映射
+      legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_claimgiftresp: "legacy_claimgift",
+      role_commitpasswordresp: "role_commitpassword",
+      legacy_sendgiftresp: "legacy_sendgift",
+      legacy_getgiftsresp: "legacy_getgifts",
+      legacy_getinforesp: "legacy_getinfo",
       // 车辆相关响应映射
       car_getrolecarresp: "car_getrolecar",
       car_refreshresp: "car_refresh",
       car_claimresp: "car_claim",
       car_sendresp: "car_send",
       car_getmemberhelpingcntresp: "car_getmemberhelpingcnt",
-      car_getmemberrankresp: "car_getmemberrank",
       role_gettargetteamresp: "role_gettargetteam",
       activity_warorderclaimresp: "activity_recyclewarorderrewardclaim",
       arena_getarearankresp: "arena_getarearank",
       bosstower_gethelprankresp: "bosstower_gethelprank",
-      // 功法相关响应映射
-      legacy_getinforesp: "legacy_getinfo",
-      legacy_claimhangupresp: "legacy_claimhangup",
-      legacy_sendgiftresp: "legacy_sendgift",
-      legacy_getgiftsresp: "legacy_getgifts",
-      // 换皮闯关相关响应映射
-      towers_getinforesp: "towers_getinfo",
-      towers_startresp: "towers_start",
-      towers_fightresp: "towers_fight",
       // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
       task_claimdailyrewardresp: "task_claimdailyreward",
       task_claimweekrewardresp: "task_claimweekreward",
 
       // 同步响应映射（优先级低）
-      syncresp: [
-        "system_mysharecallback",
-        "task_claimdailypoint",
-        "role_commitpassword",
-      ],
-      syncrewardresp: [
-        "system_buygold",
-        "discount_claimreward",
-        "card_claimreward",
-        "artifact_lottery",
-        "genie_sweep",
-        "genie_buysweep",
-        "system_signinreward",
-        "dungeon_selecthero",
-        "artifact_exchange",
-      ],
+      syncresp: ["system_mysharecallback", "task_claimdailypoint", "hero_heroupgradeorder"],
+      syncrewardresp: ["system_buygold", "discount_claimreward", "card_claimreward",
+                        "artifact_lottery", "genie_sweep", "genie_buysweep","system_signinreward","dungeon_selecthero"]
     };
 
     // 获取原始命令名（支持一对一和一对多映射）

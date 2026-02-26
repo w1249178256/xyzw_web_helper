@@ -1,0 +1,29 @@
+服务: EvoTowerService
+方法: claimLegionPrivilege
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1769518196443,
+    "resp": 54,
+    "cmd": "evotower_claimlegionprivilegeresp",
+    "body": {
+      "legionPrivilege": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      },
+      "evoTower": {
+        "legionPrivilege": {
+          "3": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}

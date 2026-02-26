@@ -1,0 +1,6293 @@
+
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/27 20:57:26
+服务: MergeBoxService
+方法: claimCostProgress
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 328,
+    "ack": 0,
+    "time": 1769518600277,
+    "resp": 240,
+    "cmd": "mergebox_claimcostprogressresp",
+    "body": {
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 3,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "costClaimCnt": 80
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 46
+}
+异步: 是
+调用ID: call_1769518646330_evu249kxp
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/27 20:57:23
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 318,
+    "ack": 0,
+    "time": 1769518597531,
+    "resp": 235,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 27
+            },
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 70
+          },
+          "2": {
+            "100001": 9
+          }
+        },
+        "costTotalCnt": 79
+      },
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        },
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1769518643594_sqasvcj1h
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/27 20:57:04
+服务: MergeBoxService
+方法: claimFreeEnergy
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 316,
+    "ack": 0,
+    "time": 1769518578353,
+    "resp": 234,
+    "cmd": "mergebox_claimfreeenergyresp",
+    "body": {
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 6,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "freeEnergy": 0
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 44
+}
+异步: 是
+调用ID: call_1769518624414_kuj9c8ihs
+
+记录 #4:
+----------------------------------------
+时间: 2026/1/27 20:57:00
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 304,
+    "ack": 0,
+    "time": 1769518574475,
+    "resp": 228,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 21
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 65
+          }
+        },
+        "costTotalCnt": 73
+      },
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 39
+}
+异步: 是
+调用ID: call_1769518620541_vklss2lw3
+
+记录 #5:
+----------------------------------------
+时间: 2026/1/27 20:56:55
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":7},"targetPos":{"gridX":1,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 302,
+    "ack": 226,
+    "time": 1769518568976,
+    "resp": 227,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": {
+              "gridItemId": 5
+            }
+          },
+          "7": {
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212204": 5
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 5
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 7
+        },
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518615041_6q5h9cvv3
+
+记录 #6:
+----------------------------------------
+时间: 2026/1/27 20:56:53
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":4},"targetPos":{"gridX":1,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 301,
+    "ack": 0,
+    "time": 1769518566944,
+    "resp": 226,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": {
+              "gridItemId": 4
+            }
+          },
+          "4": {
+            "4": null
+          }
+        },
+        "taskMap": {
+          "251212203": 10
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 10
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        },
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1769518613004_rkeysl6xw
+
+记录 #7:
+----------------------------------------
+时间: 2026/1/27 20:56:51
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":5},"targetPos":{"gridX":7,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 300,
+    "ack": 224,
+    "time": 1769518565565,
+    "resp": 225,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "5": null
+          },
+          "7": {
+            "4": {
+              "gridItemId": 7
+            }
+          }
+        },
+        "taskMap": {
+          "251212206": 1
+        },
+        "groupItemRecord": {
+          "1": {
+            "7": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 5
+        },
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1769518611635_pxjlwmgpo
+
+记录 #8:
+----------------------------------------
+时间: 2026/1/27 20:56:50
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":7},"targetPos":{"gridX":1,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 299,
+    "ack": 223,
+    "time": 1769518564464,
+    "resp": 224,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "5": {
+              "gridItemId": 6
+            }
+          },
+          "3": {
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212205": 2
+        },
+        "groupItemRecord": {
+          "1": {
+            "6": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 7
+        },
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518610530_kfitfy6a5
+
+记录 #9:
+----------------------------------------
+时间: 2026/1/27 20:56:49
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":6},"targetPos":{"gridX":7,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 298,
+    "ack": 0,
+    "time": 1769518563049,
+    "resp": 223,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "6": null
+          },
+          "7": {
+            "4": {
+              "gridItemId": 6
+            }
+          }
+        },
+        "taskMap": {
+          "251212205": 1
+        },
+        "groupItemRecord": {
+          "1": {
+            "6": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        },
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1769518609117_qtpjthqyw
+
+记录 #10:
+----------------------------------------
+时间: 2026/1/27 20:56:46
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":8},"targetPos":{"gridX":3,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 297,
+    "ack": 221,
+    "time": 1769518560872,
+    "resp": 222,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "7": {
+              "gridItemId": 5
+            },
+            "8": null
+          }
+        },
+        "taskMap": {
+          "251212204": 4
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 4
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 8
+        },
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518606941_mlov9dvct
+
+记录 #11:
+----------------------------------------
+时间: 2026/1/27 20:56:45
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":5},"targetPos":{"gridX":5,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 296,
+    "ack": 220,
+    "time": 1769518559393,
+    "resp": 221,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "5": null
+          },
+          "5": {
+            "6": {
+              "gridItemId": 5
+            }
+          }
+        },
+        "taskMap": {
+          "251212204": 3
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 5
+        },
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518605461_56g6guq9o
+
+记录 #12:
+----------------------------------------
+时间: 2026/1/27 20:56:44
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":8},"targetPos":{"gridX":1,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 295,
+    "ack": 219,
+    "time": 1769518558379,
+    "resp": 220,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "5": {
+              "gridItemId": 5
+            },
+            "8": null
+          }
+        },
+        "taskMap": {
+          "251212204": 2
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 8
+        },
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518604447_d0vnebxab
+
+记录 #13:
+----------------------------------------
+时间: 2026/1/27 20:56:43
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":5},"targetPos":{"gridX":1,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 294,
+    "ack": 0,
+    "time": 1769518556998,
+    "resp": 219,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "5": {
+              "gridItemId": 4
+            }
+          },
+          "2": {
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212203": 9
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 9
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        },
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518603062_e78rubuvk
+
+记录 #14:
+----------------------------------------
+时间: 2026/1/27 20:56:41
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":4},"targetPos":{"gridX":7,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 293,
+    "ack": 0,
+    "time": 1769518555131,
+    "resp": 218,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "4": null
+          },
+          "7": {
+            "5": {
+              "gridItemId": 100004
+            }
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100004": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 4
+        },
+        {
+          "gridX": 7,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518601199_6gdoarod9
+
+记录 #15:
+----------------------------------------
+时间: 2026/1/27 20:56:39
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":5},"targetPos":{"gridX":2,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 292,
+    "ack": 216,
+    "time": 1769518553741,
+    "resp": 217,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "4": {
+              "gridItemId": 100003
+            }
+          },
+          "3": {
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 100021,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "6": {
+            "5": null
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100003": 2
+          },
+          "4": {
+            "100021": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        },
+        {
+          "gridX": 2,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 4
+        },
+        {
+          "gridX": 3,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518599809_4r43yeepy
+
+记录 #16:
+----------------------------------------
+时间: 2026/1/27 20:56:38
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":7},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 291,
+    "ack": 0,
+    "time": 1769518552583,
+    "resp": 216,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "7": null
+          },
+          "6": {
+            "5": {
+              "gridItemId": 100002
+            }
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100002": 4
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 7
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518598648_josia3xb6
+
+记录 #17:
+----------------------------------------
+时间: 2026/1/27 20:56:36
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":6},"targetPos":{"gridX":3,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 290,
+    "ack": 214,
+    "time": 1769518550852,
+    "resp": 215,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "6": null
+          },
+          "3": {
+            "5": {
+              "gridItemId": 4
+            }
+          }
+        },
+        "taskMap": {
+          "251212203": 8
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 8
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 6
+        },
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518596921_iwwo1lowu
+
+记录 #18:
+----------------------------------------
+时间: 2026/1/27 20:56:35
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":9},"targetPos":{"gridX":1,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 288,
+    "ack": 212,
+    "time": 1769518548980,
+    "resp": 213,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "8": {
+              "gridItemId": 4
+            }
+          },
+          "2": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212203": 6
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 6
+          },
+          "2": {
+            "100001": 8
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 9
+        },
+        {
+          "gridX": 1,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 8
+        },
+        {
+          "gridX": 1,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1769518595042_6ihz84sid
+
+记录 #19:
+----------------------------------------
+时间: 2026/1/27 20:56:33
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":9},"targetPos":{"gridX":3,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 287,
+    "ack": 0,
+    "time": 1769518547437,
+    "resp": 212,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "8": {
+              "gridItemId": 4
+            }
+          },
+          "6": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212203": 5
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 5
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 9
+        },
+        {
+          "gridX": 3,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518593507_ix2eh3ojc
+
+记录 #20:
+----------------------------------------
+时间: 2026/1/27 20:56:31
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":8},"targetPos":{"gridX":7,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 286,
+    "ack": 210,
+    "time": 1769518545840,
+    "resp": 211,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "8": null
+          },
+          "7": {
+            "7": {
+              "gridItemId": 4
+            }
+          }
+        },
+        "taskMap": {
+          "251212203": 4
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 4
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 8
+        },
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518591907_ijvwdlt8z
+
+记录 #21:
+----------------------------------------
+时间: 2026/1/27 20:56:29
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":6},"targetPos":{"gridX":7,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 285,
+    "ack": 0,
+    "time": 1769518543192,
+    "resp": 210,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "6": null
+          },
+          "7": {
+            "4": {
+              "gridItemId": 5
+            }
+          }
+        },
+        "taskMap": {
+          "251212204": 1
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 1
+          },
+          "2": {
+            "100001": 7
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        },
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518589261_oq8nm8wi3
+
+记录 #22:
+----------------------------------------
+时间: 2026/1/27 20:56:27
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":6},"targetPos":{"gridX":5,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 284,
+    "ack": 208,
+    "time": 1769518541615,
+    "resp": 209,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "6": null
+          },
+          "5": {
+            "6": {
+              "gridItemId": 4
+            }
+          }
+        },
+        "taskMap": {
+          "251212203": 3
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        },
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518587685_3cq6eyk25
+
+记录 #23:
+----------------------------------------
+时间: 2026/1/27 20:56:26
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":5},"targetPos":{"gridX":7,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 283,
+    "ack": 207,
+    "time": 1769518540099,
+    "resp": 208,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "5": null
+          },
+          "7": {
+            "4": {
+              "gridItemId": 4
+            }
+          }
+        },
+        "taskMap": {
+          "251212203": 2
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        },
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518586166_wcv5hzpyr
+
+记录 #24:
+----------------------------------------
+时间: 2026/1/27 20:56:25
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":6},"targetPos":{"gridX":6,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 282,
+    "ack": 206,
+    "time": 1769518539079,
+    "resp": 207,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "6": {
+              "gridItemId": 4
+            }
+          },
+          "7": {
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212203": 1
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1769518585143_c6fztqj2o
+
+记录 #25:
+----------------------------------------
+时间: 2026/1/27 20:56:23
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":8},"targetPos":{"gridX":7,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 281,
+    "ack": 0,
+    "time": 1769518537872,
+    "resp": 206,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "8": null
+          },
+          "7": {
+            "7": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 20
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 20
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 8
+        },
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518583943_28pfn8boh
+
+记录 #26:
+----------------------------------------
+时间: 2026/1/27 20:56:21
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":4},"targetPos":{"gridX":2,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 280,
+    "ack": 204,
+    "time": 1769518535333,
+    "resp": 205,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "7": {
+              "gridItemId": 3
+            }
+          },
+          "3": {
+            "4": null
+          }
+        },
+        "taskMap": {
+          "251212202": 19
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 19
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 4
+        },
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518581400_yoia9si78
+
+记录 #27:
+----------------------------------------
+时间: 2026/1/27 20:56:20
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":8},"targetPos":{"gridX":2,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 279,
+    "ack": 203,
+    "time": 1769518533981,
+    "resp": 204,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "5": {
+              "gridItemId": 3
+            }
+          },
+          "5": {
+            "8": null
+          }
+        },
+        "taskMap": {
+          "251212202": 18
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 18
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 8
+        },
+        {
+          "gridX": 2,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518580049_yp0a5et35
+
+记录 #28:
+----------------------------------------
+时间: 2026/1/27 20:56:18
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":7},"targetPos":{"gridX":7,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 278,
+    "ack": 0,
+    "time": 1769518532551,
+    "resp": 203,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "6": {
+              "gridItemId": 3
+            },
+            "7": {
+              "gridItemId": 2
+            }
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518578620_7itmeseb5
+
+记录 #29:
+----------------------------------------
+时间: 2026/1/27 20:56:17
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":7},"targetPos":{"gridX":6,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 277,
+    "ack": 201,
+    "time": 1769518531223,
+    "resp": 202,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "7": null
+          },
+          "6": {
+            "6": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 17
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 17
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 7
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518577290_i38uczaf4
+
+记录 #30:
+----------------------------------------
+时间: 2026/1/27 20:56:14
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":5},"targetPos":{"gridX":2,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 276,
+    "ack": 200,
+    "time": 1769518528793,
+    "resp": 201,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "5": {
+              "gridItemId": 2
+            }
+          },
+          "5": {
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212201": 39
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 39
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 5
+        },
+        {
+          "gridX": 2,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518574859_g1j7cr5fe
+
+记录 #31:
+----------------------------------------
+时间: 2026/1/27 20:56:14
+服务: EvoTowerService
+方法: getTowerMyRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 275,
+    "ack": 199,
+    "time": 1769518528432,
+    "resp": 200,
+    "cmd": "evotower_gettowermyrankresp",
+    "body": {
+      "myRank": {
+        "roleId": 111582820,
+        "serverId": 8949,
+        "name": "神州丶相符",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+        "power": 12369976039,
+        "score": 289,
+        "legionName": "空山新雨后✨"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 41
+}
+异步: 是
+调用ID: call_1769518574479_j04lxmswc
+
+记录 #32:
+----------------------------------------
+时间: 2026/1/27 20:56:13
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":9},"targetPos":{"gridX":7,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 274,
+    "ack": 0,
+    "time": 1769518527552,
+    "resp": 199,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "8": {
+              "gridItemId": 2
+            },
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212201": 38
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 38
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 9
+        },
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 59
+}
+异步: 是
+调用ID: call_1769518573596_2ox8wbkza
+
+记录 #33:
+----------------------------------------
+时间: 2026/1/27 20:56:11
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":9},"targetPos":{"gridX":5,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 272,
+    "ack": 196,
+    "time": 1769518525064,
+    "resp": 197,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "8": {
+              "gridItemId": 2
+            },
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212201": 36
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 36
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 9
+        },
+        {
+          "gridX": 5,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 147
+}
+异步: 是
+调用ID: call_1769518571101_h29vpu6n6
+
+记录 #34:
+----------------------------------------
+时间: 2026/1/27 20:56:08
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":7},"targetPos":{"gridX":6,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 270,
+    "ack": 0,
+    "time": 1769518522101,
+    "resp": 195,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "7": null
+          },
+          "6": {
+            "6": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 34
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 34
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 7
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 89
+}
+异步: 是
+调用ID: call_1769518568134_mlvdtbn1f
+
+记录 #35:
+----------------------------------------
+时间: 2026/1/27 20:56:06
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":6},"targetPos":{"gridX":4,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 269,
+    "ack": 0,
+    "time": 1769518520896,
+    "resp": 194,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "6": null
+          },
+          "4": {
+            "7": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 33
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 33
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 6
+        },
+        {
+          "gridX": 4,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1769518566959_bzqmga3lf
+
+记录 #36:
+----------------------------------------
+时间: 2026/1/27 20:56:03
+服务: MergeBoxService
+方法: claimCostProgress
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 268,
+    "ack": 0,
+    "time": 1769518517254,
+    "resp": 193,
+    "cmd": "mergebox_claimcostprogressresp",
+    "body": {
+      "role": {
+        "items": {
+          "3201": {
+            "quantity": 10499
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 6,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "costClaimCnt": 70
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1769518563311_600lf0g8b
+
+记录 #37:
+----------------------------------------
+时间: 2026/1/27 20:55:58
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 262,
+    "ack": 0,
+    "time": 1769518512092,
+    "resp": 190,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 18
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 62
+          }
+        },
+        "costTotalCnt": 70
+      },
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 41
+}
+异步: 是
+调用ID: call_1769518558161_rchg6mtyy
+
+记录 #38:
+----------------------------------------
+时间: 2026/1/27 20:55:57
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 250,
+    "ack": 0,
+    "time": 1769518511078,
+    "resp": 184,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 2,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 12
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 31
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 31
+          }
+        },
+        "costTotalCnt": 64
+      },
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 4
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1769518557146_fll8q2ssd
+
+记录 #39:
+----------------------------------------
+时间: 2026/1/27 20:55:56
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 236,
+    "ack": 0,
+    "time": 1769518509949,
+    "resp": 177,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 5
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 51
+          }
+        },
+        "costTotalCnt": 57
+      },
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 5
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1769518556019_gjo5htcpk
+
+记录 #40:
+----------------------------------------
+时间: 2026/1/27 20:55:48
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":6},"targetPos":{"gridX":5,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 234,
+    "ack": 0,
+    "time": 1769518502344,
+    "resp": 176,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "4": {
+              "gridItemId": 100012
+            }
+          },
+          "6": {
+            "6": null
+          }
+        },
+        "groupItemRecord": {
+          "3": {
+            "100012": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        },
+        {
+          "gridX": 5,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518548415_yrlkg51w5
+
+记录 #41:
+----------------------------------------
+时间: 2026/1/27 20:55:46
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":7},"targetPos":{"gridX":7,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 232,
+    "ack": 173,
+    "time": 1769518500330,
+    "resp": 174,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "7": null
+          },
+          "6": {
+            "6": {
+              "gridConfId": 0,
+              "gridItemId": 100011,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "5": {
+              "gridItemId": 100002
+            }
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100002": 3
+          },
+          "3": {
+            "100011": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 5
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518546400_xtapmnxil
+
+记录 #42:
+----------------------------------------
+时间: 2026/1/27 20:55:44
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":5},"targetPos":{"gridX":2,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 231,
+    "ack": 172,
+    "time": 1769518498757,
+    "resp": 173,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "4": {
+              "gridItemId": 100002
+            }
+          },
+          "5": {
+            "5": null
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100002": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 5
+        },
+        {
+          "gridX": 2,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518544823_67btiib5o
+
+记录 #43:
+----------------------------------------
+时间: 2026/1/27 20:55:43
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":7},"targetPos":{"gridX":7,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 230,
+    "ack": 0,
+    "time": 1769518497474,
+    "resp": 172,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "7": null
+          },
+          "7": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "6": {
+              "gridItemId": 100002
+            }
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100001": 6,
+            "100002": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        },
+        {
+          "gridX": 7,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1769518543538_wle13mi4s
+
+记录 #44:
+----------------------------------------
+时间: 2026/1/27 20:55:42
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":9},"targetPos":{"gridX":6,"gridY":9}}]
+结果:
+{
+  "_raw": {
+    "seq": 229,
+    "ack": 170,
+    "time": 1769518496299,
+    "resp": 171,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "9": {
+              "gridItemId": 3
+            }
+          },
+          "7": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212202": 16
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 16
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 9
+        },
+        {
+          "gridX": 6,
+          "gridY": 9
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 9
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518542370_dwjlljfid
+
+记录 #45:
+----------------------------------------
+时间: 2026/1/27 20:55:40
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":8},"targetPos":{"gridX":6,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 227,
+    "ack": 168,
+    "time": 1769518494291,
+    "resp": 169,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "8": null
+          },
+          "6": {
+            "8": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 14
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 14
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 8
+        },
+        {
+          "gridX": 6,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518540363_2fl7kwwfs
+
+记录 #46:
+----------------------------------------
+时间: 2026/1/27 20:55:39
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":7},"targetPos":{"gridX":4,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 226,
+    "ack": 0,
+    "time": 1769518493148,
+    "resp": 168,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 100011,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "6": {
+              "gridItemId": 3
+            },
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212202": 13
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 13
+          },
+          "3": {
+            "100011": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 7
+        },
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        },
+        {
+          "gridX": 4,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518539219_fazd9b0ky
+
+记录 #47:
+----------------------------------------
+时间: 2026/1/27 20:55:38
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":6},"targetPos":{"gridX":5,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 225,
+    "ack": 0,
+    "time": 1769518492012,
+    "resp": 167,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "6": {
+              "gridItemId": 3
+            }
+          },
+          "6": {
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212202": 12
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 12
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        },
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518538084_02maej13w
+
+记录 #48:
+----------------------------------------
+时间: 2026/1/27 20:55:36
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":4},"targetPos":{"gridX":7,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 223,
+    "ack": 164,
+    "time": 1769518490318,
+    "resp": 165,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "4": null
+          },
+          "7": {
+            "4": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 10
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 10
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 4
+        },
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1769518536381_trzh7efai
+
+记录 #49:
+----------------------------------------
+时间: 2026/1/27 20:55:35
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":5},"targetPos":{"gridX":4,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 222,
+    "ack": 163,
+    "time": 1769518489151,
+    "resp": 164,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "4": {
+              "gridItemId": 3
+            },
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212202": 9
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 9
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 5
+        },
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518535221_2sb6qzjg6
+
+记录 #50:
+----------------------------------------
+时间: 2026/1/27 20:55:34
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":6},"targetPos":{"gridX":3,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 221,
+    "ack": 162,
+    "time": 1769518488140,
+    "resp": 163,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "6": null
+          },
+          "3": {
+            "5": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 8
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 8
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 6
+        },
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+异步: 是
+调用ID: call_1769518534198_n19x9x2o1
+
+记录 #51:
+----------------------------------------
+时间: 2026/1/27 20:55:33
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":6},"targetPos":{"gridX":2,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 220,
+    "ack": 0,
+    "time": 1769518487008,
+    "resp": 162,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "6": {
+              "gridItemId": 3
+            }
+          },
+          "3": {
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212202": 7
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 7
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 6
+        },
+        {
+          "gridX": 2,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518533078_kblkhunys
+
+记录 #52:
+----------------------------------------
+时间: 2026/1/27 20:55:32
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":7},"targetPos":{"gridX":3,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 219,
+    "ack": 160,
+    "time": 1769518485983,
+    "resp": 161,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "7": null
+          },
+          "3": {
+            "7": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 6
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 6
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 7
+        },
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518532055_7xoytd7jh
+
+记录 #53:
+----------------------------------------
+时间: 2026/1/27 20:55:30
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":9},"targetPos":{"gridX":2,"gridY":9}}]
+结果:
+{
+  "_raw": {
+    "seq": 217,
+    "ack": 158,
+    "time": 1769518484200,
+    "resp": 159,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "9": {
+              "gridItemId": 3
+            }
+          },
+          "3": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212202": 4
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 4
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 9
+        },
+        {
+          "gridX": 2,
+          "gridY": 9
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 9
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518530272_iw87brlwf
+
+记录 #54:
+----------------------------------------
+时间: 2026/1/27 20:55:28
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":9},"targetPos":{"gridX":3,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 216,
+    "ack": 0,
+    "time": 1769518482452,
+    "resp": 158,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "8": {
+              "gridItemId": 3
+            }
+          },
+          "4": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212202": 3
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 9
+        },
+        {
+          "gridX": 3,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1769518528520_g4d6bzur5
+
+记录 #55:
+----------------------------------------
+时间: 2026/1/27 20:55:27
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":9},"targetPos":{"gridX":4,"gridY":9}}]
+结果:
+{
+  "_raw": {
+    "seq": 215,
+    "ack": 156,
+    "time": 1769518481234,
+    "resp": 157,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "9": {
+              "gridItemId": 2
+            }
+          },
+          "5": {
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212201": 30
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 30
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 9
+        },
+        {
+          "gridX": 4,
+          "gridY": 9
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 9
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518527305_ia6qp8zi5
+
+记录 #56:
+----------------------------------------
+时间: 2026/1/27 20:55:26
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":7},"targetPos":{"gridX":7,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 214,
+    "ack": 155,
+    "time": 1769518479969,
+    "resp": 156,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "7": null
+          },
+          "7": {
+            "8": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 29
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 29
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518526042_2lo1lg2hg
+
+记录 #57:
+----------------------------------------
+时间: 2026/1/27 20:55:24
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":7},"targetPos":{"gridX":4,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 213,
+    "ack": 154,
+    "time": 1769518478642,
+    "resp": 155,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "7": null
+          },
+          "4": {
+            "6": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 28
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 28
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 7
+        },
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518524715_9e4bozjvp
+
+记录 #58:
+----------------------------------------
+时间: 2026/1/27 20:55:23
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":4},"targetPos":{"gridX":1,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 212,
+    "ack": 0,
+    "time": 1769518477494,
+    "resp": 154,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "6": {
+              "gridItemId": 2
+            }
+          },
+          "3": {
+            "4": null
+          }
+        },
+        "taskMap": {
+          "251212201": 27
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 27
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 4
+        },
+        {
+          "gridX": 1,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518523565_wn4rb1u2k
+
+记录 #59:
+----------------------------------------
+时间: 2026/1/27 20:55:22
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":5},"targetPos":{"gridX":3,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 211,
+    "ack": 152,
+    "time": 1769518476295,
+    "resp": 153,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "5": null
+          },
+          "3": {
+            "5": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 26
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 26
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        },
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518522364_8dec02t73
+
+记录 #60:
+----------------------------------------
+时间: 2026/1/27 20:55:20
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":8},"targetPos":{"gridX":2,"gridY":9}}]
+结果:
+{
+  "_raw": {
+    "seq": 210,
+    "ack": 151,
+    "time": 1769518474436,
+    "resp": 152,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "8": null,
+            "9": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 25
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 25
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 8
+        },
+        {
+          "gridX": 2,
+          "gridY": 9
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 9
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518520508_zfp783706
+
+记录 #61:
+----------------------------------------
+时间: 2026/1/27 20:55:19
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":8},"targetPos":{"gridX":3,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 209,
+    "ack": 0,
+    "time": 1769518473421,
+    "resp": 151,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "7": {
+              "gridItemId": 2
+            }
+          },
+          "4": {
+            "8": null
+          }
+        },
+        "taskMap": {
+          "251212201": 24
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 24
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 8
+        },
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518519494_celjmfckz
+
+记录 #62:
+----------------------------------------
+时间: 2026/1/27 20:55:16
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 208,
+    "ack": 149,
+    "time": 1769518470847,
+    "resp": 150,
+    "code": 12300040,
+    "error": "没有空格子了"
+  },
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518516917_e5gk4lu7a
+
+记录 #63:
+----------------------------------------
+时间: 2026/1/27 20:55:15
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 199,
+    "ack": 0,
+    "time": 1769518469773,
+    "resp": 144,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "9": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 1
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 48
+          }
+        },
+        "costTotalCnt": 53
+      },
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 9
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 41
+}
+异步: 是
+调用ID: call_1769518515846_z0nzhcp3x
+
+记录 #64:
+----------------------------------------
+时间: 2026/1/27 20:55:14
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 187,
+    "ack": 0,
+    "time": 1769518468774,
+    "resp": 138,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "3": {
+              "openCnt": 45
+            },
+            "8": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 42
+          }
+        },
+        "costTotalCnt": 47
+      },
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 44
+}
+异步: 是
+调用ID: call_1769518514846_fqgxhgcou
+
+记录 #65:
+----------------------------------------
+时间: 2026/1/27 20:55:13
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 175,
+    "ack": 0,
+    "time": 1769518467751,
+    "resp": 132,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 100011,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 39
+            },
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 2,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 23
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 23
+          },
+          "3": {
+            "100011": 1
+          }
+        },
+        "costTotalCnt": 41
+      },
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        },
+        {
+          "gridX": 5,
+          "gridY": 4
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1769518513822_qc5kjq6k1
+
+记录 #66:
+----------------------------------------
+时间: 2026/1/27 20:55:11
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":5},"targetPos":{"gridX":1,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 173,
+    "ack": 130,
+    "time": 1769518465557,
+    "resp": 131,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": {
+              "gridItemId": 3
+            }
+          },
+          "2": {
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212202": 1
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 1
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 5
+        },
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 435
+}
+异步: 是
+调用ID: call_1769518511360_quktnhhht
+
+记录 #67:
+----------------------------------------
+时间: 2026/1/27 20:55:07
+服务: ActivityService
+方法: get
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 172,
+    "ack": 129,
+    "time": 1769518461877,
+    "resp": 130,
+    "cmd": "activity_getresp",
+    "body": {
+      "activity": {
+        "firstCharge": {
+          "packId": 1003
+        },
+        "activityShop": {
+          "1": {
+            "activityId": 1,
+            "record": {
+              "5": {
+                "merchandiseId": 5,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "6": {
+                "merchandiseId": 6,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8": {
+                "merchandiseId": 8,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "64": {
+                "merchandiseId": 64,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "65": {
+                "merchandiseId": 65,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "66": {
+                "merchandiseId": 66,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "67": {
+                "merchandiseId": 67,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "68": {
+                "merchandiseId": 68,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "69": {
+                "merchandiseId": 69,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "101": {
+                "merchandiseId": 101,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "8": {
+            "activityId": 8,
+            "record": {
+              "8101": {
+                "merchandiseId": 8101,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8102": {
+                "merchandiseId": 8102,
+                "buyQuantity": 2,
+                "lastBuyTime": 0
+              },
+              "8103": {
+                "merchandiseId": 8103,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8104": {
+                "merchandiseId": 8104,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8105": {
+                "merchandiseId": 8105,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8106": {
+                "merchandiseId": 8106,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8107": {
+                "merchandiseId": 8107,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8108": {
+                "merchandiseId": 8108,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8109": {
+                "merchandiseId": 8109,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8110": {
+                "merchandiseId": 8110,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8111": {
+                "merchandiseId": 8111,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8112": {
+                "merchandiseId": 8112,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8201": {
+                "merchandiseId": 8201,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8202": {
+                "merchandiseId": 8202,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8203": {
+                "merchandiseId": 8203,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8204": {
+                "merchandiseId": 8204,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8205": {
+                "merchandiseId": 8205,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8206": {
+                "merchandiseId": 8206,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8207": {
+                "merchandiseId": 8207,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8208": {
+                "merchandiseId": 8208,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8209": {
+                "merchandiseId": 8209,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8210": {
+                "merchandiseId": 8210,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8211": {
+                "merchandiseId": 8211,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8212": {
+                "merchandiseId": 8212,
+                "buyQuantity": 2,
+                "lastBuyTime": 0
+              },
+              "8213": {
+                "merchandiseId": 8213,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8214": {
+                "merchandiseId": 8214,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8215": {
+                "merchandiseId": 8215,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8216": {
+                "merchandiseId": 8216,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8217": {
+                "merchandiseId": 8217,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8218": {
+                "merchandiseId": 8218,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8219": {
+                "merchandiseId": 8219,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8220": {
+                "merchandiseId": 8220,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8301": {
+                "merchandiseId": 8301,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8302": {
+                "merchandiseId": 8302,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8303": {
+                "merchandiseId": 8303,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8304": {
+                "merchandiseId": 8304,
+                "buyQuantity": 3,
+                "lastBuyTime": 0
+              },
+              "8305": {
+                "merchandiseId": 8305,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8999": {
+                "merchandiseId": 8999,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "10": {
+            "activityId": 10,
+            "record": {}
+          },
+          "11": {
+            "activityId": 11,
+            "record": {}
+          },
+          "12": {
+            "activityId": 12,
+            "record": {}
+          },
+          "13": {
+            "activityId": 13,
+            "record": {
+              "1301": {
+                "merchandiseId": 1301,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1302": {
+                "merchandiseId": 1302,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1303": {
+                "merchandiseId": 1303,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1304": {
+                "merchandiseId": 1304,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1305": {
+                "merchandiseId": 1305,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1306": {
+                "merchandiseId": 1306,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1307": {
+                "merchandiseId": 1307,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1308": {
+                "merchandiseId": 1308,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1309": {
+                "merchandiseId": 1309,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1310": {
+                "merchandiseId": 1310,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1311": {
+                "merchandiseId": 1311,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1312": {
+                "merchandiseId": 1312,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1313": {
+                "merchandiseId": 1313,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1314": {
+                "merchandiseId": 1314,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1315": {
+                "merchandiseId": 1315,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1316": {
+                "merchandiseId": 1316,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1317": {
+                "merchandiseId": 1317,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1318": {
+                "merchandiseId": 1318,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1319": {
+                "merchandiseId": 1319,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1320": {
+                "merchandiseId": 1320,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1321": {
+                "merchandiseId": 1321,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1322": {
+                "merchandiseId": 1322,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1323": {
+                "merchandiseId": 1323,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1324": {
+                "merchandiseId": 1324,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1325": {
+                "merchandiseId": 1325,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1326": {
+                "merchandiseId": 1326,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1327": {
+                "merchandiseId": 1327,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1328": {
+                "merchandiseId": 1328,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1329": {
+                "merchandiseId": 1329,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1330": {
+                "merchandiseId": 1330,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1331": {
+                "merchandiseId": 1331,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1332": {
+                "merchandiseId": 1332,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1333": {
+                "merchandiseId": 1333,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1334": {
+                "merchandiseId": 1334,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1335": {
+                "merchandiseId": 1335,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1336": {
+                "merchandiseId": 1336,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1337": {
+                "merchandiseId": 1337,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1338": {
+                "merchandiseId": 1338,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1339": {
+                "merchandiseId": 1339,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1340": {
+                "merchandiseId": 1340,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1341": {
+                "merchandiseId": 1341,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1342": {
+                "merchandiseId": 1342,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1343": {
+                "merchandiseId": 1343,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1344": {
+                "merchandiseId": 1344,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1345": {
+                "merchandiseId": 1345,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1346": {
+                "merchandiseId": 1346,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1347": {
+                "merchandiseId": 1347,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1348": {
+                "merchandiseId": 1348,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1349": {
+                "merchandiseId": 1349,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1350": {
+                "merchandiseId": 1350,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1351": {
+                "merchandiseId": 1351,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1352": {
+                "merchandiseId": 1352,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1353": {
+                "merchandiseId": 1353,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1354": {
+                "merchandiseId": 1354,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1355": {
+                "merchandiseId": 1355,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1356": {
+                "merchandiseId": 1356,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1357": {
+                "merchandiseId": 1357,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1358": {
+                "merchandiseId": 1358,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1359": {
+                "merchandiseId": 1359,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1360": {
+                "merchandiseId": 1360,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1361": {
+                "merchandiseId": 1361,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1362": {
+                "merchandiseId": 1362,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1363": {
+                "merchandiseId": 1363,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1364": {
+                "merchandiseId": 1364,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1365": {
+                "merchandiseId": 1365,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1366": {
+                "merchandiseId": 1366,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1367": {
+                "merchandiseId": 1367,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1368": {
+                "merchandiseId": 1368,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1369": {
+                "merchandiseId": 1369,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1370": {
+                "merchandiseId": 1370,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1371": {
+                "merchandiseId": 1371,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1372": {
+                "merchandiseId": 1372,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1373": {
+                "merchandiseId": 1373,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1374": {
+                "merchandiseId": 1374,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1375": {
+                "merchandiseId": 1375,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1376": {
+                "merchandiseId": 1376,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1377": {
+                "merchandiseId": 1377,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1378": {
+                "merchandiseId": 1378,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1379": {
+                "merchandiseId": 1379,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1380": {
+                "merchandiseId": 1380,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1381": {
+                "merchandiseId": 1381,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1382": {
+                "merchandiseId": 1382,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1383": {
+                "merchandiseId": 1383,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1384": {
+                "merchandiseId": 1384,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1385": {
+                "merchandiseId": 1385,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1386": {
+                "merchandiseId": 1386,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1387": {
+                "merchandiseId": 1387,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1388": {
+                "merchandiseId": 1388,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1389": {
+                "merchandiseId": 1389,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1390": {
+                "merchandiseId": 1390,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "15": {
+            "activityId": 15,
+            "record": {
+              "1501": {
+                "merchandiseId": 1501,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1502": {
+                "merchandiseId": 1502,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1503": {
+                "merchandiseId": 1503,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1504": {
+                "merchandiseId": 1504,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1505": {
+                "merchandiseId": 1505,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1506": {
+                "merchandiseId": 1506,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1507": {
+                "merchandiseId": 1507,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1508": {
+                "merchandiseId": 1508,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1509": {
+                "merchandiseId": 1509,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1510": {
+                "merchandiseId": 1510,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1511": {
+                "merchandiseId": 1511,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1512": {
+                "merchandiseId": 1512,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1513": {
+                "merchandiseId": 1513,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1514": {
+                "merchandiseId": 1514,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1515": {
+                "merchandiseId": 1515,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1516": {
+                "merchandiseId": 1516,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1517": {
+                "merchandiseId": 1517,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1518": {
+                "merchandiseId": 1518,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1519": {
+                "merchandiseId": 1519,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1520": {
+                "merchandiseId": 1520,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1521": {
+                "merchandiseId": 1521,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1522": {
+                "merchandiseId": 1522,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1523": {
+                "merchandiseId": 1523,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1524": {
+                "merchandiseId": 1524,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1525": {
+                "merchandiseId": 1525,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1526": {
+                "merchandiseId": 1526,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1527": {
+                "merchandiseId": 1527,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1528": {
+                "merchandiseId": 1528,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1529": {
+                "merchandiseId": 1529,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1530": {
+                "merchandiseId": 1530,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1531": {
+                "merchandiseId": 1531,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1532": {
+                "merchandiseId": 1532,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1533": {
+                "merchandiseId": 1533,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1534": {
+                "merchandiseId": 1534,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "16": {
+            "activityId": 16,
+            "record": {}
+          },
+          "17": {
+            "activityId": 17,
+            "record": {}
+          },
+          "18": {
+            "activityId": 18,
+            "record": {
+              "1801": {
+                "merchandiseId": 1801,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1802": {
+                "merchandiseId": 1802,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1803": {
+                "merchandiseId": 1803,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1804": {
+                "merchandiseId": 1804,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1805": {
+                "merchandiseId": 1805,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "19": {
+            "activityId": 19,
+            "record": {}
+          }
+        },
+        "pushGoods": {},
+        "dynamicPushGoods": {
+          "119": {
+            "id": 119,
+            "name": "自选惊喜礼·特大",
+            "desc": "灯神特地为你准备了超级奖励，帮助你快速成长～",
+            "times": "9",
+            "pushType": 2,
+            "pushValue": 1729200642,
+            "buyNum": 2,
+            "boughtNum": 0,
+            "expire": 11139,
+            "timeGift": 86400,
+            "price": 64800,
+            "stayFixedReward": [
+              {
+                "type": 2,
+                "itemId": 3,
+                "value": 12960,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 1017,
+                "value": 5,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 10202,
+                "value": 1,
+                "ext": 0
+              }
+            ],
+            "rankGift": 99,
+            "nameId": "",
+            "descId": "",
+            "giftUI": "2"
+          },
+          "120": {
+            "id": 120,
+            "name": "自选惊喜礼·中",
+            "desc": "灯神特地为你准备了超级奖励，帮助你快速成长～",
+            "times": "9",
+            "pushType": 2,
+            "pushValue": 1729200642,
+            "buyNum": 1,
+            "boughtNum": 0,
+            "expire": 11139,
+            "timeGift": 86400,
+            "price": 3000,
+            "stayFixedReward": [
+              {
+                "type": 2,
+                "itemId": 3,
+                "value": 600,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 1017,
+                "value": 1,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3031,
+                "value": 1,
+                "ext": 0
+              }
+            ],
+            "rankGift": 100,
+            "nameId": "",
+            "descId": "",
+            "giftUI": "1"
+          }
+        },
+        "activity": [
+          {
+            "id": 11,
+            "type": 12,
+            "name": "金砖达标",
+            "icon": "activities/icon/xshd_btn_dabiaojinzhuan",
+            "res": "activities/banner/xshd_img_jinzhuandabiao",
+            "module": 0,
+            "data": {
+              "rounds": 1,
+              "rewards": [
+                {
+                  "num": 1000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "num": 5000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1016,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 20,
+                      "ext": 0
+                    },
+                    {
+                      "value": 5,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1011
+                    }
+                  ],
+                  "num": 10000
+                },
+                {
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 100
+                    },
+                    {
+                      "value": 5,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1012
+                    }
+                  ],
+                  "num": 15000
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 1
+                    }
+                  ],
+                  "num": 20000
+                },
+                {
+                  "num": 35000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 150,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 1,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 50000,
+                  "rewardList": [
+                    {
+                      "value": 50,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013
+                    }
+                  ]
+                },
+                {
+                  "num": 75000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 300,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 100000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 60
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013
+                    }
+                  ]
+                }
+              ]
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-06-06T01:59:43.841Z",
+            "createTime": "2025-05-29T22:08:23.661Z",
+            "nameId": "100000944",
+            "resID": "100000944",
+            "resText": "金砖达标"
+          },
+          {
+            "id": 9,
+            "type": 4,
+            "name": "江湖黑市",
+            "icon": "activities/icon/jchd_btn_shijingheishi",
+            "res": "activities/banner/xshd_img_jhhsbanner",
+            "module": -1,
+            "data": {
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "黑市福利",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市见面礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 600,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1006,
+                      "value": 1000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市惊喜礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 1200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2500,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 6000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 5000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2003,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "顶级鱼竿包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 30,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "白玉黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级灵贝包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 25000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000711",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "养成补给包",
+                  "description": "",
+                  "limit": 4,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1016,
+                      "value": 2000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1026,
+                      "value": 3000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000945",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 3
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:14:56.880Z",
+            "createTime": "2022-04-25T12:40:39.906Z",
+            "nameId": "100000041",
+            "resID": "100000041",
+            "resText": "江湖黑市"
+          },
+          {
+            "id": 5,
+            "type": 4,
+            "name": "金砖商店",
+            "icon": "activities/icon/xshd_btn_inzhuanshangdian",
+            "res": "activities/banner/xshd_img_jzdbbanner",
+            "module": -1,
+            "data": {
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "金砖回馈",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 200,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000948",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 3000,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 660,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000949",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 6800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000950",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2820,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000951",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级金砖礼包",
+                  "description": "",
+                  "limit": 5,
+                  "price": 32800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 7220,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000952",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级金砖礼包",
+                  "description": "",
+                  "limit": 10,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 14260,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000953",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 1
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:21:06.021Z",
+            "createTime": "2021-12-24T03:30:09.806Z",
+            "nameId": "100000946",
+            "resID": "100000947",
+            "resText": "金砖闪耀 价值永恒|金砖大礼包"
+          }
+        ],
+        "myTotalInfo": {
+          "11": {
+            "num": 830,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          }
+        },
+        "myMonthInfo": {
+          "2": {
+            "num": 331,
+            "rounds": 1,
+            "complete": {
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1
+            },
+            "openTime": 1767196800
+          },
+          "3": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1767196800
+          }
+        },
+        "myArenaInfo": {
+          "num": 136,
+          "rounds": 1,
+          "complete": {
+            "0": 1,
+            "1": 1
+          },
+          "openTime": 1767196800
+        },
+        "myStoreInfo": {
+          "5": {
+            "complete": {
+              "0": 1
+            }
+          },
+          "9": {
+            "complete": {
+              "0": 1
+            }
+          }
+        },
+        "yearInfo": {},
+        "fiveInfo": {},
+        "commonActivityInfo": {},
+        "warOrderActivityInfo": {
+          "1": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1": 1,
+              "2": 1,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "10": 1,
+              "11": 1,
+              "12": 1,
+              "13": 1,
+              "14": 1,
+              "15": 1,
+              "16": 1,
+              "17": 1,
+              "18": 1,
+              "19": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          },
+          "1003": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1001": 1,
+              "1002": 1,
+              "1003": 1,
+              "1004": 1,
+              "1005": 1,
+              "1006": 1,
+              "1007": 1,
+              "1008": 1,
+              "1009": 1,
+              "1010": 1,
+              "1011": 1,
+              "1012": 1,
+              "1013": 1,
+              "1014": 1,
+              "1015": 1,
+              "1016": 1,
+              "1017": 1,
+              "1018": 1,
+              "1019": 1,
+              "1020": 1,
+              "1021": 1,
+              "1022": 1,
+              "1023": 1,
+              "1024": 1,
+              "1025": 1,
+              "1026": 1,
+              "1027": 1,
+              "1028": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 4,
+            "phaseEndTime": 0
+          },
+          "1004": {
+            "purchased": true,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1111": 2,
+              "1112": 2,
+              "1113": 2,
+              "1114": 2,
+              "1115": 2,
+              "1116": 2,
+              "1117": 2,
+              "1118": 2,
+              "1119": 2,
+              "1120": 2,
+              "1121": 2,
+              "1122": 2,
+              "1123": 2,
+              "1124": 2,
+              "1125": 2,
+              "1126": 2,
+              "1127": 2,
+              "1128": 2,
+              "1129": 2
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 1,
+            "phaseEndTime": 0
+          }
+        },
+        "totalChargeDay": 12,
+        "actBingoInfo": {},
+        "dropReward": {},
+        "actCMInfo": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 55
+}
+异步: 是
+调用ID: call_1769518507921_jusjf677l
+
+记录 #68:
+----------------------------------------
+时间: 2026/1/27 20:55:07
+服务: HallService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 171,
+    "ack": 0,
+    "time": 1769518461838,
+    "resp": 129,
+    "cmd": "hall_getinforesp",
+    "body": {
+      "bottle": {
+        "roleId": 111582820,
+        "bottleType": 1,
+        "occupyId": -1,
+        "occupyLordWeaponId": 9,
+        "occupyPower": 10922795383,
+        "occupyTotalTime": 12600,
+        "occupyEndTime": 1759724095,
+        "nextRefreshTime": -1,
+        "isFirst": false,
+        "battleTeam": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518507911_4dbvcf2yp
+
+记录 #69:
+----------------------------------------
+时间: 2026/1/27 20:54:50
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":9},"targetPos":{"gridX":7,"gridY":9}}]
+结果:
+{
+  "_raw": {
+    "seq": 170,
+    "ack": 127,
+    "time": 1769518444304,
+    "resp": 128,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "9": null
+          },
+          "7": {
+            "9": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 22
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 22
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 9
+        },
+        {
+          "gridX": 7,
+          "gridY": 9
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 9
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518490378_5avdglu0k
+
+记录 #70:
+----------------------------------------
+时间: 2026/1/27 20:54:48
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":2,"gridY":8},"targetPos":{"gridX":2,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 168,
+    "ack": 0,
+    "time": 1769518442082,
+    "resp": 126,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "7": {
+              "gridItemId": 2
+            },
+            "8": null
+          }
+        },
+        "taskMap": {
+          "251212201": 20
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 20
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 2,
+          "gridY": 8
+        },
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 39
+}
+异步: 是
+调用ID: call_1769518488139_d9k6zdvf2
+
+记录 #71:
+----------------------------------------
+时间: 2026/1/27 20:54:47
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":7},"targetPos":{"gridX":1,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 167,
+    "ack": 0,
+    "time": 1769518440971,
+    "resp": 125,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "7": null,
+            "8": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 19
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 19
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 7
+        },
+        {
+          "gridX": 1,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 8
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518487043_5e4ncjkuw
+
+记录 #72:
+----------------------------------------
+时间: 2026/1/27 20:54:45
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":5},"targetPos":{"gridX":1,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 166,
+    "ack": 123,
+    "time": 1769518439912,
+    "resp": 124,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": {
+              "gridItemId": 2
+            },
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212201": 18
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 18
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 5
+        },
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518485980_1l1p2fa73
+
+记录 #73:
+----------------------------------------
+时间: 2026/1/27 20:54:44
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":6},"targetPos":{"gridX":2,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 165,
+    "ack": 0,
+    "time": 1769518438842,
+    "resp": 123,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "6": null
+          },
+          "2": {
+            "6": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 17
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 17
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 1,
+          "gridY": 6
+        },
+        {
+          "gridX": 2,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518484916_4zsqnbqfg
+
+记录 #74:
+----------------------------------------
+时间: 2026/1/27 20:54:42
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":7},"targetPos":{"gridX":3,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 164,
+    "ack": 121,
+    "time": 1769518436477,
+    "resp": 122,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "6": {
+              "gridItemId": 2
+            },
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212201": 16
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 16
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 7
+        },
+        {
+          "gridX": 3,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 3,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518482549_wrgqy7nca
+
+记录 #75:
+----------------------------------------
+时间: 2026/1/27 20:54:40
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":9},"targetPos":{"gridX":5,"gridY":8}}]
+结果:
+{
+  "_raw": {
+    "seq": 162,
+    "ack": 0,
+    "time": 1769518434669,
+    "resp": 120,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "8": {
+              "gridItemId": 2
+            },
+            "9": null
+          }
+        },
+        "taskMap": {
+          "251212201": 14
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 14
+          },
+          "2": {
+            "100001": 4
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 9
+        },
+        {
+          "gridX": 5,
+          "gridY": 8
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 8
+        },
+        {
+          "gridX": 5,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518480742_w5qlhi3vu
+
+记录 #76:
+----------------------------------------
+时间: 2026/1/27 20:54:38
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":7},"targetPos":{"gridX":7,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 160,
+    "ack": 0,
+    "time": 1769518432624,
+    "resp": 118,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "7": null
+          },
+          "7": {
+            "6": {
+              "gridConfId": 0,
+              "gridItemId": 100001,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "7": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 12
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 12
+          },
+          "2": {
+            "100001": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518478695_hb85qv0w5
+
+记录 #77:
+----------------------------------------
+时间: 2026/1/27 20:54:36
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":7},"targetPos":{"gridX":4,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 159,
+    "ack": 0,
+    "time": 1769518430735,
+    "resp": 117,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "7": {
+              "gridItemId": 2
+            }
+          },
+          "5": {
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212201": 11
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 11
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 7
+        },
+        {
+          "gridX": 4,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769518476808_zwg08s65g
+
+记录 #78:
+----------------------------------------
+时间: 2026/1/27 20:54:29
+服务: MergeBoxService
+方法: claimMergeProgress
+参数: [{"actType":1,"taskId":251212201}]
+结果:
+{
+  "_raw": {
+    "seq": 158,
+    "ack": 0,
+    "time": 1769518423890,
+    "resp": 116,
+    "cmd": "mergebox_claimmergeprogressresp",
+    "body": {
+      "role": {
+        "items": {
+          "3007": {
+            "quantity": 20
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 3007,
+          "value": 10,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "taskClaimMap": {
+          "251212201": 1769518423
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 35
+}
+异步: 是
+调用ID: call_1769518469954_hwqscm0am
+
+记录 #79:
+----------------------------------------
+时间: 2026/1/27 20:54:14
+服务: EvoTowerService
+方法: getTowerMyRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 157,
+    "ack": 0,
+    "time": 1769518408386,
+    "resp": 115,
+    "cmd": "evotower_gettowermyrankresp",
+    "body": {
+      "myRank": {
+        "roleId": 111582820,
+        "serverId": 8949,
+        "name": "神州丶相符",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+        "power": 12369976039,
+        "score": 289,
+        "legionName": "空山新雨后✨"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1769518454458_x70stdlyf
+
+记录 #80:
+----------------------------------------
+时间: 2026/1/27 20:54:07
+服务: MergeBoxService
+方法: claimCostProgress
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 156,
+    "ack": 0,
+    "time": 1769518401893,
+    "resp": 114,
+    "cmd": "mergebox_claimcostprogressresp",
+    "body": {
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 13,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "costClaimCnt": 40
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 44
+}
+异步: 是
+调用ID: call_1769518447956_ejyxr4fj1
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

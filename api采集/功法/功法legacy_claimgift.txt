@@ -1,0 +1,36 @@
+时间: 2026/1/26 12:06:57
+服务: LegacyService
+方法: claimGift
+参数: [{"id":""}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1769400369592,
+    "resp": 52,
+    "cmd": "legacy_claimgiftresp",
+    "body": {
+      "role": {
+        "items": {
+          "37007": {
+            "quantity": 9758
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 37007,
+          "value": 837,
+          "ext": 0
+        }
+      ],
+      "roleLegacy": {
+        "receivedItemCnt": 403535
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 53

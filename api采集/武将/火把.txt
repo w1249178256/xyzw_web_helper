@@ -1,0 +1,30 @@
+
+时间: 2026/2/1 09:45:16
+服务: ItemService
+方法: consume
+参数: [{"itemId":1010,"quantity":1}]
+结果:
+{
+  "_raw": {
+    "seq": 35,
+    "ack": 0,
+    "time": 1769910316634,
+    "resp": 35,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "autoClickTime": 1800,
+        "autoClickSettleTime": 1769910316,
+        "items": {
+          "1010": {
+            "quantity": 250
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+

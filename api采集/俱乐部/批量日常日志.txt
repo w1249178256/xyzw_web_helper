@@ -1,0 +1,588 @@
+ WebSocket调试工具已加载，使用 wsDebug.verbose() 启用详细日志
+useIndexedDB.ts:87 ✅ IndexedDB "xyzw" 初始化成功
+index.js:1 [platform]: platformVersion  v1.10.13
+o @ index.js:1
+index.js:1 [platform]: platformTagTime  7/30/2025, 1:53:55 PM
+o @ index.js:1
+index.js:1 [platform]: sdk接入可联系平台组前端开发  
+o @ index.js:1
+index.js:1 [platform]: isCocosGame  
+o @ index.js:1
+index.js:1 [platform]: cocos 2.0  
+o @ index.js:1
+index.js:1 [platform]: isH5  
+o @ index.js:1
+index.js:1 [platform]: isH5PageGame  
+o @ index.js:1
+index.js:1 --------patch:begin--------
+window.__require.index-patch../fix-clean-cache-url @ index.js:1
+index.js:1 --------patch:end--------
+window.__require.index-patch../fix-clean-cache-url @ index.js:1
+index.js:35071 [platform]: platformVersion  v1.10.13
+o @ index.js:35071
+index.js:35071 [platform]: platformTagTime  7/30/2025, 1:53:55 PM
+o @ index.js:35071
+index.js:35071 [platform]: sdk接入可联系平台组前端开发  
+o @ index.js:35071
+index.js:35071 [platform]: isCocosGame  
+o @ index.js:35071
+index.js:35071 [platform]: cocos 2.0  
+o @ index.js:35071
+index.js:35071 [platform]: isH5  
+o @ index.js:35071
+index.js:35071 [platform]: isH5PageGame  
+o @ index.js:35071
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "materialParam".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "materialParam".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "MaterialParameterUpdater".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "436fb+v4yJK1qLey35VWiSK".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "OldFilmShaderHelper".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "8f7acOxZxtKz6dIxZBscxyi".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "GlobalEntityManager".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "abee2JTeIZPXZGvshlJB7ek".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "GlobalVarManager".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "385ceatJotHraYwVU3gvlgj".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "ResourceManager".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "5f192BDFZ1K4p7G/vuaA2LU".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "vedioBtn".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "b8212f9wlRA9rdQSmyRycdR".
+index.js:30637 --------patch:begin--------
+window.__require.index-patch../fix-clean-cache-url @ index.js:30637
+index.js:30646 --------patch:end--------
+window.__require.index-patch../fix-clean-cache-url @ index.js:30646
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "Game".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "9038b2OzUBGGry8KtlNHddi".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "UserAuth".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "8c864A8artAjbRHk7wDg0VI".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "Launcher".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "f5ce8gzRX5ET7keNw43jpJj".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "PlatformManager".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "d6d69DNiJZFObbfMt/qigHp".
+cocos2d-js-min.js:22946 A Class already exists with the same __classname__ : "UserAgreementAndPrivacyPolicy".
+cocos2d-js-min.js:22946 A Class already exists with the same __cid__ : "9b8f6bXfKlBIpLteHGDMdlM".
+logger.js:82 [12:14:55] [WS] [INFO] 开始创建连接: token_1771039739943_nmx5j01hs
+logger.js:88 [12:14:55] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739943_nmx5j01hs (connect)
+logger.js:82 [12:14:55] [WS] [INFO] 开始创建连接: token_1771039739944_82f3ux40i
+logger.js:88 [12:14:55] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739944_82f3ux40i (connect)
+logger.js:88 [12:14:55] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [12:14:55] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [12:14:55] [WS] [VERBOSE] WebSocket客户端创建成功: token_1771039739943_nmx5j01hs
+logger.js:88 [12:14:55] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [12:14:55] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [12:14:55] [WS] [VERBOSE] WebSocket客户端创建成功: token_1771039739944_82f3ux40i
+logger.js:82 [12:14:55] [WS] [INFO] 连接成功
+logger.js:82 [12:14:55] [WS] [INFO] 🔗 WebSocket连接: token_1771039739943_nmx5j01hs
+logger.js:88 [12:14:55] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739943_nmx5j01hs (connect)
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:55] [WS] [INFO] 连接成功
+logger.js:82 [12:14:55] [WS] [INFO] 🔗 WebSocket连接: token_1771039739944_82f3ux40i
+logger.js:88 [12:14:55] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739944_82f3ux40i (connect)
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] role_getroleinforesp
+logger.js:82 [12:14:55] [WS] [INFO] 同步 randomSeed [token_1771039739943_nmx5j01hs] Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:55] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] role_getroleinforesp ✓
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:55] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:55] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] role_getroleinforesp
+logger.js:82 [12:14:55] [WS] [INFO] 同步 randomSeed [token_1771039739944_82f3ux40i] Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:55] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] role_getroleinforesp ✓
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] role_getroleinforesp
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:55] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] role_getroleinforesp ✓
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:55] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:55] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:55] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] role_getroleinforesp
+logger.js:82 [12:14:55] [WS] [INFO] 同步 randomSeed [token_1771039739944_82f3ux40i] Object
+logger.js:94 [12:14:55] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:55] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:55] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] role_getroleinforesp ✓
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:55] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] role_getroleinforesp
+logger.js:82 [12:14:56] [WS] [INFO] 同步 randomSeed [token_1771039739943_nmx5j01hs] Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] role_getroleinforesp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] role_getroleinforesp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:56] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] role_getroleinforesp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] fight_startlevelresp
+logger.js:76 [12:14:56] [GAME] [WARN] 收到未处理事件: fight_startlevelresp TokenID: token_1771039739944_82f3ux40i Object
+warn @ logger.js:76
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] fight_startlevelresp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] fight_startlevelresp
+logger.js:76 [12:14:56] [GAME] [WARN] 收到未处理事件: fight_startlevelresp TokenID: token_1771039739943_nmx5j01hs Object
+warn @ logger.js:76
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] fight_startlevelresp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] system_claimhanguprewardresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] system_claimhanguprewardresp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] system_claimhanguprewardresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] system_claimhanguprewardresp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:56] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:56] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:56] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] role_getroleinforesp
+logger.js:94 [12:14:56] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:56] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:56] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] role_getroleinforesp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] role_getroleinforesp
+logger.js:82 [12:14:57] [WS] [INFO] 同步 randomSeed [token_1771039739944_82f3ux40i] Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] role_getroleinforesp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:57] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:57] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] role_getroleinforesp
+logger.js:82 [12:14:57] [WS] [INFO] 同步 randomSeed [token_1771039739943_nmx5j01hs] Object
+logger.js:94 [12:14:57] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:57] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:57] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] role_getroleinforesp ✓
+logger.js:82 [12:14:57] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:58] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:58] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739943_nmx5j01hs] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739943_nmx5j01hs Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739943_nmx5j01hs] syncresp ✓
+logger.js:82 [12:14:58] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] role_getroleinforesp
+logger.js:82 [12:14:58] [WS] [INFO] 同步 randomSeed [token_1771039739944_82f3ux40i] Object
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:58] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] role_getroleinforesp ✓
+logger.js:82 [12:14:58] [WS] [INFO] 📤 发送报文 Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 开始发送首次心跳
+logger.js:94 [12:14:58] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [12:14:58] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [12:14:58] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:58] [WS] [DEBUG] 📨 [token_1771039739944_82f3ux40i] syncresp
+logger.js:94 [12:14:58] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_82f3ux40i Object
+logger.js:82 [12:14:58] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:58] [GAME] [DEBUG] 🎮 [token_1771039739944_82f3ux40i] syncresp ✓
+logger.js:88 [12:14:58] [WS] [DEBUG] 开始发送首次心跳
+logger.js:94 [12:14:58] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [12:14:58] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:88 [12:14:58] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739944_82f3ux40i (disconnect)
+logger.js:88 [12:14:58] [WS] [DEBUG] 开始优雅关闭连接: token_1771039739944_82f3ux40i
+logger.js:82 [12:14:58] [WS] [INFO] 连接已优雅关闭: token_1771039739944_82f3ux40i
+logger.js:88 [12:14:58] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739944_82f3ux40i (disconnect)
+logger.js:88 [12:14:58] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739943_nmx5j01hs (disconnect)
+logger.js:88 [12:14:58] [WS] [DEBUG] 开始优雅关闭连接: token_1771039739943_nmx5j01hs
+logger.js:82 [12:14:58] [WS] [INFO] 连接已优雅关闭: token_1771039739943_nmx5j01hs
+logger.js:88 [12:14:58] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739943_nmx5j01hs (disconnect)
+logger.js:82 [12:14:59] [WS] [INFO] WebSocket 连接关闭: 1005 
+logger.js:88 [12:14:59] [WS] [DEBUG] 关闭详情: Object
+logger.js:82 [12:14:59] [WS] [INFO] 🔌 WebSocket断开: token_1771039739944_82f3ux40i
+logger.js:82 [12:14:59] [WS] [INFO] WebSocket 连接关闭: 1005 
+logger.js:88 [12:14:59] [WS] [DEBUG] 关闭详情: Object
+logger.js:82 [12:14:59] [WS] [INFO] 🔌 WebSocket断开: token_1771039739943_nmx5j01hs
+logger.js:82 [12:14:59] [WS] [INFO] 开始创建连接: token_1771039739944_pusuysft3
+logger.js:88 [12:14:59] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739944_pusuysft3 (connect)
+logger.js:88 [12:14:59] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [12:14:59] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [12:14:59] [WS] [VERBOSE] WebSocket客户端创建成功: token_1771039739944_pusuysft3
+logger.js:82 [12:14:59] [WS] [INFO] 开始创建连接: token_1771039739945_wian1xdau
+logger.js:88 [12:14:59] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739945_wian1xdau (connect)
+logger.js:88 [12:14:59] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [12:14:59] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [12:14:59] [WS] [VERBOSE] WebSocket客户端创建成功: token_1771039739945_wian1xdau
+logger.js:82 [12:14:59] [WS] [INFO] 连接成功
+logger.js:82 [12:14:59] [WS] [INFO] 🔗 WebSocket连接: token_1771039739944_pusuysft3
+logger.js:88 [12:14:59] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739944_pusuysft3 (connect)
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:59] [WS] [INFO] 连接成功
+logger.js:82 [12:14:59] [WS] [INFO] 🔗 WebSocket连接: token_1771039739945_wian1xdau
+logger.js:88 [12:14:59] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739945_wian1xdau (connect)
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] role_getroleinforesp
+logger.js:82 [12:14:59] [WS] [INFO] 同步 randomSeed [token_1771039739944_pusuysft3] Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:14:59] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] role_getroleinforesp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:14:59] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:59] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] role_getroleinforesp
+logger.js:82 [12:14:59] [WS] [INFO] 同步 randomSeed [token_1771039739945_wian1xdau] Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:14:59] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] role_getroleinforesp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] role_getroleinforesp
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:14:59] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] role_getroleinforesp ✓
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:14:59] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:14:59] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] role_getroleinforesp
+logger.js:82 [12:14:59] [WS] [INFO] 同步 randomSeed [token_1771039739945_wian1xdau] Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:14:59] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] role_getroleinforesp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:14:59] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:14:59] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:14:59] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:14:59] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:14:59] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:14:59] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] role_getroleinforesp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:00] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] role_getroleinforesp ✓
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] role_getroleinforesp
+logger.js:82 [12:15:00] [WS] [INFO] 同步 randomSeed [token_1771039739944_pusuysft3] Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] role_getroleinforesp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] fight_startlevelresp
+logger.js:76 [12:15:00] [GAME] [WARN] 收到未处理事件: fight_startlevelresp TokenID: token_1771039739945_wian1xdau Object
+warn @ logger.js:76
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] fight_startlevelresp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] fight_startlevelresp
+logger.js:76 [12:15:00] [GAME] [WARN] 收到未处理事件: fight_startlevelresp TokenID: token_1771039739944_pusuysft3 Object
+warn @ logger.js:76
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] fight_startlevelresp ✓
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] system_claimhanguprewardresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] system_claimhanguprewardresp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] system_claimhanguprewardresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] system_claimhanguprewardresp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:82 [12:15:00] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:00] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:00] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] role_getroleinforesp
+logger.js:94 [12:15:00] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:00] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:00] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] role_getroleinforesp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] role_getroleinforesp
+logger.js:82 [12:15:01] [WS] [INFO] 同步 randomSeed [token_1771039739945_wian1xdau] Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] role_getroleinforesp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:01] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:01] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] role_getroleinforesp
+logger.js:82 [12:15:01] [WS] [INFO] 同步 randomSeed [token_1771039739944_pusuysft3] Object
+logger.js:94 [12:15:01] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:01] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:01] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] role_getroleinforesp ✓
+logger.js:82 [12:15:01] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:82 [12:15:02] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令执行: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:82 [12:15:02] [WS] [INFO] 📤 发送报文 Object
+logger.js:82 [12:15:02] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739944_pusuysft3] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739944_pusuysft3 Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739944_pusuysft3] syncresp ✓
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] role_getroleinforesp
+logger.js:82 [12:15:02] [WS] [INFO] 同步 randomSeed [token_1771039739945_wian1xdau] Object
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到角色信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:02] [GAME] [INFO] 答题状态更新: maxCorrectNum=10, 完成状态=true
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] role_getroleinforesp ✓
+logger.js:82 [12:15:02] [WS] [INFO] 📤 发送报文 Object
+logger.js:94 [12:15:02] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: Object
+logger.js:88 [12:15:02] [WS] [DEBUG] 📨 [token_1771039739945_wian1xdau] syncresp
+logger.js:94 [12:15:02] [GAME] [VERBOSE] 收到加钟/时钟信息事件: token_1771039739945_wian1xdau Object
+logger.js:82 [12:15:02] [GAME] [INFO] Debounce 发送命令排期: role_getroleinfo
+logger.js:88 [12:15:02] [GAME] [DEBUG] 🎮 [token_1771039739945_wian1xdau] syncresp ✓
+logger.js:88 [12:15:02] [WS] [DEBUG] 开始发送首次心跳
+logger.js:94 [12:15:02] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [12:15:02] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:88 [12:15:02] [WS] [DEBUG] 开始发送首次心跳
+logger.js:94 [12:15:02] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [12:15:02] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:88 [12:15:02] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739945_wian1xdau (disconnect)
+logger.js:88 [12:15:02] [WS] [DEBUG] 开始优雅关闭连接: token_1771039739945_wian1xdau
+logger.js:82 [12:15:02] [WS] [INFO] 连接已优雅关闭: token_1771039739945_wian1xdau
+logger.js:88 [12:15:02] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739945_wian1xdau (disconnect)
+logger.js:88 [12:15:02] [WS] [DEBUG] 🔐 获取连接锁: token_1771039739944_pusuysft3 (disconnect)
+logger.js:88 [12:15:02] [WS] [DEBUG] 开始优雅关闭连接: token_1771039739944_pusuysft3
+logger.js:82 [12:15:02] [WS] [INFO] 连接已优雅关闭: token_1771039739944_pusuysft3
+logger.js:88 [12:15:02] [WS] [DEBUG] 🔓 释放连接锁: token_1771039739944_pusuysft3 (disconnect)
+logger.js:82 [12:15:02] [WS] [INFO] WebSocket 连接关闭: 1005 
+logger.js:88 [12:15:02] [WS] [DEBUG] 关闭详情: Object
+logger.js:82 [12:15:02] [WS] [INFO] 🔌 WebSocket断开: token_1771039739945_wian1xdau
+logger.js:82 [12:15:03] [WS] [INFO] WebSocket 连接关闭: 1005 
+logger.js:88 [12:15:03] [WS] [DEBUG] 关闭详情: Object
+logger.js:82 [12:15:03] [WS] [INFO] 🔌 WebSocket断开: token_1771039739944_pusuysft3

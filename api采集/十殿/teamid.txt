@@ -1,0 +1,25 @@
+{
+  "_raw": {
+    "seq": 11,
+    "ack": 0,
+    "time": 1771818061159,
+    "resp": 11,
+    "cmd": "matchteam_getroleteaminforesp",
+    "body": {
+      "roleID": 436379721,
+      "roleMTData": {
+        "roleId": 436379721,
+        "gDMTData": {
+          "11259064": {
+            "teamId": "11259064",
+            "teamCfgId": 1
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

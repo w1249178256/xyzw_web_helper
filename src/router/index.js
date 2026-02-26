@@ -38,6 +38,33 @@ const my_routes = [
     component: () => import('@/layout/DefaultLayout.vue'),
     children: [
       {
+        path: 'shidian',
+        name: 'ShiDian',
+        component: () => import('@/views/ShiDian.vue'),
+        meta: {
+          title: '十殿',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'fish-helper',
+        name: 'FishHelper',
+        component: () => import('@/views/FishHelper.vue'),
+        meta: {
+          title: '一键金鱼',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'resource-manager',
+        name: 'ResourceManager',
+        component: () => import('@/views/ResourceManager.vue'),
+        meta: {
+          title: '资源管理',
+          requiresToken: true
+        }
+      },
+      {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/Dashboard.vue'),

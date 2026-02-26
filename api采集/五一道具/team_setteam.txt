@@ -1,0 +1,18 @@
+{
+  "ack": 0,
+  "body": {
+    "battleTeam": {
+      "0": 116,
+      "1": 102,
+      "2": 107,
+      "3": 104,
+      "4": 112
+    },
+    "cCMonsterId": 0,
+    "lordWeaponId": 3,
+    "teamType": 6
+  },
+  "cmd": "team_setteam",
+  "seq": 73,
+  "time": 1771030205991
+}

@@ -1,0 +1,16 @@
+{
+  "ack": 0,
+  "body": {
+    "battleTeam": {
+      "0": 101,
+      "1": 102,
+      "2": 109,
+      "3": 113,
+      "4": 202
+    },
+    "lordWeaponId": 3
+  },
+  "cmd": "hero_calcpowerbyteam",
+  "seq": 46,
+  "time": 1770301343775
+}
