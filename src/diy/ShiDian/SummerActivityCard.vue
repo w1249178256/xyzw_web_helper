@@ -1156,7 +1156,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     
     if (x === 0) {
       console.log("没有活动次数为0的BOSS，跳过执行");
-      return true;
+      return false;
     }
 
     // 计算Y = Math.floor(11/X)
@@ -1319,7 +1319,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     // 5. 检查活动次数，如果大于7次，跳过执行
     if (todayUseTickCnt > 7) {
       console.log(`活动次数(${todayUseTickCnt})大于7次，跳过执行开始、战斗循环`);
-      return true;
+      return false;
     }
 
     // 6. 执行战斗逻辑
@@ -2439,15 +2439,16 @@ const batchBattle = async () => {
             });
             return { success: true, token: token };
           } else {
-            console.log(`Token ${token.name} 一键战斗部分失败`);
+            console.log(`Token ${token.name} 一键战斗跳过执行`);
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 没有活动次数为0的BOSS，跳过执行`);
             logOperation('shidian', '批量战斗', {
               cardType: '暑期活动',
               tokenId: token.id,
               tokenName: token.name,
-              status: 'warning',
-              message: '一键战斗部分失败'
+              status: 'info',
+              message: '没有活动次数为0的BOSS，跳过执行'
             });
-            return { success: false, token: token, error: '一键战斗部分失败' };
+            return { success: false, token: token, error: '没有活动次数为0的BOSS，跳过执行' };
           }
         } catch (error) {
           console.error(`Token ${token.name} 一键战斗失败:`, error);
