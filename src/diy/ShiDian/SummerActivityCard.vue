@@ -1059,128 +1059,338 @@ const oneKeyActivity = async () => {
 // 批量活动
 // 一键战斗内部函数（供批量使用）
 const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
-  // 1. 切换到阵容2
-  console.log("正在切换到阵容2...");
-  await switchToTeam2(tokenId);
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // 2. 使用fight_startlevel获取当前阵容
-  console.log("正在获取当前阵容信息...");
-  const fightResult = await logCommand(
-    'shidian',
-    '一键战斗-开始关卡',
-    tokenId,
-    tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-    'fight_startlevel',
-    {},
-    tokenStore.sendFightStartLevel(tokenId, {}),
-    true,
-    '暑期活动'
-  );
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // 3. 设置队伍
-  console.log("正在设置队伍...");
-  await setTeam(tokenId);
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // 4. 获取活动次数
-  console.log("正在获取活动次数...");
-  let todayUseTickCnt = 0;
-  try {
-    const towersInfo = await logCommand(
-      'shidian',
-      '一键战斗-获取活动次数',
-      tokenId,
-      tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-      'towers_getinfo',
-      {},
-      tokenStore.sendTowersGetInfo(tokenId),
-      true,
-      '暑期活动'
-    );
-    if (towersInfo && towersInfo.towerData && towersInfo.towerData.todayUseTickCnt !== undefined) {
-      todayUseTickCnt = towersInfo.towerData.todayUseTickCnt;
-      console.log(`活动次数: ${todayUseTickCnt}`);
-    }
-  } catch (error) {
-    console.warn("获取活动次数失败:", error);
-  }
-
-  // 5. 检查活动次数，如果大于7次，跳过执行
-  if (todayUseTickCnt > 7) {
-    console.log(`活动次数(${todayUseTickCnt})大于7次，跳过执行开始、战斗循环`);
-    return true;
-  }
-
-  // 6. 执行战斗逻辑
-  let startClickCount = 0;
-  const maxStartClicks = 8;
-
-  while (startClickCount < maxStartClicks) {
-    console.log(`执行开始... (点击次数: ${startClickCount + 1})`);
+  // 获取当前日期，判断是否为周四
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=周日, 1=周一, ..., 4=周四, 5=周五, 6=周六
+  
+  if (dayOfWeek === 4) { // 周四
+    console.log("今天是周四，执行周四特定逻辑");
     
+    // 模拟点击活动详情按钮获取所有BOSS的活动次数
+    console.log("正在获取活动详情...");
+    let todayUseTickCnt = 0;
     try {
-      // 发送 towers_start 命令开始挑战
-      const startResponse = await logCommand(
+      const towersInfo = await logCommand(
         'shidian',
-        '一键战斗-开始塔',
+        '一键战斗-获取活动详情',
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-        'towers_start',
-        { towerType: towerTypeValue },
-        tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+        'towers_getinfo',
+        {},
+        tokenStore.sendTowersGetInfo(tokenId),
         true,
         '暑期活动'
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
-    } catch (startError) {
-      // 开始按钮点击失败，但继续执行
-      console.log("开始按钮点击失败，但继续执行");
+      if (towersInfo && towersInfo.towerData && towersInfo.towerData.todayUseTickCnt !== undefined) {
+        todayUseTickCnt = towersInfo.towerData.todayUseTickCnt;
+        console.log(`活动详情: ${todayUseTickCnt}`);
+      }
+    } catch (error) {
+      console.warn("获取活动详情失败:", error);
     }
 
-    // 无论开始按钮是否成功，都连续点击战斗按钮最多10次
-    console.log("开始连续点击战斗按钮，最多10次");
-    let fightAttempts = 0;
-    const maxFightAttempts = 10;
+    // 获取塔数据
+    console.log("正在获取塔数据...");
+    let towersInfo = null;
+    try {
+      towersInfo = await logCommand(
+        'shidian',
+        '一键战斗-获取塔数据(周四)',
+        tokenId,
+        tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+        'towers_getinfo',
+        {},
+        tokenStore.sendTowersGetInfo(tokenId),
+        true,
+        '暑期活动'
+      );
+    } catch (error) {
+      console.error("获取塔数据失败:", error);
+      return false;
+    }
+
+    if (!towersInfo || !towersInfo.towerData || !towersInfo.towerData.towerData) {
+      console.error("无法获取塔数据");
+      return false;
+    }
+
+    // 计算X：BOSSes with 活动次数为0 的数量
+    let x = 0; // 计数器
+    const zeroWinBosses = [];
     
-    while (fightAttempts < maxFightAttempts) {
+    // 从活动详情中获取各BOSS的活动次数，使用levelRewardMap解析
+    if (towersInfo && towersInfo.towerData && towersInfo.towerData.levelRewardMap) {
+      // levelRewardMap格式分析：键如"2001"，前一位是BOSS编号，后两位是层数
+      // 根据您提供的示例，2001:true 表示2号BOSS打到了1层
+      // 我们需要找出哪些BOSS当前层数为0（即还没有打过）
+      
+      // 创建一个映射来记录各BOSS的最高层数
+      const bossLevels = {};
+      
+      // 初始化所有BOSS的层数为0
+      for (let i = 1; i <= 6; i++) {
+        bossLevels[i] = 0;
+      }
+      
+      // 遍历levelRewardMap来更新各BOSS的层数
+      for (const [key, value] of Object.entries(towersInfo.towerData.levelRewardMap)) {
+        if (value === true) {
+          const bossNumber = parseInt(key.substring(0, 1)); // 第一位是BOSS编号
+          const level = parseInt(key.substring(key.length - 2)); // 最后两位是层数
+          
+          // 更新该BOSS的最高层数
+          if (bossNumber >= 1 && bossNumber <= 6) {
+            bossLevels[bossNumber] = Math.max(bossLevels[bossNumber], level);
+          }
+        }
+      }
+      
+      // 检查哪些BOSS的层数为0
+      for (let i = 1; i <= 6; i++) {
+        if (bossLevels[i] === 0) {
+          x++;
+          zeroWinBosses.push(i);
+        }
+      }
+    }
+    
+    if (x === 0) {
+      console.log("没有活动次数为0的BOSS，跳过执行");
+      return true;
+    }
+
+    // 计算Y = Math.floor(11/X)
+    const y = Math.floor(11 / x);
+    
+    console.log(`X(0胜场BOSS数): ${x}, Y(每BOSS执行次数): ${y}`);
+    console.log(`零胜场BOSS列表: ${zeroWinBosses}`);
+    
+    // 模拟点击暑期活动子卡片切换阵2按钮
+    console.log("正在切换到阵容2...");
+    await switchToTeam2(tokenId);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 使用fight_startlevel获取当前阵容
+    console.log("正在获取当前阵容信息...");
+    const fightResult = await logCommand(
+      'shidian',
+      '一键战斗-开始关卡',
+      tokenId,
+      tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+      'fight_startlevel',
+      {},
+      tokenStore.sendFightStartLevel(tokenId, {}),
+      true,
+      '暑期活动'
+    );
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
+    console.log("正在设置队伍...");
+    await setTeam(tokenId);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 遍历每个零胜场BOSS
+    for (let i = 0; i < zeroWinBosses.length; i++) {
+      const bossNumber = zeroWinBosses[i];
+      const isLastBoss = (i === zeroWinBosses.length - 1);
+      
+      // 计算当前BOSS需要执行的开始按钮点击次数
+      let executions = y; // 默认执行Y次
+      if (isLastBoss) {
+        executions = 11 - ((x - 1) * y);
+        console.log(`最后一个BOSS ${bossNumber} 执行 ${executions} 次`);
+      } else {
+        console.log(`BOSS ${bossNumber} 执行 ${executions} 次`);
+      }
+      
+      // 执行开始-战斗循环
+      let startClickCount = 0;
+      while (startClickCount < executions) {
+        console.log(`BOSS ${bossNumber} - 执行开始... (点击次数: ${startClickCount + 1})`);
+        
+        try {
+          // 发送 towers_start 命令开始挑战
+          await logCommand(
+            'shidian',
+            `一键战斗-开始塔-${bossNumber}`,
+            tokenId,
+            tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+            'towers_start',
+            { towerType: bossNumber },
+            tokenStore.sendTowersStart(tokenId, { towerType: bossNumber }),
+            true,
+            '暑期活动'
+          );
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        } catch (startError) {
+          // 开始按钮点击失败，但继续执行
+          console.log(`BOSS ${bossNumber} 开始按钮点击失败，但继续执行:`, startError);
+        }
+
+        // 连续执行战斗按钮点击，直到提示错误
+        console.log(`BOSS ${bossNumber} - 开始连续点击战斗按钮`);
+        let fightAttempts = 0;
+        const maxFightAttempts = 10;
+        
+        while (fightAttempts < maxFightAttempts) {
+          try {
+            // 发送 towers_fight 命令进行战斗
+            await logCommand(
+              'shidian',
+              `一键战斗-战斗塔-${bossNumber}`,
+              tokenId,
+              tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+              'towers_fight',
+              { towerType: bossNumber },
+              tokenStore.sendTowersFight(tokenId, { towerType: bossNumber }),
+              true,
+              '暑期活动'
+            );
+            console.log(`BOSS ${bossNumber} - 战斗执行完成 (第${fightAttempts + 1}次)`);
+            
+            // 战斗成功后继续下一次战斗
+            fightAttempts++;
+            if (fightAttempts < maxFightAttempts) {
+              await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+            }
+          } catch (fightError) {
+            console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
+            // 战斗按钮失败，跳转到执行开始按钮逻辑
+            break; // 跳出战斗循环，进入下一个开始按钮循环
+          }
+        }
+
+        // 无论战斗是否成功，都增加开始按钮点击计数
+        startClickCount++;
+        await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+      }
+    }
+  } else {
+    // 非周四逻辑 - 原有逻辑
+    // 1. 切换到阵容2
+    console.log("正在切换到阵容2...");
+    await switchToTeam2(tokenId);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 2. 使用fight_startlevel获取当前阵容
+    console.log("正在获取当前阵容信息...");
+    const fightResult = await logCommand(
+      'shidian',
+      '一键战斗-开始关卡',
+      tokenId,
+      tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+      'fight_startlevel',
+      {},
+      tokenStore.sendFightStartLevel(tokenId, {}),
+      true,
+      '暑期活动'
+    );
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 3. 设置队伍
+    console.log("正在设置队伍...");
+    await setTeam(tokenId);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // 4. 获取活动次数
+    console.log("正在获取活动次数...");
+    let todayUseTickCnt = 0;
+    try {
+      const towersInfo = await logCommand(
+        'shidian',
+        '一键战斗-获取活动次数',
+        tokenId,
+        tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+        'towers_getinfo',
+        {},
+        tokenStore.sendTowersGetInfo(tokenId),
+        true,
+        '暑期活动'
+      );
+      if (towersInfo && towersInfo.towerData && towersInfo.towerData.todayUseTickCnt !== undefined) {
+        todayUseTickCnt = towersInfo.towerData.todayUseTickCnt;
+        console.log(`活动次数: ${todayUseTickCnt}`);
+      }
+    } catch (error) {
+      console.warn("获取活动次数失败:", error);
+    }
+
+    // 5. 检查活动次数，如果大于7次，跳过执行
+    if (todayUseTickCnt > 7) {
+      console.log(`活动次数(${todayUseTickCnt})大于7次，跳过执行开始、战斗循环`);
+      return true;
+    }
+
+    // 6. 执行战斗逻辑
+    let startClickCount = 0;
+    const maxStartClicks = 8;
+
+    while (startClickCount < maxStartClicks) {
+      console.log(`执行开始... (点击次数: ${startClickCount + 1})`);
+      
       try {
-        // 发送 towers_fight 命令进行战斗
-        const fightResponse = await logCommand(
+        // 发送 towers_start 命令开始挑战
+        const startResponse = await logCommand(
           'shidian',
-          '一键战斗-战斗塔',
+          '一键战斗-开始塔',
           tokenId,
           tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-          'towers_fight',
+          'towers_start',
           { towerType: towerTypeValue },
-          tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
+          tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
           true,
           '暑期活动'
         );
-        console.log(`战斗执行完成 (第${fightAttempts + 1}次)`);
-        
-        // 战斗成功后继续下一次战斗
-        fightAttempts++;
-        if (fightAttempts < maxFightAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
-        }
-      } catch (fightError) {
-        console.log(`战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
-        // 战斗按钮失败，跳转到执行开始按钮逻辑
-        break; // 跳出战斗循环，进入下一个开始按钮循环
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      } catch (startError) {
+        // 开始按钮点击失败，但继续执行
+        console.log("开始按钮点击失败，但继续执行");
       }
-    }
 
-    // 如果是因为战斗失败跳出循环，增加开始按钮点击计数
-    if (fightAttempts < maxFightAttempts) {
-      startClickCount++;
-    } else {
-      // 如果是完成了所有战斗尝试，也增加开始按钮点击计数
-      startClickCount++;
-    }
+      // 无论开始按钮是否成功，都连续点击战斗按钮最多10次
+      console.log("开始连续点击战斗按钮，最多10次");
+      let fightAttempts = 0;
+      const maxFightAttempts = 10;
+      
+      while (fightAttempts < maxFightAttempts) {
+        try {
+          // 发送 towers_fight 命令进行战斗
+          const fightResponse = await logCommand(
+            'shidian',
+            '一键战斗-战斗塔',
+            tokenId,
+            tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+            'towers_fight',
+            { towerType: towerTypeValue },
+            tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
+            true,
+            '暑期活动'
+          );
+          console.log(`战斗执行完成 (第${fightAttempts + 1}次)`);
+          
+          // 战斗成功后继续下一次战斗
+          fightAttempts++;
+          if (fightAttempts < maxFightAttempts) {
+            await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+          }
+        } catch (fightError) {
+          console.log(`战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
+          // 战斗按钮失败，跳转到执行开始按钮逻辑
+          break; // 跳出战斗循环，进入下一个开始按钮循环
+        }
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+      // 如果是因为战斗失败跳出循环，增加开始按钮点击计数
+      if (fightAttempts < maxFightAttempts) {
+        startClickCount++;
+      } else {
+        // 如果是完成了所有战斗尝试，也增加开始按钮点击计数
+        startClickCount++;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+    }
   }
 
   return true;
@@ -1845,20 +2055,6 @@ const oneKeyBattle = async () => {
               bossLevels[bossNumber] = Math.max(bossLevels[bossNumber], level);
             }
           }
-        }
-        
-        // 检查所有6个BOSS的活动次数是否都大于3次
-        let allBossesAbove3 = true;
-        for (let i = 1; i <= 6; i++) {
-          if (bossLevels[i] <= 3) {
-            allBossesAbove3 = false;
-            break;
-          }
-        }
-        
-        if (allBossesAbove3) {
-          message.warning("所有BOSS活动次数都大于3次，跳过执行");
-          return;
         }
         
         // 检查哪些BOSS的层数为0
