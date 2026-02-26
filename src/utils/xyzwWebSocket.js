@@ -419,6 +419,7 @@ export function registerDefaultCommands(reg) {
     .register("nightmare_restore")
     .register("nightmare_fight")
     .register("nightmare_setfighter")
+    .register("nightmare_dismiss")
 
     // 咸王宝库（新增）
     .register("matchteam_create", { teamCfgId: 6, param: 0, setting: { name: "", notice: "", secret: 0, apply: 0, applyList: [] }, custom: { leaderId: "", teamId: "" } })
@@ -1118,6 +1119,7 @@ export class XyzwWebSocketClient {
       nightmare_setfighterresp: "nightmare_setfighter",
       nightmare_clickturntableresp: "nightmare_clickturntable",
       nightmare_claimturnrewardtimesresp: "nightmare_claimturnrewardtimes",
+      nightmare_dismissresp: "nightmare_dismiss",
       studyresp: "study_startgame",
       role_getroleinforesp: "role_getroleinfo",
       hero_recruitresp: "hero_recruit",

@@ -249,6 +249,9 @@ const displayRoomId = ref(0)
 const displayTeamId = ref(0)
 const displayNightmareLevel = ref(0)
 
+// 存储各个token的roleId
+const tokenRoleIds = ref({})
+
 // 从本地存储加载队伍号和房间号
 onMounted(() => {
   const savedTeamId = localStorage.getItem('shidian_teamId')
@@ -1365,10 +1368,17 @@ const batchNightmare = async () => {
         let foundValidDian7 = false
         
         for (const token of dian7Tokens) {
-          // 模拟点击标签为"殿7"的Token昵称
+          // 先检查本地存储枕头数量
+          const localPillowCount = getLocalPillowCount(token.id)
+          if (localPillowCount === 0) {
+            message.warning(`${token.name} 本地存储枕头数量为0，跳过`)
+            continue
+          }
+          
+          // 连接Token
           await connectTokenByClick(token, 5)
           
-          // 2. 模拟点击"十殿枕头"按钮，重新获取十殿枕头
+          // 获取十殿枕头数量
           const pillowCount = await getPillowCountForToken(token)
           if (pillowCount === 0) {
             message.warning(`${token.name} 枕头数量为0，尝试下一个殿7Token`)
@@ -1417,10 +1427,17 @@ const batchNightmare = async () => {
         let foundValidDian2 = false
         
         for (const token of dian2Tokens) {
-          // 模拟点击标签为"殿2"的Token昵称
+          // 先检查本地存储枕头数量
+          const localPillowCount = getLocalPillowCount(token.id)
+          if (localPillowCount === 0) {
+            message.warning(`${token.name} 本地存储枕头数量为0，跳过`)
+            continue
+          }
+          
+          // 连接Token
           await connectTokenByClick(token, 5)
           
-          // 2. 模拟点击"十殿枕头"按钮，重新获取十殿枕头
+          // 获取十殿枕头数量
           const pillowCount = await getPillowCountForToken(token)
           if (pillowCount === 0) {
             message.warning(`${token.name} 枕头数量为0，尝试下一个殿2Token`)
@@ -1485,10 +1502,17 @@ const batchNightmare = async () => {
         let foundValidDian5 = false
         
         for (const token of dian5Tokens) {
-          // 模拟点击标签为"殿5"的Token昵称
+          // 先检查本地存储枕头数量
+          const localPillowCount = getLocalPillowCount(token.id)
+          if (localPillowCount === 0) {
+            message.warning(`${token.name} 本地存储枕头数量为0，跳过`)
+            continue
+          }
+          
+          // 连接Token
           await connectTokenByClick(token, 5)
           
-          // 2. 模拟点击"十殿枕头"按钮，重新获取十殿枕头
+          // 获取十殿枕头数量
           const pillowCount = await getPillowCountForToken(token)
           if (pillowCount === 0) {
             message.warning(`${token.name} 枕头数量为0，尝试下一个殿5Token`)
@@ -1558,14 +1582,20 @@ const batchNightmare = async () => {
         let foundValidDian0 = false
         
         for (const token of dian0Tokens) {
-          // 模拟点击标签为"殿0"的Token昵称
+          // 先检查本地存储枕头数量
+          const localPillowCount = getLocalPillowCount(token.id)
+          if (localPillowCount < 5) {
+            message.warning(`${token.name} 本地存储枕头数量为${localPillowCount}，小于5，跳过`)
+            continue
+          }
+          
+          // 连接Token
           await connectTokenByClick(token, 5)
           
-          // 2. 模拟点击"十殿枕头"按钮，重新获取十殿枕头
+          // 获取十殿枕头数量
           const pillowCount = await getPillowCountForToken(token)
           if (pillowCount < 5) {
-            message.warning(`${token.name} 枕头数量为${pillowCount}，小于5，标记为"空殿0"`)
-            await updateTokenRemark(token.id, '空殿0')
+            message.warning(`${token.name} 枕头数量为${pillowCount}，小于5，跳过`)
             continue
           } else {
             // 3. 模拟点击"加入房间"按钮，如果准备失败，再次点击"加入房间"按钮
@@ -1614,10 +1644,14 @@ const batchNightmare = async () => {
           message.error('没有找到枕头数量为5的殿0Token')
           // 检查结束条件：所有殿0枕头数量都小于5
           const allDian0Tokens = findTokensByRemark('殿0')
-          const allDian0PillowLessThan5 = allDian0Tokens.every(async (token) => {
-            const pillowCount = await getPillowCountForToken(token)
-            return pillowCount < 5
-          })
+          let allDian0PillowLessThan5 = true
+          for (const token of allDian0Tokens) {
+            const localPillowCount = getLocalPillowCount(token.id)
+            if (localPillowCount >= 5) {
+              allDian0PillowLessThan5 = false
+              break
+            }
+          }
           
           if (allDian0PillowLessThan5) {
             message.success('所有殿0枕头数量都小于5，循环结束')
@@ -1638,6 +1672,17 @@ const batchNightmare = async () => {
       )
       await new Promise(resolve => setTimeout(resolve, 18000)) // 等待18s
       message.success('十殿开始完成')
+
+      // 获取roomid
+      message.info('正在获取房间号...')
+      const roomInfo = await tokenStore.sendMatchteamGetRoleTeamInfo(dian7Token.id, {})
+      if (roomInfo) {
+        displayTeamId.value = roomInfo.teamId || 0
+        displayRoomId.value = roomInfo.roomId || 0
+        message.success(`获取房间号成功: 队伍号${displayTeamId.value}, 房间号${displayRoomId.value}`)
+      } else {
+        message.warning('获取房间号失败')
+      }
 
       // 第六步：殿1执行
       message.info('第六步：执行殿级1...')
@@ -1829,6 +1874,11 @@ const executeFighter = async () => {
     return
   }
 
+  if (!props.selectedTokenId) {
+    message.warning('请先选择房主Token')
+    return
+  }
+
   const tokenLabel = selectedFighterDian.value
   const tokens = findTokensByRemark(tokenLabel)
   
@@ -1839,18 +1889,26 @@ const executeFighter = async () => {
 
   const token = tokens[0]
   
+  // 检查是否已记录该token的roleId
+  if (!tokenRoleIds.value[token.id]) {
+    message.error(`未找到Token ${token.name} 的roleId，请先执行"加入房间"操作`)
+    return
+  }
+  
+  const ownerToken = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+  if (!ownerToken) {
+    message.error('找不到房主Token')
+    return
+  }
+  
   try {
     message.info(`正在为${token.name}执行出战人员...`)
     
-    // 连接Token
-    const connected = await connectTokenByClick(token, 5)
-    if (!connected) {
-      message.error(`${token.name} 连接失败`)
-      return
-    }
-    
-    // 执行出战人员命令
-    await setNightmareFighter(token)
+    // 使用房主token执行出战人员命令
+    await tokenStore.sendNightmareSetFighter(ownerToken.id, {
+      roomId: displayTeamId.value,
+      roleId: parseInt(tokenRoleIds.value[token.id])
+    })
     
     message.success(`${token.name} 出战人员设置成功`)
     logOperation('shidian', '出战人员', {
@@ -1880,6 +1938,11 @@ const executeKick = async () => {
     return
   }
 
+  if (!props.selectedTokenId) {
+    message.warning('请先选择房主Token')
+    return
+  }
+
   const tokenLabel = selectedKickDian.value
   const tokens = findTokensByRemark(tokenLabel)
   
@@ -1888,38 +1951,49 @@ const executeKick = async () => {
     return
   }
 
+  const ownerToken = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+  if (!ownerToken) {
+    message.error('找不到房主Token')
+    return
+  }
+
   try {
     if (tokenLabel === '殿0') {
       // 殿0需要依次使用两个token执行两次踢出房间
       const tokensToKick = tokens.slice(0, 2)
       for (const token of tokensToKick) {
-        message.info(`正在踢出${token.name}...`)
-        
-        // 连接Token
-        const connected = await connectTokenByClick(token, 5)
-        if (!connected) {
-          message.warning(`${token.name} 连接失败，跳过`)
+        // 检查是否已记录该token的roleId
+        if (!tokenRoleIds.value[token.id]) {
+          message.error(`未找到Token ${token.name} 的roleId，请先执行"加入房间"操作`)
           continue
         }
         
-        // 执行踢出房间命令
-        await kickFromRoom(token)
+        message.info(`正在踢出${token.name}...`)
+        
+        // 使用房主token执行踢出房间命令
+        await tokenStore.sendMatchteamKick(ownerToken.id, {
+          teamId: displayTeamId.value,
+          kickRoleId: parseInt(tokenRoleIds.value[token.id])
+        })
         message.success(`${token.name} 踢出房间成功`)
       }
     } else {
       // 其他标签使用一个token执行踢出房间
       const token = tokens[0]
-      message.info(`正在踢出${token.name}...`)
       
-      // 连接Token
-      const connected = await connectTokenByClick(token, 5)
-      if (!connected) {
-        message.error(`${token.name} 连接失败`)
+      // 检查是否已记录该token的roleId
+      if (!tokenRoleIds.value[token.id]) {
+        message.error(`未找到Token ${token.name} 的roleId，请先执行"加入房间"操作`)
         return
       }
       
-      // 执行踢出房间命令
-      await kickFromRoom(token)
+      message.info(`正在踢出${token.name}...`)
+      
+      // 使用房主token执行踢出房间命令
+      await tokenStore.sendMatchteamKick(ownerToken.id, {
+        teamId: displayTeamId.value,
+        kickRoleId: parseInt(tokenRoleIds.value[token.id])
+      })
       message.success(`${token.name} 踢出房间成功`)
     }
     
@@ -1947,6 +2021,11 @@ const executeTransfer = async () => {
     return
   }
 
+  if (!props.selectedTokenId) {
+    message.warning('请先选择房主Token')
+    return
+  }
+
   const tokenLabel = selectedTransferDian.value
   const tokens = findTokensByRemark(tokenLabel)
   
@@ -1957,18 +2036,33 @@ const executeTransfer = async () => {
 
   const token = tokens[0]
   
+  // 检查是否已记录该token的roleId
+  if (!tokenRoleIds.value[token.id]) {
+    message.error(`未找到Token ${token.name} 的roleId，请先执行"加入房间"操作`)
+    return
+  }
+  
+  const ownerToken = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+  if (!ownerToken) {
+    message.error('找不到房主Token')
+    return
+  }
+  
   try {
     message.info(`正在为${token.name}执行转让房主...`)
     
-    // 连接Token
-    const connected = await connectTokenByClick(token, 5)
-    if (!connected) {
-      message.error(`${token.name} 连接失败`)
-      return
-    }
+    // 使用房主token执行转让房主命令
+    // 先打开队伍
+    await tokenStore.sendMatchteamOpenTeam(ownerToken.id, {
+      teamId: displayTeamId.value,
+      extParam: 0
+    })
     
-    // 执行转让房主命令
-    await transferRoomOwner(token)
+    // 转让房主给指定token（使用其roleId）
+    await tokenStore.sendGameMessage(ownerToken.id, 'matchteam_transferowner', {
+      teamId: displayTeamId.value,
+      newOwnerId: parseInt(tokenRoleIds.value[token.id])
+    })
     
     message.success(`${token.name} 转让房主成功`)
     logOperation('shidian', '转让房主', {
@@ -1998,6 +2092,11 @@ const executeRestore = async () => {
     return
   }
 
+  if (!props.selectedTokenId) {
+    message.warning('请先选择房主Token')
+    return
+  }
+
   const tokenLabel = selectedRestoreDian.value
   const tokens = findTokensByRemark(tokenLabel)
   
@@ -2008,18 +2107,26 @@ const executeRestore = async () => {
 
   const token = tokens[0]
   
+  // 检查是否已记录该token的roleId
+  if (!tokenRoleIds.value[token.id]) {
+    message.error(`未找到Token ${token.name} 的roleId，请先执行"加入房间"操作`)
+    return
+  }
+  
+  const ownerToken = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+  if (!ownerToken) {
+    message.error('找不到房主Token')
+    return
+  }
+  
   try {
     message.info(`正在为${token.name}执行十殿恢复...`)
     
-    // 连接Token
-    const connected = await connectTokenByClick(token, 5)
-    if (!connected) {
-      message.error(`${token.name} 连接失败`)
-      return
-    }
-    
-    // 执行十殿恢复命令
-    await nightmareRestore(token)
+    // 使用房主token执行十殿恢复命令
+    await tokenStore.sendGameMessage(ownerToken.id, 'nightmare_restore', {
+      roomId: displayTeamId.value,
+      roleId: parseInt(tokenRoleIds.value[token.id])
+    })
     
     message.success(`${token.name} 十殿恢复成功`)
     logOperation('shidian', '十殿恢复', {
@@ -2054,6 +2161,7 @@ const switchToTeam1 = async (token) => {
     return
   }
 
+  connectingTokens.value.add(token.id)
   try {
     message.info('正在切换到阵容1...')
     
@@ -2091,6 +2199,8 @@ const switchToTeam1 = async (token) => {
       status: 'error',
       message: `切换阵容1失败: ${error.message || '未知错误'}`
     })
+  } finally {
+    connectingTokens.value.delete(token.id)
   }
 }
 
@@ -2412,6 +2522,23 @@ const updateTokenRemark = async (tokenId, newRemark) => {
   console.log(`更新Token ${tokenId} 备注为: ${newRemark}`)
 }
 
+// 获取本地存储的枕头数量
+const getLocalPillowCount = (tokenId) => {
+  try {
+    const tokenData = tokenStore.gameTokens.find(t => t.id === tokenId)
+    if (tokenData && tokenData.gameData && tokenData.gameData.items) {
+      const pillowItem = tokenData.gameData.items['5054']
+      if (pillowItem && pillowItem.quantity !== undefined) {
+        return pillowItem.quantity
+      }
+    }
+    return 0
+  } catch (error) {
+    console.error('获取本地枕头数量失败:', error)
+    return 0
+  }
+}
+
 // 加入房间（从ShiDian.vue复制）
 const joinNightmareRoom = async (token) => {
   if (!token) {
@@ -2482,6 +2609,22 @@ const joinNightmareRoom = async (token) => {
       teamId: displayTeamId.value
     })
     message.success('十殿准备完成！')
+    
+    // 第四步：获取所有token的roleId
+    message.info('正在获取所有token的roleId...')
+    const gameTokens = toRaw(tokenStore.gameTokens)
+    for (const t of gameTokens) {
+      try {
+        const roleInfo = await tokenStore.sendGetRoleInfo(t.id)
+        if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
+          tokenRoleIds.value[t.id] = roleInfo.role.roleId
+          console.log(`Token ${t.name} (${t.id}) 的roleId: ${roleInfo.role.roleId}`)
+        }
+      } catch (error) {
+        console.error(`获取Token ${t.name} (${t.id}) 的roleId失败:`, error)
+      }
+    }
+    message.success('所有token的roleId获取完成！')
     message.success('🎉 成功加入十殿并准备完成！')
     logOperation('shidian', '加入房间', {
       cardType: '十殿信息',
@@ -3096,10 +3239,10 @@ const executeDian1Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
-  // 流程：设置出战人员（殿1） -> 开始战斗（殿1）
+  // 流程：设置出战人员（殿7） -> 开始战斗（殿7）
   // 执行的命令：
-  // 1. nightmare_setfighter - 设置出战人员（殿1）
-  // 2. nightmare_fight - 开始战斗（殿1）
+  // 1. nightmare_setfighter - 设置出战人员（殿7）
+  // 2. nightmare_fight - 开始战斗（殿7）
 
   // 检查WebSocket连接状态
   if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3123,11 +3266,18 @@ const executeDian1Fight = async () => {
     throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
-  // 设置出战人员（殿1）
-  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
+  // 查找殿7Token
+  const dian7Tokens = findTokensByRemark('殿7')
+  if (dian7Tokens.length === 0) {
+    throw new Error('没有找到殿7Token')
+  }
+  const dian7Token = dian7Tokens[0]
 
-  // 开始战斗（殿1）
-  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
+  // 设置出战人员（殿7）
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+
+  // 开始战斗（殿7）
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
 }
 
 // 殿2战斗流程
@@ -3141,14 +3291,12 @@ const executeDian2Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
-  // 流程：殿7出战 -> 殿2出战 -> 检查层数（如果是2层，则殿0出战）
+  // 流程：殿7出战 -> 殿2出战 -> 检查层数（如果是2层，则殿5出战）
   // 执行的命令：
-  // 1. nightmare_setfighter - 设置出战人员（殿7）
-  // 2. nightmare_fight - 开始战斗（殿7）
-  // 3. nightmare_setfighter - 设置出战人员（殿2）
-  // 4. nightmare_fight - 开始战斗（殿2）
-  // 5. nightmare_getroleinfo - 获取十殿信息（检查层数）
-  // 6. 如果层数为2，则殿0出战
+  // 1. 殿7出战
+  // 2. 殿2出战
+  // 3. 检查层数
+  // 4. 如果层数为2，殿5出战
 
   // 检查WebSocket连接状态
   if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3165,10 +3313,6 @@ const executeDian2Fight = async () => {
     message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
-  // 殿7出战
-  await executeDian7Fight()
-
-  // 殿2出战
   // 使用本地存储的 roomId
   const roomId = displayRoomId.value
 
@@ -3176,10 +3320,29 @@ const executeDian2Fight = async () => {
     throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
-  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
-  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
+  // 殿7出战
+  // 查找殿7Token
+  const dian7Tokens = findTokensByRemark('殿7')
+  if (dian7Tokens.length === 0) {
+    throw new Error('没有找到殿7Token')
+  }
+  const dian7Token = dian7Tokens[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
 
-  // 检查层数，如果是2层，则殿0出战
+  // 殿2出战
+  // 查找殿2Token
+  const dian2Tokens = findTokensByRemark('殿2')
+  if (dian2Tokens.length === 0) {
+    throw new Error('没有找到殿2Token')
+  }
+  const dian2Token = dian2Tokens[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+
+  // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
   let roleId = token.id
   if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
@@ -3189,8 +3352,16 @@ const executeDian2Fight = async () => {
   const currentLevel = updatedNightmareInfo?.nightMareData?.level || updatedNightmareInfo?.level
 
   if (currentLevel === 2) {
-    // 殿0出战（这里假设使用另一个token执行，实际可能需要根据具体情况调整）
-    console.log('当前层数为2，需要殿0出战')
+    // 殿5出战
+    // 查找殿5Token
+    const dian5Tokens = findTokensByRemark('殿5')
+    if (dian5Tokens.length === 0) {
+      throw new Error('没有找到殿5Token')
+    }
+    const dian5Token = dian5Tokens[0]
+    
+    await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+    await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
   }
 }
 
@@ -3244,10 +3415,7 @@ const executeDian4Fight = async () => {
 
   // 流程：殿7出战
   // 执行的命令：
-  // 1. role_getroleinfo - 获取角色信息
-  // 2. nightmare_getroleinfo - 获取十殿信息（获取roomId）
-  // 3. nightmare_setfighter - 设置出战人员（殿7）
-  // 4. nightmare_fight - 开始战斗（殿7）
+  // 1. 殿7出战
 
   // 检查WebSocket连接状态
   if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3264,8 +3432,23 @@ const executeDian4Fight = async () => {
     message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
+
+  if (!roomId) {
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
+  }
+
   // 殿7出战
-  await executeDian7Fight()
+  // 查找殿7Token
+  const dian7Tokens = findTokensByRemark('殿7')
+  if (dian7Tokens.length === 0) {
+    throw new Error('没有找到殿7Token')
+  }
+  const dian7Token = dian7Tokens[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
 }
 
 // 殿5战斗流程
@@ -3279,20 +3462,13 @@ const executeDian5Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
-  // 流程：殿5出战 -> 检查层数（如果是5层，则殿2出战） -> 检查层数（如果是5层，则殿7出战）
+  // 流程：殿5出战 -> 检查层数（如果是5层，执行殿2出战） -> 再次检查层数（如果是5层，执行殿7出战）
   // 执行的命令：
-  // 1. role_getroleinfo - 获取角色信息
-  // 2. nightmare_getroleinfo - 获取十殿信息（获取roomId）
-  // 3. nightmare_setfighter - 设置出战人员（殿5）
-  // 4. nightmare_fight - 开始战斗（殿5）
-  // 5. nightmare_getroleinfo - 获取十殿信息（检查层数）
-  // 6. 如果层数为5，则殿2出战
-  // 7. nightmare_setfighter - 设置出战人员（殿2）
-  // 8. nightmare_fight - 开始战斗（殿2）
-  // 9. nightmare_getroleinfo - 获取十殿信息（检查层数）
-  // 10. 如果层数为5，则殿7出战
-  // 11. nightmare_setfighter - 设置出战人员（殿7）
-  // 12. nightmare_fight - 开始战斗（殿7）
+  // 1. 殿5出战
+  // 2. 检查层数
+  // 3. 如果层数为5，执行殿2出战
+  // 4. 再次检查层数
+  // 5. 如果层数为5，执行殿7出战
 
   // 检查WebSocket连接状态
   if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3309,7 +3485,6 @@ const executeDian5Fight = async () => {
     message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
-  // 殿5出战
   // 使用本地存储的 roomId
   const roomId = displayRoomId.value
 
@@ -3317,8 +3492,16 @@ const executeDian5Fight = async () => {
     throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
-  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
-  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
+  // 殿5出战
+  // 查找殿5Token
+  const dian5Tokens = findTokensByRemark('殿5')
+  if (dian5Tokens.length === 0) {
+    throw new Error('没有找到殿5Token')
+  }
+  const dian5Token = dian5Tokens[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3331,26 +3514,32 @@ const executeDian5Fight = async () => {
 
   if (currentLevel === 5) {
     // 殿2出战
-    await executeDian2Fight()
-  } else {
-    return // 如果不是5层，停止执行
-  }
+    // 查找殿2Token
+    const dian2Tokens = findTokensByRemark('殿2')
+    if (dian2Tokens.length === 0) {
+      throw new Error('没有找到殿2Token')
+    }
+    const dian2Token = dian2Tokens[0]
+    
+    await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+    await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
 
-  // 再次检查层数
-  const roleInfo2 = await tokenStore.sendGetRoleInfo(token.id)
-  let roleId2 = token.id
-  if (roleInfo2 && roleInfo2.role && roleInfo2.role.roleId) {
-    roleId2 = roleInfo2.role.roleId
-  }
-  const finalNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId2) })
-  const finalLevel = finalNightmareInfo?.nightMareData?.level || finalNightmareInfo?.level
+    // 再次检查层数
+    const updatedNightmareInfo2 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+    const currentLevel2 = updatedNightmareInfo2?.nightMareData?.level || updatedNightmareInfo2?.level
 
-  if (finalLevel === 5) {
-    // 殿7出战
-    await executeDian7Fight()
-  } else if (finalLevel === 5) {
-    // 如果仍然为5层，停止执行
-    console.log('层数仍为5，停止执行')
+    if (currentLevel2 === 5) {
+      // 殿7出战
+      // 查找殿7Token
+      const dian7Tokens = findTokensByRemark('殿7')
+      if (dian7Tokens.length === 0) {
+        throw new Error('没有找到殿7Token')
+      }
+      const dian7Token = dian7Tokens[0]
+      
+      await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+      await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+    }
   }
 }
 
@@ -3393,8 +3582,39 @@ const executeDian6Fight = async () => {
   }
 
   // 恢复殿2和殿7
-  // 注意：restore命令可能需要特定的实现，这里先保留注释提醒
-  console.log('恢复殿2和殿7')
+  // 查找殿2和殿7的token
+  const dian2Tokens = findTokensByRemark('殿2')
+  const dian7Tokens = findTokensByRemark('殿7')
+
+  if (dian2Tokens.length > 0) {
+    const dian2Token = dian2Tokens[0]
+    // 检查是否已记录该token的roleId
+    if (tokenRoleIds.value[dian2Token.id]) {
+      // 使用房主token执行恢复殿2命令
+      await tokenStore.sendGameMessage(token.id, 'nightmare_restore', {
+        roomId: displayTeamId.value,
+        roleId: parseInt(tokenRoleIds.value[dian2Token.id])
+      })
+      console.log('恢复殿2成功，使用roleId:', tokenRoleIds.value[dian2Token.id])
+    } else {
+      console.warn('未找到殿2的roleId，跳过恢复')
+    }
+  }
+
+  if (dian7Tokens.length > 0) {
+    const dian7Token = dian7Tokens[0]
+    // 检查是否已记录该token的roleId
+    if (tokenRoleIds.value[dian7Token.id]) {
+      // 使用房主token执行恢复殿7命令
+      await tokenStore.sendGameMessage(token.id, 'nightmare_restore', {
+        roomId: displayTeamId.value,
+        roleId: parseInt(tokenRoleIds.value[dian7Token.id])
+      })
+      console.log('恢复殿7成功，使用roleId:', tokenRoleIds.value[dian7Token.id])
+    } else {
+      console.warn('未找到殿7的roleId，跳过恢复')
+    }
+  }
 
   // 殿2出战
   await executeDian2Fight()
@@ -3452,7 +3672,23 @@ const executeDian7Fight = async () => {
   }
 
   // 恢复殿7
-  console.log('恢复殿7')
+  // 查找殿7的token
+  const dian7Tokens = findTokensByRemark('殿7')
+
+  if (dian7Tokens.length > 0) {
+    const dian7Token = dian7Tokens[0]
+    // 检查是否已记录该token的roleId
+    if (tokenRoleIds.value[dian7Token.id]) {
+      // 使用房主token执行恢复殿7命令
+      await tokenStore.sendGameMessage(token.id, 'nightmare_restore', {
+        roomId: displayTeamId.value,
+        roleId: parseInt(tokenRoleIds.value[dian7Token.id])
+      })
+      console.log('恢复殿7成功，使用roleId:', tokenRoleIds.value[dian7Token.id])
+    } else {
+      console.warn('未找到殿7的roleId，跳过恢复')
+    }
+  }
 
   // 使用本地存储的 roomId
   const roomId = displayRoomId.value

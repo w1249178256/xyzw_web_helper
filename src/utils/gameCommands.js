@@ -1256,6 +1256,23 @@ export class GameCommands {
     }
   }
   
+    	  /**
+   * 十殿离开房间
+   */
+  nightmare_dismiss(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  roomId:params.roomId,
+                ...params
+      }),
+      cmd: "nightmare_dismiss",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+  
   
   /**
    * 十殿图鉴
