@@ -154,14 +154,30 @@ pnpm run lint     # 代码检查和修复
 pnpm run format   # 代码格式化
 ```
 
-### 部署代理服务 (Cloudflare Workers)
+### 部署代理服务 (Cloudflare Pages)
 
-为了在生产环境中解决跨域(CORS)和Referer限制问题，本项目提供了 `worker.js` 脚本。
+本项目推荐使用 Cloudflare Pages 进行部署，内置了对 API 代理的支持。
 
-1. **创建 Worker**: 在 Cloudflare Dashboard 创建一个新的 Worker。
-2. **部署代码**: 将项目根目录下的 `worker.js` 内容复制到 Worker 编辑器中并保存部署。
-3. **配置域名**: 将 Worker 绑定到自定义域名（可选），或直接使用 Cloudflare 提供的 `*.workers.dev` 域名。
-4. **更新配置**: 修改生产环境配置（如 `.env.production`），将接口基础路径指向你的 Worker 域名。
+1. **准备代码**：https://github.com/w1249178256/xyzw_web_helper.git
+2. **连接仓库**：在 Cloudflare Dashboard 中选择 "Pages" -> "Connect to Git"，选择本项目仓库。
+3. **构建设置**：
+    - **构建命令**: `npm run build`
+    - **构建输出目录**: `dist`
+4. **环境变量**（可选）：可以在 Cloudflare Pages 设置中添加环境变量。
+5. **部署**：点击 "Save and Deploy"。
+
+Cloudflare Pages 会自动识别 `dist/_worker.js` 并启用 Advanced Mode，无需额外配置即可实现 API 代理和静态资源托管。
+
+### 本地预览 (Cloudflare Pages)
+
+为了在本地模拟 Cloudflare Pages 环境（包括 `worker.js` 的代理功能），请使用 `wrangler`：
+
+1. **安装 wrangler**: `npm install -g wrangler`
+2. **构建项目**: `npm run build`
+3. **启动预览**: `npx wrangler pages dev dist`
+4. **访问**: 打开浏览器访问 `http://localhost:8787`
+
+> 注意：`npm run preview` 仅提供静态文件预览，无法执行 `worker.js` 中的代理逻辑。请使用 `wrangler` 进行全功能预览。
 
 ### 部署TokenURL获取服务 (Python)
 
