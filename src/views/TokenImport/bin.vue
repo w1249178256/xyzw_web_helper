@@ -19,9 +19,12 @@
       </template>
     </n-form-item>
 
-    <n-card v-if="serverListData && serverListData.length > 0" title="服务器角色列表" style="margin-bottom: 16px;">
-      <n-data-table :columns="columns" :data="serverListData" :pagination="{ pageSize: 5 }" :scroll-x="600" />
-    </n-card>
+    <ServerRoleList
+      :data="serverListData"
+      max-height="50vh"
+      @add="addSelectedRole"
+      @download="handleDownload"
+    />
 
     <a-list>
       <a-list-item v-for="(role, index) in roleList" :key="index">
@@ -58,7 +61,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, h } from "vue";
+import { ref, reactive } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
 import { CloudUpload } from "@vicons/ionicons5";
 
@@ -71,15 +74,12 @@ import {
   NCollapse,
   NCollapseItem,
   useMessage,
-  NCard,
-  NDataTable,
 } from "naive-ui";
 
 import PQueue from "p-queue";
 import useIndexedDB from "@/hooks/useIndexedDB";
 import { getTokenId, transformToken, getServerList } from "@/utils/token";
 import { g_utils } from "@/utils/bonProtocol";
-import { formatPower } from "@/utils/legionWar";
 
 const $emit = defineEmits(["cancel", "ok"]);
 
@@ -120,75 +120,6 @@ const serverListData = ref<any[]>([]);
 const currentBinData = ref<ArrayBuffer | null>(null);
 const binDecodedResult = ref("");
 const originalBinData = ref<any>(null);
-
-const columns = [
-  {
-    title: "区服",
-    key: "serverId",
-    render(row: any) {
-      let sid = Number(row.serverId);
-      if (sid >= 2000000) sid -= 2000000;
-      else if (sid >= 1000000) sid -= 1000000;
-      return sid - 27;
-    },
-  },
-  {
-    title: "角色序号",
-    key: "roleIndex",
-    render(row: any) {
-      const sid = Number(row.serverId);
-      if (sid >= 2000000) return 2;
-      if (sid >= 1000000) return 1;
-      return 0;
-    },
-  },
-  {
-    title: "角色ID",
-    key: "roleId",
-  },
-  {
-    title: "角色名称",
-    key: "name",
-  },
-  {
-    title: "战力",
-    key: "power",
-    render(row: any) {
-      return formatPower(row.power);
-    },
-    sorter: (row1: any, row2: any) => row1.power - row2.power,
-  },
-  {
-    title: "操作",
-    key: "actions",
-    render(row: any) {
-      return h(
-        "div",
-        { style: "display: flex; gap: 8px;" },
-        [
-          h(
-            NButton,
-            {
-              size: "small",
-              type: "primary",
-              onClick: () => addSelectedRole(row),
-            },
-            { default: () => "添加" },
-          ),
-          h(
-            NButton,
-            {
-              size: "small",
-              type: "info",
-              onClick: () => handleDownload(row),
-            },
-            { default: () => "下载" },
-          ),
-        ]
-      );
-    },
-  },
-];
 
 const tQueue = new PQueue({ concurrency: 1, interval: 1000 });
 
