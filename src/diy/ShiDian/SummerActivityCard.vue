@@ -1847,6 +1847,20 @@ const oneKeyBattle = async () => {
           }
         }
         
+        // 检查所有6个BOSS的活动次数是否都大于3次
+        let allBossesAbove3 = true;
+        for (let i = 1; i <= 6; i++) {
+          if (bossLevels[i] <= 3) {
+            allBossesAbove3 = false;
+            break;
+          }
+        }
+        
+        if (allBossesAbove3) {
+          message.warning("所有BOSS活动次数都大于3次，跳过执行");
+          return;
+        }
+        
         // 检查哪些BOSS的层数为0
         for (let i = 1; i <= 6; i++) {
           if (bossLevels[i] === 0) {
