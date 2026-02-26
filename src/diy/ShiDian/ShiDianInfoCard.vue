@@ -83,50 +83,50 @@
         <CustomizedCard 
           mode="button-placeholder"
           button-text="加入房间"
-          :disabled="!selectedTokenId || !teamId || connectingTokens.has(selectedTokenId)"
+          :disabled="!selectedTokenId || !displayTeamId || connectingTokens.has(selectedTokenId)"
           @button-click="selectedTokenId ? joinNightmareRoom(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="开始十殿"
-          :disabled="!selectedTokenId || !teamId"
+          :disabled="!selectedTokenId || !displayTeamId"
           @button-click="selectedTokenId ? startNightmareFight(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="出战人员"
-          :disabled="!selectedTokenId || !teamId"
+          :disabled="!selectedTokenId || !displayTeamId"
           @button-click="selectedTokenId ? setNightmareFighter(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="踢出房间"
-          :disabled="!selectedTokenId || !teamId"
+          :disabled="!selectedTokenId || !displayTeamId"
           @button-click="selectedTokenId ? kickFromRoom(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="转让房主"
-          :disabled="!selectedTokenId || !teamId"
+          :disabled="!selectedTokenId || !displayTeamId"
           @button-click="selectedTokenId ? transferRoomOwner(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="十殿战斗"
-          :disabled="!selectedTokenId || !teamId"
+          :disabled="!selectedTokenId || !displayTeamId"
           @button-click="selectedTokenId ? nightmareFight(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
-        />
-        <CustomizedCard 
-          mode="button-placeholder"
-          button-text="导出十殿"
-          :disabled="!selectedTokenId"
-          @button-click="exportNightmareInfo()"
         />
         <CustomizedCard 
           mode="button-placeholder"
           button-text="十殿准备"
           :disabled="!selectedTokenId"
           @button-click="selectedTokenId ? oneClickNightmare(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
+        />
+        <CustomizedCard 
+          mode="button-placeholder"
+          button-text="重置枕头"
+          :disabled="!selectedTokenId"
+          @button-click="resetPillowCount"
         />
 
         <!-- 批量执行特定殿级 -->
@@ -139,7 +139,7 @@
         />
         <CustomizedCard 
           mode="button"
-          name="执行选定殿级"
+          name="执行殿级"
           :loading="isExecutingSpecificDian"
           :disabled="!selectedDianLevelToExecute || tokenStore.gameTokens.length === 0"
           @button-click="executeSpecificDian()"
@@ -180,14 +180,14 @@
       <OperationLogCard 
         page="shidian" 
         card-type="十殿信息"
-        :filter-operations="['刷新信息', '领取奖励', '批量领取', '十殿战斗', '导出十殿', '十殿准备', '批量十殿', '创建房间', '加入房间', '开始十殿', '出战人员', '踢出房间', '转让房主', '导出资源']"
+        :filter-operations="['刷新信息', '领取奖励', '批量领取', '十殿战斗', '重置枕头', '十殿准备', '批量十殿', '创建房间', '加入房间', '开始十殿', '出战人员', '踢出房间', '转让房主', '导出资源']"
       />
     </template>
   </MyCard>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, defineExpose, ref, computed, toRaw, nextTick, onBeforeUnmount } from 'vue'
+import { defineProps, defineEmits, defineExpose, ref, computed, toRaw, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useNightmareExecutionStore } from '@/stores/nightmareExecutionStore'
@@ -228,6 +228,18 @@ const pillowCount = ref(0)
 const displayRoomId = ref(0)
 const displayTeamId = ref(0)
 const displayNightmareLevel = ref(0)
+
+// 从本地存储加载队伍号和房间号
+onMounted(() => {
+  const savedTeamId = localStorage.getItem('shidian_teamId')
+  if (savedTeamId) {
+    displayTeamId.value = parseInt(savedTeamId)
+  }
+  const savedRoomId = localStorage.getItem('shidian_roomId')
+  if (savedRoomId) {
+    displayRoomId.value = parseInt(savedRoomId)
+  }
+})
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -1068,8 +1080,8 @@ const nightmareFight = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -1084,7 +1096,7 @@ const nightmareFight = async (token) => {
     
     // 执行nightmare_fight操作
     await tokenStore.sendNightmareFight(token.id, {
-      roomId: parseInt(props.teamId),
+      roomId: displayTeamId.value,
       roleId: parseInt(token.id)
     })
     
@@ -1110,129 +1122,36 @@ const nightmareFight = async (token) => {
   }
 }
 
-// 导出十殿信息
-const exportNightmareInfo = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
-    return
-  }
-
-  if (isExportingNightmare.value) {
-    message.warning('导出正在进行中，请稍候...')
-    return
-  }
-
-  isExportingNightmare.value = true
+// 重置枕头数量
+const resetPillowCount = async () => {
+  // 清空本地存储中的十殿枕头数量
   try {
-    const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-    if (!token) {
-      message.error('Token不存在')
-      return
+    const key = 'pageTokenData_shidian'
+    const valueStr = localStorage.getItem(key)
+    if (valueStr) {
+      const value = JSON.parse(valueStr)
+      value.tokenPillowCount = {}
+      localStorage.setItem(key, JSON.stringify(value))
+      console.log('本地存储中的十殿枕头数量已清空')
+      message.success('十殿枕头数量已重置')
+      logOperation('shidian', '重置枕头', {
+        cardType: '十殿信息',
+        tokenId: props.selectedTokenId,
+        tokenName: tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)?.name,
+        status: 'success',
+        message: '十殿枕头数量已重置'
+      })
     }
-
-    message.info('正在导出十殿信息...')
-
-    // 先获取roleId
-    let roleId = null
-    try {
-      const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-      if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-        roleId = roleInfo.role.roleId
-      } else {
-        roleId = token.id
-      }
-    } catch (error) {
-      console.warn('获取roleId失败，使用token.id:', error)
-      roleId = token.id
-    }
-
-    // 获取十殿信息
-    let nightmareInfo = null
-    try {
-      nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
-    } catch (error) {
-      const errorMsg = String(error.message || error || '').toLowerCase()
-      if (errorMsg.includes('200020')) {
-        console.warn('获取十殿信息失败（错误200020），使用缓存数据')
-        // 如果获取失败，尝试使用缓存的数据
-        if (token.gameData && token.gameData.nightmareData) {
-          nightmareInfo = { nightmare: token.gameData.nightmareData }
-        }
-      } else {
-        throw error
-      }
-    }
-    
-    const lines = []
-    lines.push("=".repeat(60))
-    lines.push("十殿信息导出")
-    lines.push(`导出时间: ${new Date().toLocaleString('zh-CN')}`)
-    lines.push(`Token名称: ${token.name || token.id}`)
-    lines.push("=".repeat(60))
-    lines.push("")
-
-    // 基本信息
-    lines.push("【基本信息】")
-    lines.push(`白玉: ${getWhiteJade(token.id)}`)
-    lines.push(`彩玉: ${getColorJade(token.id)}`)
-    lines.push(`灵贝: ${getSpiritShell(token.id)}`)
-    lines.push(`十殿层数: ${getNightmareLevel(token.id)}层`)
-    lines.push(`转盘次数: ${getTurntableLeftCnt(token.id)}`)
-    lines.push("")
-
-    // 十殿详细信息
-    if (nightmareInfo && nightmareInfo.nightmare) {
-      lines.push("【十殿详细信息】")
-      const nightmare = nightmareInfo.nightmare
-      
-      if (nightmare.weekAward) {
-        lines.push("周奖励信息:")
-        Object.keys(nightmare.weekAward).forEach(key => {
-          const award = nightmare.weekAward[key]
-          lines.push(`  周${key}: 最大层数=${award.maxLevel || 0}`)
-        })
-        lines.push("")
-      }
-
-      if (nightmare.maxLevel) {
-        lines.push(`最大层数: ${nightmare.maxLevel}`)
-      }
-    }
-
-    // 导出文件
-    const content = lines.join('\n')
-    const blob = new Blob(['\ufeff' + content], { type: 'text/plain;charset=utf-8;' })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    const fileName = `十殿信息_${token.name || token.id}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}.txt`
-    link.setAttribute('download', fileName)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-
-    message.success('十殿信息导出成功')
-    logOperation('shidian', '导出十殿', {
-      cardType: '十殿信息',
-      tokenId: props.selectedTokenId,
-      tokenName: token?.name,
-      status: 'success',
-      message: '十殿信息导出成功'
-    })
   } catch (error) {
-    console.error('导出十殿信息失败:', error)
-    message.error(`导出十殿信息失败: ${error.message || error}`)
-    logOperation('shidian', '导出十殿', {
+    console.error('清空本地存储中的十殿枕头数量失败:', error)
+    message.error('重置十殿枕头数量失败')
+    logOperation('shidian', '重置枕头', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
-      tokenName: token?.name,
+      tokenName: tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)?.name,
       status: 'error',
-      message: `导出十殿信息失败: ${error.message || error}`
+      message: `重置枕头失败: ${error.message || error}`
     })
-  } finally {
-    isExportingNightmare.value = false
   }
 }
 
@@ -1358,7 +1277,7 @@ const batchNightmare = async () => {
               
               // 加入房间
               await executeCommandWithRetry(
-                () => tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: parseInt(props.teamId) }), 
+                () => tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: displayTeamId.value }), 
                 token, 
                 '加入房间'
               )
@@ -1372,7 +1291,7 @@ const batchNightmare = async () => {
               )
               if (teamInfo && !teamInfo.isPrepare) {
                 await executeCommandWithRetry(
-                  () => tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: parseInt(props.teamId) }), 
+                  () => tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value }), 
                   token, 
                   '准备'
                 )
@@ -1418,13 +1337,13 @@ const batchNightmare = async () => {
               message.success(`${token.name} 连接成功，枕头数量: ${newPillowCount}`)
               
               // 加入房间
-              await tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: parseInt(props.teamId) })
+              await tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: displayTeamId.value })
               await new Promise(resolve => setTimeout(resolve, 500))
               
               // 获取队伍信息，检查准备状态
               const teamInfo = await tokenStore.sendMatchteamGetRoleTeamInfo(token.id, {})
               if (teamInfo && !teamInfo.isPrepare) {
-                await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: parseInt(props.teamId) })
+                await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value })
               }
               break
             } else {
@@ -1460,13 +1379,13 @@ const batchNightmare = async () => {
               message.success(`${token.name} 连接成功，枕头数量: ${newPillowCount}`)
               
               // 加入房间
-              await tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: parseInt(props.teamId) })
+              await tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: displayTeamId.value })
               await new Promise(resolve => setTimeout(resolve, 500))
               
               // 获取队伍信息，检查准备状态
               const teamInfo = await tokenStore.sendMatchteamGetRoleTeamInfo(token.id, {})
               if (teamInfo && !teamInfo.isPrepare) {
-                await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: parseInt(props.teamId) })
+                await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value })
               }
               
               // 执行转让房间命令，转让给新加入的"殿7"
@@ -1514,7 +1433,7 @@ const batchNightmare = async () => {
             
             // 加入房间
             await executeCommandWithRetry(
-              () => tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: parseInt(props.teamId) }), 
+              () => tokenStore.sendGameMessage(token.id, 'matchteam_join', { teamId: displayTeamId.value }), 
               token, 
               '加入房间'
             )
@@ -1528,7 +1447,7 @@ const batchNightmare = async () => {
             )
             if (teamInfo && !teamInfo.isPrepare) {
               await executeCommandWithRetry(
-                () => tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: parseInt(props.teamId) }), 
+                () => tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { teamId: displayTeamId.value }), 
                 token, 
                 '准备'
               )
@@ -1550,7 +1469,7 @@ const batchNightmare = async () => {
         await connectTokenByClick(dian7Token, 5)
         
         await executeCommandWithRetry(
-              () => tokenStore.sendMatchteamOpenTeam(dian7Token.id, { teamId: parseInt(props.teamId), extParam: 0 }), 
+              () => tokenStore.sendMatchteamOpenTeam(dian7Token.id, { teamId: displayTeamId.value, extParam: 0 }), 
               dian7Token, 
               '打开队伍'
             )
@@ -1889,7 +1808,7 @@ const oneClickNightmareFight = async () => {
     }
 
     // 获取房间ID
-    let roomId = parseInt(props.teamId)
+    let roomId = displayTeamId.value
     if (!roomId || isNaN(roomId)) {
       // 如果没有teamId，尝试从参考token获取房间信息
       try {
@@ -2210,9 +2129,12 @@ const getRoomIdInfo = async (token) => {
     // 获取十殿信息
     const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
     
-    if (nightmareInfo && nightmareInfo.nightmare) {
-      const roomId = nightmareInfo.nightmare.room?.roomId || 0
+    if (nightmareInfo && nightmareInfo.nightMareData) {
+      const roomId = nightmareInfo.nightMareData.roomId || 0
       displayRoomId.value = roomId
+      
+      // 保存到本地存储
+      localStorage.setItem('shidian_roomId', roomId.toString())
       
       message.success(`房间号：${roomId}`)
       logOperation('shidian', '房间号', {
@@ -2223,8 +2145,17 @@ const getRoomIdInfo = async (token) => {
         message: `房间号：${roomId}`
       })
     } else {
-      displayRoomId.value = 0
-      message.warning('未获取到十殿信息')
+      // 使用现有的房间号
+      const existingRoomId = localStorage.getItem('shidian_roomId') || '0'
+      displayRoomId.value = parseInt(existingRoomId)
+      message.info(`使用已保存的房间号：${existingRoomId}`)
+      logOperation('shidian', '房间号', {
+        cardType: '十殿信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `使用已保存的房间号：${existingRoomId}`
+      })
     }
   } catch (error) {
     console.error('获取房间号失败:', error)
@@ -2283,6 +2214,9 @@ const getTeamIdInfo = async (token) => {
         const teamId = teamData?.teamId || 0
         displayTeamId.value = teamId
         
+        // 保存到本地存储
+        localStorage.setItem('shidian_teamId', teamId.toString())
+        
         message.success(`队伍号：${teamId}`)
         logOperation('shidian', '队伍号', {
           cardType: '十殿信息',
@@ -2292,12 +2226,30 @@ const getTeamIdInfo = async (token) => {
           message: `队伍号：${teamId}`
         })
       } else {
-        displayTeamId.value = 0
-        message.warning('未获取到队伍信息')
+        // 使用已保存的队伍号
+        const existingTeamId = localStorage.getItem('shidian_teamId') || '0'
+        displayTeamId.value = parseInt(existingTeamId)
+        message.info(`使用已保存的队伍号：${existingTeamId}`)
+        logOperation('shidian', '队伍号', {
+          cardType: '十殿信息',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `使用已保存的队伍号：${existingTeamId}`
+        })
       }
     } else {
-      displayTeamId.value = 0
-      message.warning('未获取到队伍信息')
+      // 使用已保存的队伍号
+      const existingTeamId = localStorage.getItem('shidian_teamId') || '0'
+      displayTeamId.value = parseInt(existingTeamId)
+      message.info(`使用已保存的队伍号：${existingTeamId}`)
+      logOperation('shidian', '队伍号', {
+        cardType: '十殿信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `使用已保存的队伍号：${existingTeamId}`
+      })
     }
   } catch (error) {
     console.error('获取队伍号失败:', error)
@@ -2410,8 +2362,8 @@ const joinNightmareRoom = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -2454,7 +2406,7 @@ const joinNightmareRoom = async (token) => {
     // 第二步：执行matchteam_join操作（加入房间）
     message.info('正在加入房间...')
     await tokenStore.sendGameMessage(token.id, 'matchteam_join', {
-      teamId: parseInt(props.teamId)
+      teamId: displayTeamId.value
     })
     message.success('成功加入房间')
     
@@ -2464,7 +2416,7 @@ const joinNightmareRoom = async (token) => {
     // 第三步：执行matchteam_memberprepare操作（准备十殿）
     message.info('正在准备十殿...')
     await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', {
-      teamId: parseInt(props.teamId)
+      teamId: displayTeamId.value
     })
     message.success('十殿准备完成！')
     message.success('🎉 成功加入十殿并准备完成！')
@@ -2503,8 +2455,8 @@ const startNightmareFight = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -2517,10 +2469,10 @@ const startNightmareFight = async (token) => {
 
     message.info('正在开始十殿战斗...')
     
-    // 执行nightmare_fight操作
-    await tokenStore.sendNightmareFight(token.id, {
-      roomId: parseInt(props.teamId),
-      roleId: parseInt(token.id)
+    // 执行matchteam_openteam操作
+    await tokenStore.sendMatchteamOpenTeam(token.id, {
+      teamId: displayTeamId.value,
+      extParam: 0
     })
     
     message.success('十殿战斗开始成功')
@@ -2557,8 +2509,8 @@ const setNightmareFighter = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -2573,7 +2525,7 @@ const setNightmareFighter = async (token) => {
     
     // 执行nightmare_setfighter操作
     await tokenStore.sendNightmareSetFighter(token.id, {
-      roomId: parseInt(props.teamId),
+      roomId: displayTeamId.value,
       roleId: parseInt(token.id)
     })
     
@@ -2611,8 +2563,8 @@ const kickFromRoom = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -2627,7 +2579,7 @@ const kickFromRoom = async (token) => {
     
     // 执行matchteam_kick操作
     await tokenStore.sendMatchteamKick(token.id, {
-      teamId: parseInt(props.teamId),
+      teamId: displayTeamId.value,
       kickRoleId: parseInt(token.id)
     })
     
@@ -2665,8 +2617,8 @@ const transferRoomOwner = async (token) => {
   }
 
   // 检查是否输入了teamId
-  if (!props.teamId) {
-    message.warning('请先输入TeamID')
+  if (!displayTeamId.value) {
+    message.warning('请先获取队伍号')
     return
   }
 
@@ -2681,7 +2633,7 @@ const transferRoomOwner = async (token) => {
     
     // 执行matchteam_openteam操作（打开队伍，允许转让房主）
     await tokenStore.sendMatchteamOpenTeam(token.id, {
-      teamId: parseInt(props.teamId),
+      teamId: displayTeamId.value,
       extParam: 0
     })
     
@@ -3081,19 +3033,31 @@ const executeDian1Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
-  // 获取十殿信息
-  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-  let roleId = token.id
-  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-    roleId = roleInfo.role.roleId
+  // 流程：设置出战人员（殿1） -> 开始战斗（殿1）
+  // 执行的命令：
+  // 1. nightmare_setfighter - 设置出战人员（殿1）
+  // 2. nightmare_fight - 开始战斗（殿1）
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
-  // 获取十殿信息（获取roomId）
-  const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
-  const roomId = nightmareInfo?.room?.roomId
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
 
   if (!roomId) {
-    throw new Error('未能获取到房间ID')
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
   // 设置出战人员（殿1）
@@ -3114,27 +3078,50 @@ const executeDian2Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
+  // 流程：殿7出战 -> 殿2出战 -> 检查层数（如果是2层，则殿0出战）
+  // 执行的命令：
+  // 1. nightmare_setfighter - 设置出战人员（殿7）
+  // 2. nightmare_fight - 开始战斗（殿7）
+  // 3. nightmare_setfighter - 设置出战人员（殿2）
+  // 4. nightmare_fight - 开始战斗（殿2）
+  // 5. nightmare_getroleinfo - 获取十殿信息（检查层数）
+  // 6. 如果层数为2，则殿0出战
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
+  }
+
   // 殿7出战
   await executeDian7Fight()
 
   // 殿2出战
-  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-  let roleId = token.id
-  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-    roleId = roleInfo.role.roleId
-  }
-
-  const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
-  const roomId = nightmareInfo?.room?.roomId
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
 
   if (!roomId) {
-    throw new Error('未能获取到房间ID')
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
 
   // 检查层数，如果是2层，则殿0出战
+  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+  let roleId = token.id
+  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
+    roleId = roleInfo.role.roleId
+  }
   const updatedNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
   const currentLevel = updatedNightmareInfo?.nightMareData?.level || updatedNightmareInfo?.level
 
@@ -3155,6 +3142,28 @@ const executeDian3Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
+  // 流程：殿7出战
+  // 执行的命令：
+  // 1. role_getroleinfo - 获取角色信息
+  // 2. nightmare_getroleinfo - 获取十殿信息（获取roomId）
+  // 3. nightmare_setfighter - 设置出战人员（殿7）
+  // 4. nightmare_fight - 开始战斗（殿7）
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
+  }
+
   // 殿7出战
   await executeDian7Fight()
 }
@@ -3168,6 +3177,28 @@ const executeDian4Fight = async () => {
   const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
   if (!token) {
     throw new Error('找不到对应的Token')
+  }
+
+  // 流程：殿7出战
+  // 执行的命令：
+  // 1. role_getroleinfo - 获取角色信息
+  // 2. nightmare_getroleinfo - 获取十殿信息（获取roomId）
+  // 3. nightmare_setfighter - 设置出战人员（殿7）
+  // 4. nightmare_fight - 开始战斗（殿7）
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
   // 殿7出战
@@ -3185,24 +3216,53 @@ const executeDian5Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
-  // 殿5出战
-  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-  let roleId = token.id
-  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-    roleId = roleInfo.role.roleId
+  // 流程：殿5出战 -> 检查层数（如果是5层，则殿2出战） -> 检查层数（如果是5层，则殿7出战）
+  // 执行的命令：
+  // 1. role_getroleinfo - 获取角色信息
+  // 2. nightmare_getroleinfo - 获取十殿信息（获取roomId）
+  // 3. nightmare_setfighter - 设置出战人员（殿5）
+  // 4. nightmare_fight - 开始战斗（殿5）
+  // 5. nightmare_getroleinfo - 获取十殿信息（检查层数）
+  // 6. 如果层数为5，则殿2出战
+  // 7. nightmare_setfighter - 设置出战人员（殿2）
+  // 8. nightmare_fight - 开始战斗（殿2）
+  // 9. nightmare_getroleinfo - 获取十殿信息（检查层数）
+  // 10. 如果层数为5，则殿7出战
+  // 11. nightmare_setfighter - 设置出战人员（殿7）
+  // 12. nightmare_fight - 开始战斗（殿7）
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
-  const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
-  const roomId = nightmareInfo?.room?.roomId
+  // 殿5出战
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
 
   if (!roomId) {
-    throw new Error('未能获取到房间ID')
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
 
   // 检查层数
+  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+  let roleId = token.id
+  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
+    roleId = roleInfo.role.roleId
+  }
   const updatedNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
   const currentLevel = updatedNightmareInfo?.nightMareData?.level || updatedNightmareInfo?.level
 
@@ -3214,7 +3274,12 @@ const executeDian5Fight = async () => {
   }
 
   // 再次检查层数
-  const finalNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+  const roleInfo2 = await tokenStore.sendGetRoleInfo(token.id)
+  let roleId2 = token.id
+  if (roleInfo2 && roleInfo2.role && roleInfo2.role.roleId) {
+    roleId2 = roleInfo2.role.roleId
+  }
+  const finalNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId2) })
   const finalLevel = finalNightmareInfo?.nightMareData?.level || finalNightmareInfo?.level
 
   if (finalLevel === 5) {
@@ -3235,6 +3300,33 @@ const executeDian6Fight = async () => {
   const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
   if (!token) {
     throw new Error('找不到对应的Token')
+  }
+
+  // 流程：恢复殿2和殿7 -> 殿2出战 -> 殿7出战 -> 检查层数（如果是6层，则3个殿0依次出战）
+  // 执行的命令：
+  // 1. 恢复殿2和殿7（可能需要特定的实现）
+  // 2. role_getroleinfo - 获取角色信息
+  // 3. nightmare_getroleinfo - 获取十殿信息（获取roomId）
+  // 4. nightmare_setfighter - 设置出战人员（殿2）
+  // 5. nightmare_fight - 开始战斗（殿2）
+  // 6. nightmare_setfighter - 设置出战人员（殿7）
+  // 7. nightmare_fight - 开始战斗（殿7）
+  // 8. nightmare_getroleinfo - 获取十殿信息（检查层数）
+  // 9. 如果层数为6，则3个殿0依次出战
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
   // 恢复殿2和殿7
@@ -3275,21 +3367,35 @@ const executeDian7Fight = async () => {
     throw new Error('找不到对应的Token')
   }
 
+  // 流程：恢复殿7 -> 设置出战人员（殿7） -> 开始战斗（殿7）
+  // 执行的命令：
+  // 1. 恢复殿7（可能需要特定的实现）
+  // 2. nightmare_setfighter - 设置出战人员（殿7）
+  // 3. nightmare_fight - 开始战斗（殿7）
+
+  // 检查WebSocket连接状态
+  if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+    message.info(`正在为 ${token.name || token.id} 连接游戏...`)
+    tokenStore.selectToken(token.id)
+    let count = 0
+    while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      count++
+    }
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      throw new Error('WebSocket连接失败，请稍后重试')
+    }
+    message.success(`${token.name || token.id} 游戏连接成功`)
+  }
+
   // 恢复殿7
   console.log('恢复殿7')
 
-  // 获取十殿信息
-  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-  let roleId = token.id
-  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-    roleId = roleInfo.role.roleId
-  }
-
-  const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
-  const roomId = nightmareInfo?.room?.roomId
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
 
   if (!roomId) {
-    throw new Error('未能获取到房间ID')
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
   // 设置出战人员（殿7）
