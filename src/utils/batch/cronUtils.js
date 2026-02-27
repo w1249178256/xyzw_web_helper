@@ -602,7 +602,7 @@ export const calculateNextExecutionTime = (task) => {
       const matchesMinute = possibleMinutes.includes(minutes);
       const matchesHour = possibleHours.includes(hours);
       const matchesMonth = possibleMonths.includes(month);
-      const matchesDayOfWeek = possibleDaysOfWeek.includes(dayOfWeek);
+      let matchesDayOfWeek = possibleDaysOfWeek.includes(dayOfWeek);
 
       let matchesDayOfMonth = possibleDaysOfMonth.includes(dayOfMonth);
       if (!matchesDayOfMonth && dayOfMonthField.includes("L")) {
