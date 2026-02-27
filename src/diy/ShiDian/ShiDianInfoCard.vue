@@ -1670,7 +1670,7 @@ const batchNightmare = async () => {
         dian7Token, 
         '开始十殿'
       )
-      await new Promise(resolve => setTimeout(resolve, 18000)) // 等待18s
+      await new Promise(resolve => setTimeout(resolve, 20000)) // 等待20s
       message.success('十殿开始完成')
 
       // 获取roomid
@@ -3278,6 +3278,9 @@ const executeDian1Fight = async () => {
 
   // 开始战斗（殿7）
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 }
 
 // 殿2战斗流程
@@ -3330,6 +3333,9 @@ const executeDian2Fight = async () => {
   
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 
   // 殿2出战
   // 查找殿2Token
@@ -3341,6 +3347,9 @@ const executeDian2Fight = async () => {
   
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3362,6 +3371,9 @@ const executeDian2Fight = async () => {
     
     await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
     await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+    
+    // 等待22秒
+    await new Promise(resolve => setTimeout(resolve, 22000))
   }
 }
 
@@ -3398,8 +3410,26 @@ const executeDian3Fight = async () => {
     message.success(`${token.name || token.id} 游戏连接成功`)
   }
 
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
+
+  if (!roomId) {
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
+  }
+
   // 殿7出战
-  await executeDian7Fight()
+  // 查找殿7Token
+  const dian7Tokens = findTokensByRemark('殿7')
+  if (dian7Tokens.length === 0) {
+    throw new Error('没有找到殿7Token')
+  }
+  const dian7Token = dian7Tokens[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 }
 
 // 殿4战斗流程
@@ -3449,6 +3479,9 @@ const executeDian4Fight = async () => {
   
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 }
 
 // 殿5战斗流程
@@ -3502,6 +3535,9 @@ const executeDian5Fight = async () => {
   
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3523,6 +3559,9 @@ const executeDian5Fight = async () => {
     
     await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
     await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+    
+    // 等待22秒
+    await new Promise(resolve => setTimeout(resolve, 22000))
 
     // 再次检查层数
     const updatedNightmareInfo2 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
@@ -3539,6 +3578,19 @@ const executeDian5Fight = async () => {
       
       await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
       await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+      
+      // 等待22秒
+      await new Promise(resolve => setTimeout(resolve, 22000))
+
+      // 再次检查层数
+      const updatedNightmareInfo3 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+      const currentLevel3 = updatedNightmareInfo3?.nightMareData?.level || updatedNightmareInfo3?.level
+
+      if (currentLevel3 === 5) {
+        // 模拟点击解散十殿按钮
+        message.info('当前层数仍为5，执行解散十殿...')
+        await tokenStore.sendNightmareDismiss(token.id, { roomId })
+      }
     }
   }
 }
@@ -3616,11 +3668,26 @@ const executeDian6Fight = async () => {
     }
   }
 
-  // 殿2出战
-  await executeDian2Fight()
+  // 使用本地存储的 roomId
+  const roomId = displayRoomId.value
 
-  // 殿7出战
-  await executeDian7Fight()
+  if (!roomId) {
+    throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
+  }
+
+  // 殿2出战
+  // 查找殿2Token
+  const dian2TokensForFight = findTokensByRemark('殿2')
+  if (dian2TokensForFight.length === 0) {
+    throw new Error('没有找到殿2Token')
+  }
+  const dian2Token = dian2TokensForFight[0]
+  
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3628,14 +3695,33 @@ const executeDian6Fight = async () => {
   if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
     roleId = roleInfo.role.roleId
   }
-
   const updatedNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
   const currentLevel = updatedNightmareInfo?.nightMareData?.level || updatedNightmareInfo?.level
 
   if (currentLevel === 6) {
-    // 3个殿0依次出战
-    console.log('当前层数为6，3个殿0依次出战')
-    // 这里可能需要使用不同的tokens来执行
+    // 殿5出战
+    // 查找殿5Token
+    const dian5Tokens = findTokensByRemark('殿5')
+    if (dian5Tokens.length === 0) {
+      throw new Error('没有找到殿5Token')
+    }
+    const dian5Token = dian5Tokens[0]
+    
+    await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+    await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
+    
+    // 等待22秒
+    await new Promise(resolve => setTimeout(resolve, 22000))
+
+    // 再次检查层数
+    const updatedNightmareInfo2 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+    const currentLevel2 = updatedNightmareInfo2?.nightMareData?.level || updatedNightmareInfo2?.level
+
+    if (currentLevel2 === 6) {
+      // 模拟点击解散十殿按钮
+      message.info('当前层数仍为6，执行解散十殿...')
+      await tokenStore.sendNightmareDismiss(token.id, { roomId })
+    }
   }
 }
 
@@ -3697,11 +3783,36 @@ const executeDian7Fight = async () => {
     throw new Error('未能获取到房间ID，请先点击"房间号"按钮获取')
   }
 
+  // 查找殿7Token
+  const dian7TokensForFight = findTokensByRemark('殿7')
+  if (dian7TokensForFight.length === 0) {
+    throw new Error('没有找到殿7Token')
+  }
+  const dian7Token = dian7TokensForFight[0]
+
   // 设置出战人员（殿7）
-  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(token.id) })
+  await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
 
   // 开始战斗（殿7）
-  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(token.id) })
+  await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
+  
+  // 等待22秒
+  await new Promise(resolve => setTimeout(resolve, 22000))
+
+  // 检查层数
+  const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+  let roleId = token.id
+  if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
+    roleId = roleInfo.role.roleId
+  }
+  const updatedNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
+  const currentLevel = updatedNightmareInfo?.nightMareData?.level || updatedNightmareInfo?.level
+
+  if (currentLevel === 7) {
+    // 模拟点击解散十殿按钮
+    message.info('当前层数为7，执行解散十殿...')
+    await tokenStore.sendNightmareDismiss(token.id, { roomId })
+  }
 }
 
 // 组件卸载前清理连接池

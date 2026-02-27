@@ -1163,11 +1163,6 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "nightmare_dismiss", params);
   };
 
-  // 发送游戏消息
-  const sendGameMessage = (tokenId: string, cmd: string, params = {}) => {
-    return sendMessageWithPromise(tokenId, cmd, params);
-  };
-
   // 发送获取角色队伍信息
   const sendMatchteamGetRoleTeamInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "matchteam_getroleteaminfo", params);
