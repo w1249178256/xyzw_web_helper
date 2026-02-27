@@ -369,8 +369,8 @@ export function registerDefaultCommands(reg) {
 
     // 商店相关（新增）
     .register("store_setpurchase", { purchaseCnt: 2, purchaseItemList: [
-      {itemId: 2002, discount: 4}, {itemId: 2003, discount: 5}, 
-      {itemId: 2004, discount: 8}, {itemId: 1012, discount: 7}
+      {discount: 4, itemId: 2002}, {discount: 5, itemId: 2003}, 
+      {discount: 8, itemId: 2004}, {discount: 7, itemId: 1012}
     ]})
     .register("store_getpurchase")
 
@@ -1146,6 +1146,7 @@ export class XyzwWebSocketClient {
       fight_startgenieresp: "fight_startgenie",
       hero_exchangeresp: "hero_exchange",
       legion_exchangeresearchresp: "legion_exchangeresearch",
+      store_setpurchaseresp: "store_setpurchase",
       store_getpurchaseresp: "store_getpurchase",
       item_claimboxpointrewardresp: "item_claimboxpointreward",
       activity_claimtaskrewardresp: "activity_claimtaskreward",

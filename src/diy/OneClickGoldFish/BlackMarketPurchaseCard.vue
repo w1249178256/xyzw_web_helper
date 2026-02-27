@@ -63,7 +63,7 @@
             mode="button"
             name="批量设置"
             @button-click="handleBatchSetBlackMarket"
-            :disabled="!selectedTokenId || isBatchSetting"
+            :disabled="isBatchSetting"
             :loading="isBatchSetting"
           />
           
@@ -205,14 +205,7 @@ onMounted(() => {
   loadSettings()
 })
 
-// 预热（发送预热命令）
-const sendPreheat = async (tokenId) => {
-  try {
-    await tokenStore.sendGameMessage(tokenId, 'store_preheat', {})
-  } catch (error) {
-    console.error('预热失败:', error)
-  }
-}
+
 
 // 设置黑市购买
 const handleSetBlackMarket = async () => {
@@ -256,26 +249,23 @@ const handleSetBlackMarket = async () => {
   try {
     isSetting.value = true
     
-    // 先发送预热命令
-    await sendPreheat(token.id)
+
     
     // 构建购买清单
     const purchaseItemList = [
-      { itemId: 2002, discount: bronzeBoxDiscountNum }, // 青铜宝箱
-      { itemId: 2003, discount: goldenBoxDiscountNum }, // 黄金宝箱
-      { itemId: 2004, discount: platinumBoxDiscountNum }, // 铂金宝箱
-      { itemId: 1012, discount: goldenRodDiscountNum }  // 金鱼竿
+      { discount: bronzeBoxDiscountNum, itemId: 2002 }, // 青铜宝箱
+      { discount: goldenBoxDiscountNum, itemId: 2003 }, // 黄金宝箱
+      { discount: platinumBoxDiscountNum, itemId: 2004 }, // 铂金宝箱
+      { discount: goldenRodDiscountNum, itemId: 1012 }  // 金鱼竿
     ]
     
     // 发送设置黑市购买命令
-    const result = await tokenStore.sendMessageWithPromise(
+    const result = await tokenStore.sendStoreSetPurchase(
       token.id,
-      'store_setpurchase',
       {
         purchaseCnt: purchaseCountNum,
         purchaseItemList: purchaseItemList
-      },
-      10000
+      }
     )
     
     if (result && (result.code === 0 || result.code === undefined || result.success === true)) {
@@ -375,10 +365,10 @@ const handleBatchSetBlackMarket = async () => {
     
     // 构建购买清单
     const purchaseItemList = [
-      { itemId: 2002, discount: bronzeBoxDiscountNum },
-      { itemId: 2003, discount: goldenBoxDiscountNum },
-      { itemId: 2004, discount: platinumBoxDiscountNum },
-      { itemId: 1012, discount: goldenRodDiscountNum }
+      { discount: bronzeBoxDiscountNum, itemId: 2002 },
+      { discount: goldenBoxDiscountNum, itemId: 2003 },
+      { discount: platinumBoxDiscountNum, itemId: 2004 },
+      { discount: goldenRodDiscountNum, itemId: 1012 }
     ]
     
     for (let i = 0; i < targetTokens.length; i++) {
@@ -414,18 +404,15 @@ const handleBatchSetBlackMarket = async () => {
           continue
         }
         
-        // 先发送预热命令
-        await sendPreheat(token.id)
+
         
         // 发送设置黑市购买命令
-        const result = await tokenStore.sendMessageWithPromise(
+        const result = await tokenStore.sendStoreSetPurchase(
           token.id,
-          'store_setpurchase',
           {
             purchaseCnt: purchaseCountNum,
             purchaseItemList: purchaseItemList
-          },
-          10000
+          }
         )
         
         if (result && (result.code === 0 || result.code === undefined || result.success === true)) {

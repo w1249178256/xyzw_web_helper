@@ -292,7 +292,8 @@ export class ConnectionPoolManager {
     async batchOperate(tokens, operationFn, options = {}) {
         const {
             batchSize = 20,
-            delayBetween = 300,  // 操作之间的延迟
+            delayBetween = 100,  // 操作之间的延迟（从300ms减少到100ms）
+            keepConnections = true,  // 保持连接，不频繁断开
             onProgress = null    // 进度回调函数
         } = options;
 
@@ -393,14 +394,28 @@ export class ConnectionPoolManager {
                         });
                     }
                 } finally {
-                    // 释放连接
+                    // 释放连接（如果keepConnections为true，则不断开连接）
                     if (acquired) {
                         try {
-                            await this.release(token.id);
+                            await this.release(token.id, !keepConnections);
                         } catch (releaseError) {
                             console.error(`释放连接失败:`, releaseError);
                         }
                     }
+                }
+            }
+        }
+
+        // 如果保持连接，最后统一断开所有连接
+        if (keepConnections) {
+            for (const token of tokens) {
+                try {
+                    const status = this.tokenStore.getWebSocketStatus(token.id);
+                    if (status === 'connected') {
+                        await this.release(token.id, true);
+                    }
+                } catch (error) {
+                    console.error(`最终释放连接失败:`, error);
                 }
             }
         }

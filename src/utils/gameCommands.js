@@ -1464,10 +1464,10 @@ export class GameCommands {
       body: this.g_utils.bon.encode({
         purchaseCnt: params.purchaseCnt || 2,
         purchaseItemList: [
-          {itemId: 2002, discount: params.discount || 4},
-          {itemId: 2003, discount: params.discount || 5},
-          {itemId: 2004, discount: params.discount || 8},
-          {itemId: 1012, discount: params.discount || 7}
+          {discount: params.discount, itemId: 2002},
+          {discount: params.discount, itemId: 2003},
+          {discount: params.discount, itemId: 2004},
+          {discount: params.discount, itemId: 1012}
         ],
         ...params
       }),
