@@ -45,15 +45,6 @@
                 Token: {{ log.tokenName }}
               </div>
               <div class="log-message">{{ log.message }}</div>
-              <div v-if="log.command" class="log-command">
-                <div class="log-command-header">命令: {{ log.command }}</div>
-                <div v-if="log.commandParams" class="log-command-params">
-                  参数: <pre>{{ JSON.stringify(log.commandParams, null, 2) }}</pre>
-                </div>
-                <div v-if="log.response" class="log-command-response">
-                  返回结果: <pre>{{ JSON.stringify(log.response, null, 2) }}</pre>
-                </div>
-              </div>
               <div v-if="log.details" class="log-details">
                 <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>
               </div>
@@ -85,6 +76,10 @@ const props = defineProps({
   filterOperations: {
     type: Array,
     default: () => [] // 如果为空数组，显示所有操作；否则只显示匹配的操作
+  },
+  cardType: {
+    type: String,
+    default: '' // 卡片类型，如果指定则只显示该卡片的日志
   }
 })
 
@@ -95,10 +90,19 @@ const logListRef = ref(null)
 const pageLogs = computed(() => logStore.getLogsByPage(props.page).value)
 
 const filteredLogs = computed(() => {
-  if (props.filterOperations.length === 0) {
-    return pageLogs.value
+  let logs = pageLogs.value
+  
+  // 如果指定了卡片类型，先按卡片类型过滤
+  if (props.cardType) {
+    logs = logs.filter(log => log.cardType === props.cardType)
   }
-  return pageLogs.value.filter(log => props.filterOperations.includes(log.operation))
+  
+  // 如果指定了操作过滤，再按操作过滤
+  if (props.filterOperations.length > 0) {
+    logs = logs.filter(log => props.filterOperations.includes(log.operation))
+  }
+  
+  return logs
 })
 
 const getStatusText = (status) => {
@@ -112,7 +116,11 @@ const getStatusText = (status) => {
 }
 
 const handleClearLogs = () => {
-  if (props.filterOperations.length > 0) {
+  if (props.cardType) {
+    // 如果指定了卡片类型，只清空该卡片的日志
+    logStore.clearLogsByPage(props.page, props.cardType)
+    message.success('日志已清空')
+  } else if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只清空这些操作的日志
     const allLogs = logStore.getLogsByPage(props.page).value
     const logsToKeep = allLogs.filter(log => !props.filterOperations.includes(log.operation))
@@ -125,7 +133,11 @@ const handleClearLogs = () => {
 }
 
 const handleExportLogs = () => {
-  if (props.filterOperations.length > 0) {
+  if (props.cardType) {
+    // 如果指定了卡片类型，只导出该卡片的日志
+    logStore.exportLogs(props.page, props.cardType)
+    message.success('日志已导出')
+  } else if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只导出这些操作的日志
     const allLogs = logStore.getLogsByPage(props.page).value
     const logsToExport = allLogs.filter(log => props.filterOperations.includes(log.operation))
@@ -147,15 +159,6 @@ const handleExportLogs = () => {
       }
       lines.push(`  状态: ${log.status === 'success' ? '成功' : log.status === 'error' ? '失败' : log.status === 'warning' ? '警告' : '信息'}`)
       lines.push(`  消息: ${log.message}`)
-      if (log.command) {
-        lines.push(`  命令: ${log.command}`)
-        if (log.commandParams) {
-          lines.push(`  命令参数: ${JSON.stringify(log.commandParams, null, 2)}`)
-        }
-        if (log.response) {
-          lines.push(`  返回结果: ${JSON.stringify(log.response, null, 2)}`)
-        }
-      }
       if (log.details) {
         lines.push(`  详情: ${JSON.stringify(log.details, null, 2)}`)
       }
@@ -296,41 +299,6 @@ watch(filteredLogs, () => {
 
 .log-message {
   margin-bottom: 4px;
-}
-
-.log-command {
-  margin-top: 8px;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  border-left: 2px solid #2080f0;
-}
-
-.log-command-header {
-  font-weight: 500;
-  color: #2080f0;
-  margin-bottom: 4px;
-  font-size: 12px;
-}
-
-.log-command-params,
-.log-command-response {
-  margin-top: 4px;
-  font-size: 11px;
-}
-
-.log-command-params pre,
-.log-command-response pre {
-  margin: 4px 0 0 0;
-  padding: 4px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 2px;
-  font-size: 10px;
-  font-family: monospace;
-  max-height: 150px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
 }
 
 .log-details {

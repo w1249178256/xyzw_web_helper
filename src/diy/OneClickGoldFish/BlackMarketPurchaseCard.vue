@@ -97,7 +97,7 @@
       <!-- 操作日志 -->
       <OperationLogCard 
         page="fish-helper" 
-        :filter-operations="['确认设置', '批量设置', '导出黑市设置', '导出资源信息']"
+        card-type="黑市购买设置"
       />
     </template>
   </MyCard>
@@ -105,7 +105,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useTokenStore } from '@/stores/tokenStore'
+import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
+import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useMessage } from 'naive-ui'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
@@ -114,6 +115,7 @@ import { Settings } from '@vicons/ionicons5'
 import { savePageTokenCards, loadPageTokenCards } from '@/utils/pageTokenStorage'
 
 const tokenStore = useTokenStore()
+const logStore = useOperationLogStore()
 const message = useMessage()
 
 const props = defineProps({
@@ -270,10 +272,33 @@ const handleSetBlackMarket = async () => {
     
     if (result && (result.code === 0 || result.code === undefined || result.success === true)) {
       message.success('黑市购买设置成功')
+      
+      // 添加操作日志
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '黑市购买设置',
+        operation: '确认设置',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: '黑市购买设置成功'
+      })
+      
       await saveSettings()
     } else {
       const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
       message.error(`黑市购买设置失败: ${errorMsg}`)
+      
+      // 添加操作日志
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '黑市购买设置',
+        operation: '确认设置',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'error',
+        message: `黑市购买设置失败: ${errorMsg}`
+      })
     }
   } catch (error) {
     console.error('设置黑市购买失败:', error)
@@ -362,6 +387,7 @@ const handleBatchSetBlackMarket = async () => {
     
     let successCount = 0
     let failCount = 0
+    const failedTokens = [] // 记录失败的token
     
     // 构建购买清单
     const purchaseItemList = [
@@ -418,10 +444,33 @@ const handleBatchSetBlackMarket = async () => {
         if (result && (result.code === 0 || result.code === undefined || result.success === true)) {
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 设置成功`)
           successCount++
+          
+          // 添加操作日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '黑市购买设置',
+            operation: '批量设置',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `黑市购买设置成功`
+          })
         } else {
           failCount++
+          failedTokens.push(token.name || token.id) // 记录失败的token
           const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 设置失败: ${errorMsg}`)
+          
+          // 添加操作日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '黑市购买设置',
+            operation: '批量设置',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `黑市购买设置失败: ${errorMsg}`
+          })
         }
         
         if (i < targetTokens.length - 1) {
@@ -432,6 +481,17 @@ const handleBatchSetBlackMarket = async () => {
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 设置失败`)
         failCount++
       }
+    }
+    
+    // 批量设置完成，添加汇总日志
+    if (failedTokens.length > 0) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '黑市购买设置',
+        operation: '批量设置',
+        status: 'error',
+        message: `批量设置完成，失败的Token: ${failedTokens.join(', ')}`
+      })
     }
     
     message.success(`批量设置完成: 成功 ${successCount} 个, 失败 ${failCount} 个`)
