@@ -141,7 +141,12 @@ const uploadBin = (binFile: File) => {
       const roleToken = await transformToken(userToken);
       const roleName = roleMeta.roleName || binFile.name.split(".")?.[0] || "";
       // 刷新indexDB数据库token数据
-      storeArrayBuffer(tokenId, userToken);
+      const saved = await storeArrayBuffer(tokenId, userToken);
+      if (!saved) {
+        message.error("保存BIN数据到IndexedDB失败");
+        return;
+      }
+      
       // 上传列表中发现已存在的重复名称，提示消息
       if (roleList.value.some((role) => role.id === tokenId)) {
         message.error("上传列表中已存在同名角色! ");

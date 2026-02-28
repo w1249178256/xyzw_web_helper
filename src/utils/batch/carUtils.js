@@ -99,15 +99,95 @@ export const countRacingRefreshTickets = (rewards) => {
 };
 
 /**
+ * 检查奖励是否满足自定义条件
+ * @param {Array} rewards - 奖励列表
+ * @param {object} conditions - 自定义条件 { gold, recruit, jade, ticket }
+ * @param {boolean} matchAll - 是否需要满足所有条件 (true: AND, false: OR)
+ * @returns {boolean} - 是否满足条件
+ */
+const checkRewardConditions = (rewards, conditions, matchAll = false) => {
+  if (!Array.isArray(rewards) || !conditions) return false;
+  const { gold, recruit, jade, ticket } = conditions;
+  
+  // 如果没有设置任何条件，直接返回false
+  if (!gold && !recruit && !jade && !ticket) return false;
+
+  let goldCount = 0;
+  let recruitCount = 0;
+  let jadeCount = 0;
+  let ticketCount = 0;
+
+  rewards.forEach((r) => {
+    const val = Number(r.value || r.num || r.quantity || r.count || 0);
+    const type = Number(r.type || 0);
+    const itemId = Number(r.itemId || 0);
+
+    // Gold Bricks: type 2 (itemId 0 usually)
+    if (type === 2) {
+      goldCount += val;
+    }
+    // Recruit Orders: itemId 1001
+    if (itemId === 1001) {
+      recruitCount += val;
+    }
+    // White Jade: itemId 1022
+    if (itemId === 1022) {
+      jadeCount += val;
+    }
+    // Refresh Ticket: itemId 35002
+    if (itemId === 35002) {
+      ticketCount += val;
+    }
+  });
+
+  if (matchAll) {
+    // 必须满足所有设置了阈值的条件
+    if (gold > 0 && goldCount < gold) return false;
+    if (recruit > 0 && recruitCount < recruit) return false;
+    if (jade > 0 && jadeCount < jade) return false;
+    if (ticket > 0 && ticketCount < ticket) return false;
+    return true;
+  } else {
+    if (gold > 0 && goldCount >= gold) return true;
+    if (recruit > 0 && recruitCount >= recruit) return true;
+    if (jade > 0 && jadeCount >= jade) return true;
+    if (ticket > 0 && ticketCount >= ticket) return true;
+    return false;
+  }
+};
+
+/**
  * 判断是否应该发车
  * @param {object} car - 车辆对象
  * @param {number} tickets - 刷新票数量
  * @param {number} minColor - 最小颜色等级
+ * @param {object} customConditions - 自定义条件 { gold, recruit, jade, ticket }
+ * @param {boolean} useGoldRefreshFallback - 是否启用金砖刷新保底
+ * @param {boolean} matchAll - 是否需要满足所有自定义条件
  * @returns {boolean} - 是否应该发车
  */
-export const shouldSendCar = (car, tickets, minColor = 4) => {
+export const shouldSendCar = (car, tickets, minColor = 4, customConditions = {}, useGoldRefreshFallback = false, matchAll = false) => {
   const color = Number(car?.color || 0);
   const rewards = Array.isArray(car?.rewards) ? car.rewards : [];
+  
+  // 检查自定义条件
+  const customConditionsMet = checkRewardConditions(rewards, customConditions, matchAll);
+
+  // 如果开启了保底（严格模式），必须同时满足车辆颜色要求和自定义条件
+  if (useGoldRefreshFallback) {
+    // 1. 必须达到保底颜色
+    if (color < minColor) {
+      return false;
+    }
+    // 2. 必须满足自定义条件
+    return customConditionsMet;
+  }
+
+  // 非严格模式：只要满足自定义条件，直接发车（视作大奖）
+  if (customConditionsMet) {
+    return true;
+  }
+
   const racingTickets = countRacingRefreshTickets(rewards);
   if (tickets >= 6) {
     return (
@@ -202,8 +282,15 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
           // Check if we should send immediately
           // 当启用金砖保底时，强制使用高票数的判断逻辑（严格模式），避免因票数不足而提前发车
           const effectiveTickets = batchSettings.useGoldRefreshFallback ? 999 : refreshTickets;
+          
+          const customConditions = {
+            gold: batchSettings.smartDepartureGoldThreshold,
+            recruit: batchSettings.smartDepartureRecruitThreshold,
+            jade: batchSettings.smartDepartureJadeThreshold,
+            ticket: batchSettings.smartDepartureTicketThreshold,
+          };
 
-          if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor)) {
+          if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
             addLog({
               time: new Date().toLocaleTimeString(),
               message: `${token.name} 车辆[${gradeLabel(car.color)}]满足条件，直接发车`,
@@ -236,7 +323,7 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
             shouldRefresh = true;
             addLog({
               time: new Date().toLocaleTimeString(),
-              message: `${token.name} 车辆[${gradeLabel(car.color)}]启用金砖刷新保底`,
+              message: `${token.name} 车辆[${gradeLabel(car.color)}]仍不满足条件且无刷新次数，将启用金砖刷新`,
               type: "warning",
             });
           }
@@ -299,7 +386,7 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
             } catch (_) {}
 
             // Check if good enough now
-            if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor)) {
+            if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
               addLog({
                 time: new Date().toLocaleTimeString(),
                 message: `${token.name} 刷新后车辆[${gradeLabel(car.color)}]满足条件，发车`,
@@ -481,6 +568,25 @@ export function createCarManager({ tokenStore, connectionManager, batchSettings,
                 });
                 break; // 升级失败时跳出循环
               }
+            }
+
+            // 尝试领取改装升级累计奖励
+            try {
+              const rewardRes = await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "car_claimpartconsumereward",
+                {},
+                5000
+              );
+              if (rewardRes && rewardRes.reward) {
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 领取改装升级累计奖励成功`,
+                  type: "success",
+                });
+              }
+            } catch (e) {
+              // 忽略错误
             }
           } catch (e) {
             addLog({

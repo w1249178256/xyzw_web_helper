@@ -262,7 +262,10 @@ const addSelectedRole = async (roleInfo: any) => {
     const roleName = roleInfo.name || `角色_${roleInfo.roleId}`;
 
     // 刷新indexDB数据库token数据 (保存原始bin)
-    storeArrayBuffer(tokenId, newBinBuffer);
+    const saved = await storeArrayBuffer(tokenId, newBinBuffer);
+    if (!saved) {
+      throw new Error("保存BIN数据到IndexedDB失败，请检查浏览器存储空间或权限");
+    }
 
     let sid = Number(roleInfo.serverId);
     let roleIndex = 0;

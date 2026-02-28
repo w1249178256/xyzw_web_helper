@@ -562,45 +562,8 @@ export function createTasksArena(deps) {
       
       // 加载该Token的独立配置，如果未找到则回退到currentSettings
       const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
-
-      const teamInfo = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "presetteam_getinfo",
-        {},
-        5000,
-      );
-      if (!teamInfo || !teamInfo.presetTeamInfo) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `阵容信息异常: ${JSON.stringify(teamInfo)}`,
-          type: "warning",
-        });
-      }
-
-      const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
-      let Isswitching = false;
-      if (currentFormation === tokenSettings.arenaFormation) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
-          type: "info",
-        });
-      } else {
-        await tokenStore.sendMessageWithPromise(
-          tokenId,
-          "presetteam_saveteam",
-          { teamId: tokenSettings.arenaFormation },
-          5000,
-        );
-        Isswitching = true;
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `成功切换到阵容${tokenSettings.arenaFormation}`,
-          type: "info",
-        });
-      }
-
       const token = tokens.value.find((t) => t.id === tokenId);
+
       try {
         addLog({
           time: new Date().toLocaleTimeString(),
@@ -608,6 +571,43 @@ export function createTasksArena(deps) {
           type: "info",
         });
         await ensureConnection(tokenId);
+
+        const teamInfo = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "presetteam_getinfo",
+          {},
+          5000,
+        );
+        if (!teamInfo || !teamInfo.presetTeamInfo) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `阵容信息异常: ${JSON.stringify(teamInfo)}`,
+            type: "warning",
+          });
+        }
+
+        const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
+        let Isswitching = false;
+        if (currentFormation === tokenSettings.arenaFormation) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
+            type: "info",
+          });
+        } else {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "presetteam_saveteam",
+            { teamId: tokenSettings.arenaFormation },
+            5000,
+          );
+          Isswitching = true;
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `成功切换到阵容${tokenSettings.arenaFormation}`,
+            type: "info",
+          });
+        }
         addLog({
           time: new Date().toLocaleTimeString(),
           message: `${token.name} 获取月度任务进度...`,

@@ -44,6 +44,7 @@ const errorCodeMap = {
   12300080: "未达到解锁条件",
   200330: "无效的ID",
   1500040: "上座塔的奖励未领取",
+  1500010: "已经全部通关",
 };
 
 // 事件节流定义表，根据实际需要调整命令和节流时间
@@ -312,6 +313,7 @@ export function registerDefaultCommands(reg) {
     .register("car_getmemberhelpingcnt")
     .register("car_getmemberrank")
     .register("car_research")
+    .register("car_claimpartconsumereward")
 
     // 功法
     .register("legacy_getinfo")
@@ -1082,6 +1084,8 @@ export class XyzwWebSocketClient {
       car_sendresp: "car_send",
       car_getmemberhelpingcntresp: "car_getmemberhelpingcnt",
       car_getmemberrankresp: "car_getmemberrank",
+      car_researchresp: "car_research",
+      car_claimpartconsumerewardresp: "car_claimpartconsumereward",
       role_gettargetteamresp: "role_gettargetteam",
       activity_warorderclaimresp: "activity_recyclewarorderrewardclaim",
       arena_getarearankresp: "arena_getarearank",

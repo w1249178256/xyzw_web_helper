@@ -629,7 +629,7 @@ import { h, onMounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { transformToken } from "@/utils/token";
 import useIndexedDB from "@/hooks/useIndexedDB";
-const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer } = useIndexedDB();
+const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } = useIndexedDB();
 // 接收路由参数
 const props = defineProps({
   token: String,
@@ -1202,8 +1202,8 @@ const deleteToken = (token) => {
     content: `确定要删除Token "${token.name}" 吗？此操作无法恢复。`,
     positiveText: "确定删除",
     negativeText: "取消",
-    onPositiveClick: () => {
-      tokenStore.removeToken(token.id);
+    onPositiveClick: async () => {
+      await tokenStore.removeToken(token.id);
       message.success("Token已删除");
     },
   });
@@ -1364,8 +1364,8 @@ const importTokenFile = () => {
   input.click();
 };
 
-const cleanExpiredTokens = () => {
-  const count = tokenStore.cleanExpiredTokens();
+const cleanExpiredTokens = async () => {
+  const count = await tokenStore.cleanExpiredTokens();
   message.success(`已清理 ${count} 个过期Token`);
 };
 
@@ -1382,8 +1382,8 @@ const clearAllTokens = () => {
     content: "确定要清除所有Token吗？此操作无法恢复！",
     positiveText: "确定清除",
     negativeText: "取消",
-    onPositiveClick: () => {
-      tokenStore.clearAllTokens();
+    onPositiveClick: async () => {
+      await tokenStore.clearAllTokens();
       message.success("所有Token已清除");
     },
   });

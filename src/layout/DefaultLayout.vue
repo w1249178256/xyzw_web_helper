@@ -218,10 +218,10 @@ const userMenuOptions = [
 ];
 
 // 方法
-const handleUserAction = (key) => {
+const handleUserAction = async (key) => {
   switch (key) {
     case "logout":
-      tokenStore.clearAllTokens();
+      await tokenStore.clearAllTokens();
       message.success("已清除所有Token");
       router.push("/tokens");
       break;
