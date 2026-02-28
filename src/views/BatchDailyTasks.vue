@@ -609,6 +609,14 @@
                 >
                   一键竞技场补齐
                 </n-button>
+                <n-button
+                  size="small"
+                  @click="openWarGuessModal"
+                  :disabled="isRunning || selectedTokens.length === 0 || !isWarGuessActivityOpen"
+                  :title="isWarGuessActivityOpen ? '' : warGuessActivityTip"
+                >
+                  月赛助威
+                </n-button>
               </n-space>
             </n-tab-pane>
           </n-tabs>
@@ -1964,6 +1972,45 @@
       </div>
     </n-modal>
 
+    <!-- War Guess Modal -->
+    <n-modal
+      v-model:show="showWarGuessModal"
+      preset="card"
+      title="月赛助威"
+      style="width: 90%; max-width: 800px"
+    >
+      <div class="settings-content">
+        <div class="settings-grid" style="display: block;">
+          <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 16px">拍手器:</span>
+             <n-input-number v-model:value="warGuessCoin" placeholder="拍手器" :min="1" :max="20" style="width: 120px" >
+             </n-input-number>
+             <n-button type="primary" @click="handleWarGuessCheer" :disabled="!selectedWarGuessLegionId || isRunning">
+               助威
+             </n-button>
+             <n-button @click="fetchWarGuessRank" :loading="warGuessLoading">
+               刷新数据
+             </n-button>
+          </div>
+          
+          <n-data-table
+            :columns="warGuessColumns"
+            :data="warGuessList"
+            :loading="warGuessLoading"
+            :row-key="row => row.id"
+            :checked-row-keys="selectedWarGuessLegionId ? [selectedWarGuessLegionId] : []"
+            @update:checked-row-keys="(keys) => selectedWarGuessLegionId = keys[0]"
+            :row-props="warGuessRowProps"
+            style="height: 400px; flex: 1;"
+            flex-height
+          />
+        </div>
+        <div class="modal-actions" style="margin-top: 20px; text-align: right">
+          <n-button @click="showWarGuessModal = false">关闭</n-button>
+        </div>
+      </div>
+    </n-modal>
+
     <!-- Token Group Management Modal -->
     <n-modal
       v-model:show="showGroupManageModal"
@@ -2236,6 +2283,7 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
+  h,
 } from "vue";
 import { useTokenStore, gameTokens, tokenGroups } from "@/stores/tokenStore";
 import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
@@ -2446,6 +2494,60 @@ const isWeirdTowerActivityOpen = computed(() => {
   return true;
 });
 
+// 获取本月第四个周日的日期
+const getFourthSundayOfMonth = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  
+  // 当月第一天
+  const firstDay = new Date(year, month, 1);
+  const dayOfWeek = firstDay.getDay(); // 0-6
+  
+  // 计算第一个周日的日期 (1号是周日则为1，否则为 1 + 7 - dayOfWeek)
+  let firstSundayDate = 1 + (7 - dayOfWeek) % 7;
+
+  // 仅针对2026年3月进行特殊处理
+  if (year === 2026 && month === 2 && dayOfWeek === 0) {
+    firstSundayDate = 8;
+  }
+  
+  // 第四个周日 = 第一个周日 + 21天
+  return new Date(year, month, firstSundayDate + 21);
+};
+
+const isWarGuessActivityOpen = computed(() => {
+  const now = new Date();
+  
+  // 手动修正：2026年3月1日开放
+  if (now.getFullYear() === 2026 && now.getMonth() === 2 && now.getDate() === 1) {
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    if (hour < 19 || (hour === 19 && minute <= 55)) return true;
+  }
+
+  const fourthSunday = getFourthSundayOfMonth();
+  
+  // 检查是否是今天
+  if (now.getDate() !== fourthSunday.getDate()) return false;
+  
+  // 检查时间 00:00 - 19:55
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  if (hour > 19 || (hour === 19 && minute > 55)) return false;
+  
+  return true;
+});
+
+const warGuessActivityTip = computed(() => {
+  if (isWarGuessActivityOpen.value) return "";
+  
+  const fourthSunday = getFourthSundayOfMonth();
+  const month = fourthSunday.getMonth() + 1;
+  const date = fourthSunday.getDate();
+  return `月赛助威仅在每月第四个周日 (${month}月${date}日) 00:00-19:55 开放`;
+});
+
 const selectedTokens = ref([]);
 const tokenStatus = ref({}); // { tokenId: 'waiting' | 'running' | 'completed' | 'failed' }
 const isRunning = ref(false);
@@ -2474,6 +2576,136 @@ const groupColors = [
   "#eb2f96", // 粉色
   "#fa8c16", // 赤红色
 ];
+
+// ======================
+// War Guess Feature
+// ======================
+const showWarGuessModal = ref(false);
+const warGuessList = ref([]);
+const warGuessLoading = ref(false);
+const warGuessCoin = ref(20);
+const selectedWarGuessLegionId = ref(null);
+const currentGuessCount = ref(0);
+
+const formatPower = (power) => {
+  if (!power) return "0";
+  if (power >= 100000000) {
+    return (power / 100000000).toFixed(2) + "亿";
+  }
+  if (power >= 10000) {
+    return (power / 10000).toFixed(2) + "万";
+  }
+  return power.toString();
+};
+
+const warGuessColumns = [
+  {
+    type: 'selection',
+    multiple: false,
+  },
+  { title: 'ID', key: 'id', width: 100 },
+  { title: '头像', key: 'logo', render(row) {
+      return h('img', { src: row.logo, style: { width: '30px', height: '30px', borderRadius: '50%' } });
+  }, width: 60 },
+  { title: '区服', key: 'serverId', width: 80 },
+  { title: '俱乐部', key: 'name', width: 120 },
+  { title: '战力', key: 'power', render(row) {
+    return formatPower(row.power);
+  }, width: 100 },
+  { title: '红淬', key: 'quenchNum' },
+  { title: '已助威', key: 'guessNum' },
+  { title: '总热度', key: 'totalNum',render(row) {
+    return formatPower(row.totalNum || 0);
+  }, width: 100 },
+];
+
+const warGuessRowProps = (row) => {
+  return {
+    style: "cursor: pointer",
+    onClick: () => {
+      selectedWarGuessLegionId.value = row.id;
+    },
+  };
+};
+
+const openWarGuessModal = () => {
+  showWarGuessModal.value = true;
+  // Reset selection
+  selectedWarGuessLegionId.value = null;
+  warGuessList.value = [];
+  
+  // Auto fetch if tokens selected
+  if (selectedTokens.value.length > 0) {
+      fetchWarGuessRank();
+  }
+};
+
+const fetchWarGuessRank = async () => {
+  if (selectedTokens.value.length === 0) {
+    message.warning("请先选择一个账号用于获取月赛助威数据");
+    return;
+  }
+  
+  const tokenId = selectedTokens.value[0];
+  const token = tokens.value.find(t => t.id === tokenId);
+  
+  warGuessLoading.value = true;
+  try {
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `正在使用 ${token.name} 获取月赛助威数据...`,
+      type: "info",
+    });
+    
+    // Ensure connection
+    const status = tokenStore.getWebSocketStatus(tokenId);
+    if (status !== "connected") {
+        tokenStore.createWebSocketConnection(tokenId, token.token, token.wsUrl);
+        await new Promise(r => setTimeout(r, 2000)); // Wait for connection
+    }
+    
+    // Fetch rank
+    const res = await tokenStore.sendMessageWithPromise(tokenId, "warguess_getrank", { bfId: '' }, 5000);
+    
+    if (res && res.list) {
+      let list = [];
+      if (Array.isArray(res.list)) {
+        list = res.list;
+      } else {
+        list = Object.values(res.list);
+      }
+      
+      // Sort by totalNum desc
+      warGuessList.value = list.sort((a, b) => (b.totalNum || 0) - (a.totalNum || 0)).slice(0, 20);
+    } else {
+      message.warning("获取月赛助威数据为空");
+    }
+    
+  } catch (error) {
+    console.error("Fetch rank error:", error);
+    message.error("获取月赛助威数据失败: " + error.message);
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `获取月赛助威数据失败: ${error.message}`,
+      type: "error",
+    });
+  } finally {
+    warGuessLoading.value = false;
+  }
+};
+
+const handleWarGuessCheer = async () => {
+    if (!selectedWarGuessLegionId.value) {
+        message.warning("请先选择一个俱乐部");
+        return;
+    }
+    // Close modal
+    showWarGuessModal.value = false;
+    // Call the batch function
+    await batchWarGuessCheer(selectedWarGuessLegionId.value, warGuessCoin.value);
+    
+    
+};
 
 // Settings Modal State
 const showSettingsModal = ref(false);
@@ -3363,62 +3595,9 @@ const startScheduler = () => {
           shouldRun = nowTime === taskTime;
           reason = `currentTime=${nowTime}, taskTime=${taskTime}, match=${shouldRun}`;
         } else if (task.runType === "cron") {
-          // Improved cron expression parsing
+          // Improved cron expression parsing using shared utility
           try {
-            const cronParts = task.cronExpression.split(" ").filter(Boolean);
-
-            if (cronParts.length < 5) {
-              console.error(
-                `[${new Date().toISOString()}] Invalid cron expression: ${task.cronExpression}, must have at least 5 parts`,
-              );
-              addLog({
-                time: currentTime,
-                message: `=== 定时任务 ${task.name} 的Cron表达式无效: ${task.cronExpression}，必须包含至少5个字段 ===`,
-                type: "error",
-              });
-              return;
-            }
-
-            const [
-              minuteField,
-              hourField,
-              dayOfMonthField,
-              monthField,
-              dayOfWeekField,
-            ] = cronParts;
-
-            // 使用之前定义的parseCronField函数解析cron字段
-            const possibleMinutes = parseCronField(minuteField, 0, 59);
-            const possibleHours = parseCronField(hourField, 0, 23);
-            const possibleDaysOfMonth = parseCronField(dayOfMonthField, 1, 31);
-            const possibleMonths = parseCronField(monthField, 1, 12);
-            const possibleDaysOfWeek = parseCronField(dayOfWeekField, 0, 7);
-
-            // 检查当前时间是否匹配cron表达式
-            const matchesMinute = possibleMinutes.includes(now.getMinutes());
-            const matchesHour = possibleHours.includes(now.getHours());
-            const matchesDayOfMonth = possibleDaysOfMonth.includes(
-              now.getDate(),
-            );
-            const matchesMonth = possibleMonths.includes(now.getMonth() + 1); // months are 0-based in JS
-            const matchesDayOfWeek = possibleDaysOfWeek.includes(now.getDay()); // 0是周日
-
-            // Special handling: if both dayOfMonth and dayOfWeek are specified, they are OR'ed
-            const isDayOfWeekSpecified = dayOfWeekField !== "*";
-            const isDayOfMonthSpecified = dayOfMonthField !== "*";
-
-            let matchesDay;
-            if (isDayOfWeekSpecified && isDayOfMonthSpecified) {
-              // If both are specified, match either
-              matchesDay = matchesDayOfMonth || matchesDayOfWeek;
-            } else {
-              // If only one is specified, match that one
-              matchesDay = matchesDayOfMonth && matchesDayOfWeek;
-            }
-
-            shouldRun =
-              matchesMinute && matchesHour && matchesDay && matchesMonth;
-            reason = `minute=${matchesMinute}, hour=${matchesHour}, dayOfMonth=${matchesDayOfMonth}, dayOfWeek=${matchesDayOfWeek}, month=${matchesMonth}, matchesDay=${matchesDay}`;
+             shouldRun = matchesCronExpression(task.cronExpression, now);
           } catch (error) {
             console.error(
               `[${new Date().toISOString()}] Error parsing cron expression ${task.cronExpression}:`,
@@ -3431,31 +3610,29 @@ const startScheduler = () => {
             });
             return;
           }
-        }
 
-        if (shouldRun) {
-          // Check if the task was already executed in the last minute to avoid duplicate execution
-          const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
-          const lastExecutionKey = localStorage.getItem(
-            `lastTaskExecution_${task.id}`,
-          );
-
-          if (lastExecutionKey !== taskExecutionKey) {
-            // Update last execution time
-            localStorage.setItem(
+          if (shouldRun) {
+            // Check if the task was already executed in the last minute to avoid duplicate execution
+            const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
+            const lastExecutionKey = localStorage.getItem(
               `lastTaskExecution_${task.id}`,
-              taskExecutionKey,
             );
 
-            // Execute the task
-            lastTaskExecution = Date.now();
-            executeScheduledTask(task);
-          } else {
-            addLog({
-              time: currentTime,
-              message: `=== 任务 ${task.name} 本分钟内已执行，跳过 ===`,
-              type: "info",
-            });
+            if (lastExecutionKey !== taskExecutionKey) {
+              // Update last execution time
+              localStorage.setItem(
+                `lastTaskExecution_${task.id}`,
+                taskExecutionKey,
+              );
+
+              // Execute the task
+              lastTaskExecution = Date.now();
+              executeScheduledTask(task);
+            } else {
+              // Only log once per minute to avoid spamming logs
+              // But since we check every 10s, this might log multiple times if we don't track logged state
+              // For now, we can skip logging "already executed" to keep logs clean
+            }
           }
         }
       });
@@ -4862,7 +5039,7 @@ const createTaskDeps = () => ({
 
 // 初始化任务模块
 const tasksHangUp = createTasksHangUp(createTaskDeps());
-const { claimHangUpRewards, batchAddHangUpTime, batchStudy, batchclubsign } = tasksHangUp;
+const { claimHangUpRewards, batchAddHangUpTime, batchStudy, batchclubsign, batchWarGuessCheer } = tasksHangUp;
 
 const tasksBottle = createTasksBottle(createTaskDeps());
 const { resetBottles, batchlingguanzi } = tasksBottle;

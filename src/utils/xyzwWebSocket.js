@@ -300,6 +300,9 @@ export function registerDefaultCommands(reg) {
     .register("legion_getpayloadkillrecord")
     .register("legion_getpayloadbf")
     .register("legion_getpayloadrecord")
+    .register("warguess_getrank")
+    .register("warguess_startguess")
+    .register("warguess_getguesscoinreward")
 
     // 珍宝阁相关
     .register("collection_claimfreereward")
@@ -1064,6 +1067,9 @@ export class XyzwWebSocketClient {
       legion_claimpayloadtaskprogressresp: "legion_claimpayloadtaskprogress",
       saltroad_getwartyperesp: "saltroad_getwartype",
       saltroad_getsaltroadwartotalrankresp: "saltroad_getsaltroadwartotalrank",
+      warguess_getrankresp: "warguess_getrank",
+      warguess_startguessresp: "warguess_startguess",
+      warguess_getguesscoinrewardresp: "warguess_getguesscoinreward",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",
