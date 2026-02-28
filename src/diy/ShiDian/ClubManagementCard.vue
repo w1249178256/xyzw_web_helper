@@ -1551,11 +1551,11 @@ const handleExportLegacyDetails = async () => {
 
     // 导出文件
     const content = lines.join('\n')
-    const blob = new Blob(['\ufeff' + content], { type: 'text/plain;charset=utf-8;' })
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `功法详情_${new Date().toISOString().slice(0, 10)}.txt`)
+    link.setAttribute('download', `功法详情_${new Date().toISOString().slice(0, 10)}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -1698,11 +1698,11 @@ const handleExportClubInfo = async () => {
 
     // 导出文件
     const content = lines.join('\n')
-    const blob = new Blob(['\ufeff' + content], { type: 'text/plain;charset=utf-8;' })
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `俱乐部信息_${new Date().toISOString().slice(0, 10)}.txt`)
+    link.setAttribute('download', `俱乐部信息_${new Date().toISOString().slice(0, 10)}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()

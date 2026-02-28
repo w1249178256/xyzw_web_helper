@@ -3083,11 +3083,11 @@ const exportResources = async () => {
 
     // 导出文件
     const content = lines.join('\n')
-    const blob = new Blob(['\ufeff' + content], { type: 'text/plain;charset=utf-8;' })
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    const fileName = `资源导出_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}.txt`
+    const fileName = `资源导出_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}.csv`
     link.setAttribute('download', fileName)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)

@@ -49,6 +49,11 @@
           :selected-token-id="selectedTokenId"
         />
 
+        <!-- 养号卡片 -->
+        <AccountMaintenanceCard 
+          :selected-token-id="selectedTokenId"
+        />
+
         <!-- 资源管理卡片 -->
         <ResourceManagementCard 
           :selected-token-id="selectedTokenId"
@@ -134,6 +139,7 @@ import BinTokenForm from '@/views/TokenImport/bin.vue'
 
 // 导入模块化卡片组件
 import BlackMarketPurchaseCard from '@/diy/OneClickGoldFish/BlackMarketPurchaseCard.vue'
+import AccountMaintenanceCard from '@/diy/OneClickGoldFish/AccountMaintenanceCard.vue'
 import ResourceManagementCard from '@/diy/OneClickGoldFish/ResourceManagementCard.vue'
 import TowerStarUpgradeCard from '@/diy/OneClickGoldFish/TowerStarUpgradeCard.vue'
 import FishResourceCard from '@/diy/OneClickGoldFish/FishResourceCard.vue'

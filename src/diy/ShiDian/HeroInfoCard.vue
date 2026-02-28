@@ -230,8 +230,17 @@ const getHeroName = (heroId) => {
 }
 
 // 获取星级显示
+// 1-5: 黄星1-黄星5, 6-10: 紫星1-紫星5, 11-15: 橙星1-橙星5
+// 16-20: 红星1-红星5, 21-25: 黄冠1-黄冠5, 26-30: 紫冠1-紫冠5
 const getStarDisplay = (star) => {
-  return `${star}星`
+  if (star < 1) return '无'
+  if (star <= 5) return `黄星${star}`
+  if (star <= 10) return `紫星${star - 5}`
+  if (star <= 15) return `橙星${star - 10}`
+  if (star <= 20) return `红星${star - 15}`
+  if (star <= 25) return `黄冠${star - 20}`
+  if (star <= 30) return `紫冠${star - 25}`
+  return `未知(${star})`
 }
 
 // 刷新阵容信息
