@@ -398,6 +398,7 @@ export function registerDefaultCommands(reg) {
     .register("activity_startegame")
     .register("activity_commonbuygoods")
     .register("activity_maydaylottery")
+    .register("activity_claimweekactreward")
     .register("mergebox_claimmergeprogress")
     .register("mergebox_claimcostprogress")
     .register("evotower_claimtask")
@@ -1149,12 +1150,14 @@ export class XyzwWebSocketClient {
       store_setpurchaseresp: "store_setpurchase",
       store_getpurchaseresp: "store_getpurchase",
       item_claimboxpointrewardresp: "item_claimboxpointreward",
+      item_batchclaimboxpointrewardresp: "item_batchclaimboxpointreward",
       activity_claimtaskrewardresp: "activity_claimtaskreward",
       activity_getactegameinforesp: "activity_getactegameinfo",
       activity_actegamestageclaimresp: "activity_actegamestageclaim",
       activity_startegameresp: "activity_startegame",
       activity_commonbuygoodsresp: "activity_commonbuygoods",
       activity_maydaylotteryresp: "activity_maydaylottery",
+      activity_claimweekactrewardresp: "activity_claimweekactreward",
       mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
       mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
       evotower_claimtaskresp: "evotower_claimtask",

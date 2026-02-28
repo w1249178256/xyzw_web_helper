@@ -168,13 +168,36 @@
                   align-items: center;
                 "
               >
-                <n-button
-                  type="info"
-                  size="small"
-                  @click="showGroupManageModal = true"
-                >
-                  管理分组
-                </n-button>
+                <n-space>
+                  <n-button
+                    type="info"
+                    size="small"
+                    @click="showGroupManageModal = true"
+                  >
+                    管理分组
+                  </n-button>
+                  <n-button
+                    type="primary"
+                    size="small"
+                    @click="handleAddTokensToGroup"
+                    :disabled="!selectedAddGroupId || !addTokenRange"
+                  >
+                    添加token
+                  </n-button>
+                  <n-select
+                    v-model:value="selectedAddGroupId"
+                    :options="groupOptions"
+                    placeholder="选择分组"
+                    style="width: 120px"
+                    size="small"
+                  />
+                  <n-input
+                    v-model:value="addTokenRange"
+                    placeholder="如 1-30 或 1,2,3"
+                    style="width: 120px"
+                    size="small"
+                  />
+                </n-space>
                 <span
                   v-if="selectedGroups.length > 0"
                   style="font-size: 12px; color: #86909c"
@@ -183,8 +206,75 @@
                   {{ selectedTokens.length }} 个账号
                 </span>
               </div>
+              
+              <!-- 清空token按钮行 -->
+              <div style="margin-top: 8px;">
+                <n-space>
+                  <n-button
+                    type="error"
+                    size="small"
+                    @click="handleClearGroupTokens"
+                    :disabled="!selectedClearGroupId"
+                  >
+                    清空token
+                  </n-button>
+                  <n-select
+                    v-model:value="selectedClearGroupId"
+                    :options="groupOptions"
+                    placeholder="选择分组"
+                    style="width: 120px"
+                    size="small"
+                  />
+                </n-space>
+              </div>
             </n-space>
           </div>
+          
+          <!-- 多选功能区域 -->
+          <div style="margin-bottom: 12px; padding: 8px; background-color: #f5f5f5; border-radius: 6px;">
+            <n-space align="center" wrap>
+              <span style="font-size: 13px; color: #666;">多选功能：</span>
+              <n-checkbox v-model:checked="multiSelectTasks.claimHangUp">
+                领取挂机
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.genieSweep">
+                一键灯神扫荡
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.resetBottles">
+                重置罐子
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchlingguanzi">
+                领取罐子
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchclubsign">
+                一键俱乐部签到
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batcharenafight">
+                一键竞技场战斗3次
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.store_purchase">
+                一键黑市采购
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchHeroUpgrade">
+                一键英雄升星
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchBookUpgrade">
+                一键图鉴升级
+              </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchClaimStarRewards">
+                一键领取图鉴奖励
+              </n-checkbox>
+              <n-button
+                type="primary"
+                size="small"
+                @click="executeMultiSelectedTasks"
+                :disabled="isRunning || selectedTokens.length === 0 || !hasSelectedMultiTask"
+              >
+                执行选中功能
+              </n-button>
+            </n-space>
+          </div>
+          
           <n-space style="margin-bottom: 12px">
             <n-button
               size="small"
@@ -2339,6 +2429,328 @@ const groupColors = [
   "#eb2f96", // 粉色
   "#fa8c16", // 赤红色
 ];
+
+// 添加token到分组相关状态
+const selectedAddGroupId = ref(null);
+const addTokenRange = ref("");
+const selectedClearGroupId = ref(null);
+
+// 多选功能状态
+const multiSelectTasks = reactive({
+  claimHangUp: false,
+  genieSweep: false,
+  resetBottles: false,
+  batchlingguanzi: false,
+  batchclubsign: false,
+  batcharenafight: false,
+  store_purchase: false,
+  batchHeroUpgrade: false,
+  batchBookUpgrade: false,
+  batchClaimStarRewards: false,
+});
+
+// 分组选项（用于下拉选择）
+const groupOptions = computed(() => {
+  return tokenGroups.value.map(group => ({
+    label: group.name,
+    value: group.id
+  }));
+});
+
+// 是否有选中的多选功能
+const hasSelectedMultiTask = computed(() => {
+  return multiSelectTasks.claimHangUp || 
+         multiSelectTasks.genieSweep || 
+         multiSelectTasks.resetBottles || 
+         multiSelectTasks.batchlingguanzi || 
+         multiSelectTasks.batchclubsign || 
+         multiSelectTasks.batcharenafight || 
+         multiSelectTasks.store_purchase || 
+         multiSelectTasks.batchHeroUpgrade || 
+         multiSelectTasks.batchBookUpgrade || 
+         multiSelectTasks.batchClaimStarRewards;
+});
+
+// 解析Token范围
+const parseTokenRangeInput = (rangeStr) => {
+  if (!rangeStr || !rangeStr.trim()) {
+    return [];
+  }
+  
+  const tokens = [];
+  const parts = rangeStr.split(',');
+  
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (trimmed.includes('-')) {
+      const [start, end] = trimmed.split('-').map(Number);
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        for (let i = start; i <= end; i++) {
+          tokens.push(i);
+        }
+      }
+    } else {
+      const num = Number(trimmed);
+      if (!isNaN(num)) {
+        tokens.push(num);
+      }
+    }
+  }
+  
+  return tokens;
+};
+
+// 添加token到分组
+const handleAddTokensToGroup = () => {
+  if (!selectedAddGroupId.value || !addTokenRange.value) {
+    return;
+  }
+  
+  const tokenIndices = parseTokenRangeInput(addTokenRange.value);
+  if (tokenIndices.length === 0) {
+    message.warning('请输入有效的Token范围');
+    return;
+  }
+  
+  // 获取按名称排序的token列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase();
+    const nameB = (b.name || '未命名').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  
+  let addedCount = 0;
+  tokenIndices.forEach(index => {
+    const arrayIndex = index - 1;
+    if (arrayIndex >= 0 && arrayIndex < sortedTokensList.length) {
+      const token = sortedTokensList[arrayIndex];
+      tokenStore.addTokenToGroup(selectedAddGroupId.value, token.id);
+      addedCount++;
+    }
+  });
+  
+  message.success(`已将 ${addedCount} 个Token添加到分组`);
+  addTokenRange.value = "";
+};
+
+// 清空分组中的所有token
+const handleClearGroupTokens = () => {
+  if (!selectedClearGroupId.value) {
+    return;
+  }
+  
+  const group = tokenGroups.value.find(g => g.id === selectedClearGroupId.value);
+  if (!group) {
+    message.warning('分组不存在');
+    return;
+  }
+  
+  // 获取分组中的所有token
+  const tokensInGroup = tokenStore.gameTokens.filter(token => 
+    tokenStore.getTokenGroups(token.id).some(g => g.id === selectedClearGroupId.value)
+  );
+  
+  if (tokensInGroup.length === 0) {
+    message.info('该分组中没有Token');
+    return;
+  }
+  
+  // 从分组中移除所有token
+  tokensInGroup.forEach(token => {
+    tokenStore.removeTokenFromGroup(selectedClearGroupId.value, token.id);
+  });
+  
+  message.success(`已清空分组「${group.name}」中的 ${tokensInGroup.length} 个Token`);
+};
+
+// 执行多选功能
+const executeMultiSelectedTasks = async () => {
+  if (selectedTokens.value.length === 0) {
+    message.warning('请先选择Token');
+    return;
+  }
+  
+  if (!hasSelectedMultiTask.value) {
+    message.warning('请至少选择一个功能');
+    return;
+  }
+  
+  isRunning.value = true;
+  shouldStop.value = false;
+  
+  const selectedTaskNames = [];
+  if (multiSelectTasks.claimHangUp) selectedTaskNames.push('领取挂机');
+  if (multiSelectTasks.genieSweep) selectedTaskNames.push('一键灯神扫荡');
+  if (multiSelectTasks.resetBottles) selectedTaskNames.push('重置罐子');
+  if (multiSelectTasks.batchlingguanzi) selectedTaskNames.push('领取罐子');
+  if (multiSelectTasks.batchclubsign) selectedTaskNames.push('一键俱乐部签到');
+  if (multiSelectTasks.batcharenafight) selectedTaskNames.push('一键竞技场战斗3次');
+  if (multiSelectTasks.store_purchase) selectedTaskNames.push('一键黑市采购');
+  if (multiSelectTasks.batchHeroUpgrade) selectedTaskNames.push('一键英雄升星');
+  if (multiSelectTasks.batchBookUpgrade) selectedTaskNames.push('一键图鉴升级');
+  if (multiSelectTasks.batchClaimStarRewards) selectedTaskNames.push('一键领取图鉴奖励');
+  
+  message.info(`开始执行多选功能：${selectedTaskNames.join('、')}，共${selectedTokens.value.length}个Token`);
+  
+  // 获取按名称排序的token列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase();
+    const nameB = (b.name || '未命名').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  
+  for (let i = 0; i < selectedTokens.value.length; i++) {
+    if (shouldStop.value) break;
+    
+    const tokenId = selectedTokens.value[i];
+    const token = sortedTokensList.find(t => t.id === tokenId);
+    if (!token) continue;
+    
+    tokenStatus.value[tokenId] = 'running';
+    
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `=== 开始执行: ${token.name} ===`,
+        type: "info",
+      });
+      
+      // 确保连接
+      await ensureConnection(tokenId);
+      
+      // 按顺序执行选中的功能
+      if (multiSelectTasks.claimHangUp) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行领取挂机...`,
+          type: "info",
+        });
+        await tasksHangUp.claimHangUpRewardsForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.genieSweep) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键灯神扫荡...`,
+          type: "info",
+        });
+        await tasksItem.batchGenieSweepForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.resetBottles) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行重置罐子...`,
+          type: "info",
+        });
+        await tasksBottle.resetBottlesForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchlingguanzi) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行领取罐子...`,
+          type: "info",
+        });
+        await tasksBottle.batchlingguanziForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchclubsign) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键俱乐部签到...`,
+          type: "info",
+        });
+        await tasksHangUp.batchclubsignForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batcharenafight) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键竞技场战斗3次...`,
+          type: "info",
+        });
+        await tasksArena.batcharenafightForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.store_purchase) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键黑市采购...`,
+          type: "info",
+        });
+        await tasksStore.store_purchaseForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchHeroUpgrade) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键英雄升星...`,
+          type: "info",
+        });
+        await tasksItem.batchHeroUpgradeForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchBookUpgrade) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键图鉴升级...`,
+          type: "info",
+        });
+        await tasksItem.batchBookUpgradeForToken(tokenId);
+      }
+      
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchClaimStarRewards) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键领取图鉴奖励...`,
+          type: "info",
+        });
+        await tasksItem.batchClaimStarRewardsForToken(tokenId);
+      }
+      
+      tokenStatus.value[tokenId] = 'success';
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `=== 完成: ${token.name} ===`,
+        type: "success",
+      });
+    } catch (error) {
+      tokenStatus.value[tokenId] = 'error';
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 执行失败: ${error.message || '未知错误'}`,
+        type: "error",
+      });
+    }
+    
+    // Token之间的延迟
+    if (i < selectedTokens.value.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, batchSettings.taskDelay || 500));
+    }
+  }
+  
+  isRunning.value = false;
+  message.success('多选功能执行完成');
+};
 
 // Settings Modal State
 const showSettingsModal = ref(false);
@@ -4523,10 +4935,10 @@ const createTaskDeps = () => ({
 
 // 初始化任务模块
 const tasksHangUp = createTasksHangUp(createTaskDeps());
-const { claimHangUpRewards, batchAddHangUpTime, batchStudy, batchclubsign } = tasksHangUp;
+const { claimHangUpRewards, claimHangUpRewardsForToken, batchAddHangUpTime, batchStudy, batchclubsign, batchclubsignForToken } = tasksHangUp;
 
 const tasksBottle = createTasksBottle(createTaskDeps());
-const { resetBottles, batchlingguanzi } = tasksBottle;
+const { resetBottles, batchlingguanzi, resetBottlesForToken, batchlingguanziForToken } = tasksBottle;
 
 const tasksTower = createTasksTower(createTaskDeps());
 const { climbTower, climbWeirdTower, batchClaimFreeEnergy, skinChallenge, batchUseItems, batchMergeItems } = tasksTower;
@@ -4541,20 +4953,24 @@ const {
   batchFish,
   batchRecruit,
   batchHeroUpgrade,
+  batchHeroUpgradeForToken,
   batchBookUpgrade,
+  batchBookUpgradeForToken,
   batchClaimStarRewards,
+  batchClaimStarRewardsForToken,
   batchClaimPeachTasks,
   batchGenieSweep,
+  batchGenieSweepForToken,
 } = tasksItem;
 
 const tasksDungeon = createTasksDungeon(createTaskDeps());
 const { batchbaoku13, batchbaoku45, batchmengjing } = tasksDungeon;
 
 const tasksArena = createTasksArena(createTaskDeps());
-const { batcharenafight, batchTopUpFish, batchTopUpArena } = tasksArena;
+const { batcharenafight, batchTopUpFish, batchTopUpArena, batcharenafightForToken } = tasksArena;
 
 const tasksStore = createTasksStore(createTaskDeps());
-const { legion_storebuygoods, legionStoreBuySkinCoins, store_purchase, collection_claimfreereward } = tasksStore;
+const { legion_storebuygoods, legionStoreBuySkinCoins, store_purchase, store_purchaseForToken, collection_claimfreereward } = tasksStore;
 
 const tasksLegacy = createTasksLegacy(createTaskDeps());
 const { batchLegacyClaim, batchLegacyGiftSendEnhanced } = tasksLegacy;

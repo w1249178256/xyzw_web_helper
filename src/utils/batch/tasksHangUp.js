@@ -26,6 +26,59 @@ export function createTasksHangUp(deps) {
   } = deps;
 
   /**
+   * 领取挂机奖励（单个Token）
+   */
+  const claimHangUpRewardsForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取挂机奖励`,
+        type: "info",
+      });
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "system_claimhangupreward",
+        {},
+        5000,
+      );
+      await new Promise((r) => setTimeout(r, 500));
+
+      for (let i = 0; i < 4; i++) {
+        if (shouldStop.value) break;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 挂机加钟 ${i + 1}/4`,
+          type: "info",
+        });
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "system_mysharecallback",
+          { isSkipShareCard: true, type: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取挂机奖励完成`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取挂机奖励失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 领取挂机奖励
    */
   const claimHangUpRewards = async () => {
@@ -325,6 +378,46 @@ export function createTasksHangUp(deps) {
   };
 
   /**
+   * 一键俱乐部签到（单个Token）
+   */
+  const batchclubsignForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始俱乐部签到`,
+        type: "info",
+      });
+
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "legion_signin",
+        {},
+        5000,
+      );
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部签到完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部签到失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 一键俱乐部签到
    */
   const batchclubsign = async () => {
@@ -388,8 +481,10 @@ export function createTasksHangUp(deps) {
 
   return {
     claimHangUpRewards,
+    claimHangUpRewardsForToken,
     batchAddHangUpTime,
     batchStudy,
     batchclubsign,
+    batchclubsignForToken,
   };
 }

@@ -1298,6 +1298,25 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "item_claimboxpointreward", params);
   };
 
+  // 发送批量领取宝箱奖励
+  const sendBatchClaimBoxPointReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_batchclaimboxpointreward", params);
+  };
+
+  // 发送获取活动信息
+  const sendActivityGet = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_get", params);
+  };
+
+  // 发送领取活动周奖励
+  const sendActivityClaimWeekActReward = (tokenId: string, params = {}) => {
+    const defaultParams = {
+      selectRewardsMap: { 0: 1 },
+      typ: 2
+    };
+    return sendMessageWithPromise(tokenId, "activity_claimweekactreward", { ...defaultParams, ...params });
+  };
+
   // 发送领取任务奖励
   const sendActivityClaimTaskReward = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "activity_claimtaskreward", params);
@@ -1984,6 +2003,9 @@ export const useTokenStore = defineStore("tokens", () => {
     sendStoreSetPurchase,
     sendStoreGetPurchase,
     sendItemClaimBoxPointReward,
+    sendBatchClaimBoxPointReward,
+    sendActivityGet,
+    sendActivityClaimWeekActReward,
     sendActivityClaimTaskReward,
     sendActivityGetActeGameInfo,
     sendActivityActeGameStageClaim,

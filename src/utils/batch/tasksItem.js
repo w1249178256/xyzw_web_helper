@@ -42,6 +42,72 @@ export function createTasksItem(deps) {
   const heroIds = Object.keys(HERO_DICT).map(Number);
 
   /**
+   * 批量英雄升星（单个Token）
+   */
+  const batchHeroUpgradeForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始英雄升星`,
+        type: "info",
+      });
+
+      for (const heroId of heroIds) {
+        if (shouldStop.value) break;
+
+        // 每个英雄尝试最多10次升星
+        for (let i = 1; i <= 10; i++) {
+          if (shouldStop.value) break;
+
+          try {
+            const res = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "hero_heroupgradestar",
+              { heroId },
+              5000,
+            );
+            const ok = res && (res.code === 0 || res.success === true || res.result === 0);
+
+            if (ok) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 英雄ID:${heroId} 升星成功 (第${i}次)`,
+                type: "success",
+              });
+              // 成功了继续尝试下一级
+            } else {
+              // 失败说明无法继续升星，跳出循环
+              throw new Error("升星失败");
+            }
+          } catch (err) {
+            // 失败则停止当前英雄的升星尝试
+            break;
+          }
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 英雄升星完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `英雄升星失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 批量英雄升星
    */
   const batchHeroUpgrade = async () => {
@@ -133,6 +199,72 @@ export function createTasksItem(deps) {
   };
 
   /**
+   * 批量图鉴升星（单个Token）
+   */
+  const batchBookUpgradeForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始图鉴升星`,
+        type: "info",
+      });
+
+      for (const heroId of heroIds) {
+        if (shouldStop.value) break;
+
+        // 每个英雄尝试最多10次图鉴升星
+        for (let i = 1; i <= 10; i++) {
+          if (shouldStop.value) break;
+
+          try {
+            const res = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "book_upgrade",
+              { heroId },
+              5000,
+            );
+            const ok = res && (res.code === 0 || res.success === true || res.result === 0);
+
+            if (ok) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 英雄ID:${heroId} 图鉴升星成功 (第${i}次)`,
+                type: "success",
+              });
+              // 成功了继续尝试下一级
+            } else {
+              // 失败说明无法继续图鉴升星，跳出循环
+              throw new Error("图鉴升星失败");
+            }
+          } catch (err) {
+            // 失败则停止当前英雄的图鉴升星尝试
+            break;
+          }
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 图鉴升星完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `图鉴升星失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 批量图鉴升星
    */
   const batchBookUpgrade = async () => {
@@ -221,6 +353,81 @@ export function createTasksItem(deps) {
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("批量图鉴升星结束");
+  };
+
+  /**
+   * 批量领取图鉴奖励（单个Token）
+   */
+  const batchClaimStarRewardsForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始领取图鉴奖励`,
+        type: "info",
+      });
+
+      // 领取图鉴星星奖励
+      const starRewardRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "book_claimstarreward",
+        {},
+        5000
+      );
+      
+      if (starRewardRes?.result === 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴星星奖励领取成功`,
+          type: "success",
+        });
+      } else {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴星星奖励领取失败: ${starRewardRes?.hint || "未知错误"}`,
+          type: "warning",
+        });
+      }
+
+      // 领取图鉴成就奖励
+      const achievementRewardRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "book_claimachievementreward",
+        {},
+        5000
+      );
+      
+      if (achievementRewardRes?.result === 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴成就奖励领取成功`,
+          type: "success",
+        });
+      } else {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴成就奖励领取失败: ${achievementRewardRes?.hint || "未知错误"}`,
+          type: "warning",
+        });
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 图鉴奖励领取完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `图鉴奖励领取失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
   };
 
   /**
@@ -584,6 +791,140 @@ export function createTasksItem(deps) {
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("批量领取蟠桃园任务奖励结束");
+  };
+
+  /**
+   * 一键灯神扫荡（单个Token）
+   */
+  const batchGenieSweepForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始灯神扫荡`,
+        type: "info",
+      });
+
+      const roleInfoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "role_getroleinfo",
+        {},
+        5000
+      );
+      
+      const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
+      const genieData = role.genie || {};
+      const sweepTicketCount = role.items?.[1021]?.quantity || 0;
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 当前扫荡券数量: ${sweepTicketCount}`,
+        type: "info",
+      });
+
+      if (sweepTicketCount <= 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 扫荡券不足，停止扫荡`,
+          type: "warning",
+        });
+        return;
+      }
+
+      let maxLayer = -1;
+      let bestGenieId = -1;
+
+      for (let i = 1; i <= 4; i++) {
+        if (genieData[i] !== undefined) {
+          const currentLayer = genieData[i] + 1;
+          if (currentLayer > maxLayer) {
+            maxLayer = currentLayer;
+            bestGenieId = i;
+          }
+        }
+      }
+
+      if (bestGenieId === -1) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 未找到可扫荡的灯神关卡`,
+          type: "warning",
+        });
+        return;
+      }
+
+      const genieNames = { 1: "魏国", 2: "蜀国", 3: "吴国", 4: "群雄", 5: "深海" };
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 扫荡: ${genieNames[bestGenieId]}灯神 (第${maxLayer}层)`,
+        type: "info",
+      });
+
+      let remainingTickets = sweepTicketCount;
+      
+      while (remainingTickets > 0 && !shouldStop.value) {
+        const sweepCnt = Math.min(remainingTickets, 20);
+        
+        try {
+          const res = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "genie_sweep",
+            { 
+              genieId: bestGenieId,
+              sweepCnt: sweepCnt 
+            },
+            5000
+          );
+
+          const ok = res && (res.role || res.role.items);
+          
+          if (ok) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 扫荡成功 ${sweepCnt} 次`,
+              type: "success",
+            });
+            remainingTickets = res.role.items?.[1021]?.quantity || 0;
+          } else {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 扫荡失败: ${res.hint || "未知错误"}`,
+              type: "error",
+            });
+            break;
+          }
+        } catch (err) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 扫荡请求异常: ${err.message}`,
+            type: "error",
+          });
+          break;
+        }
+
+        if (remainingTickets > 0) {
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      await tokenStore.sendMessage(tokenId, "role_getroleinfo");
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 灯神扫荡完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `灯神扫荡失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
   };
 
   /**
@@ -1199,9 +1540,13 @@ export function createTasksItem(deps) {
     batchFish,
     batchRecruit,
     batchHeroUpgrade,
+    batchHeroUpgradeForToken,
     batchBookUpgrade,
+    batchBookUpgradeForToken,
     batchClaimStarRewards,
+    batchClaimStarRewardsForToken,
     batchClaimPeachTasks,
     batchGenieSweep,
+    batchGenieSweepForToken,
   };
 }

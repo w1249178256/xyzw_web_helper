@@ -26,6 +26,63 @@ export function createTasksBottle(deps) {
   } = deps;
 
   /**
+   * 重置罐子（单个Token）
+   */
+  const resetBottlesForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始重置罐子`,
+        type: "info",
+      });
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 停止计时...`,
+        type: "info",
+      });
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "bottlehelper_stop",
+        {},
+        5000,
+      );
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始计时...`,
+        type: "info",
+      });
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "bottlehelper_start",
+        {},
+        5000,
+      );
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 重置完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 重置失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 重置罐子
    */
   const resetBottles = async () => {
@@ -114,6 +171,46 @@ export function createTasksBottle(deps) {
   };
 
   /**
+   * 一键领取盐罐（单个Token）
+   */
+  const batchlingguanziForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始领取盐罐`,
+        type: "info",
+      });
+
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "bottlehelper_claim",
+        {},
+        5000,
+      );
+
+      await new Promise((r) => setTimeout(r, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取盐罐完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取盐罐失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 一键领取盐罐
    */
   const batchlingguanzi = async () => {
@@ -177,6 +274,8 @@ export function createTasksBottle(deps) {
 
   return {
     resetBottles,
+    resetBottlesForToken,
     batchlingguanzi,
+    batchlingguanziForToken,
   };
 }

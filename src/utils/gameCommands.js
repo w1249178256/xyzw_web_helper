@@ -2048,6 +2048,55 @@ export class GameCommands {
       time: Date.now()
     }
   }
+  
+    /**
+   * 宝箱积分奖励
+   */
+  item_batchclaimboxpointreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        ...params
+      }),
+      cmd: "item_batchclaimboxpointreward",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+      /**
+   * 活动详情
+   */
+  activity_get(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+          ...params
+      }),
+      cmd: "activity_get",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+        /**
+   * 活动周奖励
+   */
+  activity_claimweekactreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	     selectRewardsMap: {
+      	     0: 1
+      	     },
+      	     typ: 2，
+        ...params
+      }),
+      cmd: "activity_claimweekactreward",
+      seq,
+      time: Date.now()
+    }
+  }
 
   /**
    * 怪异塔特权
