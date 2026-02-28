@@ -2030,7 +2030,7 @@ const colorArray = [
       "name": item.name, //俱乐部名称
       "color": colorArray[item.color], //俱乐部颜色
       "id": item.id, //俱乐部序号
-      "memberCount": Object.keys(item.members).length,
+      "memberCount": Object.keys(item.membersV2).length,
       "point": item.point, //老版的分
       "position": item.position, //大本营坐标
       "strongholdId": item.strongholdId,//大本营坐标字符串
@@ -2045,12 +2045,14 @@ const colorArray = [
   }))
   //统计具体信息
   let memberInfo = Object.values(rawResult.battlefield.roles).map(item => {
+    
     legionInfo[item.legionID + ""].participantsCount++;
     if (item.isOnline) {
       legionInfo[item.legionID + ""].OnlineCount++;
     }
     legionInfo[item.legionID].reviveCount += item.revive;
     legionInfo[item.legionID].danCount += item.d - 6 > 0 ? item.d - 6 : 0;
+    
     return {
       "name": item.name,
       "legionName": legionInfo[item.legionID].name,
@@ -2061,7 +2063,7 @@ const colorArray = [
       "revive": item.revive, //五次复活,使用了几次
       "die": item.d, //死亡次数
       "dan": item.d - 6 > 0 ? item.d - 6 : 0,
-      "score": result.battlefield.roleIds[item.key]
+      "score": result.battlefield.roles[item.key]
     }
   })
   return {

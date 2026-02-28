@@ -47,6 +47,11 @@
           </div>
         </div>
         <div class="legion-war-operation-item">
+          <n-button type="primary" @click="getBattlefieldInfo" :disabled="!isEntireBattlefield" style="padding:12px">
+            拉取数据(需进入战场后)
+          </n-button>
+        </div>
+        <div class="legion-war-operation-item">
           <n-button type="primary" @click="sendMessageToLegion" style="padding:12px">
             发送各战队免费复活到战队频道
           </n-button>
