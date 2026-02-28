@@ -221,7 +221,6 @@ const drawCanvasLeft = (mouseX=0,mouseY=0,type='') => {
   graph.removeAllNode();
   //提取result.value中的数据
   validData.value = extractValidData(result.value,isOccupyOrDistribution.value)
-  console.log(2)
   if(validData.value){
     graph.addNodeList(Object.values(validData.value.buildingData).map(
       item=> {
