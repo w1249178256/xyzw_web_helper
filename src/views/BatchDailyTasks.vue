@@ -3363,62 +3363,9 @@ const startScheduler = () => {
           shouldRun = nowTime === taskTime;
           reason = `currentTime=${nowTime}, taskTime=${taskTime}, match=${shouldRun}`;
         } else if (task.runType === "cron") {
-          // Improved cron expression parsing
+          // Improved cron expression parsing using shared utility
           try {
-            const cronParts = task.cronExpression.split(" ").filter(Boolean);
-
-            if (cronParts.length < 5) {
-              console.error(
-                `[${new Date().toISOString()}] Invalid cron expression: ${task.cronExpression}, must have at least 5 parts`,
-              );
-              addLog({
-                time: currentTime,
-                message: `=== 定时任务 ${task.name} 的Cron表达式无效: ${task.cronExpression}，必须包含至少5个字段 ===`,
-                type: "error",
-              });
-              return;
-            }
-
-            const [
-              minuteField,
-              hourField,
-              dayOfMonthField,
-              monthField,
-              dayOfWeekField,
-            ] = cronParts;
-
-            // 使用之前定义的parseCronField函数解析cron字段
-            const possibleMinutes = parseCronField(minuteField, 0, 59);
-            const possibleHours = parseCronField(hourField, 0, 23);
-            const possibleDaysOfMonth = parseCronField(dayOfMonthField, 1, 31);
-            const possibleMonths = parseCronField(monthField, 1, 12);
-            const possibleDaysOfWeek = parseCronField(dayOfWeekField, 0, 7);
-
-            // 检查当前时间是否匹配cron表达式
-            const matchesMinute = possibleMinutes.includes(now.getMinutes());
-            const matchesHour = possibleHours.includes(now.getHours());
-            const matchesDayOfMonth = possibleDaysOfMonth.includes(
-              now.getDate(),
-            );
-            const matchesMonth = possibleMonths.includes(now.getMonth() + 1); // months are 0-based in JS
-            const matchesDayOfWeek = possibleDaysOfWeek.includes(now.getDay()); // 0是周日
-
-            // Special handling: if both dayOfMonth and dayOfWeek are specified, they are OR'ed
-            const isDayOfWeekSpecified = dayOfWeekField !== "*";
-            const isDayOfMonthSpecified = dayOfMonthField !== "*";
-
-            let matchesDay;
-            if (isDayOfWeekSpecified && isDayOfMonthSpecified) {
-              // If both are specified, match either
-              matchesDay = matchesDayOfMonth || matchesDayOfWeek;
-            } else {
-              // If only one is specified, match that one
-              matchesDay = matchesDayOfMonth && matchesDayOfWeek;
-            }
-
-            shouldRun =
-              matchesMinute && matchesHour && matchesDay && matchesMonth;
-            reason = `minute=${matchesMinute}, hour=${matchesHour}, dayOfMonth=${matchesDayOfMonth}, dayOfWeek=${matchesDayOfWeek}, month=${matchesMonth}, matchesDay=${matchesDay}`;
+             shouldRun = matchesCronExpression(task.cronExpression, now);
           } catch (error) {
             console.error(
               `[${new Date().toISOString()}] Error parsing cron expression ${task.cronExpression}:`,
@@ -3431,31 +3378,29 @@ const startScheduler = () => {
             });
             return;
           }
-        }
 
-        if (shouldRun) {
-          // Check if the task was already executed in the last minute to avoid duplicate execution
-          const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
-          const lastExecutionKey = localStorage.getItem(
-            `lastTaskExecution_${task.id}`,
-          );
-
-          if (lastExecutionKey !== taskExecutionKey) {
-            // Update last execution time
-            localStorage.setItem(
+          if (shouldRun) {
+            // Check if the task was already executed in the last minute to avoid duplicate execution
+            const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
+            const lastExecutionKey = localStorage.getItem(
               `lastTaskExecution_${task.id}`,
-              taskExecutionKey,
             );
 
-            // Execute the task
-            lastTaskExecution = Date.now();
-            executeScheduledTask(task);
-          } else {
-            addLog({
-              time: currentTime,
-              message: `=== 任务 ${task.name} 本分钟内已执行，跳过 ===`,
-              type: "info",
-            });
+            if (lastExecutionKey !== taskExecutionKey) {
+              // Update last execution time
+              localStorage.setItem(
+                `lastTaskExecution_${task.id}`,
+                taskExecutionKey,
+              );
+
+              // Execute the task
+              lastTaskExecution = Date.now();
+              executeScheduledTask(task);
+            } else {
+              // Only log once per minute to avoid spamming logs
+              // But since we check every 10s, this might log multiple times if we don't track logged state
+              // For now, we can skip logging "already executed" to keep logs clean
+            }
           }
         }
       });
