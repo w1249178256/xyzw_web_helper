@@ -612,7 +612,8 @@
                 <n-button
                   size="small"
                   @click="openWarGuessModal"
-                  :disabled="isRunning || selectedTokens.length === 0"
+                  :disabled="isRunning || selectedTokens.length === 0 || !isWarGuessActivityOpen"
+                  :title="isWarGuessActivityOpen ? '' : warGuessActivityTip"
                 >
                   月赛助威
                 </n-button>
@@ -2491,6 +2492,60 @@ const isWeirdTowerActivityOpen = computed(() => {
     return hour >= 12;
   }
   return true;
+});
+
+// 获取本月第四个周日的日期
+const getFourthSundayOfMonth = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  
+  // 当月第一天
+  const firstDay = new Date(year, month, 1);
+  const dayOfWeek = firstDay.getDay(); // 0-6
+  
+  // 计算第一个周日的日期 (1号是周日则为1，否则为 1 + 7 - dayOfWeek)
+  let firstSundayDate = 1 + (7 - dayOfWeek) % 7;
+
+  // 仅针对2026年3月进行特殊处理
+  if (year === 2026 && month === 2 && dayOfWeek === 0) {
+    firstSundayDate = 8;
+  }
+  
+  // 第四个周日 = 第一个周日 + 21天
+  return new Date(year, month, firstSundayDate + 21);
+};
+
+const isWarGuessActivityOpen = computed(() => {
+  const now = new Date();
+  
+  // 手动修正：2026年3月1日开放
+  if (now.getFullYear() === 2026 && now.getMonth() === 2 && now.getDate() === 1) {
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    if (hour < 19 || (hour === 19 && minute <= 55)) return true;
+  }
+
+  const fourthSunday = getFourthSundayOfMonth();
+  
+  // 检查是否是今天
+  if (now.getDate() !== fourthSunday.getDate()) return false;
+  
+  // 检查时间 00:00 - 19:55
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  if (hour > 19 || (hour === 19 && minute > 55)) return false;
+  
+  return true;
+});
+
+const warGuessActivityTip = computed(() => {
+  if (isWarGuessActivityOpen.value) return "";
+  
+  const fourthSunday = getFourthSundayOfMonth();
+  const month = fourthSunday.getMonth() + 1;
+  const date = fourthSunday.getDate();
+  return `月赛助威仅在每月第四个周日 (${month}月${date}日) 00:00-19:55 开放`;
 });
 
 const selectedTokens = ref([]);
