@@ -137,6 +137,7 @@
       <!-- 操作日志 -->
       <OperationLogCard 
         page="fish-helper" 
+        card-type="怪异塔"
         :filter-operations="[]"
       />
     </template>

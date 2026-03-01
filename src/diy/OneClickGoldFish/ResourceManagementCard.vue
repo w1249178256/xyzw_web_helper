@@ -44,6 +44,7 @@
       <!-- 操作日志 -->
       <OperationLogCard 
         page="fish-helper" 
+        card-type="资源管理"
         :filter-operations="[]"
       />
     </template>
