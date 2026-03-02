@@ -102,7 +102,8 @@ const filteredLogs = computed(() => {
     logs = logs.filter(log => props.filterOperations.includes(log.operation))
   }
   
-  return logs
+  // 只保留最近10条日志
+  return logs.slice(0, 10)
 })
 
 const getStatusText = (status) => {

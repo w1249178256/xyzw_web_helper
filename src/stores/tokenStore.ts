@@ -1442,6 +1442,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "item_openpack", params);
   };
 
+  // 发送武将上阵/下阵
+  const sendHeroGoIntoBattle = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
+  };
+
   // 发送购买咸鱼币订单
   const sendChargeCreateOrder = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "charge_createorder", params);
@@ -2031,6 +2036,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendTowersGetInfo,
     sendMailClaimAllAttachment,
     sendItemOpenPack,
+    sendHeroGoIntoBattle,
     sendChargeCreateOrder,
     sendBossTowerStartBoss,
     sendBossTowerGetInfo,

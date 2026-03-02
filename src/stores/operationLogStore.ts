@@ -19,7 +19,7 @@ export interface OperationLog {
 
 export const useOperationLogStore = defineStore('operationLog', () => {
   const logs = ref<OperationLog[]>([])
-  const maxLogs = 1000 // 最多保存1000条日志
+  const maxLogs = 100 // 最多保存100条日志
 
   // 添加日志
   const addLog = (log: Omit<OperationLog, 'id' | 'timestamp'>) => {

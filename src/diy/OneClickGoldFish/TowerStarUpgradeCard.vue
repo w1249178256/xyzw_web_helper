@@ -111,6 +111,7 @@
 <script setup>
 import { defineProps, ref, computed } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
+import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useMessage } from 'naive-ui'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
@@ -118,6 +119,7 @@ import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { TrendingUp } from '@vicons/ionicons5'
 
 const tokenStore = useTokenStore()
+const logStore = useOperationLogStore()
 const message = useMessage()
 
 const props = defineProps({
@@ -312,6 +314,17 @@ const startHeroUpgrade = async () => {
     
     message.info('开始英雄升星...')
     
+    // 添加开始日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '英雄升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `开始英雄升星...`
+    })
+    
     // 英雄ID列表（101-120, 201-228, 301-314）
     const heroIds = [
       ...Array.from({ length: 20 }, (_, i) => 101 + i),
@@ -323,8 +336,22 @@ const startHeroUpgrade = async () => {
     let successCount = 0
     let failCount = 0
     
-    for (const heroId of heroIds) {
+    for (let idx = 0; idx < heroIds.length; idx++) {
+      const heroId = heroIds[idx]
       let heroUpgradeCount = 0
+      
+      // 每10个英雄更新一次进度日志
+      if (idx % 10 === 0) {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '英雄升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `英雄升星进度: ${idx + 1}/${heroIds.length}，已升星 ${totalUpgrades} 次`
+        })
+      }
       
       // 对每个英雄尝试升星，最多10次
       for (let i = 1; i <= 10; i++) {
@@ -366,9 +393,31 @@ const startHeroUpgrade = async () => {
     }
     
     message.success(`英雄升星完成！共升星 ${totalUpgrades} 次（成功: ${successCount}, 失败: ${failCount}）`)
+    
+    // 添加完成日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '英雄升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `英雄升星完成！共升星 ${totalUpgrades} 次（成功: ${successCount}, 失败: ${failCount}）`
+    })
   } catch (error) {
     console.error('英雄升星失败:', error)
     message.error('英雄升星失败: ' + (error.message || '未知错误'))
+    
+    // 添加失败日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '英雄升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `英雄升星失败: ${error.message || '未知错误'}`
+    })
   } finally {
     isRunning.value = false
   }
@@ -394,13 +443,40 @@ const startBookUpgrade = async () => {
   try {
     isRunning.value = true
     message.info('开始图鉴升星...')
+    
+    // 添加开始日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '图鉴升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `开始图鉴升星...`
+    })
+    
     const heroIds = [
       ...Array.from({ length: 20 }, (_, i) => 101 + i),
       ...Array.from({ length: 28 }, (_, i) => 201 + i),
       ...Array.from({ length: 14 }, (_, i) => 301 + i),
     ]
     
-    for (const heroId of heroIds) {
+    for (let idx = 0; idx < heroIds.length; idx++) {
+      const heroId = heroIds[idx]
+      
+      // 每10个英雄更新一次进度日志
+      if (idx % 10 === 0) {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '图鉴升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `图鉴升星进度: ${idx + 1}/${heroIds.length}`
+        })
+      }
+      
       for (let i = 1; i <= 10; i++) {
         try {
           await tokenStore.sendMessageWithPromise(
@@ -419,9 +495,31 @@ const startBookUpgrade = async () => {
       }
     }
     message.success('图鉴升星完成')
+    
+    // 添加完成日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '图鉴升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `图鉴升星完成`
+    })
   } catch (error) {
     console.error('图鉴升星失败:', error)
     message.error('图鉴升星失败')
+    
+    // 添加失败日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '图鉴升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `图鉴升星失败: ${error.message || '未知错误'}`
+    })
   } finally {
     isRunning.value = false
   }
@@ -446,6 +544,19 @@ const claimBookReward = async () => {
   
   try {
     message.info('正在领取图鉴奖励...')
+    
+    // 添加开始日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '领取图鉴奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `开始领取图鉴奖励...`
+    })
+    
+    let successCount = 0
     for (let i = 1; i <= 10; i++) {
       try {
         await tokenStore.sendMessageWithPromise(
@@ -454,6 +565,7 @@ const claimBookReward = async () => {
           {},
           8000
         )
+        successCount++
       } catch (err) {
         // 失败后也执行延迟1秒
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -463,9 +575,31 @@ const claimBookReward = async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
     }
     message.success('图鉴奖励领取完成')
+    
+    // 添加完成日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '领取图鉴奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `图鉴奖励领取完成，共领取${successCount}次`
+    })
   } catch (error) {
     console.error('领取图鉴奖励失败:', error)
     message.error('领取图鉴奖励失败')
+    
+    // 添加失败日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '领取图鉴奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `领取图鉴奖励失败: ${error.message || '未知错误'}`
+    })
   }
 }
 
@@ -679,39 +813,130 @@ const handleBatchUpgrade = async () => {
     .sort((a, b) => a.index - b.index)
     .map(item => item.token)
   
+  // 记录失败的token列表
+  const failedTokens = []
+  
   try {
     isBatchRunning.value = true
     const rangeText = tokenIndices === null ? '全部' : `范围${tokenIndices.join(',')}`
     message.info(`开始批量升星操作（${rangeText}），共${sortedTargetTokens.length}个Token，按序号顺序执行...`)
     
+    // 添加开始日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '批量执行',
+      status: 'info',
+      message: `开始批量升星操作（${rangeText}），共${sortedTargetTokens.length}个Token`
+    })
+    
     for (let i = 0; i < sortedTargetTokens.length; i++) {
       const token = sortedTargetTokens[i]
       const tokenIndex = getTokenIndex(token)
+      
+      // 添加进度日志
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '批量执行',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: [序号${tokenIndex}] ${token.name || token.id}`
+      })
       
       try {
         // 1. 连接Token（模拟点击token昵称，最多重试5次）
         const connected = await connectTokenWithRetry(token, tokenIndex)
         if (!connected) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '批量执行',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`
+          })
+          failedTokens.push({
+            index: tokenIndex,
+            name: token.name || token.id,
+            reason: '连接失败'
+          })
           continue
         }
         
         // 2. 执行英雄升星
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '英雄升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 开始英雄升星...`
+        })
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始英雄升星...`)
         await executeHeroUpgrade(token)
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 英雄升星完成`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '英雄升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 英雄升星完成`
+        })
         await new Promise(resolve => setTimeout(resolve, 500))
         
         // 3. 执行图鉴升星
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '图鉴升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 开始图鉴升星...`
+        })
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始图鉴升星...`)
         await executeBookUpgrade(token)
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 图鉴升星完成`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '图鉴升星',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 图鉴升星完成`
+        })
         await new Promise(resolve => setTimeout(resolve, 500))
         
         // 4. 执行领取图鉴奖励
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '领取图鉴奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 开始领取图鉴奖励...`
+        })
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取图鉴奖励...`)
         await executeClaimBookReward(token)
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 图鉴奖励领取完成`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '领取图鉴奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 图鉴奖励领取完成`
+        })
         
         if (i < sortedTargetTokens.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 500))
@@ -719,13 +944,89 @@ const handleBatchUpgrade = async () => {
       } catch (error) {
         console.error(`Token [序号${tokenIndex}] ${token.name || token.id} 批量升星失败:`, error)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 批量升星失败`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '批量执行',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `[序号${tokenIndex}] ${token.name || token.id} 批量升星失败: ${error.message || '未知错误'}`
+        })
+        failedTokens.push({
+          index: tokenIndex,
+          name: token.name || token.id,
+          reason: error.message || '批量升星失败'
+        })
       }
     }
     
-    message.success('批量升星操作完成')
+    // 批量执行完成，生成失败报告
+    const successCount = sortedTargetTokens.length - failedTokens.length
+    const failCount = failedTokens.length
+    
+    message.success(`批量升星操作完成，成功: ${successCount}个，失败: ${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '批量执行',
+      status: 'success',
+      message: `批量升星操作完成，成功: ${successCount}个，失败: ${failCount}个`
+    })
+    
+    // 如果有失败的token，生成txt文档
+    if (failedTokens.length > 0) {
+      const timestamp = new Date().toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }).replace(/[/:]/g, '-')
+      
+      const content = [
+        `批量升星失败报告 - ${timestamp}`,
+        `================================`,
+        `总Token数: ${sortedTargetTokens.length}`,
+        `成功: ${successCount}个`,
+        `失败: ${failCount}个`,
+        ``,
+        `失败列表:`,
+        ...failedTokens.map(t => `  [序号${t.index}] ${t.name} - ${t.reason}`),
+        ``,
+        `================================`
+      ].join('\n')
+      
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `升星失败报告_${timestamp}.txt`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      message.info(`已生成失败报告: 升星失败报告_${timestamp}.txt`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '批量执行',
+        status: 'info',
+        message: `已生成失败报告: 升星失败报告_${timestamp}.txt`
+      })
+    }
   } catch (error) {
     console.error('批量升星操作失败:', error)
     message.error('批量升星操作失败')
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '批量执行',
+      status: 'error',
+      message: `批量升星操作失败: ${error.message || '未知错误'}`
+    })
   } finally {
     isBatchRunning.value = false
   }

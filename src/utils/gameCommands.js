@@ -1608,6 +1608,23 @@ export class GameCommands {
   }
 
   /**
+   * 咸将上阵
+   */
+  hero_gointobattle(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId: params.heroId,
+        slot: params.slot,
+        ...params
+      }),
+      cmd: "hero_gointobattle",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
    * 设置阵容
    */
   team_setteam(ack = 0, seq = 0, params = {}) {
@@ -1952,7 +1969,7 @@ export class GameCommands {
   }
 
   /**
-   * 神具主动升级
+   * 玩具主动升级
    */
   lordweapon_upgradeactiveskilllevel(ack = 0, seq = 0, params = {}) {
     return {
@@ -1968,7 +1985,7 @@ export class GameCommands {
   }
 
   /**
-   * 神具被动升级
+   * 玩具被动升级
    */
   lordweapon_upgradepassiveskilllevel(ack = 0, seq = 0, params = {}) {
     return {

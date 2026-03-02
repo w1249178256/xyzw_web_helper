@@ -264,6 +264,9 @@
               <n-checkbox v-model:checked="multiSelectTasks.batchClaimStarRewards">
                 一键领取图鉴奖励
               </n-checkbox>
+              <n-checkbox v-model:checked="multiSelectTasks.batchTowerClimb">
+                一键爬塔
+              </n-checkbox>
               <n-button
                 type="primary"
                 size="small"
@@ -2447,6 +2450,7 @@ const multiSelectTasks = reactive({
   batchHeroUpgrade: false,
   batchBookUpgrade: false,
   batchClaimStarRewards: false,
+  batchTowerClimb: false,
 });
 
 // 分组选项（用于下拉选择）
@@ -2468,7 +2472,8 @@ const hasSelectedMultiTask = computed(() => {
          multiSelectTasks.store_purchase || 
          multiSelectTasks.batchHeroUpgrade || 
          multiSelectTasks.batchBookUpgrade || 
-         multiSelectTasks.batchClaimStarRewards;
+         multiSelectTasks.batchClaimStarRewards ||
+         multiSelectTasks.batchTowerClimb;
 });
 
 // 解析Token范围
@@ -2589,21 +2594,55 @@ const executeMultiSelectedTasks = async () => {
   if (multiSelectTasks.batchHeroUpgrade) selectedTaskNames.push('一键英雄升星');
   if (multiSelectTasks.batchBookUpgrade) selectedTaskNames.push('一键图鉴升级');
   if (multiSelectTasks.batchClaimStarRewards) selectedTaskNames.push('一键领取图鉴奖励');
+  if (multiSelectTasks.batchTowerClimb) selectedTaskNames.push('一键爬塔');
   
   message.info(`开始执行多选功能：${selectedTaskNames.join('、')}，共${selectedTokens.value.length}个Token`);
   
-  // 获取按名称排序的token列表
-  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
-    const nameA = (a.name || '未命名').toLowerCase();
-    const nameB = (b.name || '未命名').toLowerCase();
-    return nameA.localeCompare(nameB);
+  // 使用页面当前的排序配置对选中的token进行排序
+  const sortedSelectedTokens = [...selectedTokens.value].sort((idA, idB) => {
+    const tokenA = tokenStore.gameTokens.find(t => t.id === idA);
+    const tokenB = tokenStore.gameTokens.find(t => t.id === idB);
+    
+    let valueA, valueB;
+    
+    // 根据排序字段获取比较值
+    switch (sortConfig.value.field) {
+      case "name":
+        valueA = tokenA?.name?.toLowerCase() || "";
+        valueB = tokenB?.name?.toLowerCase() || "";
+        break;
+      case "server":
+        valueA = tokenA?.server?.toLowerCase() || "";
+        valueB = tokenB?.server?.toLowerCase() || "";
+        break;
+      case "createdAt":
+        valueA = new Date(tokenA?.createdAt || 0).getTime();
+        valueB = new Date(tokenB?.createdAt || 0).getTime();
+        break;
+      case "lastUsed":
+        valueA = new Date(tokenA?.lastUsed || 0).getTime();
+        valueB = new Date(tokenB?.lastUsed || 0).getTime();
+        break;
+      default:
+        valueA = tokenA?.name?.toLowerCase() || "";
+        valueB = tokenB?.name?.toLowerCase() || "";
+    }
+    
+    // 根据排序方向比较值
+    if (valueA < valueB) {
+      return sortConfig.value.direction === "asc" ? -1 : 1;
+    }
+    if (valueA > valueB) {
+      return sortConfig.value.direction === "asc" ? 1 : -1;
+    }
+    return 0;
   });
   
-  for (let i = 0; i < selectedTokens.value.length; i++) {
+  for (let i = 0; i < sortedSelectedTokens.length; i++) {
     if (shouldStop.value) break;
     
-    const tokenId = selectedTokens.value[i];
-    const token = sortedTokensList.find(t => t.id === tokenId);
+    const tokenId = sortedSelectedTokens[i];
+    const token = tokenStore.gameTokens.find(t => t.id === tokenId);
     if (!token) continue;
     
     tokenStatus.value[tokenId] = 'running';
@@ -2727,6 +2766,17 @@ const executeMultiSelectedTasks = async () => {
         await tasksItem.batchClaimStarRewardsForToken(tokenId);
       }
       
+      if (shouldStop.value) break;
+      
+      if (multiSelectTasks.batchTowerClimb) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `执行一键爬塔...`,
+          type: "info",
+        });
+        await tasksTower.batchTowerClimbForToken(tokenId);
+      }
+      
       tokenStatus.value[tokenId] = 'success';
       addLog({
         time: new Date().toLocaleTimeString(),
@@ -2740,6 +2790,15 @@ const executeMultiSelectedTasks = async () => {
         message: `${token.name} 执行失败: ${error.message || '未知错误'}`,
         type: "error",
       });
+    } finally {
+      // 完成后关闭连接并释放槽位
+      tokenStore.closeWebSocketConnection(tokenId);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+        type: "info",
+      });
+      releaseConnectionSlot();
     }
     
     // Token之间的延迟
@@ -2854,7 +2913,7 @@ const batchSettings = reactive({
   refreshDelay: 1000,       // 刷新延迟（发车刷新等）
   longDelay: 3000,          // 长延迟（功法赠送等）
   // 其他配置
-  maxActive: 2,
+  maxActive: 1,
   carMinColor: 4,
   connectionTimeout: 10000,
   reconnectDelay: 1000,
@@ -4703,26 +4762,15 @@ const addLog = (log) => {
     logs.value = logs.value.slice(-maxLogEntries);
   }
 
-  // 尝试DOM操作，但不依赖nextTick确保日志显示
-  // 在后台运行时，浏览器可能会限制DOM操作
-  try {
-    if (logContainer.value && autoScrollLog.value) {
-      // 直接尝试滚动，不使用nextTick
-      logContainer.value.scrollTop = logContainer.value.scrollHeight;
-    }
-  } catch (error) {
-    // 忽略DOM操作错误，确保日志数据仍然被记录
-    console.warn("Failed to scroll log container:", error);
-  }
-
-  // 同时使用nextTick作为后备，确保在页面回到前台时能正确滚动
+  // 使用nextTick确保DOM更新后再滚动
   nextTick(() => {
     try {
       if (logContainer.value && autoScrollLog.value) {
         logContainer.value.scrollTop = logContainer.value.scrollHeight;
       }
     } catch (error) {
-      // 忽略错误
+      // 忽略DOM操作错误，确保日志数据仍然被记录
+      console.warn("Failed to scroll log container:", error);
     }
   });
 };
@@ -4739,6 +4787,18 @@ watch(autoScrollLog, (newValue) => {
     });
   }
 });
+
+watch(filteredLogs, () => {
+  if (autoScrollLog.value && logContainer.value) {
+    nextTick(() => {
+      try {
+        logContainer.value.scrollTop = logContainer.value.scrollHeight;
+      } catch (error) {
+        console.warn("Failed to scroll log container:", error);
+      }
+    });
+  }
+}, { deep: true });
 
 const copyLogs = () => {
   if (logs.value.length === 0) {
@@ -4849,6 +4909,9 @@ const ensureConnection = async (tokenId, maxRetries = 2) => {
       releaseConnectionSlot();
       throw new Error("连接失败 (重试后仍超时)");
     }
+  } else {
+    // 已经连接，也要等待槽位并占用
+    await waitForConnectionSlot();
   }
 
   // 连接成功，槽位保持占用，直到任务完成后手动释放
@@ -4988,8 +5051,17 @@ const startBatch = async () => {
     tokenStatus.value[id] = "waiting";
   });
 
+  // 按token昵称排序
+  const sortedSelectedTokens = [...selectedTokens.value].sort((idA, idB) => {
+    const tokenA = tokens.value.find((t) => t.id === idA);
+    const tokenB = tokens.value.find((t) => t.id === idB);
+    const nameA = (tokenA?.name || '').toLowerCase();
+    const nameB = (tokenB?.name || '').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+
   // 并行执行任务，但通过connectionQueue限制并发连接数
-  const taskPromises = selectedTokens.value.map(async (tokenId) => {
+  const taskPromises = sortedSelectedTokens.map(async (tokenId) => {
     if (shouldStop.value) return;
 
     tokenStatus.value[tokenId] = "running";

@@ -453,6 +453,7 @@ export function registerDefaultCommands(reg) {
     .register("legion_research", { researchId: 0 })
     .register("legion_resetresearch", {})
     .register("equipment_quench", { equipmentId: 0, quenchType: 1 })
+    .register("hero_gointobattle", { heroId: 0, slot: 0 })
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
