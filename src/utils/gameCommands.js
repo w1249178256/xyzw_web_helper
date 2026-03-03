@@ -1969,6 +1969,23 @@ export class GameCommands {
   }
 
   /**
+   * 玩具解锁
+   */
+  lordweapon_unlock(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        weaponId: 3,
+        ...params
+      }),
+      cmd: "lordweapon_unlock",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 玩具主动升级
    */
   lordweapon_upgradeactiveskilllevel(ack = 0, seq = 0, params = {}) {

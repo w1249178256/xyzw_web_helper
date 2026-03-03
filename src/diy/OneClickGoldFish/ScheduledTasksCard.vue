@@ -84,11 +84,6 @@ import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { GameController } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
-import * as tasksHangUp from '@/utils/batch/tasksHangUp'
-import * as tasksBottle from '@/utils/batch/tasksBottle'
-import * as tasksItem from '@/utils/batch/tasksItem'
-import * as tasksArena from '@/utils/batch/tasksArena'
-import * as tasksStore from '@/utils/batch/tasksStore'
 
 const tokenStore = useTokenStore()
 const logStore = useOperationLogStore()
@@ -155,13 +150,24 @@ const parseExecutionRange = (rangeStr) => {
 
 // 执行定时任务
 const handleExecuteScheduledTasks = async () => {
-  const executionRange = parseExecutionRange(scheduledExecutionTokens.value)
-  const targetTokens = executionRange 
-    ? tokenStore.gameTokens.filter((token, index) => executionRange.includes(index + 1))
-    : tokenStore.gameTokens
+  // 按token昵称排序的token列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  // 解析执行范围
+  const tokenIndices = connectionPool.parseTokenRange(scheduledExecutionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
   
   if (targetTokens.length === 0) {
-    message.warning('没有可用的Token')
+    message.warning('执行范围内没有有效的Token')
     return
   }
   
@@ -172,6 +178,15 @@ const handleExecuteScheduledTasks = async () => {
     return
   }
   
+  // 获取每个token在sortedTokens中的序号
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = scheduledExecutionTokens.value ? `范围${scheduledExecutionTokens.value}` : "全部"
+  message.info(`开始执行定时任务（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  
   isExecutingScheduledTasks.value = true
   
   try {
@@ -179,12 +194,31 @@ const handleExecuteScheduledTasks = async () => {
       targetTokens,
       async (token, globalIndex) => {
         try {
-          const tokenIndex = targetTokens.findIndex(t => t.id === token.id) + 1
+          const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行定时任务...`)
           
           // 按顺序执行打开的任务
           if (scheduledTasks.value.claimHangUp) {
-            await tasksHangUp.claimHangUpRewardsForToken(token.id)
+            // 领取挂机奖励
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'system_claimhangupreward',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            // 挂机加钟4次
+            for (let i = 0; i < 4; i++) {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'system_mysharecallback',
+                { isSkipShareCard: true, type: 2 },
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -197,7 +231,23 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.resetBottles) {
-            await tasksBottle.resetBottlesForToken(token.id)
+            // 重置罐子：先停止计时，再开始计时
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'bottlehelper_stop',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'bottlehelper_start',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -210,7 +260,15 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.genieSweep) {
-            await tasksItem.batchGenieSweepForToken(token.id)
+            // 灯神扫荡 - 简化版本，直接扫荡10次
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'genie_sweep',
+              { genieId: 1, sweepCnt: 10 },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -223,7 +281,15 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.batchlingguanzi) {
-            await tasksBottle.batchlingguanziForToken(token.id)
+            // 领取盐罐
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'bottlehelper_claim',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -236,7 +302,15 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.batchclubsign) {
-            await tasksHangUp.batchclubsignForToken(token.id)
+            // 俱乐部签到
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'legion_signin',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -249,7 +323,17 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.batcharenafight) {
-            await tasksArena.batcharenafightForToken(token.id)
+            // 竞技场战斗3次
+            for (let i = 0; i < 3; i++) {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'arena_fight',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',
@@ -262,7 +346,15 @@ const handleExecuteScheduledTasks = async () => {
           }
           
           if (scheduledTasks.value.store_purchase) {
-            await tasksStore.store_purchaseForToken(token.id)
+            // 黑市采购
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'store_purchase',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '定时任务',

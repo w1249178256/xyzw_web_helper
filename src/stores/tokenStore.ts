@@ -1367,6 +1367,16 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "lordweapon_upgradepassiveskilllevel", params);
   };
 
+  // 发送主公武器解锁
+  const sendLordWeaponUnlockt = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_unlockt", params);
+  };
+
+  // 发送主公武器解锁（新命令）
+  const sendLordWeaponUnlock = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_unlock", params);
+  };
+
   // 发送水晶升级
   const sendTrumpUpgrade = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "trump_upgrade", params);
@@ -2021,6 +2031,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendTowerBuyEnergy,
     sendLordWeaponUpgradeActiveSkillLevel,
     sendLordWeaponUpgradePassiveSkillLevel,
+    sendLordWeaponUnlockt,
+    sendLordWeaponUnlock,
     sendTrumpUpgrade,
     sendHeroUpgradeStar,
     sendBookUpgrade,

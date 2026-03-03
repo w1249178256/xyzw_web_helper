@@ -1,0 +1,50 @@
+
+时间: 2026/3/2 16:06:45
+服务: HeroService
+方法: heroUpgradeLevel
+参数: [{"heroId":105,"upgradeNum":50}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1772438807996,
+    "resp": 55,
+    "cmd": "syncresp",
+    "body": {
+      "role": {
+        "gold": 6184503812,
+        "power": 1995632961,
+        "dailyTask": {
+          "complete": {
+            "8": 99
+          }
+        },
+        "heroes": {
+          "105": {
+            "level": 150,
+            "power": 122507664,
+            "attack": 24387072,
+            "defense": 550142,
+            "hp": 465249937,
+            "speed": 90
+          }
+        },
+        "achievement": {
+          "7": {
+            "completeValue": 14050
+          }
+        },
+        "statistics": {
+          "task:complete:10": 14050,
+          "task:complete:22": 1995632961,
+          "task:complete:8": 18801
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+

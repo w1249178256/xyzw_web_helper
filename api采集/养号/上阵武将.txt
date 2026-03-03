@@ -1,0 +1,37 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 116,
+    "slot": 0
+  },
+  "cmd": "hero_gointobattle",
+  "seq": 48,
+  "time": 1772434619204
+}
+{
+  "ack": 0,
+  "body": {
+    "role": {
+      "battleTeam": {
+        "1": {
+          "heroId": 104
+        },
+        "4": {
+          "heroId": 102
+        }
+      },
+      "heroes": {
+        "102": {
+          "battleTeamSlot": 4
+        },
+        "104": {
+          "battleTeamSlot": 1
+        }
+      }
+    }
+  },
+  "cmd": "SyncResp",
+  "resp": 39,
+  "seq": 39,
+  "time": 1772435079315
+}
