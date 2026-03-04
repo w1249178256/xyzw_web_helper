@@ -2551,9 +2551,12 @@ const joinNightmareRoom = async (token) => {
     return
   }
 
-  // 检查是否输入了teamId
-  if (!displayTeamId.value) {
-    message.warning('请先获取队伍号')
+  // 确定使用哪个teamId：优先使用props.teamId（十殿页面输入的），如果为空则使用displayTeamId.value（从游戏获取的）
+  const teamIdToUse = props.teamId || displayTeamId.value
+  
+  // 检查是否有有效的teamId
+  if (!teamIdToUse) {
+    message.warning('请先输入或获取队伍号')
     return
   }
 
@@ -2594,9 +2597,9 @@ const joinNightmareRoom = async (token) => {
     await new Promise(resolve => setTimeout(resolve, 500))
 
     // 第二步：执行matchteam_join操作（加入房间）
-    message.info('正在加入房间...')
+    message.info(`正在加入房间，使用TeamID: ${teamIdToUse}...`)
     await tokenStore.sendGameMessage(token.id, 'matchteam_join', {
-      teamId: displayTeamId.value
+      teamId: teamIdToUse
     })
     message.success('成功加入房间')
     
@@ -2606,7 +2609,7 @@ const joinNightmareRoom = async (token) => {
     // 第三步：执行matchteam_memberprepare操作（准备十殿）
     message.info('正在准备十殿...')
     await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', {
-      teamId: displayTeamId.value
+      teamId: teamIdToUse
     })
     message.success('十殿准备完成！')
     
@@ -2631,7 +2634,7 @@ const joinNightmareRoom = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '成功加入十殿并准备完成'
+      message: `成功加入十殿并准备完成，使用TeamID: ${teamIdToUse}`
     })
   } catch (error) {
     console.error('加入十殿失败:', error)

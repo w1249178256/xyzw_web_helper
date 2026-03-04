@@ -2037,6 +2037,38 @@ export class GameCommands {
   }
 
   /**
+   * 主公升级
+   */
+  hero_lordupgradelevel(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        upgradeNum:50,
+        ...params
+      }),
+      cmd: "hero_lordupgradelevel",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 主公升阶
+   */
+  hero_lordupgradeorder(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+                ...params
+      }),
+      cmd: "hero_lordupgradeorder",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 武将升星
    */
   hero_heroupgradestar(ack = 0, seq = 0, params = {}) {

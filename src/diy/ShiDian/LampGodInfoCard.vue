@@ -95,7 +95,13 @@
         <CustomizedCard mode="button" name="导出灯神信息" :disabled="isExportingLampGodInfo" @button-click="exportLampGodInfo" />
         <CustomizedCard mode="button" name="批量灯神" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchLampGodFight" />
         <CustomizedCard mode="button" name="批量扫荡" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchSweepAction" />
-        <CustomizedCard mode="button" name="批量激活玩具" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchActivateToys" />
+        <CustomizedCard 
+          mode="name-select" 
+          name="选择玩具" 
+          :select-value="selectedWeaponId" 
+          :select-options="weaponOptions"
+          @update:select-value="handleWeaponSelect" 
+        />
       </CustomizedCard>
       
       <!-- 操作日志 -->
@@ -125,7 +131,7 @@ const message = useMessage()
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
-  maxConnections: 5,
+  maxConnections: 1,
   connectionTimeout: 30000,
   reconnectDelay: 1000,
   maxRetries: 3
@@ -213,7 +219,25 @@ const lampGodSelection = ref({
   deepsea: false
 })
 
-// 处理灯神执行范围输入
+const selectedWeaponId = ref(3)
+
+const weaponOptions = [
+  { label: '未激活', value: 0 },
+  { label: '一支穿云箭', value: 1 },
+  { label: '皮鞋手机', value: 2 },
+  { label: '懦弱百合', value: 3 },
+  { label: '正义喇叭', value: 4 },
+  { label: '祖传大饼', value: 5 },
+  { label: '冰镇啤酒', value: 6 },
+  { label: '导演话筒', value: 7 },
+  { label: '驱蚊花露水', value: 8 },
+  { label: '止痒花露水', value: 9 }
+]
+
+const handleWeaponSelect = (value) => {
+  selectedWeaponId.value = value
+}
+
 const handleLampGodTokensInput = (value) => {
   lampGodTokens.value = value
 }
@@ -358,6 +382,25 @@ const refreshTeamInfo = async () => {
     // 1. 使用fight_startlevel获取当前阵容
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     console.log('fight_startlevel 原始响应:', fightResult)
+    
+    // 提取并显示阵容英雄名称
+    let heroNames = []
+    if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
+      const team = fightResult.battleData.leftTeam.team
+      for (let i = 0; i < 5; i++) {
+        const hero = team[String(i)] || team[i]
+        if (hero && hero.id) {
+          heroNames.push(getHeroName(hero.id))
+        }
+      }
+    }
+    logOperation('shidian', '刷新阵容', {
+      cardType: '灯神信息',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
+    })
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // 2. 使用presetteam_getinfo获取useTeamId
@@ -526,7 +569,15 @@ const switchToTeam1 = async () => {
   try {
     message.info('正在切换到阵容1...')
     
-    await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
+    const saveTeamParams = { teamId: 1 }
+    await tokenStore.sendPresetteamSaveTeam(token.id, saveTeamParams)
+    logOperation('shidian', '切换阵1', {
+      cardType: '灯神信息',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行命令: presetteam_saveTeam, 保存/切换预设阵容1`
+    })
     currentUseTeamId.value = 1
     
     // 刷新阵容信息
@@ -641,12 +692,59 @@ const switchTeam = async () => {
       if (currentHero && currentHero.heroId !== targetHeroId) {
         try {
           message.info(`正在更换位置${i+1}的英雄: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
-          await tokenStore.sendHeroExchange(token.id, {
+          const exchangeParams = {
             heroId: currentHero.heroId,
             targetHeroId: targetHeroId
+          }
+          await tokenStore.sendHeroExchange(token.id, exchangeParams)
+          logOperation('shidian', '切换阵容', {
+            cardType: '灯神信息',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `执行命令: hero_exchange, 位置${i+1}: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`
           })
           message.success(`位置${i+1}英雄更换成功: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 每次更换后重新获取最新阵容
+          await new Promise(resolve => setTimeout(resolve, 300))
+          const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
+          if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
+            const battleTeam = refreshResult.battleData.leftTeam.team
+            for (let j = 0; j < 5; j++) {
+              const hero = battleTeam[String(j)] || battleTeam[j]
+              if (hero && hero.id) {
+                currentHeroes[j] = {
+                  heroId: hero.id,
+                  level: hero.level,
+                  star: hero.star,
+                  order: hero.order,
+                  color: hero.color,
+                  power: hero.power || 0
+                }
+              } else {
+                currentHeroes[j] = null
+              }
+            }
+          } else if (refreshResult && refreshResult.body && refreshResult.body.battleData && refreshResult.body.battleData.leftTeam && refreshResult.body.battleData.leftTeam.team) {
+            const battleTeam = refreshResult.body.battleData.leftTeam.team
+            for (let j = 0; j < 5; j++) {
+              const hero = battleTeam[String(j)] || battleTeam[j]
+              if (hero && hero.id) {
+                currentHeroes[j] = {
+                  heroId: hero.id,
+                  level: hero.level,
+                  star: hero.star,
+                  order: hero.order,
+                  color: hero.color,
+                  power: hero.power || 0
+                }
+              } else {
+                currentHeroes[j] = null
+              }
+            }
+          }
+          await new Promise(resolve => setTimeout(resolve, 200))
         } catch (error) {
           message.error(`位置${i+1}英雄更换失败: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
           console.error(`更换英雄失败: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`, error)
@@ -657,12 +755,59 @@ const switchTeam = async () => {
         message.info(`位置${i+1}: 当前为空位，将添加英雄 ${getHeroName(targetHeroId)}`)
         try {
           // 对于空位，我们只需将目标英雄放入该位置
-          await tokenStore.sendHeroExchange(token.id, {
+          const exchangeParams = {
             heroId: targetHeroId,
             targetHeroId: targetHeroId
+          }
+          await tokenStore.sendHeroExchange(token.id, exchangeParams)
+          logOperation('shidian', '切换阵容', {
+            cardType: '灯神信息',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `执行命令: hero_exchange, 位置${i+1}: 空位 → ${getHeroName(targetHeroId)}`
           })
           message.success(`位置${i+1}英雄添加成功: ${getHeroName(targetHeroId)}`)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 每次更换后重新获取最新阵容
+          await new Promise(resolve => setTimeout(resolve, 300))
+          const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
+          if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
+            const battleTeam = refreshResult.battleData.leftTeam.team
+            for (let j = 0; j < 5; j++) {
+              const hero = battleTeam[String(j)] || battleTeam[j]
+              if (hero && hero.id) {
+                currentHeroes[j] = {
+                  heroId: hero.id,
+                  level: hero.level,
+                  star: hero.star,
+                  order: hero.order,
+                  color: hero.color,
+                  power: hero.power || 0
+                }
+              } else {
+                currentHeroes[j] = null
+              }
+            }
+          } else if (refreshResult && refreshResult.body && refreshResult.body.battleData && refreshResult.body.battleData.leftTeam && refreshResult.body.battleData.leftTeam.team) {
+            const battleTeam = refreshResult.body.battleData.leftTeam.team
+            for (let j = 0; j < 5; j++) {
+              const hero = battleTeam[String(j)] || battleTeam[j]
+              if (hero && hero.id) {
+                currentHeroes[j] = {
+                  heroId: hero.id,
+                  level: hero.level,
+                  star: hero.star,
+                  order: hero.order,
+                  color: hero.color,
+                  power: hero.power || 0
+                }
+              } else {
+                currentHeroes[j] = null
+              }
+            }
+          }
+          await new Promise(resolve => setTimeout(resolve, 200))
         } catch (error) {
           message.error(`位置${i+1}英雄添加失败: ${getHeroName(targetHeroId)}`)
           console.error(`添加英雄失败: ${getHeroName(targetHeroId)}`, error)
@@ -774,11 +919,12 @@ const changeTech = async () => {
       message.info('开始执行军团重置研究...')
       for (let type = 1; type <= 6; type++) {
         try {
-          message.info(`执行军团重置研究: type=${type}, advanced=false`)
-          const result = await tokenStore.sendLegionResetResearch(token.id, {
+          const resetParams = {
             type: type,
             advanced: false
-          })
+          }
+          message.info(`执行军团重置研究: type=${type}, advanced=false`)
+          const result = await tokenStore.sendLegionResetResearch(token.id, resetParams)
           
           // 检查是否收到资源不足的提示
           if (result && (result.msg || '').includes('资源不足') || 
@@ -789,7 +935,7 @@ const changeTech = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `军团重置研究收到资源不足提示，停止执行`
+              message: `执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)} - 资源不足，停止执行`
             })
             return
           }
@@ -802,7 +948,7 @@ const changeTech = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `军团重置研究: type=${type}, advanced=false`
+            message: `执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)}`
           })
           
           // 每次执行间隔：500ms
@@ -903,11 +1049,12 @@ const changeTech = async () => {
           const researchId = prefix + subIndex; // 如 101, 102, ..., 108 或 201, 202, ..., 208 等
           
           try {
-            message.info(`执行研究: researchId=${researchId}, isMax=true`)
-            const result = await tokenStore.sendLegionResearch(token.id, {
+            const researchParams = {
               researchId: researchId,
               isMax: true
-            })
+            }
+            message.info(`执行研究: researchId=${researchId}, isMax=true`)
+            const result = await tokenStore.sendLegionResearch(token.id, researchParams)
             
             // 检查是否收到资源不足的提示
             if (result && (result.msg || '').includes('资源不足') || 
@@ -918,7 +1065,7 @@ const changeTech = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
-                message: `研究收到资源不足提示，停止执行`
+                message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
               })
               researchFailed = true
               break
@@ -932,7 +1079,7 @@ const changeTech = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `研究: researchId=${researchId}, isMax=true`
+              message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)}`
             })
             
             // 每次执行间隔：500ms
@@ -1026,6 +1173,18 @@ const lampGodAction = async () => {
       return
     }
     
+    // 获取武器名称
+    const weaponName = weaponOptions.find(w => w.value === selectedWeaponId.value)?.label || '未激活'
+    
+    // 记录开始执行灯神按钮
+    logOperation('shidian', '灯神按钮', {
+      cardType: '灯神信息',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `开始执行灯神按钮，灯神类型: ${selectedTypes.map(t => t.name).join(', ')}, 玩具: ${weaponName}(ID:${selectedWeaponId.value})`
+    })
+    
     // 执行完整的灯神战斗流程
     for (const type of selectedTypes) {
       // 模拟点击刷新阵容
@@ -1047,25 +1206,57 @@ const lampGodAction = async () => {
       
       // 获取当前阵容的英雄ID
       let currentTeamHeroes = []
-      if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
-        const currentTeam = fightResult.body.battleData.leftTeam.team
+      let currentTeamHeroNames = []
+      // fight_startlevel响应结构: { battleData: { leftTeam: { team: { "0": {...}, "1": {...} } } } }
+      let battleTeam = null
+      if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
+        battleTeam = fightResult.battleData.leftTeam.team
+      } else if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
+        battleTeam = fightResult.body.battleData.leftTeam.team
+      }
+      
+      if (battleTeam) {
         for (let pos = 0; pos < 5; pos++) {
-          if (Array.isArray(currentTeam)) {
-            currentTeamHeroes.push(currentTeam[pos]?.id || 0)
-          } else {
-            currentTeamHeroes.push(currentTeam[pos]?.id || currentTeam?.[String(pos)]?.id || 0)
+          const hero = battleTeam[String(pos)] || battleTeam[pos]
+          const heroId = hero && hero.id ? hero.id : 0
+          currentTeamHeroes.push(heroId)
+          if (heroId > 0) {
+            currentTeamHeroNames.push(getHeroName(heroId))
           }
         }
       }
+      
+      logOperation('shidian', '灯神按钮', {
+        cardType: '灯神信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `执行命令: fight_startlevel, 获取当前阵容: [${currentTeamHeroNames.join(', ')}]`
+      })
       
       // 获取灯神阵容配置
       const config = lampGodConfigs[type.name === '爬塔' ? 'tower' : type.name === '魏国' ? 'wei' : type.name === '蜀国' ? 'shu' : type.name === '吴国' ? 'wu' : type.name === '群雄' ? 'qunxiong' : 'deepsea']
       
       // 比较当前阵容与灯神阵容
       let needSwitchTeam = true
+      let comparisonResult = ''
       if (config && config.heroes) {
+        const presetHeroNames = config.heroes.map(id => id > 0 ? getHeroName(id) : '空位')
         needSwitchTeam = !currentTeamHeroes.every((heroId, index) => heroId === config.heroes[index])
+        comparisonResult = needSwitchTeam 
+          ? `当前阵容[${currentTeamHeroNames.join(', ')}] 与 预设阵容[${presetHeroNames.join(', ')}] 不同，需要切换`
+          : `当前阵容[${currentTeamHeroNames.join(', ')}] 与 预设阵容[${presetHeroNames.join(', ')}] 相同，跳过切换`
+      } else {
+        comparisonResult = '未找到预设阵容配置，需要切换'
       }
+      
+      logOperation('shidian', '灯神按钮', {
+        cardType: '灯神信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `阵容比较: ${comparisonResult}`
+      })
       
       // 如果阵容不同，执行切换阵容和科技
       if (needSwitchTeam) {
@@ -1107,35 +1298,118 @@ const lampGodAction = async () => {
       // 模拟点击灯神战斗
       message.info(`${type.name} 灯神战斗开始（10次）...`)
       
-      for (let i = 0; i < 10; i++) {
-        try {
-          // 构建battleTeam参数，使用灯神战斗阵容的heroId作为0-4参数
-          const battleTeam = {}
+      // 第一次战斗前获取阵容并执行hero_calcpowerbyteam
+      let currentBattleTeam = {}
+      try {
+        message.info(`${type.name} 第 1 次战斗前获取当前阵容...`)
+        const currentFightResult = await tokenStore.sendFightStartLevel(token.id, {})
+        
+        // 提取当前阵容
+        if (currentFightResult && currentFightResult.battleData && currentFightResult.battleData.leftTeam && currentFightResult.battleData.leftTeam.team) {
+          const team = currentFightResult.battleData.leftTeam.team
           for (let pos = 0; pos < 5; pos++) {
-            battleTeam[pos] = battleTeamData[pos] || 0
+            const hero = team[String(pos)] || team[pos]
+            currentBattleTeam[pos] = hero && hero.id ? hero.id : 0
           }
-          
-          // 先执行计算英雄战力
-          await tokenStore.sendHeroCalcpowerbyteam(token.id, {
-            battleTeam: battleTeam,
-            lordWeaponId: 3
-          })
-          
-          // 再执行灯神战斗
-          await tokenStore.sendFightStartGenie(token.id, {
-            battleTeam: battleTeam,
+        } else if (currentFightResult && currentFightResult.body && currentFightResult.body.battleData && currentFightResult.body.battleData.leftTeam && currentFightResult.body.battleData.leftTeam.team) {
+          const team = currentFightResult.body.battleData.leftTeam.team
+          for (let pos = 0; pos < 5; pos++) {
+            const hero = team[String(pos)] || team[pos]
+            currentBattleTeam[pos] = hero && hero.id ? hero.id : 0
+          }
+        } else {
+          // 如果获取失败，使用之前的阵容
+          for (let pos = 0; pos < 5; pos++) {
+            currentBattleTeam[pos] = battleTeamData[pos] || 0
+          }
+        }
+        
+        // 获取当前阵容英雄名称用于日志
+        const currentHeroNames = []
+        for (let pos = 0; pos < 5; pos++) {
+          const heroId = currentBattleTeam[pos]
+          if (heroId > 0) {
+            currentHeroNames.push(getHeroName(heroId))
+          }
+        }
+        
+        logOperation('shidian', '灯神战斗', {
+          cardType: '灯神信息',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行命令: fight_startlevel, 第 1 次战斗前获取当前阵容: [${currentHeroNames.join(', ')}]`
+        })
+        
+        // 第一次执行计算英雄战力
+        const calcPowerParams = {
+          battleTeam: currentBattleTeam,
+          lordWeaponId: selectedWeaponId.value
+        }
+        await tokenStore.sendHeroCalcpowerbyteam(token.id, calcPowerParams)
+        logOperation('shidian', '灯神战斗', {
+          cardType: '灯神信息',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
+        })
+      } catch (error) {
+        console.error(`${type.name} 第 1 次战斗前获取阵容失败:`, error)
+        message.warning(`${type.name} 第 1 次战斗前获取阵容失败，使用默认阵容`)
+        // 使用默认阵容
+        for (let pos = 0; pos < 5; pos++) {
+          currentBattleTeam[pos] = battleTeamData[pos] || 0
+        }
+      }
+      
+      let challengeExhausted = false
+      for (let i = 0; i < 10; i++) {
+        if (challengeExhausted) break
+        
+        try {
+          // 执行灯神战斗
+          const fightParams = {
+            battleTeam: currentBattleTeam,
             genieId: type.genieId,
-            lordWeaponId: 3
+            lordWeaponId: selectedWeaponId.value
+          }
+          await tokenStore.sendFightStartGenie(token.id, fightParams)
+          logOperation('shidian', '灯神战斗', {
+            cardType: '灯神信息',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `执行命令: fight_startgenie, 第 ${i + 1} 次, 参数: ${JSON.stringify(fightParams)}`
           })
           message.success(`${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
           // 每次战斗间隔：500ms
           await new Promise(resolve => setTimeout(resolve, 500))
         } catch (error) {
           console.error(`${type.name} 灯神战斗第 ${i + 1} 次失败:`, error)
-          message.warning(`${type.name} 灯神战斗第 ${i + 1} 次失败: ${error.message || error}`)
+          const errorMessage = error.message || ''
+          
+          // 检查是否是挑战次数已用完的错误
+          if (errorMessage.includes('挑战次数已用完') || errorMessage.includes('3300030')) {
+            message.warning(`${type.name} 挑战次数已用完，停止剩余挑战`)
+            logOperation('shidian', '灯神战斗', {
+              cardType: '灯神信息',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${type.name} 挑战次数已用完，停止剩余挑战`
+            })
+            challengeExhausted = true
+          } else {
+            message.warning(`${type.name} 灯神战斗第 ${i + 1} 次失败: ${errorMessage || error}`)
+          }
         }
       }
-      message.success(`${type.name} 灯神战斗10次执行完成`)
+      if (challengeExhausted) {
+        message.success(`${type.name} 灯神战斗因次数用完而结束`)
+      } else {
+        message.success(`${type.name} 灯神战斗10次执行完成`)
+      }
     }
     
     message.success('灯神按钮执行完成')
@@ -1197,10 +1471,11 @@ const sweepAction = async () => {
       
       try {
         // 执行genie_sweep命令
-        const result = await tokenStore.sendGenieSweep(token.id, {
+        const sweepParams = {
           genieId: 4, // 固定使用群雄的genieId
           sweepCnt: sweepCnt
-        })
+        }
+        const result = await tokenStore.sendGenieSweep(token.id, sweepParams)
         
         message.success(`扫荡执行成功: genieId=4, sweepCnt=${sweepCnt}`)
         
@@ -1227,7 +1502,7 @@ const sweepAction = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `扫荡执行成功: genieId=4, sweepCnt=${sweepCnt}, 剩余魔毯: ${remainingCarpetCount}`
+          message: `执行命令: genie_sweep, 参数: ${JSON.stringify(sweepParams)}, 剩余魔毯: ${remainingCarpetCount}`
         })
         
         // 每次扫荡间隔：500ms
@@ -1367,14 +1642,14 @@ const lampGodFight = async () => {
           // 先执行计算英雄战力
           await tokenStore.sendHeroCalcpowerbyteam(token.id, {
             battleTeam: battleTeam,
-            lordWeaponId: 3
+            lordWeaponId: selectedWeaponId.value
           })
           
           // 再执行灯神战斗
           await tokenStore.sendFightStartGenie(token.id, {
             battleTeam: battleTeam,
             genieId: type.genieId,
-            lordWeaponId: 3
+            lordWeaponId: selectedWeaponId.value
           })
           message.success(`${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
           // 每次战斗间隔：500ms
@@ -1469,140 +1744,6 @@ const downloadTxtFile = (content, fileName) => {
   URL.revokeObjectURL(url)
 }
 
-// 批量激活玩具
-const batchActivateToys = async () => {
-  // 按token昵称排序的token列表（与页面显示顺序一致）
-  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
-    const nameA = (a.name || '未命名').toLowerCase()
-    const nameB = (b.name || '未命名').toLowerCase()
-    return nameA.localeCompare(nameB)
-  })
-  
-  if (sortedTokensList.length === 0) {
-    message.warning('没有可用的Token')
-    return
-  }
-  
-  // 解析执行范围（如果为空则执行全部）
-  const tokenIndices = connectionPool.parseTokenRange(lampGodTokens.value)
-  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
-  
-  if (targetTokens.length === 0) {
-    message.warning('执行范围内没有有效的Token')
-    return
-  }
-  
-  // 获取每个token在sortedTokens中的序号（用于显示）
-  const getTokenIndex = (token) => {
-    const index = sortedTokensList.findIndex(t => t.id === token.id)
-    return index + 1
-  }
-  
-  const rangeText = lampGodTokens.value ? `范围${lampGodTokens.value}` : "全部"
-  message.info(`开始批量激活玩具（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logOperation('shidian', '批量激活玩具', {
-    cardType: '灯神信息',
-    status: 'info',
-    message: `开始批量激活玩具，${rangeText}，共${targetTokens.length}个Token`
-  })
-  
-  try {
-    // 使用连接池执行批量操作
-    const results = await connectionPool.batchOperate(
-      targetTokens,
-      async (token, globalIndex) => {
-        try {
-          const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在检查玩具状态...`)
-          
-          // 保存原始选中的token
-          const originalSelectedTokenId = tokenStore.selectedTokenId
-          
-          try {
-            // 临时选中当前token
-            tokenStore.selectedTokenId = token.id
-            
-            // 获取角色信息，检查lordWeapon
-            const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
-            
-            // 检查是否有玩具3（花盆）
-            const hasToy3 = roleInfo && roleInfo.role && roleInfo.role.lordWeapon && roleInfo.role.lordWeapon['3']
-            
-            if (hasToy3) {
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} 已经激活了玩具3（花盆）`)
-              logOperation('shidian', '批量激活玩具', {
-                cardType: '灯神信息',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `玩具3（花盆）已经激活`
-              })
-              return { success: true, tokenId: token.id, tokenName: token.name, status: '已激活' }
-            } else {
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在激活玩具3（花盆）...`)
-              // 激活玩具3，添加weaponId: 3参数
-            await tokenStore.sendLordWeaponUnlock(token.id, { weaponId: 3 })
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} 玩具3（花盆）激活成功`)
-              logOperation('shidian', '批量激活玩具', {
-                cardType: '灯神信息',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `玩具3（花盆）激活成功`
-              })
-              return { success: true, tokenId: token.id, tokenName: token.name, status: '新激活' }
-            }
-          } finally {
-            // 恢复原始选中的token
-            tokenStore.selectedTokenId = originalSelectedTokenId
-          }
-        } catch (error) {
-          const tokenIndex = getTokenIndex(token)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 激活玩具失败: ${error.message || '未知错误'}`)
-          logOperation('shidian', '批量激活玩具', {
-            cardType: '灯神信息',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `激活玩具失败: ${error.message || '未知错误'}`
-          })
-          return { success: false, tokenId: token.id, tokenName: token.name, error: error.message }
-        }
-      },
-      {
-        maxConcurrency: 1, // 最多同时处理1个token
-        delayBetweenTokens: 1000, // 每个token之间的延迟
-        timeout: 60000 // 每个token的操作超时时间
-      }
-    )
-    
-    // 统计结果
-    const successCount = results.filter(r => r.success).length
-    const errorCount = results.filter(r => !r.success).length
-    
-    // 生成txt文件内容
-    const txtContent = generateActivationReport(results)
-    
-    // 下载txt文件
-    downloadTxtFile(txtContent, '花盆玩具激活报告.txt')
-    
-    message.success(`批量激活玩具完成，成功: ${successCount}，失败: ${errorCount}`)
-    logOperation('shidian', '批量激活玩具', {
-      cardType: '灯神信息',
-      status: 'info',
-      message: `批量激活玩具完成，成功: ${successCount}，失败: ${errorCount}`
-    })
-  } catch (error) {
-    console.error('批量激活玩具失败:', error)
-    message.error(`批量激活玩具失败: ${error.message || '未知错误'}`)
-    logOperation('shidian', '批量激活玩具', {
-      cardType: '灯神信息',
-      status: 'error',
-      message: `批量激活玩具失败: ${error.message || '未知错误'}`
-    })
-  }
-}
-
 // 批量灯神战斗
 // 批量灯神按钮 - 使用连接池处理多个token的连接
 const batchLampGodFight = async () => {
@@ -1633,12 +1774,22 @@ const batchLampGodFight = async () => {
     return index + 1
   }
   
+  // 获取选中的灯神类型和武器信息
+  const selectedTypes = []
+  if (lampGodSelection.value.wei) selectedTypes.push('魏国')
+  if (lampGodSelection.value.shu) selectedTypes.push('蜀国')
+  if (lampGodSelection.value.wu) selectedTypes.push('吴国')
+  if (lampGodSelection.value.qunxiong) selectedTypes.push('群雄')
+  if (lampGodSelection.value.tower) selectedTypes.push('爬塔')
+  if (lampGodSelection.value.deepsea) selectedTypes.push('深海')
+  const weaponName = weaponOptions.find(w => w.value === selectedWeaponId.value)?.label || '未激活'
+  
   const rangeText = lampGodTokens.value ? `范围${lampGodTokens.value}` : "全部"
   message.info(`开始批量执行灯神按钮（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
   logOperation('shidian', '批量灯神按钮', {
     cardType: '灯神信息',
     status: 'info',
-    message: `开始批量执行灯神按钮，${rangeText}，共${targetTokens.length}个Token`
+    message: `开始批量执行灯神按钮，${rangeText}，共${targetTokens.length}个Token，灯神类型: ${selectedTypes.join(', ')}, 玩具: ${weaponName}(ID:${selectedWeaponId.value})`
   })
   
   try {

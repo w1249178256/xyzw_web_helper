@@ -19,7 +19,7 @@ export interface OperationLog {
 
 export const useOperationLogStore = defineStore('operationLog', () => {
   const logs = ref<OperationLog[]>([])
-  const maxLogs = 100 // 最多保存100条日志
+  const maxLogs = 500 // 最多保存500条日志
 
   // 添加日志
   const addLog = (log: Omit<OperationLog, 'id' | 'timestamp'>) => {
@@ -48,8 +48,8 @@ export const useOperationLogStore = defineStore('operationLog', () => {
   const getLogsByPage = (page: 'shidian' | 'fish-helper') => {
     return computed(() => {
       const filteredLogs = logs.value.filter(log => log.page === page)
-      // 最多显示50条日志
-      return filteredLogs.slice(0, 50)
+      // 最多显示100条日志
+      return filteredLogs.slice(0, 100)
     })
   }
 
@@ -62,8 +62,8 @@ export const useOperationLogStore = defineStore('operationLog', () => {
       } else {
         filteredLogs = logs.value.filter(log => log.page === page && log.cardType === cardType)
       }
-      // 最多显示50条日志
-      return filteredLogs.slice(0, 50)
+      // 最多显示100条日志
+      return filteredLogs.slice(0, 100)
     })
   }
 

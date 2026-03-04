@@ -1457,6 +1457,16 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
   };
 
+  // 发送主公升级
+  const sendHeroLordUpgradeLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_lordupgradelevel", params);
+  };
+
+  // 发送主公进阶
+  const sendHeroLordUpgradeOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_lordupgradeorder", params);
+  };
+
   // 发送购买咸鱼币订单
   const sendChargeCreateOrder = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "charge_createorder", params);
@@ -2006,8 +2016,10 @@ export const useTokenStore = defineStore("tokens", () => {
     sendFightStartLevel,
     sendHeroExchange,
     sendHeroUpgradeLevel,
+    sendHeroLordUpgradeLevel,
     sendHeroSimulation,
     sendHeroUpgradeOrder,
+    sendHeroLordUpgradeOrder,
     sendHeroCalcpowerbyteam,
     sendGenieSweep,
     sendLegionExchangeResearch,

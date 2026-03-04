@@ -164,6 +164,13 @@
             :disabled="isBatchActivatingToys"
             :loading="isBatchActivatingToys"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchUpgradingLord ? '批量升级主公中...' : '批量升级主公'"
+            @button-click="handleBatchUpgradeLord"
+            :disabled="isBatchUpgradingLord"
+            :loading="isBatchUpgradingLord"
+          />
         </CustomizedCard>
       </div>
       
@@ -240,6 +247,7 @@ const isBatchSettingStoryTeam = ref(false)
 const isBatchSettingTowerTeam = ref(false)
 const isBatchUpgrading900 = ref(false)
 const isExportingTeam = ref(false)
+const isBatchUpgradingLord = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
@@ -5004,6 +5012,449 @@ const handleBatchActivateToys = async () => {
     })
   } finally {
     isBatchActivatingToys.value = false
+  }
+}
+
+// 计算主公升级数量
+// 如果最后两位均为0，upgradeNum使用50
+// 如果不为0，执行upgradeNum使用10/5/1，升级到00，再执行upgradeNum使用50
+const calculateLordUpgradeNum = (currentLevel) => {
+  const lastTwoDigits = currentLevel % 100
+  
+  if (lastTwoDigits === 0) {
+    // 最后两位为00，使用50
+    return 50
+  } else {
+    // 最后两位不为00，计算需要多少级才能到00
+    const remaining = 100 - lastTwoDigits
+    if (remaining >= 10) {
+      return 10
+    } else if (remaining >= 5) {
+      return 5
+    } else {
+      return 1
+    }
+  }
+}
+
+// 批量升级主公
+const handleBatchUpgradeLord = async () => {
+  // 按token昵称排序的token列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  // 解析执行范围
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  // 获取每个token在sortedTokens中的序号
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量升级主公（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量升级主公',
+    status: 'info',
+    message: `开始批量升级主公，${rangeText}，共${targetTokens.length}个Token`
+  })
+  
+  try {
+    isBatchUpgradingLord.value = true
+    
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行升级主公...`)
+          
+          // 1. 使用role_getroleinfo获取当前主公等级
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升级主公',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: '执行role_getroleinfo命令，获取主公等级'
+          })
+          
+          const roleResult = await tokenStore.sendGetRoleInfo(token.id)
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 2. 从响应中获取主公等级
+          let lordLevel = 0
+          if (roleResult && roleResult.role && roleResult.role.lord) {
+            lordLevel = roleResult.role.lord.level || 0
+          } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.lord) {
+            lordLevel = roleResult._raw.body.role.lord.level || 0
+          } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.lord) {
+            lordLevel = roleResult.body.role.lord.level || 0
+          }
+          
+          if (lordLevel === 0) {
+            throw new Error('无法获取主公等级')
+          }
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升级主公',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `获取主公等级成功: 当前等级${lordLevel}`
+          })
+          
+          // 3. 循环升级主公
+          let currentLevel = lordLevel
+          let upgradeCount = 0
+          const maxUpgrades = 100 // 最多升级次数，防止死循环
+          
+          while (upgradeCount < maxUpgrades) {
+            try {
+              // 根据当前等级计算升级参数
+              const upgradeNum = calculateLordUpgradeNum(currentLevel)
+              
+              // 执行主公升级
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量升级主公',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `执行hero_lordupgradelevel命令: 当前等级${currentLevel}，升级${upgradeNum}级`
+              })
+              
+              const upgradeRes = await tokenStore.sendHeroLordUpgradeLevel(
+                token.id,
+                {
+                  upgradeNum: upgradeNum
+                }
+              )
+              
+              // 检查响应中是否有错误消息
+              const errorMsg = upgradeRes?.hint || upgradeRes?.message || upgradeRes?.error || ''
+              const errorMsgStr = String(errorMsg).toLowerCase()
+              
+              // 检查是否包含"升阶"错误
+              if (errorMsgStr.includes('升阶') || errorMsgStr.includes('进阶') || errorMsgStr.includes('400060')) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `主公升级失败: 需要升阶，准备执行升阶命令`
+                })
+                
+                // 执行升阶命令
+                try {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `执行hero_lordupgradeorder命令进行升阶`
+                  })
+                  
+                  await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
+                  
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `主公升阶成功`
+                  })
+                  
+                  await new Promise(resolve => setTimeout(resolve, 500))
+                  // 升阶后继续升级循环
+                  continue
+                } catch (orderError) {
+                  console.error(`主公升阶失败:`, orderError)
+                  const orderErrorMsg = String(orderError.message || '').toLowerCase()
+                  
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'error',
+                    message: `主公升阶失败: ${orderError.message || '未知错误'}`
+                  })
+                  
+                  // 如果升阶失败是因为物品数量不足，停止升级
+                  if (orderErrorMsg.includes('物品数量不足')) {
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `主公升阶失败: 物品数量不足，停止升级`
+                    })
+                    break
+                  }
+                  
+                  // 其他升阶错误，停止升级
+                  break
+                }
+              }
+              
+              // 检查是否包含"物品数量不足"
+              if (errorMsgStr.includes('物品数量不足')) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `主公升级失败: 物品数量不足，停止升级`
+                })
+                break
+              }
+              
+              // 更新主公等级
+              let updatedLevel = currentLevel
+              
+              // 尝试从不同的路径获取lord数据
+              let lordData = null
+              if (upgradeRes && upgradeRes.role && upgradeRes.role.lord) {
+                lordData = upgradeRes.role.lord
+              } else if (upgradeRes && upgradeRes._raw && upgradeRes._raw.body && upgradeRes._raw.body.role && upgradeRes._raw.body.role.lord) {
+                lordData = upgradeRes._raw.body.role.lord
+              } else if (upgradeRes && upgradeRes.body && upgradeRes.body.role && upgradeRes.body.role.lord) {
+                lordData = upgradeRes.body.role.lord
+              }
+              
+              if (lordData && lordData.level > currentLevel) {
+                const oldLevel = currentLevel
+                currentLevel = lordData.level
+                upgradeCount++
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `主公升级成功: ${oldLevel} → ${currentLevel}`
+                })
+              } else {
+                // 等级没有变化，可能已达到上限或无法继续升级
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `主公等级没有变化，可能已达到上限`
+                })
+                break
+              }
+              
+              await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (error) {
+              // 捕获升级命令的错误
+              const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
+              
+              // 检查是否包含"升阶"错误
+              if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `主公升级失败: 需要升阶，准备执行升阶命令`
+                })
+                
+                // 执行升阶命令
+                try {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `执行hero_lordupgradeorder命令进行升阶`
+                  })
+                  
+                  await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
+                  
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `主公升阶成功`
+                  })
+                  
+                  await new Promise(resolve => setTimeout(resolve, 500))
+                  // 升阶后继续升级循环
+                  continue
+                } catch (orderError) {
+                  console.error(`主公升阶失败:`, orderError)
+                  const orderErrorMsg = String(orderError.message || '').toLowerCase()
+                  
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'error',
+                    message: `主公升阶失败: ${orderError.message || '未知错误'}`
+                  })
+                  
+                  if (orderErrorMsg.includes('物品数量不足')) {
+                    break
+                  }
+                  
+                  break
+                }
+              } else if (errorMsg.includes('物品数量不足')) {
+                // 物品数量不足，停止升级
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `主公升级失败: 物品数量不足`
+                })
+                break
+              } else {
+                // 其他错误，记录并继续
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'error',
+                  message: `主公升级失败: ${error.message || '未知错误'}`
+                })
+                break
+              }
+            }
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 升级主公完成，共升级${upgradeCount}次`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升级主公',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `升级主公完成，共升级${upgradeCount}次，最终等级${currentLevel}`
+          })
+          
+          return { success: true, token: token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公失败: ${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升级主公',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `升级主公失败: ${error.message || '未知错误'}`
+          })
+          return { success: false, token: token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            if (progress.status === 'warning') {
+              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量升级主公完成：成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公',
+      status: 'success',
+      message: `批量升级主公完成：成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量升级主公失败:', error)
+    message.error(`批量升级主公失败: ${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公',
+      status: 'error',
+      message: `批量升级主公失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchUpgradingLord.value = false
   }
 }
 </script>

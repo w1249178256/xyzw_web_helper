@@ -1177,6 +1177,8 @@ export class XyzwWebSocketClient {
       mergeboxinforesp: "mergebox_getinfo",
       mergebox_claimfreeenergyresp: "mergebox_claimfreeenergy",
       mergebox_automergeitemresp: "mergebox_automergeitem",
+      hero_lordupgradelevelresp: "hero_lordupgradelevel",
+      hero_lordupgradeorderresp: "hero_lordupgradeorder",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       matchteam_createresp: "matchteam_create",

@@ -134,60 +134,203 @@ const isBatchRunning = ref(false)
 const isBatchTowerRunning = ref(false)
 const batchTokens = ref('')
 
-// 计算属性：当前层数（从FishHelper.vue复制）
+// 爬塔相关状态
+let stopFlag = false
+const climbTimeout = ref(null)
+
+// 计算属性：当前层数（从tokenStore.gameData获取）
 const currentFloor = computed(() => {
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token || !token.gameData || !token.gameData.roleInfo) return '0 - 0'
-  const tower = token.gameData.roleInfo.role?.tower
+  const roleInfo = tokenStore.gameData.roleInfo
+  if (!roleInfo || !roleInfo.role) return '0 - 0'
+  const tower = roleInfo.role.tower
   if (!tower || tower.id === undefined) return '0 - 0'
   const floor = Math.floor(tower.id / 10) + 1
   const layer = (tower.id % 10) + 1
   return `${floor} - ${layer}`
 })
 
-// 计算属性：爬塔能量（从FishHelper.vue复制）
+// 计算属性：爬塔能量（从tokenStore.gameData获取）
 const towerEnergy = computed(() => {
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token || !token.gameData || !token.gameData.roleInfo) return 0
-  const tower = token.gameData.roleInfo.role?.tower
+  const roleInfo = tokenStore.gameData.roleInfo
+  if (!roleInfo || !roleInfo.role) return 0
+  const tower = roleInfo.role.tower
   return tower?.energy || 0
 })
 
-// 开始爬塔（从FishHelper.vue复制）
+// 开始爬塔（从GameStatus.vue复制）
 const startTowerClimb = async () => {
   if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
-    return
+    message.warning("请先选择Token");
+    return;
   }
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接游戏')
-    return
-  }
+
   if (towerEnergy.value <= 0) {
-    message.warning('爬塔能量不足')
-    return
+    message.warning("体力不足或正在爬塔中");
+    return;
   }
-  
+
+  // 清除之前的超时
+  if (climbTimeout.value) {
+    clearTimeout(climbTimeout.value);
+    climbTimeout.value = null;
+  }
+
+  isRunning.value = true;
+  stopFlag = false;
+  let climbCount = 0;
+  let maxClimb = 600; // 最多批量次数，防止死循环
+  // 设置超时保护，60秒后自动重置状态
+  climbTimeout.value = setTimeout(() => {
+    isRunning.value = false;
+    climbTimeout.value = null;
+    stopFlag = true;
+    message.info("批量爬塔已超时自动停止");
+  }, 60000);
+
   try {
-    isRunning.value = true
+    const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+    if (!token) {
+      throw new Error('Token不存在')
+    }
+    const tokenId = token.id;
+    
+    // 记录开始爬塔日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `${token.name || token.id} 开始爬塔...`
+    })
     message.info('开始爬塔...')
-    // 这里调用实际的爬塔API
-    await tokenStore.sendGameMessage(token.id, 'fight_starttower', {})
-    message.success('爬塔命令已发送')
+    
+    // 检查并领取未领取的塔奖励
+    const roleInfo = tokenStore.gameData.roleInfo
+    if (roleInfo && roleInfo.role && roleInfo.role.tower) {
+      const tower = roleInfo.role.tower
+      if (tower && tower.reward) {
+        let claimedCount = 0
+        for (let i = 0; i < 100; i++) {
+          if (!tower.reward[i]) {
+            try {
+              await tokenStore.sendMessageWithPromise(tokenId, 'tower_claimreward', { rewardId: i }, 10000)
+              claimedCount++
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${token.name || token.id} 成功领取第${i}章通关奖励`
+              })
+              message.success(`${token.name || token.id} 成功领取第${i}章通关奖励`)
+            } catch (error) {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `${token.name || token.id} 领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
+              })
+            }
+          }
+        }
+        if (claimedCount > 0) {
+          message.info(`${token.name || token.id} 共领取了${claimedCount}个塔奖励`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '领取塔奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `${token.name || token.id} 共领取了${claimedCount}个塔奖励`
+          })
+        }
+      }
+    }
+    
+    for (let i = 0; i < maxClimb; i++) {
+      if (stopFlag) break;
+      
+      // 体力判断必须每次都刷新
+      const roleInfo = tokenStore.gameData.roleInfo
+      if (!roleInfo || !roleInfo.role) {
+        throw new Error('角色信息不存在')
+      }
+      const tower = roleInfo.role.tower
+      const energy = tower?.energy || 0;
+      if (energy <= 0) {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '开始爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${token.name || token.id} 体力已耗尽`
+        })
+        break;
+      }
+      
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "fight_starttower",
+        {},
+        10000,
+      );
+      climbCount++;
+      
+      // 记录每次爬塔日志
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '开始爬塔',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
+      })
+      message.success(`第${climbCount}次爬塔命令已发送`);
+      await new Promise((res) => setTimeout(res, 2000)); // 每次间隔2秒
+    }
+    
+    message.success(`已自动爬塔${climbCount}次，体力已耗尽或达到上限。`);
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限`
+    })
   } catch (error) {
     console.error('爬塔失败:', error)
-    message.error('爬塔失败')
-  } finally {
-    setTimeout(() => {
-      isRunning.value = false
-    }, 2000)
+    message.error("批量爬塔失败: " + (error.message || "未知错误"));
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `${token.name || token.id} 爬塔失败: ${error.message || '未知错误'}`
+    })
   }
+
+  // 清除超时并重置状态
+  if (climbTimeout.value) {
+    clearTimeout(climbTimeout.value);
+    climbTimeout.value = null;
+  }
+  isRunning.value = false;
 }
 
 // 停止爬塔（从FishHelper.vue复制）
@@ -1235,31 +1378,117 @@ const handleBatchTower = async () => {
   }
 }
 
-// 为单个token执行爬塔操作
+// 为单个token执行爬塔操作（模拟点击开始爬塔按钮）
 const startTowerClimbForToken = async (token) => {
-  // 这里需要实现爬塔逻辑
-  // 由于原代码中startTowerClimb是针对当前选中token的，这里需要适配
-  // 暂时使用模拟实现，实际需要调用具体的爬塔函数
-  
-  // 模拟爬塔过程
-  for (let i = 1; i <= 5; i++) {
-    try {
-      // 这里应该调用实际的爬塔命令
-      // 例如：await tokenStore.sendTowerClimb(token.id)
-      await new Promise(resolve => setTimeout(resolve, 2000))
+  // 模拟点击开始爬塔按钮的完整流程
+  try {
+    // 检查WebSocket连接状态
+    const status = tokenStore.getWebSocketStatus(token.id)
+    if (status !== 'connected') {
+      throw new Error('WebSocket未连接')
+    }
+    
+    // 获取爬塔能量
+    const roleInfo = tokenStore.gameData.roleInfo
+    if (!roleInfo || !roleInfo.role) {
+      throw new Error('角色信息不存在')
+    }
+    const tower = roleInfo.role.tower
+    const energy = tower?.energy || 0
+    
+    if (energy <= 0) {
+      throw new Error('爬塔能量不足')
+    }
+    
+    // 清除之前的超时
+    if (climbTimeout.value) {
+      clearTimeout(climbTimeout.value);
+      climbTimeout.value = null;
+    }
+
+    isRunning.value = true;
+    stopFlag = false;
+    let climbCount = 0;
+    let maxClimb = 600; // 最多批量次数，防止死循环
+    // 设置超时保护，60秒后自动重置状态
+    climbTimeout.value = setTimeout(() => {
+      isRunning.value = false;
+      climbTimeout.value = null;
+      stopFlag = true;
+      message.info("批量爬塔已超时自动停止");
+    }, 60000);
+    
+    // 记录开始爬塔日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `${token.name || token.id} 开始爬塔...`
+    })
+    message.info(`${token.name || token.id} 开始爬塔...`)
+    
+    // 检查并领取未领取的塔奖励
+    if (roleInfo && roleInfo.role && roleInfo.role.tower) {
+      const tower = roleInfo.role.tower
+      if (tower && tower.reward) {
+        let claimedCount = 0
+        for (let i = 0; i < 100; i++) {
+          if (!tower.reward[i]) {
+            try {
+              await tokenStore.sendMessageWithPromise(token.id, 'tower_claimreward', { rewardId: i }, 10000)
+              claimedCount++
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${token.name || token.id} 成功领取第${i}章通关奖励`
+              })
+              message.success(`${token.name || token.id} 成功领取第${i}章通关奖励`)
+            } catch (error) {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `${token.name || token.id} 领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
+              })
+            }
+          }
+        }
+        if (claimedCount > 0) {
+          message.info(`${token.name || token.id} 共领取了${claimedCount}个塔奖励`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '领取塔奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `${token.name || token.id} 共领取了${claimedCount}个塔奖励`
+          })
+        }
+      }
+    }
+    
+    for (let i = 0; i < maxClimb; i++) {
+      if (stopFlag) break;
       
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '爬塔升星',
-        operation: '开始爬塔',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'info',
-        message: `${token.name || token.id} 爬塔第 ${i} 次`
-      })
-    } catch (error) {
-      if (error.message && error.message.includes('200400')) {
-        // 爬塔次数已用完
+      // 体力判断必须每次都刷新
+      const roleInfo = tokenStore.gameData.roleInfo
+      if (!roleInfo || !roleInfo.role) {
+        throw new Error('角色信息不存在')
+      }
+      const tower = roleInfo.role.tower
+      const energy = tower?.energy || 0;
+      if (energy <= 0) {
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1267,23 +1496,65 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${token.name || token.id} 爬塔次数已用完 (200400)`
+          message: `${token.name || token.id} 体力已耗尽`
         })
-        break
+        break;
       }
-      throw error
+      
+      await tokenStore.sendMessageWithPromise(
+        token.id,
+        "fight_starttower",
+        {},
+        10000,
+      );
+      climbCount++;
+      
+      // 记录每次爬塔日志
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '开始爬塔',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
+      })
+      message.success(`${token.name || token.id} 第${climbCount}次爬塔命令已发送`);
+      await new Promise((res) => setTimeout(res, 2000)); // 每次间隔2秒
     }
+    
+    message.success(`${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限。`);
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限`
+    })
+  } catch (error) {
+    console.error(`${token.name || token.id} 爬塔失败:`, error)
+    message.error(`${token.name || token.id} 批量爬塔失败: ${error.message || "未知错误"}`);
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '爬塔升星',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `${token.name || token.id} 爬塔失败: ${error.message || '未知错误'}`
+    })
+    throw error
+  } finally {
+    // 清除超时并重置状态
+    if (climbTimeout.value) {
+      clearTimeout(climbTimeout.value);
+      climbTimeout.value = null;
+    }
+    isRunning.value = false;
   }
-  
-  logStore.addLog({
-    page: 'fish-helper',
-    cardType: '爬塔升星',
-    operation: '开始爬塔',
-    tokenId: token.id,
-    tokenName: token.name,
-    status: 'success',
-    message: `=== ${token.name || token.id} 爬塔结束 ===`
-  })
 }
 </script>
 
