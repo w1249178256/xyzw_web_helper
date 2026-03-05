@@ -150,6 +150,24 @@ export class GameCommands {
     };
   }
 
+ /**
+   * 用火把
+   */
+  item_consume(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        itemId: 1008,
+        quantity: 1,
+        ...params,
+      }),
+      cmd: "item_consume",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+
   /**
    * 开宝箱
    */
@@ -399,6 +417,8 @@ export class GameCommands {
     return {
       ack,
       body: this.g_utils.bon.encode({
+      	  genieId:params.genieId
+      	  sweepCnt:params.sweepCnt
         ...params,
       }),
       cmd: "genie_sweep",

@@ -172,6 +172,7 @@ export function registerDefaultCommands(reg) {
     .register("item_openbox", { itemId: 2001, number: 10 })
     .register("item_batchclaimboxpointreward")
     .register("item_openpack")
+    .register("item_consume", { itemId: 1008, quantity: 1 })
     .register("rank_getserverrank")
 
     // 竞技场
@@ -1170,6 +1171,7 @@ export class XyzwWebSocketClient {
       towers_fightresp: "towers_fight",
       towers_getinforesp: "towers_getinfo",
       item_openpackresp: "item_openpack",
+      item_consumeresp: "item_consume",
       evotowerinforesp: "evotower_getinfo",
       evotower_fightresp: "evotower_fight",
       evotower_readyfightresp: "evotower_readyfight",

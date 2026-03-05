@@ -15,13 +15,17 @@ export class ConnectionPoolManager {
         this.config = {
             maxConnections: options.maxConnections || 20,           // 最大并发连接数
             connectionTimeout: options.connectionTimeout || 10000,  // 连接超时时间(ms)
-            reconnectDelay: options.reconnectDelay || 1000,        // 重连延迟(ms)
+            reconnectDelay: options.reconnectDelay || 1000,        // 初始重连延迟(ms)
+            maxReconnectDelay: options.maxReconnectDelay || 30000, // 最大重连延迟(ms)
             maxRetries: options.maxRetries || 2,                   // 最大重试次数
         };
 
         // 简化的连接槽位控制 - 使用计数器机制（类似批量日常页面）
         this.connectionSlots = { active: 0 };
         this.maxActive = this.config.maxConnections;
+        
+        // 重连状态跟踪 - 用于指数退避
+        this.reconnectState = new Map(); // tokenId -> { retries, delay }
 
         console.log('[ConnectionPool] 连接池管理器已初始化（简化版）', this.config);
     }
@@ -65,7 +69,12 @@ export class ConnectionPoolManager {
                 console.log(`[ConnectionPool] 连接超时，尝试重连: ${tokenId}`);
 
                 this.tokenStore.closeWebSocketConnection(tokenId);
-                await new Promise((resolve) => setTimeout(resolve, this.config.reconnectDelay));
+                
+                // 获取重连状态，实现指数退避
+                const reconnectInfo = this.getReconnectInfo(tokenId);
+                console.log(`[ConnectionPool] 重连信息: ${tokenId} - 尝试次数: ${reconnectInfo.retries}, 延迟: ${reconnectInfo.delay}ms`);
+                
+                await new Promise((resolve) => setTimeout(resolve, reconnectInfo.delay));
 
                 console.log(`[ConnectionPool] 正在重连: ${tokenId}`);
 
@@ -77,6 +86,17 @@ export class ConnectionPoolManager {
                 );
 
                 connected = await this.waitForConnection(tokenId);
+                
+                if (!connected) {
+                    // 更新重连状态，增加延迟
+                    this.updateReconnectInfo(tokenId);
+                } else {
+                    // 连接成功，重置重连状态
+                    this.resetReconnectInfo(tokenId);
+                }
+            } else if (connected) {
+                // 连接成功，重置重连状态
+                this.resetReconnectInfo(tokenId);
             }
 
             if (!connected) {
@@ -194,10 +214,48 @@ export class ConnectionPoolManager {
     async destroy() {
         console.log('[ConnectionPool] 销毁连接池...');
         await this.releaseAll();
+        // 清空重连状态
+        this.reconnectState.clear();
         console.log('[ConnectionPool] 连接池已销毁');
     }
 
     // ==================== 内部辅助方法 ====================
+
+    /**
+     * 获取重连信息（指数退避）
+     */
+    getReconnectInfo(tokenId) {
+        if (!this.reconnectState.has(tokenId)) {
+            this.reconnectState.set(tokenId, {
+                retries: 0,
+                delay: this.config.reconnectDelay
+            });
+        }
+        return this.reconnectState.get(tokenId);
+    }
+
+    /**
+     * 更新重连信息（指数退避）
+     */
+    updateReconnectInfo(tokenId) {
+        const info = this.getReconnectInfo(tokenId);
+        info.retries++;
+        // 指数退避：每次重连延迟翻倍，但不超过最大延迟
+        info.delay = Math.min(info.delay * 2, this.config.maxReconnectDelay);
+        this.reconnectState.set(tokenId, info);
+        console.log(`[ConnectionPool] 更新重连信息: ${tokenId} - 尝试次数: ${info.retries}, 下次延迟: ${info.delay}ms`);
+    }
+
+    /**
+     * 重置重连信息
+     */
+    resetReconnectInfo(tokenId) {
+        this.reconnectState.set(tokenId, {
+            retries: 0,
+            delay: this.config.reconnectDelay
+        });
+        console.log(`[ConnectionPool] 重置重连信息: ${tokenId}`);
+    }
 
     /**
      * 等待连接建立（类似批量日常页面的逻辑）

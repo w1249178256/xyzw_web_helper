@@ -378,88 +378,91 @@ const handleUseTorch = async () => {
     
     message.info(`开始批量使用火把（${rangeText}），共${targetTokens.length}个Token...`)
     
-    // 逐个处理Token
-    for (let i = 0; i < targetTokens.length; i++) {
-      const token = targetTokens[i]
-      message.info(`处理第 ${i + 1}/${targetTokens.length} 个Token: ${token.name}`)
-      
-      try {
-        // 连接Token
-        const status = tokenStore.getWebSocketStatus(token.id)
-        if (status !== 'connected') {
-          message.info(`${token.name} - 正在连接Token`)
-          await tokenStore.createWebSocketConnection(token.id, token.token, token.wsUrl)
-          let retryCount = 0
-          while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 30) {
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            retryCount++
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始使用火把...`)
+          
+          let successCount = 0
+          let failCount = 0
+          
+          // 执行100次 item_consume 命令
+          for (let i = 0; i < 100; i++) {
+            try {
+              await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity: 1 })
+              await new Promise(resolve => setTimeout(resolve, 500))
+              successCount++
+            } catch (error) {
+              console.error(`第${i + 1}次使用火把失败:`, error)
+              failCount++
+              // 如果服务器错误，跳过执行剩余次数
+              if (error.message && error.message.includes('服务器错误')) {
+                message.warning(`${token.name} - 第${i + 1}次使用火把失败: ${error.message}，跳过剩余次数`)
+                break
+              }
+            }
           }
           
-          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
-            throw new Error('Token连接失败')
-          }
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用火把完成：成功${successCount}次，失败${failCount}次`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '使用火把',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `使用火把完成：成功${successCount}次，失败${failCount}次`
+          })
+          
+          return { success: true, tokenId: token.id, successCount, failCount }
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 使用火把失败:`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 使用火把失败: ${error.message}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '使用火把',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `使用火把失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
         }
-        
-        // TODO: 实现使用火把功能
-        message.info(`${token.name} - 使用火把功能开发中...`)
-        
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '使用火把',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: `${token.name} - 使用火把功能开发中`
-        })
-        
-        message.success(`${token.name} - 使用火把完成`)
-        
-      } catch (error) {
-        console.error(`${token.name} - 使用火把失败:`, error)
-        message.error(`${token.name} - 使用火把失败: ${error.message || '未知错误'}`)
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '使用火把',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'error',
-          message: `${token.name} - 使用火把失败: ${error.message || '未知错误'}`
-        })
-      } finally {
-        // 关闭WebSocket连接
-        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
-          await tokenStore.closeWebSocketConnection(token.id)
-        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
       }
-      
-      // 处理完一个Token后，等待一段时间再处理下一个
-      if (i < targetTokens.length - 1) {
-        message.info(`等待3秒后处理下一个Token...`)
-        await new Promise(resolve => setTimeout(resolve, 3000))
-      }
-    }
+    )
     
-    message.success(`批量使用火把完成，共处理${targetTokens.length}个Token`)
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+    
+    message.success(`批量使用火把完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '使用火把',
       status: 'success',
-      message: `批量使用火把完成，共处理${targetTokens.length}个Token`
+      message: `批量使用火把完成：成功 ${successCount} 个，失败 ${failureCount} 个`
     })
     
   } catch (error) {
     console.error('批量使用火把失败:', error)
-    message.error(`批量使用火把失败: ${error.message || '未知错误'}`)
+    message.error(`批量使用火把失败: ${error.message}`)
+    
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '使用火把',
       status: 'error',
-      message: `批量使用火把失败: ${error.message || '未知错误'}`
+      message: `批量使用火把失败: ${error.message}`
     })
   } finally {
     isUsingTorch.value = false

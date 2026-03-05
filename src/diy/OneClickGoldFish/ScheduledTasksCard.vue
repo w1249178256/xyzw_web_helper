@@ -205,192 +205,309 @@ const handleExecuteScheduledTasks = async () => {
           
           // 按顺序执行打开的任务
           if (scheduledTasks.value.claimHangUp) {
-            // 领取挂机奖励
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'system_claimhangupreward',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            // 挂机加钟4次
-            for (let i = 0; i < 4; i++) {
+            try {
+              // 领取挂机奖励
               await tokenStore.sendMessageWithPromise(
                 token.id,
-                'system_mysharecallback',
-                { isSkipShareCard: true, type: 2 },
-                5000
-              )
-              await new Promise(resolve => setTimeout(resolve, 500))
-            }
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '领取挂机',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '领取挂机成功'
-            })
-          }
-          
-          if (scheduledTasks.value.resetBottles) {
-            // 重置罐子：先停止计时，再开始计时
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'bottlehelper_stop',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'bottlehelper_start',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '重置罐子',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '重置罐子成功'
-            })
-          }
-          
-          if (scheduledTasks.value.genieSweep) {
-            // 灯神扫荡 - 简化版本，直接扫荡10次
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'genie_sweep',
-              { genieId: 1, sweepCnt: 10 },
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '一键灯神扫荡',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '一键灯神扫荡成功'
-            })
-          }
-          
-          if (scheduledTasks.value.batchlingguanzi) {
-            // 领取盐罐
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'bottlehelper_claim',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '领取罐子',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '领取罐子成功'
-            })
-          }
-          
-          if (scheduledTasks.value.batchclubsign) {
-            // 俱乐部签到
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'legion_signin',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '一键俱乐部签到',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '一键俱乐部签到成功'
-            })
-          }
-          
-          if (scheduledTasks.value.batcharenafight) {
-            // 竞技场战斗3次
-            for (let i = 0; i < 3; i++) {
-              await tokenStore.sendMessageWithPromise(
-                token.id,
-                'arena_fight',
+                'system_claimhangupreward',
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 1000))
+              await new Promise(resolve => setTimeout(resolve, 1200))
+              
+              // 挂机加钟4次
+              for (let i = 0; i < 4; i++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'system_mysharecallback',
+                  { isSkipShareCard: true, type: 2 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+              }
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '领取挂机',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '领取挂机成功'
+              })
+            } catch (error) {
+              console.error(`领取挂机失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '领取挂机',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `领取挂机失败: ${error.message}`
+              })
             }
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '一键竞技场战斗3次',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '一键竞技场战斗3次成功'
-            })
+          }
+          
+          if (scheduledTasks.value.resetBottles) {
+            try {
+              // 重置罐子：先停止计时，再开始计时
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'bottlehelper_stop',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'bottlehelper_start',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '重置罐子',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '重置罐子成功'
+              })
+            } catch (error) {
+              console.error(`重置罐子失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '重置罐子',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `重置罐子失败: ${error.message}`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.genieSweep) {
+            try {
+              // 执行3次genie_buysweep命令
+              for (let i = 0; i < 3; i++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'genie_buysweep',
+                  {},
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+              }
+              
+              // 灯神扫荡 - 循环执行4次，每次使用不同的genieId（1-4）
+              for (let genieId = 1; genieId <= 4; genieId++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'genie_sweep',
+                  { genieId: genieId, sweepCnt: 1 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+              }
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键灯神扫荡',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '一键灯神扫荡成功（执行3次genie_buysweep，4个灯神各扫荡1次）'
+              })
+            } catch (error) {
+              console.error(`一键灯神扫荡失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键灯神扫荡',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `一键灯神扫荡失败: ${error.message}`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.batchlingguanzi) {
+            try {
+              // 领取盐罐
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'bottlehelper_claim',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '领取罐子',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '领取罐子成功'
+              })
+            } catch (error) {
+              console.error(`领取罐子失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '领取罐子',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `领取罐子失败: ${error.message}`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.batchclubsign) {
+            try {
+              // 俱乐部签到
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'legion_signin',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键俱乐部签到',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '一键俱乐部签到成功'
+              })
+            } catch (error) {
+              console.error(`一键俱乐部签到失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键俱乐部签到',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `一键俱乐部签到失败: ${error.message}`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.batcharenafight) {
+            try {
+              // 竞技场战斗3次
+              for (let i = 0; i < 3; i++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'arena_fight',
+                  {},
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              }
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键竞技场战斗3次',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '一键竞技场战斗3次成功'
+              })
+            } catch (error) {
+              console.error(`一键竞技场战斗3次失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键竞技场战斗3次',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `一键竞技场战斗3次失败: ${error.message}`
+              })
+            }
           }
           
           if (scheduledTasks.value.store_purchase) {
-            // 黑市采购
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'store_purchase',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '一键黑市采购',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '一键黑市采购成功'
-            })
+            try {
+              // 黑市采购
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'store_purchase',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键黑市采购',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '一键黑市采购成功'
+              })
+            } catch (error) {
+              console.error(`一键黑市采购失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键黑市采购',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `一键黑市采购失败: ${error.message}`
+              })
+            }
           }
           
           if (scheduledTasks.value.legion_boss) {
-            // 一键俱乐部BOSS
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'fight_startlegionboss',
-              {},
-              5000
-            )
-            await new Promise(resolve => setTimeout(resolve, 500))
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '定时任务',
-              operation: '一键俱乐部BOSS',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '一键俱乐部BOSS成功'
-            })
+            try {
+              // 一键俱乐部BOSS
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'fight_startlegionboss',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键俱乐部BOSS',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: '一键俱乐部BOSS成功'
+              })
+            } catch (error) {
+              console.error(`一键俱乐部BOSS失败: ${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键俱乐部BOSS',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `一键俱乐部BOSS失败: ${error.message}`
+              })
+            }
           }
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 定时任务执行完成`)
