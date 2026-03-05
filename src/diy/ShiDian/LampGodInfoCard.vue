@@ -587,6 +587,8 @@ const switchToTeam1 = async () => {
     message.info('正在切换到阵容1...')
     
     const saveTeamParams = { teamId: 1 }
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendPresetteamSaveTeam(token.id, saveTeamParams)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
@@ -669,6 +671,8 @@ const switchTeam = async () => {
     
     // 使用fight_startlevel获取最新阵容
     message.info('正在获取最新阵容...')
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     
     let currentHeroes = teamInfo.value[1]
@@ -714,6 +718,8 @@ const switchTeam = async () => {
             heroId: currentHero.heroId,
             targetHeroId: targetHeroId
           }
+          // 执行命令前等待400ms
+          await new Promise(resolve => setTimeout(resolve, 400))
           await tokenStore.sendHeroExchange(token.id, exchangeParams)
           logOperation('shidian', '切换阵容', {
             cardType: '灯神信息',
@@ -726,6 +732,8 @@ const switchTeam = async () => {
           
           // 每次更换后重新获取最新阵容
           await new Promise(resolve => setTimeout(resolve, 300))
+          // 执行命令前等待400ms
+          await new Promise(resolve => setTimeout(resolve, 400))
           const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
           if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
             const battleTeam = refreshResult.battleData.leftTeam.team
@@ -777,6 +785,8 @@ const switchTeam = async () => {
             heroId: targetHeroId,
             targetHeroId: targetHeroId
           }
+          // 执行命令前等待400ms
+          await new Promise(resolve => setTimeout(resolve, 400))
           await tokenStore.sendHeroExchange(token.id, exchangeParams)
           logOperation('shidian', '切换阵容', {
             cardType: '灯神信息',
@@ -789,6 +799,8 @@ const switchTeam = async () => {
           
           // 每次更换后重新获取最新阵容
           await new Promise(resolve => setTimeout(resolve, 300))
+          // 执行命令前等待400ms
+          await new Promise(resolve => setTimeout(resolve, 400))
           const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
           if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
             const battleTeam = refreshResult.battleData.leftTeam.team

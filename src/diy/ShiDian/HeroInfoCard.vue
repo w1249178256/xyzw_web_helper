@@ -266,10 +266,14 @@ const refreshTeamInfo = async () => {
     message.info('正在刷新阵容信息...')
     
     // 获取角色信息
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendGetRoleInfo(token.id)
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // 1. 使用fight_startlevel获取当前实际阵容
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     await new Promise(resolve => setTimeout(resolve, 500))
     
@@ -283,6 +287,8 @@ const refreshTeamInfo = async () => {
     }
     
     // 3. 使用presetteam_getinfo获取预设阵容和useTeamId
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const teamInfoRes = await tokenStore.sendPresetteamGetInfo(token.id, {})
     await new Promise(resolve => setTimeout(resolve, 500))
     
@@ -385,6 +391,8 @@ const heroUpgrade = async () => {
     message.info('正在执行武将升级...')
     
     // 1. 使用fight_startlevel获取当前阵容
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     await new Promise(resolve => setTimeout(resolve, 500))
     
@@ -448,6 +456,8 @@ const heroUpgrade = async () => {
             // 尝试执行武将升级
             let upgradeRes
             try {
+              // 执行命令前等待400ms
+              await new Promise(resolve => setTimeout(resolve, 400))
               upgradeRes = await tokenStore.sendMessageWithPromise(
                 token.id,
                 'hero_heroupgradelevel',
@@ -470,6 +480,8 @@ const heroUpgrade = async () => {
               if (hasErrorCode400060 || errorMsg.includes('未进阶') || errorMsg.includes('不能升级主公')) {
                 // 执行升阶命令
                 try {
+                  // 执行命令前等待400ms
+                  await new Promise(resolve => setTimeout(resolve, 400))
                   await tokenStore.sendMessageWithPromise(
                     token.id,
                     'hero_heroupgradeorder',
@@ -697,6 +709,8 @@ const heroUpgrade = async () => {
     }
     
     // 5. 刷新角色信息
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendGetRoleInfo(token.id)
     await new Promise(resolve => setTimeout(resolve, 500))
     

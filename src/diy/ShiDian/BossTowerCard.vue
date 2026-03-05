@@ -296,6 +296,8 @@ const executeCommandWithLog = async (type, tokenId, tokenName, cmd, params, time
   const command = { cmd, params };
   try {
     addLog(type, tokenName, `执行命令: ${cmd}`, true, command);
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const response = await tokenStore.sendMessageWithPromise(tokenId, cmd, params, timeout);
     // 更新日志，添加响应结果
     addLog(type, tokenName, `执行命令: ${cmd} 成功`, true, command, response);
@@ -386,7 +388,11 @@ const updateTokenResourceData = async (tokenId) => {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // 获取最新的角色信息和十殿信息
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendGetRoleInfo(tokenId)
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendNightmareGetRoleInfo(tokenId, { roleId: tokenId })
 
     // 等待数据更新
@@ -562,6 +568,8 @@ const getTeam = async () => {
 
     // 如果仍然没有，尝试获取角色信息
     if (!roleId || !roleName) {
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
       await tokenStore.sendGetRoleInfo(helpedTokenId.value);
       await new Promise(resolve => setTimeout(resolve, 500)); // 等待数据更新
       
@@ -592,6 +600,8 @@ const getTeam = async () => {
     }
 
     // 获取宝库信息
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const response = await tokenStore.sendBossTowerGetInfo(helpedTokenId.value);
 
     // 更新宝库层数和队伍序号
@@ -637,17 +647,19 @@ const searchTeam = async () => {
   }
 
   try {
-    // teamId 应该是字符串格式（如 'R8i799013'）
-    const teamId = String(teamIndex.value);
-    console.log("搜索队伍参数:", { teamId, teamIndex: teamIndex.value });
-    
-    // 使用 tokenStore 的 sendBossTowerSearchTeam 方法
-    const response = await tokenStore.sendBossTowerSearchTeam(
-      helperTokenId.value,
-      { teamId: teamId }
-    );
-    message.success("搜索队伍成功");
-    console.log("队伍列表:", response);
+      // teamId 应该是字符串格式（如 'R8i799013'）
+      const teamId = String(teamIndex.value);
+      console.log("搜索队伍参数:", { teamId, teamIndex: teamIndex.value });
+      
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
+      // 使用 tokenStore 的 sendBossTowerSearchTeam 方法
+      const response = await tokenStore.sendBossTowerSearchTeam(
+        helperTokenId.value,
+        { teamId: teamId }
+      );
+      message.success("搜索队伍成功");
+      console.log("队伍列表:", response);
   } catch (error) {
     console.error("搜索队伍失败:", error);
     console.error("错误详情:", {
@@ -694,6 +706,8 @@ const buyBoom = async () => {
     for (let i = 0; i < goodsIds.length; i++) {
       console.log(`购买第${i + 1}个商品（goodsId: ${goodsIds[i]}）...`);
       try {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400))
         const response = await tokenStore.sendMessageWithPromise(
           helpedTokenId.value,
           "charge_createorder",
@@ -786,6 +800,8 @@ const createTeam = async () => {
       
       // 如果仍然没有，尝试获取角色信息
       if (!leaderId) {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400))
         await tokenStore.sendGetRoleInfo(helpedTokenId.value);
         await new Promise(resolve => setTimeout(resolve, 500)); // 等待数据更新
         
@@ -829,6 +845,8 @@ const createTeam = async () => {
     // 检查是否已经在队伍中
     console.log("检查当前队伍状态...");
     try {
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
       const teamInfo = await tokenStore.sendMessageWithPromise(
         helperTokenId.value,
         "matchteam_getroleteaminfo",
@@ -847,6 +865,8 @@ const createTeam = async () => {
     }
 
     // 使用宝库创建队伍命令，传入被助Token的roleId和队伍序号
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const response = await tokenStore.sendMessageWithPromise(
       helperTokenId.value,
       "matchteam_create_baoku",
