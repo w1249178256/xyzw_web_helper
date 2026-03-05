@@ -397,10 +397,10 @@ const heroUpgrade = async () => {
       battleTeam = fightResult.leftTeam.team
     }
     
-    // 从 fight_startlevel 获取的当前实际阵容
+    // 从 fight_startlevel 获取的当前实际阵容（按位置4-0顺序）
     const heroes = []
     if (battleTeam) {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 4; i >= 0; i--) {
         const hero = battleTeam[String(i)] || battleTeam[i]
         if (hero && hero.id) {
           heroes.push({
@@ -425,7 +425,7 @@ const heroUpgrade = async () => {
     // 输出调试信息
     console.log('DEBUG: 从 fight_startlevel 检测到的武将信息', heroes.map(h => ({ heroId: h.heroId, level: h.level })))
     
-    // 3. 对每个武将循环升级（每次50级），达到6000级换下一个武将
+    // 3. 对每个武将循环升级（每次50级，按位置4-0顺序），达到6000级换下一个武将
     let upgradeCount = 0
     let shouldStop = false
     
@@ -479,7 +479,7 @@ const heroUpgrade = async () => {
                     5000
                   )
                   message.info(`武将${hero.heroId}已执行升阶，继续升级...`)
-                  await new Promise(resolve => setTimeout(resolve, 200))
+                  await new Promise(resolve => setTimeout(resolve, 500))
                   // 升阶后继续升级循环
                   continue
                 } catch (orderError) {
@@ -501,7 +501,7 @@ const heroUpgrade = async () => {
                     break
                   } else if (orderHasServerError) {
                     // 服务器错误，忽视并继续执行操作
-                    await new Promise(resolve => setTimeout(resolve, 200))
+                    await new Promise(resolve => setTimeout(resolve, 500))
                     // 继续升级循环
                     continue
                   } else if (orderErrorMsg.includes('物品数量不足')) {
@@ -542,7 +542,7 @@ const heroUpgrade = async () => {
                   5000
                 )
                 message.info(`武将${hero.heroId}已执行升阶，继续升级...`)
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
                 // 升阶后继续升级循环
                 continue
               } catch (orderError) {
@@ -564,7 +564,7 @@ const heroUpgrade = async () => {
                   break
                 } else if (orderHasServerError) {
                   // 服务器错误，忽视并继续执行操作
-                  await new Promise(resolve => setTimeout(resolve, 200))
+                  await new Promise(resolve => setTimeout(resolve, 500))
                   // 继续升级循环
                   continue
                 } else if (orderErrorMsg.includes('物品数量不足')) {
@@ -609,7 +609,7 @@ const heroUpgrade = async () => {
               break
             }
             
-            await new Promise(resolve => setTimeout(resolve, 200))
+            await new Promise(resolve => setTimeout(resolve, 500))
           } catch (error) {
             // 捕获升级命令的错误
             const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
@@ -631,7 +631,7 @@ const heroUpgrade = async () => {
                   5000
                 )
                 message.info(`武将${hero.heroId}已执行升阶，继续升级...`)
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
                 // 升阶后继续升级循环
                 continue
               } catch (orderError) {
@@ -1287,6 +1287,8 @@ const switchToTeam1Internal = async (tokenId) => {
     await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
     currentUseTeamId.value = 1
     
+    // 等待500ms再刷新阵容信息（避免操作太快错误）
+    await new Promise(resolve => setTimeout(resolve, 500))
     // 刷新阵容信息
     await refreshTeamInfoInternal(token.id)
   } catch (error) {
@@ -1442,6 +1444,8 @@ const switchToTeam2Internal = async (tokenId) => {
     await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 2 })
     currentUseTeamId.value = 2
     
+    // 等待500ms再刷新阵容信息（避免操作太快错误）
+    await new Promise(resolve => setTimeout(resolve, 500))
     // 刷新阵容信息
     await refreshTeamInfoInternal(token.id)
   } catch (error) {
@@ -1483,10 +1487,10 @@ const heroUpgradeInternal = async (tokenId) => {
     battleTeam = fightResult.leftTeam.team
   }
   
-  // 提取当前阵容中的武将列表
+  // 提取当前阵容中的武将列表（按位置4-0顺序）
   const heroes = []
   if (battleTeam) {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 4; i >= 0; i--) {
       const hero = battleTeam[String(i)] || battleTeam[i]
       if (hero && hero.id) {
         heroes.push({
@@ -1558,7 +1562,7 @@ const heroUpgradeInternal = async (tokenId) => {
                   },
                   5000
                 )
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
                 // 升阶后继续升级循环
                 continue
               } catch (orderError) {
@@ -1597,7 +1601,7 @@ const heroUpgradeInternal = async (tokenId) => {
                 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 200))
+              await new Promise(resolve => setTimeout(resolve, 500))
               // 升阶后继续升级循环
               continue
             } catch (orderError) {
@@ -1619,7 +1623,7 @@ const heroUpgradeInternal = async (tokenId) => {
                 break
               } else if (orderHasServerError) {
                 // 服务器错误，忽视并继续执行操作
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
                 // 继续升级循环
                 continue
               } else if (orderErrorMsg.includes('物品数量不足')) {
@@ -1662,7 +1666,7 @@ const heroUpgradeInternal = async (tokenId) => {
             break
           }
           
-          await new Promise(resolve => setTimeout(resolve, 200))
+          await new Promise(resolve => setTimeout(resolve, 500))
         } catch (error) {
           // 捕获升级命令的错误
           const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
@@ -1694,7 +1698,7 @@ const heroUpgradeInternal = async (tokenId) => {
                 break
               }
               
-              await new Promise(resolve => setTimeout(resolve, 200))
+              await new Promise(resolve => setTimeout(resolve, 500))
               // 升阶成功，继续升级循环
               continue
             } catch (orderError) {
@@ -1714,7 +1718,7 @@ const heroUpgradeInternal = async (tokenId) => {
               
               if (orderHasErrorCode200020 || orderHasServerError) {
                 // 错误代码200020，忽视并继续执行操作
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
                 continue
               } else if (orderHasErrorCode400060 || orderHasNotUpgradeError) {
                 // 升阶命令也返回"未进阶"错误，说明无法升阶，跳过这个武将
@@ -1906,6 +1910,9 @@ const batchUpgrade = async (teamId) => {
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 连接成功`)
         
+        // 连接成功后等待2秒再执行后续操作（避免操作太快错误）
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
         // 切换阵容
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在切换阵容${teamId}...`)
         await tokenStore.sendPresetteamSaveTeam(token.id, { teamId })
@@ -1928,13 +1935,14 @@ const batchUpgrade = async (teamId) => {
           continue
         }
         
-        // 获取阵容中的武将列表
+        // 获取阵容中的武将列表（按位置4-0顺序）
         const heroes = []
-        for (const [pos, hero] of Object.entries(teamInfoData)) {
+        for (let i = 4; i >= 0; i--) {
+          const hero = teamInfoData[String(i)] || teamInfoData[i]
           if (hero && hero.heroId) {
             heroes.push({
               heroId: hero.heroId,
-              position: pos,
+              position: i,
               level: hero.level || 1
             })
           }
@@ -1947,7 +1955,7 @@ const batchUpgrade = async (teamId) => {
         
         message.info(`[序号${tokenIndex}] ${token.name || token.id}: 找到${heroes.length}个武将，开始升级...`)
         
-        // 对每个武将进行升级
+        // 对每个武将进行升级（按位置4-0顺序）
         let upgradeCount = 0
         for (const hero of heroes) {
           try {
@@ -1990,7 +1998,7 @@ const batchUpgrade = async (teamId) => {
                   break
                 }
                 
-                await new Promise(resolve => setTimeout(resolve, 200))
+                await new Promise(resolve => setTimeout(resolve, 500))
               } catch (upgradeError) {
                 // 捕获升级命令的错误
                 const errorMsg = String(upgradeError.message || upgradeError.hint || upgradeError.error || '').toLowerCase()
@@ -2003,7 +2011,7 @@ const batchUpgrade = async (teamId) => {
                 
                 if (hasErrorCode200020 || hasServerError) {
                   // 错误代码200020，忽视并继续执行操作
-                  await new Promise(resolve => setTimeout(resolve, 200))
+                  await new Promise(resolve => setTimeout(resolve, 500))
                   continue
                 }
                 
@@ -2034,7 +2042,7 @@ const batchUpgrade = async (teamId) => {
                       break
                     }
                     
-                    await new Promise(resolve => setTimeout(resolve, 200))
+                    await new Promise(resolve => setTimeout(resolve, 500))
                     // 升阶成功，继续升级循环
                     continue
                   } catch (orderError) {
@@ -2054,7 +2062,7 @@ const batchUpgrade = async (teamId) => {
                     
                     if (orderHasErrorCode200020 || orderHasServerError) {
                       // 错误代码200020，忽视并继续执行操作
-                      await new Promise(resolve => setTimeout(resolve, 200))
+                      await new Promise(resolve => setTimeout(resolve, 500))
                       continue
                     } else if (orderHasErrorCode400060 || orderHasNotUpgradeError) {
                       // 升阶命令也返回"未进阶"错误，说明无法升阶，跳过这个武将
@@ -2093,13 +2101,6 @@ const batchUpgrade = async (teamId) => {
           })
         } else {
           message.info(`[序号${tokenIndex}] ${token.name || token.id}: 阵容${teamId}无需升级`)
-        }
-        
-        // 刷新角色信息
-        await tokenStore.sendGetRoleInfo(token.id)
-        
-        if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级失败:`, error)

@@ -102,6 +102,13 @@
           :select-options="weaponOptions"
           @update:select-value="handleWeaponSelect" 
         />
+        <CustomizedCard 
+          mode="name-select" 
+          name="执行次数" 
+          :select-value="lampGodFightCount" 
+          :select-options="lampGodFightCountOptions"
+          @update:select-value="handleLampGodFightCountSelect" 
+        />
       </CustomizedCard>
       
       <!-- 操作日志 -->
@@ -234,8 +241,19 @@ const weaponOptions = [
   { label: '止痒花露水', value: 9 }
 ]
 
+const lampGodFightCount = ref(10)
+
+const lampGodFightCountOptions = [
+  { label: '5', value: 5 },
+  { label: '10', value: 10 }
+]
+
 const handleWeaponSelect = (value) => {
   selectedWeaponId.value = value
+}
+
+const handleLampGodFightCountSelect = (value) => {
+  lampGodFightCount.value = value
 }
 
 const handleLampGodTokensInput = (value) => {
@@ -380,6 +398,8 @@ const refreshTeamInfo = async () => {
     message.info('正在刷新阵容信息...')
     
     // 1. 使用fight_startlevel获取当前阵容
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     console.log('fight_startlevel 原始响应:', fightResult)
     
@@ -404,11 +424,15 @@ const refreshTeamInfo = async () => {
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // 2. 使用presetteam_getinfo获取useTeamId
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const teamInfoRes = await tokenStore.sendPresetteamGetInfo(token.id, {})
     console.log('presetteam_getinfo 原始响应:', teamInfoRes)
     await new Promise(resolve => setTimeout(resolve, 500))
     
     // 3. 使用role_getroleinfo获取角色科技信息
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const roleInfoRes = await tokenStore.sendGetRoleInfo(token.id, {})
     console.log('role_getroleinfo 原始响应:', roleInfoRes)
     await new Promise(resolve => setTimeout(resolve, 500))
@@ -558,14 +582,7 @@ const switchToTeam1 = async () => {
     return
   }
   
-  // 检查当前useTeamId，如果为1则跳过执行
-  if (currentUseTeamId.value === 1) {
-    message.info('当前已经是阵容1，无需切换')
-    // 但仍需更新当前使用的预设阵容显示
-    updateCurrentPresetTeam()
-    return
-  }
-  
+  // 不再检查当前阵容，直接执行切换阵容1
   try {
     message.info('正在切换到阵容1...')
     
@@ -593,7 +610,7 @@ const switchToTeam1 = async () => {
     })
   } catch (error) {
     console.error('切换阵容1失败:', error)
-    message.error(`切换阵容1失败: ${error.message || '未知错误'}`)
+    message.warning(`切换阵容1失败: ${error.message || '未知错误'}，继续执行后续操作`)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,
@@ -601,6 +618,7 @@ const switchToTeam1 = async () => {
       status: 'error',
       message: `切换阵容1失败: ${error.message || '未知错误'}`
     })
+    // 失败后不返回，继续执行后续操作
   }
 }
 
@@ -1296,7 +1314,7 @@ const lampGodAction = async () => {
       }
       
       // 模拟点击灯神战斗
-      message.info(`${type.name} 灯神战斗开始（10次）...`)
+      message.info(`${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
       
       // 第一次战斗前获取阵容并执行hero_calcpowerbyteam
       let currentBattleTeam = {}
@@ -1364,7 +1382,7 @@ const lampGodAction = async () => {
       }
       
       let challengeExhausted = false
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < lampGodFightCount.value; i++) {
         if (challengeExhausted) break
         
         try {
@@ -1408,7 +1426,7 @@ const lampGodAction = async () => {
       if (challengeExhausted) {
         message.success(`${type.name} 灯神战斗因次数用完而结束`)
       } else {
-        message.success(`${type.name} 灯神战斗10次执行完成`)
+        message.success(`${type.name} 灯神战斗${lampGodFightCount.value}次执行完成`)
       }
     }
     
@@ -1606,7 +1624,7 @@ const lampGodFight = async () => {
     
     for (const type of selectedTypes) {
       // 执行灯神战斗
-      message.info(`${type.name} 灯神战斗开始（10次）...`)
+      message.info(`${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
       
       // 获取对应灯神的战斗阵容
       let battleTeamData = genieBattleTeam[type.genieId]
@@ -1631,7 +1649,7 @@ const lampGodFight = async () => {
         }
       }
       
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < lampGodFightCount.value; i++) {
         try {
           // 构建battleTeam参数，使用灯神战斗阵容的heroId作为0-4参数
           const battleTeam = {}
@@ -1659,7 +1677,7 @@ const lampGodFight = async () => {
           message.warning(`${type.name} 灯神战斗第 ${i + 1} 次失败: ${error.message || error}`)
         }
       }
-      message.success(`${type.name} 灯神战斗10次执行完成`)
+      message.success(`${type.name} 灯神战斗${lampGodFightCount.value}次执行完成`)
     }
     
     message.success('灯神战斗完成')

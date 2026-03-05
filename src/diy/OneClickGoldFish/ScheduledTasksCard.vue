@@ -47,6 +47,11 @@
             name="一键黑市采购"
             v-model:switchValue="scheduledTasks.store_purchase"
           />
+          <CustomizedCard 
+            mode="name-switch"
+            name="一键俱乐部BOSS"
+            v-model:switchValue="scheduledTasks.legion_boss"
+          />
 
           <CustomizedCard 
             mode="execution-range" 
@@ -107,7 +112,8 @@ const scheduledTasks = ref({
   batchlingguanzi: false,
   batchclubsign: false,
   batcharenafight: false,
-  store_purchase: false
+  store_purchase: false,
+  legion_boss: false
 })
 
 // 处理定时任务执行范围输入
@@ -363,6 +369,27 @@ const handleExecuteScheduledTasks = async () => {
               tokenName: token.name,
               status: 'success',
               message: '一键黑市采购成功'
+            })
+          }
+          
+          if (scheduledTasks.value.legion_boss) {
+            // 一键俱乐部BOSS
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'fight_startlegionboss',
+              {},
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '一键俱乐部BOSS',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: '一键俱乐部BOSS成功'
             })
           }
           

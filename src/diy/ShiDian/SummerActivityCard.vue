@@ -359,10 +359,14 @@ const getUsedItems = async () => {
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'activity_getactegameinfo',
       { actId: Number(activityId.value) },
-      tokenStore.sendActivityGetActeGameInfo(
-        selectedTokenId.value,
-        { actId: Number(activityId.value) }
-      ),
+      (async () => {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return tokenStore.sendActivityGetActeGameInfo(
+          selectedTokenId.value,
+          { actId: Number(activityId.value) }
+        );
+      })(),
       true,
       '暑期活动'
     );
@@ -415,7 +419,11 @@ const getRemainingItems = async () => {
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'role_getroleinfo',
       {},
-      tokenStore.sendGetRoleInfo(selectedTokenId.value),
+      (async () => {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return tokenStore.sendGetRoleInfo(selectedTokenId.value);
+      })(),
       true,
       '暑期活动'
     );
@@ -549,7 +557,11 @@ const startTower = async () => {
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'towers_start',
       { towerType: bossSelect.value },
-      tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value }),
+      (async () => {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value });
+      })(),
       true,
       '暑期活动'
     );
@@ -591,7 +603,11 @@ const fightTower = async () => {
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'towers_fight',
       { towerType: bossSelect.value },
-      tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value }),
+      (async () => {
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400));
+        return tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value });
+      })(),
       true,
       '暑期活动'
     );

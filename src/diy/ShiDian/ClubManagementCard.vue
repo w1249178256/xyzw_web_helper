@@ -379,6 +379,8 @@ const handleLegacyHangup = async () => {
     message.info('正在领取功法挂机奖励...')
     
     try {
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
       const res = await tokenStore.sendMessageWithPromise(
         token.id,
         'legacy_claimhangup',
@@ -736,6 +738,8 @@ const handleLegacyCollect = async () => {
     
     // 1. 使用 role_getroleinfo 获取 items:37007 数量
     message.info('正在获取功法残卷数量...')
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
     const legacyFragmentCount = roleInfo?.role?.items?.[37007]?.quantity || 0
     
@@ -750,6 +754,8 @@ const handleLegacyCollect = async () => {
     // 2. 使用 role_commitpassword 命令
     message.info('正在提交密码...')
     try {
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
       await tokenStore.sendRoleCommitPassword(token.id, {
         password: legacyPassword.value ? parseInt(legacyPassword.value) : 946215
       })
@@ -765,6 +771,8 @@ const handleLegacyCollect = async () => {
     // 3. 使用 legacy_sendgift 命令，itemCnt 设为获取的 items:37007 数量
     message.info(`正在赠送功法残卷，数量: ${legacyFragmentCount}...`)
     try {
+      // 执行命令前等待400ms
+      await new Promise(resolve => setTimeout(resolve, 400))
       const giftRes = await tokenStore.sendLegacySendGift(token.id, {
         itemCnt: legacyFragmentCount,
         targetId: legacyTargetId.value ? parseInt(legacyTargetId.value) : 111582820
@@ -1236,6 +1244,8 @@ const handleAcceptGift = async () => {
     }
 
     // 执行legacy_claimgift
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendLegacyClaimGift(token.id, {})
     message.success('接受礼物成功')
     logOperation('shidian', '接受礼物', {
@@ -1957,6 +1967,8 @@ const handleRefreshLegacyInfo = async () => {
     isRefreshLegacyInfoRunning.value = true
     message.info('正在刷新图鉴信息...')
     
+    // 执行命令前等待400ms
+    await new Promise(resolve => setTimeout(resolve, 400))
     const legacyInfo = await tokenStore.sendLegacyGetInfo(token.id, {})
     
     if (!legacyInfo) {
