@@ -1,0 +1,122 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/3/6 19:15:22
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 2
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/3/6 19:15:09
+服务: ActivityService
+方法: buyStoreGoods
+参数: [{"activityId":9,"goodsIndex":1,"buyNum":1}]
+结果:
+{
+  "_raw": {
+    "seq": 59,
+    "ack": 0,
+    "time": 1772795709870,
+    "resp": 57,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 465390,
+        "freeDiamond": 465390,
+        "items": {
+          "1001": {
+            "quantity": 4214
+          },
+          "1006": {
+            "quantity": 589813
+          }
+        },
+        "statistics": {
+          "wa:diamond": 17600
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1001,
+          "value": 5,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 1000,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 124
+}
+异步: 是
+调用ID: call_1772795709784_gs7cdgmkt
+
+记录 #2:
+----------------------------------------
+时间: 2026/3/6 19:14:57
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0
+        }
+      ]
+    },
+    "seq": 56,
+    "ack": 0,
+    "time": 1772795697753,
+    "resp": 56,
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1772795697676_szk50ytx3
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

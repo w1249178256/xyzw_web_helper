@@ -126,7 +126,7 @@
             />
             <CustomizedCard 
               mode="button" 
-              :name="isBatchRunning ? '批量执行中...' : '批量执行'" 
+              :name="isBatchRunning ? '批量爬塔中...' : '批量爬塔'" 
               :disabled="tokenStore.gameTokens.length === 0 || isBatchRunning" 
               @button-click="handleBatchClimb" 
             />
@@ -145,16 +145,34 @@
 </template>
 
 <script setup>
-import { defineProps, ref, computed, watch } from 'vue'
+import { defineProps, ref, computed, watch, onUnmounted } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { TrendingUp } from '@vicons/ionicons5'
+import ConnectionPoolManager from '@/utils/connectionPoolManager'
 
 const tokenStore = useTokenStore()
 const message = useMessage()
+
+// 初始化连接池管理器
+const connectionPool = new ConnectionPoolManager(tokenStore, {
+  maxConnections: 20,
+  connectionTimeout: 10000,
+  maxRetries: 2
+})
+
+// 组件卸载前清理连接池
+onUnmounted(async () => {
+  try {
+    await connectionPool.destroy()
+    console.log('[WeirdTowerCard] 连接池已清理')
+  } catch (error) {
+    console.error('[WeirdTowerCard] 清理连接池失败:', error)
+  }
+})
 
 const props = defineProps({
   selectedTokenId: {
@@ -1097,70 +1115,41 @@ const handleBatchClimb = async () => {
     return
   }
   
-  // 获取每个token在sortedTokens中的序号（用于显示）
-  const getTokenIndex = (token) => {
-    const index = sortedTokensList.findIndex(t => t.id === token.id)
-    return index + 1
-  }
-  
   try {
     isBatchRunning.value = true
     const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
     message.info(`开始批量爬塔（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
     
-    let successCount = 0
-    let failCount = 0
-    
-    for (let i = 0; i < targetTokens.length; i++) {
-      const token = targetTokens[i]
-      const tokenIndex = getTokenIndex(token)
+    // 定义爬塔操作函数
+    const towerClimbOperation = async (token, globalIndex) => {
+      const tokenIndex = globalIndex + 1
       
       try {
-        // 连接Token
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
-        tokenStore.selectToken(token.id, true)
+        // 获取怪异塔信息（直接从响应获取）
+        const towerInfoRes = await tokenStore.sendMessageWithPromise(
+          token.id,
+          'evotower_getinfo',
+          {},
+          5000
+        )
         
-        // 等待连接，最多重试5次
-        let retryCount = 0
-        const maxRetries = 5
-        let status = tokenStore.getWebSocketStatus(token.id)
+        // 从响应中直接获取能量
+        let currentEnergy = towerInfoRes?.evoTower?.energy || 0
+        let currentTowerId = towerInfoRes?.evoTower?.towerId || 0
         
-        while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          status = tokenStore.getWebSocketStatus(token.id)
-          retryCount++
-          
-          if (status !== 'connected' && retryCount < maxRetries) {
-            message.info(`[序号${tokenIndex}] 连接尝试 ${retryCount}/${maxRetries}...`)
-            tokenStore.selectToken(token.id, true)
-          }
-        }
-        
-        if (status !== 'connected') {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
-          failCount++
-          continue
-        }
-        
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 连接成功`)
-        
-        // 刷新怪异塔信息
-        await getTowerInfo(token.id)
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        // 执行爬塔逻辑
+        // 执行爬塔逻辑（模拟点击开始爬塔按钮）
         let climbCount = 0
         const maxClimb = 100
         
+        if (currentEnergy <= 0) {
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 能量不足，跳过爬塔`)
+          return { climbCount: 0 }
+        }
+        
         for (let j = 0; j < maxClimb; j++) {
           // 检查当前能量
-          await getTowerInfo(token.id)
-          
-          // 获取当前能量
-          const currentToken = tokenStore.gameTokens.find(t => t.id === token.id)
-          const currentEvoTowerInfo = currentToken?.gameData?.evoTowerInfo
-          const currentEnergy = currentEvoTowerInfo?.evoTower?.energy || 0
-          
           if (currentEnergy <= 0) break
 
           // 准备战斗
@@ -1184,11 +1173,17 @@ const handleBatchClimb = async () => {
 
           climbCount++
 
-          // 更新爬塔信息
-          await getTowerInfo(token.id)
+          // 更新爬塔信息和能量
+          const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
+            token.id,
+            'evotower_getinfo',
+            {},
+            5000
+          )
+          currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
+          currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
 
           // 检查是否刚通关10层
-          const currentTowerId = currentEvoTowerInfo?.evoTower?.towerId || 0
           const floor = (currentTowerId % 10) + 1
           if (
             fightResult &&
@@ -1209,17 +1204,37 @@ const handleBatchClimb = async () => {
         }
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成，共${climbCount}次`)
-        successCount++
-        
-        if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
-        }
+        return { climbCount }
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败:`, error)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
-        failCount++
+        throw error
       }
     }
+    
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      towerClimbOperation,
+      {
+        batchSize: 20,
+        delayBetween: 100,
+        keepConnections: true,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`[序号${progress.globalIndex}] ${progress.tokenName} 正在连接...`)
+          } else if (progress.type === 'token-success' && progress.message === '连接成功') {
+            message.success(`[序号${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error' && progress.message === '连接失败，跳过') {
+            message.warning(`[序号${progress.globalIndex}] ${progress.tokenName} 连接失败，跳过`)
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
     
     message.success(`批量爬塔完成（成功: ${successCount}, 失败: ${failCount}）`)
   } catch (error) {
