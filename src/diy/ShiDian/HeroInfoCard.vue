@@ -1875,6 +1875,28 @@ const batchUpgrade = async (teamId) => {
     return
   }
   
+  // 计算升级数量的函数
+  const calculateUpgradeNum = (level) => {
+    const lastTwoDigits = level % 100
+    if (lastTwoDigits === 0 || lastTwoDigits === 50) {
+      return 50 // 已经是整50级，直接升50级
+    }
+    
+    // 计算需要升到下一个50或00的等级差
+    const diffToNext50 = (50 - lastTwoDigits + 100) % 100
+    const diffToNext00 = (100 - lastTwoDigits + 100) % 100
+    const minDiff = Math.min(diffToNext50, diffToNext00)
+    
+    // 根据等级差选择升级数量
+    if (minDiff >= 10) {
+      return 10
+    } else if (minDiff >= 5) {
+      return 5
+    } else {
+      return 1
+    }
+  }
+  
   try {
     const rangeText = tokenIndices === null ? '全部' : `范围${tokenIndices.join(',')}`
     message.info(`开始批量升级阵容${teamId}（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
@@ -1983,12 +2005,15 @@ const batchUpgrade = async (teamId) => {
             // 循环升级，直到达到6000级或遇到错误
             while (currentLevel < 6000) {
               try {
+                // 计算升级数量
+                const upgradeNum = calculateUpgradeNum(currentLevel)
+                
                 const upgradeRes = await tokenStore.sendMessageWithPromise(
                   token.id,
                   'hero_heroupgradelevel',
                   {
                     heroId: hero.heroId,
-                    upgradeNum: 50
+                    upgradeNum: upgradeNum
                   },
                   5000
                 )

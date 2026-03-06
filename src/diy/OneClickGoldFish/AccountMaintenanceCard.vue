@@ -864,6 +864,20 @@ const handleExportDetails = async () => {
             boxScore = woodBox + bronzeBox * 10 + goldenBox * 20 + platinumBox * 50
           }
 
+          const lordLevel = role.lord?.level || 0
+
+          const lordWeaponId = role.lordWeaponId || 0
+
+          const activatedWeapons = []
+          if (role.lordWeapon) {
+            for (const key in role.lordWeapon) {
+              if (key !== '0' && role.lordWeapon.hasOwnProperty(key)) {
+                activatedWeapons.push(key)
+              }
+            }
+          }
+          const activatedWeaponsStr = activatedWeapons.join(',')
+
           // 使用activity_get获取宝箱周执行轮次
           let boxWeekRounds = '获取失败'
           try {
@@ -887,6 +901,9 @@ const handleExportDetails = async () => {
             推图层数: levelId,
             吕布星级: lvbuStarDisplay,
             宝箱总分: boxScore,
+            主公等级: lordLevel,
+            使用玩具: lordWeaponId,
+            已激活玩具: activatedWeaponsStr,
             宝箱周执行轮次: boxWeekRounds
           })
 
@@ -911,9 +928,9 @@ const handleExportDetails = async () => {
 
     if (detailsList.length > 0) {
       const lines = []
-      lines.push('序号,Token名称,推图层数,吕布星级,宝箱总分,宝箱周执行轮次')
+      lines.push('序号,Token名称,推图层数,吕布星级,宝箱总分,主公等级,使用玩具,已激活玩具,宝箱周执行轮次')
       detailsList.forEach(item => {
-        lines.push(`${item.序号},${item.Token名称},${item.推图层数},${item.吕布星级},${item.宝箱总分},${item.宝箱周执行轮次}`)
+        lines.push(`${item.序号},${item.Token名称},${item.推图层数},${item.吕布星级},${item.宝箱总分},${item.主公等级},${item.使用玩具},${item.已激活玩具},${item.宝箱周执行轮次}`)
       })
 
       const content = lines.join('\n')
@@ -2166,7 +2183,7 @@ const handleBatchSetStoryTeam = async () => {
           })
           
           // 5. 0-4heroid,逐个执行hero_exchange命令，更换阵容为吕布、太史慈、黄月英、张飞、魏延
-          const targetHeroes = [107, 119, 106, 118, 219] // 吕布、太史慈、黄月英、张飞、魏延
+          const targetHeroes = [107, 106, 110, 204, 217] // 吕布、太史慈、黄月英、张飞、魏延
           
           // 尝试从不同的结构中获取阵容数据
           let finalTeamData = null
