@@ -2350,7 +2350,9 @@ import { merchantConfig, goldItemsConfig } from "@/utils/dreamConstants";
 // Initialize token store, message service, and task runner
 const tokenStore = useTokenStore();
 const message = useMessage();
-
+// 创建一个响应式的当前时间引用
+const currentTime = ref(new Date());
+let timer = null;
 // 排序配置（从localStorage读取，与TokenImport共享）
 const savedSortConfig = localStorage.getItem("tokenSortConfig");
 const sortConfig = ref(
@@ -2443,26 +2445,26 @@ const getSortIcon = (field) => {
 
 const tokens = computed(() => tokenStore.gameTokens);
 const isCarActivityOpen = computed(() => {
-  const now = new Date();
+  const now = currentTime.value;
   const day = now.getDay();
   const hour = now.getHours();
   // 1=Mon, 2=Tue, 3=Wed; 6点之后
   return day >= 1 && day <= 3 && hour >= 6;
 });
 const ismengjingActivityOpen = computed(() => {
-  const day = new Date().getDay();
+  const day = currentTime.value.getDay();
   return day === 0 || day === 1 || day === 3 || day === 4;
 });
 const isbaokuActivityOpen = computed(() => {
-  const day = new Date().getDay();
+  const day = currentTime.value.getDay();
   return day != 1 && day != 2;
 });
 const isarenaActivityOpen = computed(() => {
-  const hour = new Date().getHours();
+  const hour = currentTime.value.getHours();
   return hour >= 6 && hour < 22;
 });
 const getCurrentActivityWeek = computed(() => {
-  const now = new Date();
+  const now = currentTime.value;
   const start = new Date("2025-12-12T12:00:00"); // 起始时间：黑市周开始
   const weekDuration = 7 * 24 * 60 * 60 * 1000; // 一周毫秒数
   const cycleDuration = 3 * weekDuration; // 三周期毫秒数
@@ -2484,7 +2486,7 @@ const getCurrentActivityWeek = computed(() => {
 const isWeirdTowerActivityOpen = computed(() => {
   if (getCurrentActivityWeek.value !== "黑市周") return false;
 
-  const now = new Date();
+  const now = currentTime.value;
   const day = now.getDay();
   const hour = now.getHours();
   // 如果是周五，必须在12点之后
@@ -3477,7 +3479,13 @@ const startCountdown = () => {
   // Update countdowns every second
   countdownInterval = setInterval(updateCountdowns, 1000);
 };
-
+//启动定时器，每秒更新时间
+const startUpdateTime = () => {
+  timer = setInterval(() => {
+    currentTime.value = new Date();
+    console.log("update current Time:", currentTime.value);
+  }, 1000); // 每秒更新一次，足以捕捉到小时的变化
+};
 // ======================
 // Scheduled Tasks Scheduler
 // ======================
@@ -3657,6 +3665,9 @@ onMounted(() => {
   // Start countdown timer
   startCountdown();
   loadTaskTemplates();
+
+  //启动定时器，每秒更新时间
+  startUpdateTime()
 });
 
 // Cleanup countdown interval on unmount
@@ -3680,6 +3691,12 @@ onBeforeUnmount(() => {
   if (healthCheckInterval) {
     clearInterval(healthCheckInterval);
     healthCheckInterval = null;
+  }
+
+
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
   }
 });
 
