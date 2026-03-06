@@ -1065,81 +1065,168 @@ const changeTech = async () => {
       
       let researchFailed = false
       
-      for (const targetTechType of targetTechTypes) {
-        if (researchFailed) break
+      // 爬塔阵容特殊处理：战士科技109升15次，110升20次，111升10次
+      if (selectedType === 'tower') {
+        message.info('爬塔阵容：对战士科技执行特殊升级（109升15次，110升20次，111升10次）')
         
-        message.info(`对目标科技 ${techTypeMap[targetTechType]} 执行研究...`)
+        const towerTechUpgrades = [
+          { researchId: 109, count: 15, name: '战士科技109' },
+          { researchId: 110, count: 20, name: '战士科技110' },
+          { researchId: 111, count: 10, name: '战士科技111' }
+        ]
         
-        // 计算该科技类型的researchId前缀
-        const prefix = targetTechType * 100; // 例如：type=1 -> prefix=100, type=2 -> prefix=200
-        
-        for (let subIndex = 1; subIndex <= 8; subIndex++) {
+        for (const tech of towerTechUpgrades) {
           if (researchFailed) break
           
-          const researchId = prefix + subIndex; // 如 101, 102, ..., 108 或 201, 202, ..., 208 等
+          message.info(`开始升级${tech.name}，共${tech.count}次`)
           
-          try {
-            const researchParams = {
-              researchId: researchId,
-              isMax: true
+          for (let i = 0; i < tech.count; i++) {
+            if (researchFailed) break
+            
+            try {
+              const researchParams = {
+                researchId: tech.researchId,
+                isMax: false
+              }
+              message.info(`执行研究: researchId=${tech.researchId}, isMax=false (${i+1}/${tech.count})`)
+              const result = await tokenStore.sendLegionResearch(token.id, researchParams)
+              
+              // 检查是否收到资源不足的提示
+              if (result && (result.msg || '').includes('资源不足') || 
+                  (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
+                message.warning(`研究收到资源不足提示，停止执行`)
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
+                })
+                researchFailed = true
+                break
+              }
+              
+              message.success(`${tech.name}升级成功 (${i+1}/${tech.count})`)
+              
+              // 每次执行间隔：500ms
+              await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (error) {
+              console.error(`${tech.name}升级失败: researchId=${tech.researchId}, isMax=false`, error)
+              message.warning(`${tech.name}升级失败`)
+              
+              // 检查错误信息是否包含资源不足
+              if (error.message && error.message.includes('资源不足')) {
+                message.warning(`研究收到资源不足提示，停止执行`)
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+                })
+                researchFailed = true
+                break
+              } else {
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'error',
+                  message: `${tech.name}升级失败: researchId=${tech.researchId}, isMax=false, 错误: ${error.message || '未知错误'}`
+                })
+              }
             }
-            message.info(`执行研究: researchId=${researchId}, isMax=true`)
-            const result = await tokenStore.sendLegionResearch(token.id, researchParams)
-            
-            // 检查是否收到资源不足的提示
-            if (result && (result.msg || '').includes('资源不足') || 
-                (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
-              message.warning(`研究收到资源不足提示，停止执行`)
-              logOperation('shidian', '更换科技', {
-                cardType: '灯神信息',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'warning',
-                message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
-              })
-              researchFailed = true
-              break
-            }
-            
-            message.success(`研究成功: researchId=${researchId}, isMax=true`)
-            
-            // 记录操作日志
+          }
+          
+          if (!researchFailed) {
+            message.success(`${tech.name}升级完成，共${tech.count}次`)
             logOperation('shidian', '更换科技', {
               cardType: '灯神信息',
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)}`
+              message: `${tech.name}升级完成，共${tech.count}次`
             })
+          }
+        }
+      } else {
+        // 其他阵容：正常升级所有目标科技
+        for (const targetTechType of targetTechTypes) {
+          if (researchFailed) break
+          
+          message.info(`对目标科技 ${techTypeMap[targetTechType]} 执行研究...`)
+          
+          // 计算该科技类型的researchId前缀
+          const prefix = targetTechType * 100; // 例如：type=1 -> prefix=100, type=2 -> prefix=200
+          
+          for (let subIndex = 1; subIndex <= 8; subIndex++) {
+            if (researchFailed) break
             
-            // 每次执行间隔：500ms
-            await new Promise(resolve => setTimeout(resolve, 500))
-          } catch (error) {
-            console.error(`研究失败: researchId=${researchId}, isMax=true`, error)
-            message.warning(`研究失败: researchId=${researchId}, isMax=true`)
+            const researchId = prefix + subIndex; // 如 101, 102, ..., 108 或 201, 202, ..., 208 等
             
-            // 检查错误信息是否包含资源不足
-            if (error.message && error.message.includes('资源不足')) {
-              message.warning(`研究收到资源不足提示，停止执行`)
+            try {
+              const researchParams = {
+                researchId: researchId,
+                isMax: true
+              }
+              message.info(`执行研究: researchId=${researchId}, isMax=true`)
+              const result = await tokenStore.sendLegionResearch(token.id, researchParams)
+              
+              // 检查是否收到资源不足的提示
+              if (result && (result.msg || '').includes('资源不足') || 
+                  (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
+                message.warning(`研究收到资源不足提示，停止执行`)
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
+                })
+                researchFailed = true
+                break
+              }
+              
+              message.success(`研究成功: researchId=${researchId}, isMax=true`)
+              
+              // 记录操作日志
               logOperation('shidian', '更换科技', {
                 cardType: '灯神信息',
                 tokenId: token.id,
                 tokenName: token.name,
-                status: 'warning',
-                message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+                status: 'success',
+                message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)}`
               })
-            } else {
-              logOperation('shidian', '更换科技', {
-                cardType: '灯神信息',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'error',
-                message: `研究失败: researchId=${researchId}, isMax=true, 错误: ${error.message || '未知错误'}`
-              })
+              
+              // 每次执行间隔：500ms
+              await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (error) {
+              console.error(`研究失败: researchId=${researchId}, isMax=true`, error)
+              message.warning(`研究失败: researchId=${researchId}, isMax=true`)
+              
+              // 检查错误信息是否包含资源不足
+              if (error.message && error.message.includes('资源不足')) {
+                message.warning(`研究收到资源不足提示，停止执行`)
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+                })
+              } else {
+                logOperation('shidian', '更换科技', {
+                  cardType: '灯神信息',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'error',
+                  message: `研究失败: researchId=${researchId}, isMax=true, 错误: ${error.message || '未知错误'}`
+                })
+              }
+              
+              researchFailed = true
+              break
             }
-            
-            researchFailed = true
-            break
           }
         }
       }

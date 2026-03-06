@@ -807,11 +807,34 @@ const claimTaskReward = async () => {
     message.info('正在领取任务奖励...')
     await tokenStore.sendEvotowerClaimTask(token.id, {})
     message.success('领取任务奖励完成')
+    
+    // 添加操作日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '领取任务奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: '领取任务奖励完成'
+    })
+    
     // 刷新信息
     await getTowerInfo(token.id)
   } catch (error) {
     console.error('领取任务奖励失败:', error)
     message.error('领取任务奖励失败: ' + (error.message || '未知错误'))
+    
+    // 添加错误日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '领取任务奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `领取任务奖励失败: ${error.message || '未知错误'}`
+    })
   }
 }
 
@@ -970,11 +993,38 @@ const startUseItems = async () => {
     ).catch(() => {})
 
     message.success(`已使用道具 ${processedCount} 次`)
+    
+    // 添加操作日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '一键使用道具',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `已使用道具 ${processedCount} 次`,
+      details: {
+        processedCount,
+        remainingItems: lotteryLeftCnt
+      }
+    })
+    
     // 刷新一下
     await getTowerInfo(tokenId)
 
   } catch (error) {
     message.error("使用道具失败: " + (error.message || "未知错误"))
+    
+    // 添加错误日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '一键使用道具',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `使用道具失败: ${error.message || '未知错误'}`
+    })
   } finally {
     if (itemTimeout.value) {
       clearTimeout(itemTimeout.value)
@@ -1140,11 +1190,37 @@ const autoMergeItems = async () => {
     }
 
     message.success("一键合成操作完成")
+    
+    // 添加操作日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '一键合成',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: '一键合成操作完成',
+      details: {
+        loopCount
+      }
+    })
+    
     // 刷新一下
     await getTowerInfo(token.id)
 
   } catch (error) {
     message.error("一键合成失败: " + (error.message || "未知错误"))
+    
+    // 添加错误日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '一键合成',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `一键合成失败: ${error.message || '未知错误'}`
+    })
   } finally {
     if (mergeTimeout.value) {
       clearTimeout(mergeTimeout.value)

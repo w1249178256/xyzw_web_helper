@@ -1693,6 +1693,15 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿7出战'
       )
+      // 开始战斗（殿7）
+      await executeCommandWithRetry(
+        () => tokenStore.sendNightmareFight(dian7Token.id, {
+          roomId: displayRoomId.value,
+          dianLevel: 7
+        }),
+        dian7Token,
+        '开始殿7战斗'
+      )
       // 殿2出战
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
@@ -1702,41 +1711,37 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿2出战'
       )
-      // 检查层数，若为2层则殿0出战
-      const dian0Tokens = findTokensByRemark('殿0')
-      if (dian0Tokens.length > 0) {
-        const dian0Token = dian0Tokens[0]
-        const nightmareInfo = await executeCommandWithRetry(
-          () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-          dian7Token,
-          '获取十殿信息'
-        )
-        if (nightmareInfo && nightmareInfo.maxLevel === 2) {
-          await executeCommandWithRetry(
-            () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
-              roomId: displayRoomId.value,
-              roleId: parseInt(dian0Token.id)
-            }),
-            dian7Token,
-            '设置殿0出战'
-          )
-        }
-      }
-
-      // 第七步：殿3执行
-      message.info('第七步：执行殿级3...')
-      // 获取角色信息
+      // 开始战斗（殿2）
       await executeCommandWithRetry(
-        () => tokenStore.sendGetRoleInfo(dian7Token.id),
+        () => tokenStore.sendNightmareFight(dian7Token.id, {
+          roomId: displayRoomId.value,
+          dianLevel: 2
+        }),
         dian7Token,
-        '获取角色信息'
+        '开始殿2战斗'
       )
-      // 获取十殿信息
-      await executeCommandWithRetry(
+      // 获取十殿信息（检查层数）
+      const dian0Tokens = findTokensByRemark('殿0')
+      const nightmareInfo2 = await executeCommandWithRetry(
         () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
         dian7Token,
         '获取十殿信息'
       )
+      // 如果层数为2，则殿0出战
+      if (nightmareInfo2 && nightmareInfo2.maxLevel === 2 && dian0Tokens.length > 0) {
+        const dian0Token = dian0Tokens[0]
+        await executeCommandWithRetry(
+          () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
+            roomId: displayRoomId.value,
+            roleId: parseInt(dian0Token.id)
+          }),
+          dian7Token,
+          '设置殿0出战'
+        )
+      }
+
+      // 第七步：殿3执行
+      message.info('第七步：执行殿级3...')
       // 殿7出战
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
@@ -1746,6 +1751,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿7出战'
       )
+      // 开始战斗（殿3）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
@@ -1757,18 +1763,6 @@ const batchNightmare = async () => {
 
       // 第八步：殿4执行
       message.info('第八步：执行殿级4...')
-      // 获取角色信息
-      await executeCommandWithRetry(
-        () => tokenStore.sendGetRoleInfo(dian7Token.id),
-        dian7Token,
-        '获取角色信息'
-      )
-      // 获取十殿信息
-      await executeCommandWithRetry(
-        () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-        dian7Token,
-        '获取十殿信息'
-      )
       // 殿7出战
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
@@ -1778,6 +1772,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿7出战'
       )
+      // 开始战斗（殿4）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
@@ -1786,21 +1781,54 @@ const batchNightmare = async () => {
         dian7Token,
         '开始殿4战斗'
       )
-
-      // 第九步：殿5执行
-      message.info('第九步：执行殿级5...')
-      // 获取角色信息
-      await executeCommandWithRetry(
-        () => tokenStore.sendGetRoleInfo(dian7Token.id),
-        dian7Token,
-        '获取角色信息'
-      )
-      // 获取十殿信息
-      await executeCommandWithRetry(
+      // 获取十殿信息（检查层数）
+      let usedRestoreInDian4 = false
+      const nightmareInfo4 = await executeCommandWithRetry(
         () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
         dian7Token,
         '获取十殿信息'
       )
+      // 如果层数为4，则nightmare_restore - 恢复殿7，殿2出战
+      if (nightmareInfo4 && nightmareInfo4.maxLevel === 4) {
+        // 恢复殿7
+        await executeCommandWithRetry(
+          () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_restore', {
+            roomId: displayRoomId.value,
+            roleId: parseInt(dian7Token.id)
+          }),
+          dian7Token,
+          '恢复殿7'
+        )
+        // 殿2出战
+        await executeCommandWithRetry(
+          () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
+            roomId: displayRoomId.value,
+            roleId: parseInt(dian2Token.id)
+          }),
+          dian7Token,
+          '设置殿2出战'
+        )
+        usedRestoreInDian4 = true
+      }
+      // 再次获取十殿信息（检查层数）
+      const nightmareInfo4Again = await executeCommandWithRetry(
+        () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
+        dian7Token,
+        '获取十殿信息'
+      )
+      // 如果层数为4，执行解散十殿
+      if (nightmareInfo4Again && nightmareInfo4Again.maxLevel === 4) {
+        await executeCommandWithRetry(
+          () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_dismiss', {
+            roomId: displayRoomId.value
+          }),
+          dian7Token,
+          '解散十殿'
+        )
+      }
+
+      // 第九步：殿5执行
+      message.info('第九步：执行殿级5...')
       // 殿2出战
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
@@ -1810,6 +1838,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿2出战'
       )
+      // 开始战斗（殿5）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
@@ -1818,79 +1847,7 @@ const batchNightmare = async () => {
         dian7Token,
         '开始殿5战斗'
       )
-      // 检查层数，若为5层则殿0出战
-      if (dian0Tokens.length > 0) {
-        const dian0Token = dian0Tokens[0]
-        const nightmareInfo = await executeCommandWithRetry(
-          () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-          dian7Token,
-          '获取十殿信息'
-        )
-        if (nightmareInfo && nightmareInfo.maxLevel === 5) {
-          await executeCommandWithRetry(
-            () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
-              roomId: displayRoomId.value,
-              roleId: parseInt(dian0Token.id)
-            }),
-            dian7Token,
-            '设置殿0出战'
-          )
-          // 再次检查层数，若为5层则殿0出战
-          const nightmareInfo2 = await executeCommandWithRetry(
-            () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-            dian7Token,
-            '获取十殿信息'
-          )
-          if (nightmareInfo2 && nightmareInfo2.maxLevel === 5) {
-            if (dian0Tokens.length > 1) {
-              const dian0Token2 = dian0Tokens[1]
-              await executeCommandWithRetry(
-                () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
-                  roomId: displayRoomId.value,
-                  roleId: parseInt(dian0Token2.id)
-                }),
-                dian7Token,
-                '设置殿0出战'
-              )
-            }
-          }
-          // 再次检查层数，若为5层则殿7出战
-          const nightmareInfo3 = await executeCommandWithRetry(
-            () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-            dian7Token,
-            '获取十殿信息'
-          )
-          if (nightmareInfo3 && nightmareInfo3.maxLevel === 5) {
-            await executeCommandWithRetry(
-              () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
-                roomId: displayRoomId.value,
-                roleId: parseInt(dian7Token.id)
-              }),
-              dian7Token,
-              '设置殿7出战'
-            )
-            // 检查层数，若为5层,模拟点击解散十殿按钮
-            const nightmareInfo4 = await executeCommandWithRetry(
-              () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
-              dian7Token,
-              '获取十殿信息'
-            )
-            if (nightmareInfo4 && nightmareInfo4.maxLevel === 5) {
-              await executeCommandWithRetry(
-                () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_dismiss', {
-                  roomId: displayRoomId.value
-                }),
-                dian7Token,
-                '解散十殿'
-              )
-            }
-          }
-        }
-      }
-
-      // 第十步：殿6执行
-      message.info('第十步：执行殿级6...')
-      // 恢复殿2和殿7
+      // 恢复殿2
       await executeCommandWithRetry(
         () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_restore', {
           roomId: displayRoomId.value,
@@ -1899,14 +1856,63 @@ const batchNightmare = async () => {
         dian7Token,
         '恢复殿2'
       )
+      // 获取十殿信息（检查层数）
+      const nightmareInfo5 = await executeCommandWithRetry(
+        () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
+        dian7Token,
+        '获取十殿信息'
+      )
+      // 如果层数为5，则殿0出战
+      if (nightmareInfo5 && nightmareInfo5.maxLevel === 5 && dian0Tokens.length > 0) {
+        const dian0Token = dian0Tokens[0]
+        await executeCommandWithRetry(
+          () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
+            roomId: displayRoomId.value,
+            roleId: parseInt(dian0Token.id)
+          }),
+          dian7Token,
+          '设置殿0出战'
+        )
+      }
+      // 殿7出战
       await executeCommandWithRetry(
-        () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_restore', {
+        () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
           roomId: displayRoomId.value,
           roleId: parseInt(dian7Token.id)
         }),
         dian7Token,
-        '恢复殿7'
+        '设置殿7出战'
       )
+      // 获取十殿信息（检查层数）
+      const nightmareInfo5Again = await executeCommandWithRetry(
+        () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
+        dian7Token,
+        '获取十殿信息'
+      )
+      // 如果层数为5，则解散十殿
+      if (nightmareInfo5Again && nightmareInfo5Again.maxLevel === 5) {
+        await executeCommandWithRetry(
+          () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_dismiss', {
+            roomId: displayRoomId.value
+          }),
+          dian7Token,
+          '解散十殿'
+        )
+      }
+      // 如果殿4用过恢复，继续执行，如果殿4没用过恢复，恢复殿7
+      if (!usedRestoreInDian4) {
+        await executeCommandWithRetry(
+          () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_restore', {
+            roomId: displayRoomId.value,
+            roleId: parseInt(dian7Token.id)
+          }),
+          dian7Token,
+          '恢复殿7'
+        )
+      }
+
+      // 第十步：殿6执行
+      message.info('第十步：执行殿级6...')
       // 殿2出战
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
@@ -1916,6 +1922,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿2出战'
       )
+      // 开始战斗（殿6）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
@@ -1933,6 +1940,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿7出战'
       )
+      // 开始战斗（殿6）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
@@ -1941,12 +1949,27 @@ const batchNightmare = async () => {
         dian7Token,
         '开始殿6战斗'
       )
-      // 检查层数，若为6层,模拟点击解散十殿按钮
+      // 获取十殿信息（检查层数）
       const nightmareInfo6 = await executeCommandWithRetry(
         () => tokenStore.sendNightmareGetRoleInfo(dian7Token.id, { roleId: parseInt(dian7Token.id) }),
         dian7Token,
         '获取十殿信息'
       )
+      // 如果层数为6，则剩余两个殿0出战
+      if (nightmareInfo6 && nightmareInfo6.maxLevel === 6 && dian0Tokens.length >= 2) {
+        for (let i = 1; i < Math.min(3, dian0Tokens.length); i++) {
+          const dian0Token = dian0Tokens[i]
+          await executeCommandWithRetry(
+            () => tokenStore.sendNightmareSetFighter(dian7Token.id, {
+              roomId: displayRoomId.value,
+              roleId: parseInt(dian0Token.id)
+            }),
+            dian7Token,
+            '设置殿0出战'
+          )
+        }
+      }
+      // 如果层数为6，则解散十殿
       if (nightmareInfo6 && nightmareInfo6.maxLevel === 6) {
         await executeCommandWithRetry(
           () => tokenStore.sendGameMessage(dian7Token.id, 'nightmare_dismiss', {
@@ -1977,6 +2000,7 @@ const batchNightmare = async () => {
         dian7Token,
         '设置殿7出战'
       )
+      // 开始战斗（殿7）
       await executeCommandWithRetry(
         () => tokenStore.sendNightmareFight(dian7Token.id, {
           roomId: displayRoomId.value,
