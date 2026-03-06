@@ -25,6 +25,13 @@
         <div class="tower-actions-section" style="margin-bottom: 1rem;">
           <CustomizedCard mode="container">
             <CustomizedCard 
+              mode="execution-range" 
+              name="执行范围" 
+              v-model:inputValue="batchTokens" 
+              placeholder="留空执行全部，或输入 1-20 或 1,2,3" 
+              @update:inputValue="handleBatchTokensInput" 
+            />
+            <CustomizedCard 
               mode="button" 
               name="开始爬塔" 
               :disabled="!selectedTokenId || isRunning || towerEnergy <= 0"
@@ -42,48 +49,6 @@
               name="刷新信息" 
               :disabled="!selectedTokenId || isRunning"
               @button-click="refreshTowerInfo" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="领取奖励" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimTowerReward" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="特权领取" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimLegionPrivilege" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="开箱" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="openBox" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="合成" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="mergeItem" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="领取奖励钥匙" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimCostProgress" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="领取任务奖励" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimTaskReward" 
-            />
-            <CustomizedCard 
-              mode="button" 
-              name="领取合成奖励" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimMergeProgress" 
             />
             <CustomizedCard 
               mode="button" 
@@ -113,16 +78,21 @@
             />
             <CustomizedCard 
               mode="button" 
+              name="领取任务奖励" 
+              :disabled="!selectedTokenId || isRunning"
+              @button-click="claimTaskReward" 
+            />
+            <CustomizedCard 
+              mode="button" 
+              name="批量特权领取" 
+              :disabled="isBatchPrivilegeRunning"
+              @button-click="batchClaimLegionPrivilege" 
+            />
+            <CustomizedCard 
+              mode="button" 
               name="批量怪异塔" 
               :disabled="!selectedTokenId || isRunning"
               @button-click="batchWeirdTower" 
-            />
-            <CustomizedCard 
-              mode="execution-range" 
-              name="执行范围" 
-              v-model:inputValue="batchTokens" 
-              placeholder="留空执行全部，或输入 1-20 或 1,2,3" 
-              @update:inputValue="handleBatchTokensInput" 
             />
             <CustomizedCard 
               mode="button" 
@@ -147,6 +117,7 @@
 <script setup>
 import { defineProps, ref, computed, watch, onUnmounted } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
+import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useMessage } from 'naive-ui'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
@@ -155,6 +126,7 @@ import { TrendingUp } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
 
 const tokenStore = useTokenStore()
+const logStore = useOperationLogStore()
 const message = useMessage()
 
 // 初始化连接池管理器
@@ -193,6 +165,7 @@ const stopMergeFlag = ref(false)
 const climbTimeout = ref(null)
 const itemTimeout = ref(null)
 const mergeTimeout = ref(null)
+const isBatchPrivilegeRunning = ref(false)
 
 // 计算属性：怪异塔信息
 const evoTowerInfo = computed(() => {
@@ -460,10 +433,46 @@ const startTowerClimb = async () => {
     }
     
     await new Promise((res) => setTimeout(res, 500))
-    message.success(`已自动爬塔${climbCount}次，体力已耗尽或达到上限。`)
+    
+    // 获取最终状态
+    const finalTowerId = currentTowerId.value
+    const finalChapter = Math.floor(finalTowerId / 10) + 1
+    const finalFloor = (finalTowerId % 10) + 1
+    const finalDisplayFloor = `${finalChapter}-${finalFloor}`
+    const finalEnergy = towerEnergy.value
+    
+    message.success(`已自动爬塔${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}。`)
+    
+    // 添加操作日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `爬塔完成，共${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}`,
+      details: {
+        climbCount,
+        currentFloor: finalDisplayFloor,
+        currentTowerId: finalTowerId,
+        remainingEnergy: finalEnergy
+      }
+    })
   } catch (error) {
     console.error('批量爬塔失败:', error)
     message.error('批量爬塔失败: ' + (error.message || '未知错误'))
+    
+    // 添加错误日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '开始爬塔',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `爬塔失败: ${error.message || '未知错误'}`
+    })
   }
 
   // 清除超时并重置状态
@@ -550,37 +559,135 @@ const claimTowerReward = async () => {
   }
 }
 
-// 领取军团特权
-const claimLegionPrivilege = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+// 批量领取军团特权
+const batchClaimLegionPrivilege = async () => {
+  // 按token昵称排序的token列表（与页面显示顺序一致）
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
     return
   }
   
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
+  // 解析执行范围（如果为空则执行全部）
+  const tokenIndices = parseTokenRange(batchTokens.value)
+  let targetTokens = []
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    // 留空执行全部
+    targetTokens = sortedTokensList
+  } else {
+    // 根据执行范围获取目标token
+    targetTokens = tokenIndices
+      .map(index => {
+        const arrayIndex = index - 1
+        const token = sortedTokensList[arrayIndex]
+        return token ? { token, index } : null
+      })
+      .filter(item => item !== null)
+      .sort((a, b) => a.index - b.index)
+      .map(item => item.token)
   }
   
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接游戏')
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
     return
   }
   
   try {
-    message.info('正在领取军团特权...')
-    // 执行evotower_claimlegionprivilege 4次
-    for (let i = 0; i < 4; i++) {
-      await tokenStore.sendEvotowerClaimLegionPrivilege(token.id, {})
-      message.info(`军团特权领取第${i+1}次完成`)
-      await new Promise(resolve => setTimeout(resolve, 500))
+    isBatchPrivilegeRunning.value = true
+    const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
+    message.info(`开始批量领取军团特权（${rangeText}），共${targetTokens.length}个Token...`)
+    
+    // 定义特权领取操作函数
+    const privilegeOperation = async (token, globalIndex) => {
+      const tokenIndex = globalIndex + 1
+      let successCount = 0
+      
+      try {
+        // 最多领取4次，如果提示错误则跳过剩余领取
+        for (let i = 0; i < 4; i++) {
+          try {
+            await tokenStore.sendEvotowerClaimLegionPrivilege(token.id, {})
+            successCount++
+            await new Promise(resolve => setTimeout(resolve, 500))
+          } catch (error) {
+            // 如果领取失败（如已领取过），跳过剩余领取
+            console.log(`[序号${tokenIndex}] ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
+            break
+          }
+        }
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 军团特权领取完成，成功${successCount}次`)
+        
+        // 添加操作日志
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量特权领取',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `军团特权领取完成，成功${successCount}次`,
+          details: {
+            successCount
+          }
+        })
+        
+        return { successCount }
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量特权领取失败:`, error)
+        message.error(`[序号${tokenIndex}] ${token.name || token.id}: 特权领取失败 - ${error.message || '未知错误'}`)
+        
+        // 添加错误日志
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量特权领取',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `特权领取失败: ${error.message || '未知错误'}`
+        })
+        
+        throw error
+      }
     }
-    message.success('军团特权领取完成')
+    
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      privilegeOperation,
+      {
+        batchSize: 20,
+        delayBetween: 100,
+        keepConnections: true,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`[序号${progress.globalIndex}] ${progress.tokenName} 正在连接...`)
+          } else if (progress.type === 'token-success' && progress.message === '连接成功') {
+            message.success(`[序号${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error' && progress.message === '连接失败，跳过') {
+            message.warning(`[序号${progress.globalIndex}] ${progress.tokenName} 连接失败，跳过`)
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量特权领取完成（成功: ${successCount}, 失败: ${failCount}）`)
   } catch (error) {
-    console.error('军团特权领取失败:', error)
-    message.error('军团特权领取失败: ' + (error.message || '未知错误'))
+    console.error('批量特权领取失败:', error)
+    message.error('批量特权领取失败: ' + (error.message || '未知错误'))
+  } finally {
+    isBatchPrivilegeRunning.value = false
   }
 }
 
@@ -1145,7 +1252,22 @@ const handleBatchClimb = async () => {
         
         if (currentEnergy <= 0) {
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 能量不足，跳过爬塔`)
-          return { climbCount: 0 }
+          
+          // 添加操作日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '怪异塔',
+            operation: '批量爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: '能量不足，跳过爬塔',
+            details: {
+              remainingEnergy: 0
+            }
+          })
+          
+          return { climbCount: 0, currentFloor: '1-1', remainingEnergy: 0 }
         }
         
         for (let j = 0; j < maxClimb; j++) {
@@ -1203,11 +1325,46 @@ const handleBatchClimb = async () => {
           await new Promise((res) => setTimeout(res, 400))
         }
         
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成，共${climbCount}次`)
-        return { climbCount }
+        // 计算显示层数
+        const chapter = Math.floor(currentTowerId / 10) + 1
+        const floor = (currentTowerId % 10) + 1
+        const displayFloor = `${chapter}-${floor}`
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`)
+        
+        // 添加操作日志
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
+          details: {
+            climbCount,
+            currentFloor: displayFloor,
+            currentTowerId,
+            remainingEnergy: currentEnergy
+          }
+        })
+        
+        return { climbCount, currentFloor: displayFloor, remainingEnergy: currentEnergy }
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败:`, error)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
+        
+        // 添加错误日志
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `爬塔失败: ${error.message || '未知错误'}`
+        })
+        
         throw error
       }
     }
