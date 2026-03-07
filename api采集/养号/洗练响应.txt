@@ -1,0 +1,104 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 1,
+    "quenchId": 0,
+    "quenches": {},
+    "seed": 0,
+    "skipOrange": false
+  },
+  "cmd": "equipment_quench",
+  "seq": 3,
+  "time": 1772862095109
+}
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 2,
+    "quenchId": 0,
+    "quenches": {},
+    "seed": 0,
+    "skipOrange": false
+  },
+  "cmd": "equipment_quench",
+  "seq": 2,
+  "time": 1772862172286
+}
+响应
+{
+  "_raw": {
+    "seq": 6,
+    "ack": 0,
+    "time": 1772865141646,
+    "resp": 5,
+    "cmd": "equipment_quenchresp",
+    "body": {
+      "role": {
+        "diamond": 222373,
+        "freeDiamond": 222373,
+        "power": 183588558,
+        "heroes": {
+          "107": {
+            "power": 178736778,
+            "attack": 51692593,
+            "attribute": {
+              "51": 0.4000000059604645,
+              "54": 0.15000000596046448,
+              "57": 0.20000000298023224,
+              "59": 0.020000000298023225,
+              "61": 0.27000000327825546
+            },
+            "equipment": {
+              "1": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "level": 4000,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 45492,
+                "defense": 0,
+                "hp": 0,
+                "curQuenchId": 0,
+                "quenchTimes": 1,
+                "quenches": {
+                  "1": {
+                    "colorId": 2,
+                    "attrId": 12,
+                    "attrNum": 10,
+                    "isLocked": false
+                  }
+                },
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 9,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": "",
+                "seed": 0
+              }
+            }
+          }
+        },
+        "achievement": {
+          "6": {
+            "completeValue": 183588558
+          }
+        },
+        "statistics": {
+          "max:power": 183588558,
+          "task:complete:22": 183588558,
+          "wa:diamond": 27062
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

@@ -136,6 +136,18 @@ const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxRetries: 2
 })
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const gameTokens = [...tokenStore.gameTokens]
+  const sortedTokens = gameTokens.sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 组件卸载前清理连接池
 onUnmounted(async () => {
   try {
@@ -444,6 +456,7 @@ const startTowerClimb = async () => {
     message.success(`已自动爬塔${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}。`)
     
     // 添加操作日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -451,7 +464,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `爬塔完成，共${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}`,
+      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}`,
       details: {
         climbCount,
         currentFloor: finalDisplayFloor,
@@ -464,6 +477,7 @@ const startTowerClimb = async () => {
     message.error('批量爬塔失败: ' + (error.message || '未知错误'))
     
     // 添加错误日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -471,7 +485,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `爬塔失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
     })
   }
 
@@ -632,7 +646,7 @@ const batchClaimLegionPrivilege = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `军团特权领取完成，成功${successCount}次`,
+          message: `${tokenIndex}、${token.name || token.id}、军团特权领取完成，成功${successCount}次`,
           details: {
             successCount
           }
@@ -651,7 +665,7 @@ const batchClaimLegionPrivilege = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `特权领取失败: ${error.message || '未知错误'}`
+          message: `${tokenIndex}、${token.name || token.id}、特权领取失败: ${error.message || '未知错误'}`
         })
         
         throw error
@@ -809,6 +823,7 @@ const claimTaskReward = async () => {
     message.success('领取任务奖励完成')
     
     // 添加操作日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -816,7 +831,7 @@ const claimTaskReward = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '领取任务奖励完成'
+      message: `${tokenIndex}、${token.name || token.id}、领取任务奖励完成`
     })
     
     // 刷新信息
@@ -826,6 +841,7 @@ const claimTaskReward = async () => {
     message.error('领取任务奖励失败: ' + (error.message || '未知错误'))
     
     // 添加错误日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -833,7 +849,7 @@ const claimTaskReward = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `领取任务奖励失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、领取任务奖励失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -995,6 +1011,7 @@ const startUseItems = async () => {
     message.success(`已使用道具 ${processedCount} 次`)
     
     // 添加操作日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -1002,7 +1019,7 @@ const startUseItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `已使用道具 ${processedCount} 次`,
+      message: `${tokenIndex}、${token.name || token.id}、已使用道具 ${processedCount} 次`,
       details: {
         processedCount,
         remainingItems: lotteryLeftCnt
@@ -1016,6 +1033,7 @@ const startUseItems = async () => {
     message.error("使用道具失败: " + (error.message || "未知错误"))
     
     // 添加错误日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -1023,7 +1041,7 @@ const startUseItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `使用道具失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、使用道具失败: ${error.message || '未知错误'}`
     })
   } finally {
     if (itemTimeout.value) {
@@ -1192,6 +1210,7 @@ const autoMergeItems = async () => {
     message.success("一键合成操作完成")
     
     // 添加操作日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -1199,7 +1218,7 @@ const autoMergeItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '一键合成操作完成',
+      message: `${tokenIndex}、${token.name || token.id}、一键合成操作完成`,
       details: {
         loopCount
       }
@@ -1212,6 +1231,7 @@ const autoMergeItems = async () => {
     message.error("一键合成失败: " + (error.message || "未知错误"))
     
     // 添加错误日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '怪异塔',
@@ -1219,7 +1239,7 @@ const autoMergeItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `一键合成失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、一键合成失败: ${error.message || '未知错误'}`
     })
   } finally {
     if (mergeTimeout.value) {
@@ -1337,7 +1357,7 @@ const handleBatchClimb = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: '能量不足，跳过爬塔',
+            message: `${tokenIndex}、${token.name || token.id}、能量不足，跳过爬塔`,
             details: {
               remainingEnergy: 0
             }
@@ -1407,7 +1427,7 @@ const handleBatchClimb = async () => {
         const displayFloor = `${chapter}-${floor}`
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`)
-        
+
         // 添加操作日志
         logStore.addLog({
           page: 'fish-helper',
@@ -1416,7 +1436,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
+          message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
           details: {
             climbCount,
             currentFloor: displayFloor,
@@ -1424,12 +1444,12 @@ const handleBatchClimb = async () => {
             remainingEnergy: currentEnergy
           }
         })
-        
+
         return { climbCount, currentFloor: displayFloor, remainingEnergy: currentEnergy }
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败:`, error)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
-        
+
         // 添加错误日志
         logStore.addLog({
           page: 'fish-helper',
@@ -1438,7 +1458,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `爬塔失败: ${error.message || '未知错误'}`
+          message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
         })
         
         throw error

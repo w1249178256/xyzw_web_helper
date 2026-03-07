@@ -1382,6 +1382,21 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "trump_upgrade", params);
   };
 
+  // 发送装备批量升级
+  const sendEquipmentBatchUpgradeLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "equipment_batchupgradelevel", params);
+  };
+
+  // 发送英雄技能觉醒
+  const sendHeroSkillAwake = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_skillawake", params);
+  };
+
+  // 发送挂机升级
+  const sendSystemHangupUpgrade = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_hangupupgrade", params);
+  };
+
   // 发送武将升星
   const sendHeroUpgradeStar = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_heroupgradestar", params);
@@ -2051,6 +2066,9 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLordWeaponUnlockt,
     sendLordWeaponUnlock,
     sendTrumpUpgrade,
+    sendEquipmentBatchUpgradeLevel,
+    sendHeroSkillAwake,
+    sendSystemHangupUpgrade,
     sendHeroUpgradeStar,
     sendBookUpgrade,
     sendBookClaimPointReward,

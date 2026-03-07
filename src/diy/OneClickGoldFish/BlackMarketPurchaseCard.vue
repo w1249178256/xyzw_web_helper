@@ -444,7 +444,7 @@ const handleBatchSetBlackMarket = async () => {
         if (result && (result.code === 0 || result.code === undefined || result.success === true)) {
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 设置成功`)
           successCount++
-          
+
           // 添加操作日志
           logStore.addLog({
             page: 'fish-helper',
@@ -453,14 +453,14 @@ const handleBatchSetBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `黑市购买设置成功`
+            message: `${tokenIndex}、${token.name || token.id}、黑市购买设置成功`
           })
         } else {
           failCount++
           failedTokens.push(token.name || token.id) // 记录失败的token
           const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 设置失败: ${errorMsg}`)
-          
+
           // 添加操作日志
           logStore.addLog({
             page: 'fish-helper',
@@ -469,7 +469,7 @@ const handleBatchSetBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `黑市购买设置失败: ${errorMsg}`
+            message: `${tokenIndex}、${token.name || token.id}、黑市购买设置失败: ${errorMsg}`
           })
         }
         

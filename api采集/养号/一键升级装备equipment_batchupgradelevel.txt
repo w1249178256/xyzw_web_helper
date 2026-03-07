@@ -1,0 +1,9 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107
+  },
+  "cmd": "equipment_batchupgradelevel",
+  "seq": 6,
+  "time": 1772861884332
+}

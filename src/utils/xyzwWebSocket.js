@@ -456,6 +456,9 @@ export function registerDefaultCommands(reg) {
     .register("legion_resetresearch", {})
     .register("equipment_quench", { equipmentId: 0, quenchType: 1 })
     .register("hero_gointobattle", { heroId: 0, slot: 0 })
+    .register("equipment_batchupgradelevel", { heroId: 107 })
+    .register("hero_skillawake", { heroId: 107, index: -1 })
+    .register("system_hangupupgrade", { upgradeNum: 10 })
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {

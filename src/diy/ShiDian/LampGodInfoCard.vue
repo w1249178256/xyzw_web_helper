@@ -413,13 +413,14 @@ const refreshTeamInfo = async () => {
           heroNames.push(getHeroName(hero.id))
         }
       }
-    }
+    }    
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '刷新阵容', {
       cardType: '灯神信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
+      message: `${tokenIndex}、${token.name || token.id}、执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
     })
     await new Promise(resolve => setTimeout(resolve, 500))
     
@@ -590,12 +591,13 @@ const switchToTeam1 = async () => {
     // 执行命令前等待400ms
     await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendPresetteamSaveTeam(token.id, saveTeamParams)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行命令: presetteam_saveTeam, 保存/切换预设阵容1`
+      message: `${tokenIndex}、${token.name || token.id}、执行命令: presetteam_saveTeam, 保存/切换预设阵容1`
     })
     currentUseTeamId.value = 1
     
@@ -603,22 +605,24 @@ const switchToTeam1 = async () => {
     await refreshTeamInfo()
     
     message.success('已切换到阵容1')
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '已切换到阵容1'
+      message: `${tokenIndex}、${token.name || token.id}、已切换到阵容1`
     })
   } catch (error) {
     console.error('切换阵容1失败:', error)
     message.warning(`切换阵容1失败: ${error.message || '未知错误'}，继续执行后续操作`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `切换阵容1失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、切换阵容1失败: ${error.message || '未知错误'}`
     })
     // 失败后不返回，继续执行后续操作
   }

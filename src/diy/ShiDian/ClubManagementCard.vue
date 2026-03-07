@@ -146,6 +146,18 @@ const legacyBookInfo = ref({
   storage: {}
 })
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const gameTokens = [...tokenStore.gameTokens]
+  const sortedTokens = gameTokens.sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 按token昵称排序的token列表（与页面显示顺序一致）
 const sortedTokens = computed(() => {
   return [...tokenStore.gameTokens].sort((a, b) => {
@@ -415,12 +427,13 @@ const handleLegacyHangup = async () => {
         }).join(', ')
         console.log('功法挂机成功 - 奖励:', rewardInfo)
         message.success(`功法挂机奖励领取成功: ${rewardInfo}`)
+        const tokenIndex = getTokenIndex(token)
       logOperation('shidian', '功法挂机', {
         cardType: '俱乐部管理',
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `功法挂机奖励领取成功: ${rewardInfo}`
+        message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功: ${rewardInfo}`
       })
       } else if (res.role && res.role.items) {
         // 检查是否有物品更新
@@ -428,33 +441,36 @@ const handleLegacyHangup = async () => {
         if (item37007) {
           console.log('功法挂机成功 - 功法残卷数量:', item37007.quantity)
           message.success(`功法挂机奖励领取成功，功法残卷: ${item37007.quantity}`)
+          const tokenIndex = getTokenIndex(token)
           logOperation('shidian', '功法挂机', {
             cardType: '俱乐部管理',
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `功法挂机奖励领取成功，功法残卷: ${item37007.quantity}`
+            message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功，功法残卷: ${item37007.quantity}`
           })
         } else {
           console.log('功法挂机成功 - 但无奖励信息')
           message.success('功法挂机奖励领取成功')
+          const tokenIndex = getTokenIndex(token)
           logOperation('shidian', '功法挂机', {
             cardType: '俱乐部管理',
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '功法挂机奖励领取成功'
+            message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功`
           })
         }
       } else {
         console.log('功法挂机成功 - 但响应格式异常:', res)
         message.success('功法挂机奖励领取成功')
+        const tokenIndex = getTokenIndex(token)
         logOperation('shidian', '功法挂机', {
           cardType: '俱乐部管理',
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: '功法挂机奖励领取成功'
+          message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功`
         })
       }
       
@@ -496,12 +512,13 @@ const handleLegacyHangup = async () => {
       }
       
       message.error(`功法挂机失败: ${errorMessage}`)
+      const tokenIndex = getTokenIndex(token)
       logOperation('shidian', '功法挂机', {
         cardType: '俱乐部管理',
         tokenId: token.id,
         tokenName: token.name,
         status: 'error',
-        message: `功法挂机失败: ${errorMessage}`
+        message: `${tokenIndex}、${token.name || token.id}、功法挂机失败: ${errorMessage}`
       })
     } finally {
       isLegacyHangupRunning.value = false
@@ -509,12 +526,13 @@ const handleLegacyHangup = async () => {
   } catch (error) {
     console.error('功法挂机失败 - 外层异常:', error)
     message.error('功法挂机失败: ' + (error.message || '未知错误'))
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '功法挂机', {
       cardType: '俱乐部管理',
       tokenId: token?.id,
       tokenName: token?.name,
       status: 'error',
-      message: `功法挂机失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token?.name || '未知'}、功法挂机失败: ${error.message || '未知错误'}`
     })
     isLegacyHangupRunning.value = false
   }

@@ -208,6 +208,17 @@ const tokenOptions = computed(() => {
     }));
 });
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const sortedTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 连接中的Token（只包含正在连接状态的token）
 const connectingTokens = computed(() => {
   return new Set(
@@ -278,12 +289,13 @@ const addLog = (type, tokenName, message, success = true, command = null, respon
   
   // 同时记录到统一日志系统（十殿页面）
   const token = tokenStore.gameTokens.find(t => t.name === tokenName)
+  const tokenIndex = token ? getTokenIndex(token) : '?'
   logOperation('shidian', type, {
     cardType: 'BOSS塔',
     tokenId: token?.id,
     tokenName: tokenName,
     status: success ? 'success' : 'error',
-    message: logMessage,
+    message: `${tokenIndex}、${tokenName}、${logMessage}`,
     details: command ? { command: command.cmd, params: command.params } : undefined,
     command: command ? command.cmd : undefined,
     commandParams: command ? command.params : undefined,

@@ -138,6 +138,18 @@ const batchTokens = ref('')
 let stopFlag = false
 const climbTimeout = ref(null)
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const gameTokens = [...tokenStore.gameTokens]
+  const sortedTokens = gameTokens.sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 计算属性：当前层数（从tokenStore.gameData获取）
 const currentFloor = computed(() => {
   const roleInfo = tokenStore.gameData.roleInfo
@@ -195,6 +207,7 @@ const startTowerClimb = async () => {
     const tokenId = token.id;
     
     // 记录开始爬塔日志
+    const tokenIndex = getTokenIndex(token)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
@@ -202,7 +215,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${token.name || token.id} 开始爬塔...`
+      message: `${tokenIndex}、${token.name || token.id}、开始爬塔...`
     })
     message.info('开始爬塔...')
     
@@ -217,6 +230,7 @@ const startTowerClimb = async () => {
             try {
               await tokenStore.sendMessageWithPromise(tokenId, 'tower_claimreward', { rewardId: i }, 10000)
               claimedCount++
+              const tokenIndex = getTokenIndex(token)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '爬塔升星',
@@ -224,10 +238,11 @@ const startTowerClimb = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${token.name || token.id} 成功领取第${i}章通关奖励`
+                message: `${tokenIndex}、${token.name || token.id}、成功领取第${i}章通关奖励`
               })
               message.success(`${token.name || token.id} 成功领取第${i}章通关奖励`)
             } catch (error) {
+              const tokenIndex = getTokenIndex(token)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '爬塔升星',
@@ -235,7 +250,7 @@ const startTowerClimb = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${token.name || token.id} 领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
+                message: `${tokenIndex}、${token.name || token.id}、领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
               })
             }
           }
@@ -266,6 +281,7 @@ const startTowerClimb = async () => {
       const tower = roleInfo.role.tower
       const energy = tower?.energy || 0;
       if (energy <= 0) {
+        const tokenIndex = getTokenIndex(token)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -273,7 +289,7 @@ const startTowerClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${token.name || token.id} 体力已耗尽`
+          message: `${tokenIndex}、${token.name || token.id}、体力已耗尽`
         })
         break;
       }
@@ -1281,7 +1297,7 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 爬塔完成`
+          message: `${tokenIndex}、${token.name || token.id}、爬塔完成`
         })
         
         if (i < sortedTargetTokens.length - 1) {
@@ -1489,6 +1505,7 @@ const startTowerClimbForToken = async (token) => {
       const tower = roleInfo.role.tower
       const energy = tower?.energy || 0;
       if (energy <= 0) {
+        const tokenIndex = getTokenIndex(token)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1496,7 +1513,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${token.name || token.id} 体力已耗尽`
+          message: `${tokenIndex}、${token.name || token.id}、体力已耗尽`
         })
         break;
       }

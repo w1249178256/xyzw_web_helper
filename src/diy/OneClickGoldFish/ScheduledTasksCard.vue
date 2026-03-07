@@ -242,7 +242,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '领取挂机成功'
+                message: `${tokenIndex}、${token.name || token.id}、领取挂机成功`
               })
             } catch (error) {
               console.error(`领取挂机失败: ${error.message}`, error)
@@ -253,7 +253,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `领取挂机失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、领取挂机失败`
               })
             }
           }
@@ -284,7 +284,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '重置罐子成功'
+                message: `${tokenIndex}、${token.name || token.id}、重置罐子成功`
               })
             } catch (error) {
               console.error(`重置罐子失败: ${error.message}`, error)
@@ -295,7 +295,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `重置罐子失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、重置罐子失败`
               })
             }
           }
@@ -331,7 +331,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '一键灯神扫荡成功（执行3次genie_buysweep，4个灯神各扫荡1次）'
+                message: `${tokenIndex}、${token.name || token.id}、一键灯神扫荡成功`
               })
             } catch (error) {
               console.error(`一键灯神扫荡失败: ${error.message}`, error)
@@ -342,7 +342,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `一键灯神扫荡失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、一键灯神扫荡失败`
               })
             }
           }
@@ -365,7 +365,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '领取罐子成功'
+                message: `${tokenIndex}、${token.name || token.id}、领取罐子成功`
               })
             } catch (error) {
               console.error(`领取罐子失败: ${error.message}`, error)
@@ -376,7 +376,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `领取罐子失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、领取罐子失败`
               })
             }
           }
@@ -399,7 +399,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '一键俱乐部签到成功'
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部签到成功`
               })
             } catch (error) {
               console.error(`一键俱乐部签到失败: ${error.message}`, error)
@@ -410,7 +410,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `一键俱乐部签到失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部签到失败`
               })
             }
           }
@@ -435,7 +435,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '一键竞技场战斗3次成功'
+                message: `${tokenIndex}、${token.name || token.id}、一键竞技场战斗3次成功`
               })
             } catch (error) {
               console.error(`一键竞技场战斗3次失败: ${error.message}`, error)
@@ -446,7 +446,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `一键竞技场战斗3次失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、一键竞技场战斗3次失败`
               })
             }
           }
@@ -469,10 +469,10 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '一键黑市采购成功'
+                message: `${tokenIndex}、${token.name || token.id}、黑市采购成功`
               })
             } catch (error) {
-              console.error(`一键黑市采购失败: ${error.message}`, error)
+              console.error(`黑市采购失败: ${error.message}`, error)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
@@ -480,7 +480,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `一键黑市采购失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、黑市采购失败`
               })
             }
           }
@@ -503,7 +503,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: '一键俱乐部BOSS成功'
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部BOSS成功`
               })
             } catch (error) {
               console.error(`一键俱乐部BOSS失败: ${error.message}`, error)
@@ -514,7 +514,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `一键俱乐部BOSS失败: ${error.message}`
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部BOSS失败`
               })
             }
           }

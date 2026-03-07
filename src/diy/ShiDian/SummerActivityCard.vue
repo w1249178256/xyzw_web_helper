@@ -267,6 +267,18 @@ const itemId = ref("5264"); // 默认道具id
 const executionRange = ref(""); // 执行范围
 const bossSelect = ref(1); // BOSS选择，默认为1
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const gameTokens = [...tokenStore.gameTokens]
+  const sortedTokens = gameTokens.sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // BOSS选项
 const bossOptions = [
   { label: "1", value: 1 },
@@ -1038,34 +1050,37 @@ const oneKeyActivity = async () => {
     if (success) {
       message.success("一键活动完成");
       const token = tokenStore.gameTokens.find(t => t.id === selectedTokenId.value);
+      const tokenIndex = getTokenIndex(token);
       logOperation('shidian', '一键活动', {
         cardType: '暑期活动',
         tokenId: selectedTokenId.value,
         tokenName: token?.name,
         status: 'success',
-        message: '一键活动完成'
+        message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动完成`
       });
     } else {
       message.warning("一键活动部分完成（连续失败4次）");
       const token = tokenStore.gameTokens.find(t => t.id === selectedTokenId.value);
+      const tokenIndex = getTokenIndex(token);
       logOperation('shidian', '一键活动', {
         cardType: '暑期活动',
         tokenId: selectedTokenId.value,
         tokenName: token?.name,
         status: 'warning',
-        message: '一键活动部分完成（连续失败4次）'
+        message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动部分完成（连续失败4次）`
       });
     }
   } catch (error) {
     console.error("一键活动失败:", error);
     message.error(`一键活动失败: ${error.message || error}`);
     const token = tokenStore.gameTokens.find(t => t.id === selectedTokenId.value);
+    const tokenIndex = getTokenIndex(token);
     logOperation('shidian', '一键活动', {
       cardType: '暑期活动',
       tokenId: selectedTokenId.value,
       tokenName: token?.name,
       status: 'error',
-      message: `一键活动失败: ${error.message || error}`
+      message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -1473,7 +1488,7 @@ const batchActivity = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: '一键战斗完成'
+              message: `${tokenIndex}、${token.name || token.id}、一键战斗完成`
             });
             return { success: true, token: token };
           } else {
@@ -1483,7 +1498,7 @@ const batchActivity = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: '一键战斗部分失败'
+              message: `${tokenIndex}、${token.name || token.id}、一键战斗部分失败`
             });
             return { success: false, token: token, error: '一键战斗部分失败' };
           }
@@ -1494,7 +1509,7 @@ const batchActivity = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `一键战斗失败: ${error.message || error}`
+            message: `${tokenIndex}、${token.name || token.id}、一键战斗失败: ${error.message || error}`
           });
           return { success: false, token: token, error: error.message || error };
         }

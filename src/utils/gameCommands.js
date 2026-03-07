@@ -85,6 +85,23 @@ export class GameCommands {
   }
 
   /**
+   * 挂机升级
+   */
+  system_hangupupgrade(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        upgradeNum: params.upgradeNum,
+        ...params,
+      }),
+      cmd: "system_hangupupgrade",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+
+  /**
    * 分享回调
    */
   system_mysharecallback(ack = 0, seq = 0, params = {}) {
@@ -805,6 +822,22 @@ export class GameCommands {
         ...params
       }),
       cmd: "legacy_claimgift",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 装备批量升级
+   */
+  equipment_batchupgradelevel(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId: params.heroId || 0,
+        ...params
+      }),
+      cmd: "equipment_batchupgradelevel",
       seq,
       time: Date.now()
     }
@@ -1589,6 +1622,23 @@ export class GameCommands {
         	        ...params
       }),
       cmd: "hero_simulation",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 咸将觉醒
+   */
+  hero_skillawake(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId:params.heroId,
+        index: -1,
+        	        ...params
+      }),
+      cmd: "hero_skillawake",
       seq,
       time: Date.now()
     }

@@ -145,6 +145,12 @@ const sortedTokens = computed(() => {
   })
 })
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const index = sortedTokens.value.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 获取金币数量
 // 根据 api采集/黑市/role_getroleinfo.txt，金币在 role.gold 字段
 const getGold = (tokenId) => {
@@ -684,12 +690,13 @@ const heroUpgrade = async () => {
     } else if (upgradeCount > 0) {
       message.success(`武将升级完成，共升级${upgradeCount}次`)
       const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+      const tokenIndex = token ? getTokenIndex(token) : '?'
       logOperation('shidian', '武将升级', {
         cardType: '武将信息',
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'success',
-        message: `武将升级完成，共升级${upgradeCount}次`
+        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、武将升级完成，共升级${upgradeCount}次`
       })
     } else {
       // 检查是否有武将但未进行升级
@@ -724,12 +731,13 @@ const heroUpgrade = async () => {
     } else {
       message.error(`武将升级失败: ${error.message || '未知错误'}`)
       const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+      const tokenIndex = token ? getTokenIndex(token) : '?'
       logOperation('shidian', '武将升级', {
         cardType: '武将信息',
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'error',
-        message: `武将升级失败: ${error.message || '未知错误'}`
+        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、武将升级失败: ${error.message || '未知错误'}`
       })
     }
   }
@@ -908,7 +916,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '切换爬塔功能待实现'
+            message: `${tokenIndex}、${token.name || token.id}、切换爬塔功能待实现`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -920,7 +928,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量切换爬塔失败: ${error.message || '未知错误'}`
+            message: `${tokenIndex}、${token.name || token.id}、批量切换爬塔失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -973,6 +981,12 @@ const batchSwitchTower = async () => {
   } finally {
     isBatchSwitchTowerRunning.value = false
   }
+}
+
+// 辅助函数：获取token的序号（用于批量切换推图）
+const getStoryTokenIndex = (token, sortedTokensList) => {
+  const index = sortedTokensList.findIndex(t => t.id === token.id)
+  return index + 1
 }
 
 // 批量切换推图（功能待实现）

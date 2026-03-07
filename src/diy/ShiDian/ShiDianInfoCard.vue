@@ -274,6 +274,18 @@ const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxRetries: 3
 })
 
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const gameTokens = toRaw(tokenStore.gameTokens)
+  const sortedTokens = [...gameTokens].sort((a, b) => {
+    const nameA = a.name || a.id || ''
+    const nameB = b.name || b.id || ''
+    return nameA.localeCompare(nameB, 'zh-CN')
+  })
+  const index = sortedTokens.findIndex(t => t.id === token.id)
+  return index + 1
+}
+
 // 计算属性：十殿层数
 const currentNightmareLevel = computed(() => {
   return props.selectedTokenId ? getNightmareLevel(props.selectedTokenId) : 0
@@ -631,12 +643,13 @@ const getNightmareRoleInfo = async (token) => {
       message.success('十殿信息获取成功')
       console.log('十殿信息:', result)
       console.log('已更新token.gameData.nightmareData:', token.gameData.nightmareData)
+      const tokenIndex = getTokenIndex(token)
       logOperation('shidian', '刷新信息', {
         cardType: '十殿信息',
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: '十殿信息获取成功'
+        message: `${tokenIndex}、${token.name || token.id}、十殿信息获取成功`
       })
       
       // 调试：输出层数和转盘次数
@@ -660,12 +673,13 @@ const getNightmareRoleInfo = async (token) => {
     } else {
       message.error(`获取十殿信息失败: ${error.message || error}`)
       const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+      const tokenIndex = token ? getTokenIndex(token) : '?'
       logOperation('shidian', '刷新信息', {
         cardType: '十殿信息',
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'error',
-        message: `获取十殿信息失败: ${error.message || error}`
+        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、获取十殿信息失败: ${error.message || error}`
       })
     }
   }
@@ -862,22 +876,24 @@ const claimNightmareRewardsForCard = async (token) => {
     }
     
     message.success(`🎉 ${token.name || token.id} 十殿奖励领取完成！`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '领取奖励', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '十殿奖励领取完成'
+      message: `${tokenIndex}、${token.name || token.id}、十殿奖励领取完成`
     })
   } catch (error) {
     message.error(`领取十殿奖励失败: ${error.message}`)
     console.error('领取十殿奖励失败详细信息:', error)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '领取奖励', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `领取十殿奖励失败: ${error.message}`
+      message: `${tokenIndex}、${token.name || token.id}、领取十殿奖励失败: ${error.message}`
     })
   } finally {
     connectingTokens.value.delete(token.id)
@@ -967,7 +983,7 @@ const batchClaimNightmareRewards = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: '十殿奖励领取成功'
+          message: `${i + 1}、${token.name || token.id}、十殿奖励领取成功`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -983,7 +999,7 @@ const batchClaimNightmareRewards = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `领取失败: ${error.message}`
+          message: `${i + 1}、${token.name || token.id}、十殿奖励领取失败: ${error.message}`
         })
       } finally {
         // 释放连接
@@ -1177,23 +1193,25 @@ const nightmareRestore = async (token) => {
     })
     
     message.success('十殿恢复执行成功')
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '十殿恢复', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'success',
-      message: '十殿恢复执行成功'
+      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿恢复执行成功`
     })
   } catch (error) {
     console.error('十殿恢复失败:', error)
     message.error(`十殿恢复失败: ${error.message || error}`)
     const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '十殿恢复', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'error',
-      message: `十殿恢复失败: ${error.message || error}`
+      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿恢复失败: ${error.message || error}`
     })
   }
 }
@@ -1210,23 +1228,27 @@ const resetPillowCount = async () => {
       localStorage.setItem(key, JSON.stringify(value))
       console.log('本地存储中的十殿枕头数量已清空')
       message.success('十殿枕头数量已重置')
+      const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+      const tokenIndex = token ? getTokenIndex(token) : '?'
       logOperation('shidian', '重置枕头', {
         cardType: '十殿信息',
         tokenId: props.selectedTokenId,
-        tokenName: tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)?.name,
+        tokenName: token?.name,
         status: 'success',
-        message: '十殿枕头数量已重置'
+        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿枕头数量已重置`
       })
     }
   } catch (error) {
     console.error('清空本地存储中的十殿枕头数量失败:', error)
     message.error('重置十殿枕头数量失败')
+    const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '重置枕头', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
-      tokenName: tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)?.name,
+      tokenName: token?.name,
       status: 'error',
-      message: `重置枕头失败: ${error.message || error}`
+      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、重置枕头失败: ${error.message || error}`
     })
   }
 }
@@ -1399,6 +1421,12 @@ const batchNightmare = async () => {
     }
     
     message.info(`执行范围: ${resourceExportRange.value || '全部Token'}，共${tokens.length}个Token`)
+
+    // 辅助函数：获取token的序号
+    const getTokenIndex = (token) => {
+      const index = gameTokens.findIndex(t => t.id === token.id)
+      return index + 1
+    }
 
     let cycleCount = 0
     let continueLoop = true
@@ -2105,23 +2133,25 @@ const nightmareDismiss = async (token) => {
     })
     
     message.success('解散十殿执行成功')
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '解散十殿', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'success',
-      message: '解散十殿执行成功'
+      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、解散十殿执行成功`
     })
   } catch (error) {
     console.error('解散十殿失败:', error)
     message.error(`解散十殿失败: ${error.message || error}`)
     const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+    const tokenIndex = token ? getTokenIndex(token) : '?'
     logOperation('shidian', '解散十殿', {
       cardType: '十殿信息',
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'error',
-      message: `解散十殿失败: ${error.message || error}`
+      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、解散十殿失败: ${error.message || error}`
     })
   }
 }
@@ -2170,22 +2200,24 @@ const executeFighter = async () => {
     })
     
     message.success(`${token.name} 出战人员设置成功`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '出战人员', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name} 出战人员设置成功`
+      message: `${tokenIndex}、${token.name || token.id}、出战人员设置成功`
     })
   } catch (error) {
     console.error('执行出战人员失败:', error)
     message.error(`执行出战人员失败: ${error.message || error}`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '出战人员', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `执行出战人员失败: ${error.message || error}`
+      message: `${tokenIndex}、${token.name || token.id}、执行出战人员失败: ${error.message || error}`
     })
   }
 }
@@ -2257,18 +2289,24 @@ const executeKick = async () => {
     }
     
     message.success('踢出房间执行成功')
+    const ownerTokenIndex = ownerToken ? getTokenIndex(ownerToken) : '?'
     logOperation('shidian', '踢出房间', {
       cardType: '十殿信息',
+      tokenId: ownerToken?.id,
+      tokenName: ownerToken?.name,
       status: 'success',
-      message: `踢出房间执行成功`
+      message: `${ownerTokenIndex}、${ownerToken?.name || props.selectedTokenId}、踢出房间执行成功`
     })
   } catch (error) {
     console.error('执行踢出房间失败:', error)
     message.error(`执行踢出房间失败: ${error.message || error}`)
+    const ownerTokenIndex = ownerToken ? getTokenIndex(ownerToken) : '?'
     logOperation('shidian', '踢出房间', {
       cardType: '十殿信息',
+      tokenId: ownerToken?.id,
+      tokenName: ownerToken?.name,
       status: 'error',
-      message: `执行踢出房间失败: ${error.message || error}`
+      message: `${ownerTokenIndex}、${ownerToken?.name || props.selectedTokenId}、执行踢出房间失败: ${error.message || error}`
     })
   }
 }
@@ -2324,22 +2362,24 @@ const executeTransfer = async () => {
     })
     
     message.success(`${token.name} 转让房主成功`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '转让房主', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name} 转让房主成功`
+      message: `${tokenIndex}、${token.name || token.id}、转让房主成功`
     })
   } catch (error) {
     console.error('执行转让房主失败:', error)
     message.error(`执行转让房主失败: ${error.message || error}`)
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '转让房主', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `执行转让房主失败: ${error.message || error}`
+      message: `${tokenIndex}、${token.name || token.id}、执行转让房主失败: ${error.message || error}`
     })
   }
 }
@@ -3275,12 +3315,13 @@ const exportResources = async () => {
         })
 
         message.success(`Token ${token.name || token.id} 资源获取成功 (${i + 1}/${tokenIds.length})`)
+        const tokenIndex = getTokenIndex(token)
         logOperation('shidian', '导出资源', {
           cardType: '十殿信息',
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 宝箱总分数${chestScore}, 招募令${recruitOrder}`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 宝箱总分数${chestScore}, 招募令${recruitOrder}`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -3308,12 +3349,13 @@ const exportResources = async () => {
           error: error.message || '未知错误'
         })
         message.warning(`Token ${token.name || token.id} 处理失败: ${error.message || '未知错误'}`)
+        const tokenIndex = getTokenIndex(token)
         logOperation('shidian', '导出资源', {
           cardType: '十殿信息',
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `资源获取失败: ${error.message || '未知错误'}`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取失败: ${error.message || '未知错误'}`
         })
       }
 
