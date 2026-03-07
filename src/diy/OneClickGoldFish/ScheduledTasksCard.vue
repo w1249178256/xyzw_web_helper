@@ -67,6 +67,13 @@
             :disabled="isExecutingScheduledTasks"
             :loading="isExecutingScheduledTasks"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchBlackMarketRunning ? '批量黑市周中...' : '批量黑市周'"
+            @button-click="handleBatchBlackMarket"
+            :disabled="isBatchBlackMarketRunning"
+            :loading="isBatchBlackMarketRunning"
+          />
         </CustomizedCard>
       </div>
       
@@ -74,6 +81,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="定时任务"
+        :filter-operations="['批量黑市周']"
       />
     </template>
   </MyCard>
@@ -104,6 +112,7 @@ const connectionPool = new ConnectionPoolManager(tokenStore, {
 
 // 定时任务相关
 const isExecutingScheduledTasks = ref(false)
+const isBatchBlackMarketRunning = ref(false)
 const scheduledExecutionTokens = ref('')
 const scheduledTasks = ref({
   claimHangUp: false,
@@ -559,6 +568,186 @@ const handleExecuteScheduledTasks = async () => {
     })
   } finally {
     isExecutingScheduledTasks.value = false
+  }
+}
+
+// 批量黑市周
+const handleBatchBlackMarket = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(scheduledExecutionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = scheduledExecutionTokens.value ? `范围${scheduledExecutionTokens.value}` : "全部"
+  message.info(`开始批量黑市周（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  
+  isBatchBlackMarketRunning.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始批量黑市周...`)
+          
+          let diamondCount = 0
+          let goldenRodCount = 0
+          
+          try {
+            const roleInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'role_getroleinfo',
+              {},
+              5000
+            )
+            
+            if (roleInfo && roleInfo.role) {
+              diamondCount = roleInfo.role.diamond || 0
+              const items = roleInfo.role.items || roleInfo.role.itemList || roleInfo.role.bag?.items || roleInfo.role.inventory || []
+              
+              if (Array.isArray(items)) {
+                const goldenRodItem = items.find(i => Number(i.id ?? i.itemId) === 1012)
+                if (goldenRodItem) {
+                  goldenRodCount = Number(goldenRodItem.num ?? goldenRodItem.count ?? goldenRodItem.quantity ?? 0)
+                }
+              } else if (typeof items === 'object' && items !== null) {
+                const goldenRodItem = items['1012'] || items[1012]
+                if (goldenRodItem) {
+                  goldenRodCount = typeof goldenRodItem === 'number' ? goldenRodItem : Number(goldenRodItem.quantity ?? goldenRodItem.num ?? goldenRodItem.count ?? 0)
+                }
+              }
+              
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 金砖: ${diamondCount}, 金竿: ${goldenRodCount}`)
+            }
+          } catch (error) {
+            console.error(`获取角色信息失败: ${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
+          }
+          
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_buystoregoods',
+              { activityId: 9, goodsIndex: 4, buyNum: 1 },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买宝箱成功`)
+          } catch (error) {
+            console.error(`购买宝箱失败: ${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买宝箱失败，继续执行`)
+          }
+          
+          if (goldenRodCount < 900) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_buystoregoods',
+                { activityId: 9, goodsIndex: 6, buyNum: 1 },
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿成功`)
+            } catch (error) {
+              console.error(`购买金竿失败: ${error.message}`, error)
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿失败，继续执行`)
+            }
+          }
+          
+          if (diamondCount > 300000) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_buystoregoods',
+                { activityId: 9, goodsIndex: 8, buyNum: 1 },
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买灵贝成功`)
+            } catch (error) {
+              console.error(`购买灵贝失败: ${error.message}`, error)
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买灵贝失败，继续执行`)
+            }
+          }
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量黑市周',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `批量黑市周成功（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
+          })
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 批量黑市周执行完成`)
+          return { success: true, tokenId: token.id }
+        } catch (error) {
+          console.error(`批量黑市周失败: ${error.message}`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 批量黑市周执行失败: ${error.message}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量黑市周',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `批量黑市周执行失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+    
+    message.success(`批量黑市周执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量黑市周',
+      status: 'success',
+      message: `批量黑市周执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+  } catch (error) {
+    console.error('批量黑市周失败:', error)
+    message.error(`批量黑市周失败: ${error.message}`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量黑市周',
+      status: 'error',
+      message: `批量黑市周失败: ${error.message}`
+    })
+  } finally {
+    isBatchBlackMarketRunning.value = false
   }
 }
 </script>
