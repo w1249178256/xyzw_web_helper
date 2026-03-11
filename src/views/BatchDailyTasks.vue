@@ -517,6 +517,13 @@
                 </n-button>
                 <n-button
                   size="small"
+                  @click="openHelperModal('pointsBox')"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  按积分开箱
+                </n-button>
+                <n-button
+                  size="small"
                   @click="batchClaimBoxPointReward"
                   :disabled="isRunning || selectedTokens.length === 0"
                 >
@@ -1402,7 +1409,7 @@
       </div>
     </n-modal>
 
-    <!-- Helper Modal (开箱/钓鱼/招募) -->
+    <!-- Helper Modal (开箱/钓鱼/招募/按积分开箱) -->
     <n-modal
       v-model:show="showHelperModal"
       preset="card"
@@ -1427,7 +1434,22 @@
               size="small"
             />
           </div>
-          <div class="setting-item">
+          <div class="setting-item" v-if="helperType === 'pointsBox'">
+            <label class="setting-label">目标积分</label>
+            <n-input-number
+              v-model:value="helperSettings.targetPoints"
+              :min="1"
+              :max="1000000"
+              :step="100"
+              size="small"
+              style="width: 100%"
+            />
+          </div>
+          <n-alert v-if="helperType === 'pointsBox'" type="info" style="margin-bottom: 12px">
+            开箱优先级: 木质宝箱(保留200个) → 青铜宝箱 → 黄金宝箱 → 铂金宝箱<br/>
+            积分: 木质=1分, 青铜=10分, 黄金=20分, 铂金=50分
+          </n-alert>
+          <div class="setting-item" v-if="helperType !== 'pointsBox'">
             <label class="setting-label">消耗数量（10的倍数）</label>
             <n-input-number
               v-model:value="helperSettings.count"
@@ -1820,6 +1842,10 @@
               <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
                 <label class="setting-label">默认鱼竿类型</label>
                 <n-select v-model:value="batchSettings.defaultFishType" :options="fishTypeOptions" size="small" style="width: 100px" />
+              </div>
+              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                <label class="setting-label">按积分开箱目标</label>
+                <n-input-number v-model:value="batchSettings.targetBoxPoints" :min="1" :max="1000000" :step="100" size="small" style="width: 100px" />
               </div>
               <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
                 <label class="setting-label">梦境商品购买配置</label>
@@ -2781,10 +2807,11 @@ const helperSettings = reactive({
   boxType: 2001,
   fishType: 1,
   count: 100,
+  targetPoints: 1000,
 });
 
 const helperModalTitle = computed(() => {
-  const titles = { box: "批量开宝箱", fish: "批量钓鱼", recruit: "批量招募" };
+  const titles = { box: "批量开宝箱", fish: "批量钓鱼", recruit: "批量招募", pointsBox: "按积分开箱" };
   return titles[helperType.value] || "批量助手";
 });
 
@@ -2805,6 +2832,7 @@ const batchSettings = reactive({
   recruitCount: 100,
   defaultBoxType: 2001,
   defaultFishType: 1,
+  targetBoxPoints: 1000,
   receiverId: "",
   password: "",
   tokenListColumns: 2,
@@ -2907,7 +2935,7 @@ const taskGroupDefinitions = [
   { name: 'dungeon', label: '副本', tasks: ['climbTower', 'batchmengjing', 'skinChallenge', 'batchClaimPeachTasks', 'batchBuyDreamItems'] },
   { name: 'baoku', label: '宝库', tasks: ['batchbaoku13', 'batchbaoku45'] },
   { name: 'weirdTower', label: '怪异塔', tasks: ['climbWeirdTower', 'batchUseItems', 'batchMergeItems', 'batchClaimFreeEnergy'] },
-  { name: 'resource', label: '资源', tasks: ['batchOpenBox', 'batchClaimBoxPointReward', 'batchFish', 'batchRecruit', 'legion_storebuygoods'] },
+  { name: 'resource', label: '资源', tasks: ['batchOpenBox', 'batchOpenBoxByPoints', 'batchClaimBoxPointReward', 'batchFish', 'batchRecruit', 'legion_storebuygoods'] },
   { name: 'legacy', label: '功法', tasks: ['batchLegacyClaim', 'batchLegacyGiftSendEnhanced'] },
   { name: 'monthly', label: '月度', tasks: ['batchTopUpFish', 'batchTopUpArena'] }
 ];
@@ -3916,6 +3944,7 @@ const executeScheduledTask = async (task) => {
         if (
           [
             "batchOpenBox",
+            "batchOpenBoxByPoints",
             "batchFish",
             "batchRecruit",
             "batchLegacyGiftSendEnhanced",
@@ -4190,10 +4219,11 @@ const confirmLegacyGift = async () => {
 };
 
 const executeHelper = () => {
-  // 验证数量是10的倍数
-  if (helperSettings.count % 10 !== 0 || helperSettings.count < 10) {
-    message.warning("消耗数量必须是10的整数倍，最小为10");
-    return;
+  if (helperType.value !== 'pointsBox') {
+    if (helperSettings.count % 10 !== 0 || helperSettings.count < 10) {
+      message.warning("消耗数量必须是10的整数倍，最小为10");
+      return;
+    }
   }
   showHelperModal.value = false;
   if (helperType.value === "box") {
@@ -4202,6 +4232,8 @@ const executeHelper = () => {
     batchFish();
   } else if (helperType.value === "recruit") {
     batchRecruit();
+  } else if (helperType.value === "pointsBox") {
+    batchOpenBoxByPoints();
   }
 };
 
@@ -5053,6 +5085,7 @@ const { batchSmartSendCar, batchClaimCars } = tasksCar;
 const tasksItem = createTasksItem(createTaskDeps());
 const {
   batchOpenBox,
+  batchOpenBoxByPoints,
   batchClaimBoxPointReward,
   batchFish,
   batchRecruit,

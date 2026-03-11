@@ -1193,8 +1193,273 @@ export function createTasksItem(deps) {
     message.success("批量招募结束");
   };
 
+  const batchOpenBoxByPoints = async (isScheduledTask = false) => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    const targetPoints = isScheduledTask
+      ? batchSettings.targetBoxPoints
+      : helperSettings.targetPoints;
+
+    const boxPriority = [
+      { id: 2001, name: "木质宝箱", points: 1, reserve: 200 },
+      { id: 2002, name: "青铜宝箱", points: 10, reserve: 0 },
+      { id: 2003, name: "黄金宝箱", points: 20, reserve: 0 },
+      { id: 2004, name: "铂金宝箱", points: 50, reserve: 0 },
+    ];
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 开始按积分开箱: ${token.name} ===`,
+          type: "info",
+        });
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 目标积分: ${targetPoints}`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        const roleInfoRes = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "role_getroleinfo",
+          {},
+          5000,
+        );
+        const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
+        const items = role.items || {};
+
+        const boxInventory = {};
+        let totalAvailablePoints = 0;
+
+        for (const box of boxPriority) {
+          const count = items[box.id]?.quantity || 0;
+          boxInventory[box.id] = count;
+          totalAvailablePoints += count * box.points;
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 箱子库存: 木质=${boxInventory[2001]}, 青铜=${boxInventory[2002]}, 黄金=${boxInventory[2003]}, 铂金=${boxInventory[2004]}`,
+          type: "info",
+        });
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 可获得总积分: ${totalAvailablePoints}`,
+          type: "info",
+        });
+
+        if (totalAvailablePoints < targetPoints) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 积分不足! 需要 ${targetPoints}, 可获得 ${totalAvailablePoints}`,
+            type: "error",
+          });
+          tokenStatus.value[tokenId] = "failed";
+          return;
+        }
+
+        const boxToOpen = {};
+        let remainingPoints = targetPoints;
+
+        const woodenAvailable = boxInventory[2001] - 200;
+        if (woodenAvailable >= 10) {
+          const woodenPoints = woodenAvailable * 1;
+          const pointsNeeded = Math.min(woodenPoints, remainingPoints);
+          let woodenToOpen = Math.min(pointsNeeded, woodenAvailable);
+          woodenToOpen = Math.floor(woodenToOpen / 10) * 10;
+          if (woodenToOpen === 0 && woodenAvailable >= 10 && pointsNeeded > 0) {
+            woodenToOpen = 10;
+          }
+          
+          if (woodenToOpen >= 10) {
+            boxToOpen[2001] = woodenToOpen;
+            remainingPoints -= woodenToOpen * 1;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 计划开 木质宝箱: ${woodenToOpen} 个 (积分: ${woodenToOpen})`,
+              type: "info",
+            });
+          }
+        }
+
+        if (remainingPoints > 0) {
+          const bronzeAvailable = Math.floor(boxInventory[2002] / 10) * 10;
+          const goldAvailable = Math.floor(boxInventory[2003] / 10) * 10;
+          const platinumAvailable = Math.floor(boxInventory[2004] / 10) * 10;
+          const woodenTotal = Math.floor(boxInventory[2001] / 10) * 10;
+
+          let bestResult = null;
+          let minWaste = Infinity;
+
+          for (let bronze = 0; bronze <= bronzeAvailable; bronze += 10) {
+            const bronzePoints = bronze * 10;
+            if (bronzePoints > remainingPoints) break;
+            
+            for (let gold = 0; gold <= goldAvailable; gold += 10) {
+              const goldPoints = gold * 20;
+              if (bronzePoints + goldPoints > remainingPoints) break;
+              
+              const afterBronzeGold = remainingPoints - bronzePoints - goldPoints;
+              
+              for (let platinum = 0; platinum <= platinumAvailable; platinum += 10) {
+                const platinumPoints = platinum * 50;
+                if (platinumPoints > afterBronzeGold) break;
+                
+                const afterPlatinum = afterBronzeGold - platinumPoints;
+                
+                let wooden = 0;
+                if (afterPlatinum > 0) {
+                  wooden = Math.ceil(afterPlatinum / 10) * 10;
+                  if (wooden > woodenTotal || wooden > 100) continue;
+                }
+                
+                const totalPoints = bronzePoints + goldPoints + platinumPoints + wooden;
+                const waste = totalPoints - targetPoints;
+                
+                if (waste >= 0 && waste < minWaste) {
+                  minWaste = waste;
+                  bestResult = { bronze, gold, platinum, wooden, totalPoints };
+                  if (waste === 0) break;
+                }
+              }
+              if (minWaste === 0) break;
+            }
+            if (minWaste === 0) break;
+          }
+
+          if (bestResult) {
+            if (bestResult.bronze > 0) {
+              boxToOpen[2002] = bestResult.bronze;
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 计划开 青铜宝箱: ${bestResult.bronze} 个 (积分: ${bestResult.bronze * 10})`,
+                type: "info",
+              });
+            }
+            if (bestResult.gold > 0) {
+              boxToOpen[2003] = bestResult.gold;
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 计划开 黄金宝箱: ${bestResult.gold} 个 (积分: ${bestResult.gold * 20})`,
+                type: "info",
+              });
+            }
+            if (bestResult.platinum > 0) {
+              boxToOpen[2004] = bestResult.platinum;
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 计划开 铂金宝箱: ${bestResult.platinum} 个 (积分: ${bestResult.platinum * 50})`,
+                type: "info",
+              });
+            }
+            if (bestResult.wooden > 0) {
+              boxToOpen[2001] = (boxToOpen[2001] || 0) + bestResult.wooden;
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 计划开 木质宝箱: ${bestResult.wooden} 个 (积分: ${bestResult.wooden})`,
+                type: "info",
+              });
+            }
+            remainingPoints = 0;
+          }
+        }
+
+        for (const box of boxPriority) {
+          if (shouldStop.value) break;
+
+          const count = boxToOpen[box.id] || 0;
+          if (count <= 0) continue;
+
+          const batches = Math.floor(count / 10);
+          const remainder = count % 10;
+
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 开始开 ${box.name}: ${count} 个`,
+            type: "info",
+          });
+
+          for (let i = 0; i < batches && !shouldStop.value; i++) {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "item_openbox",
+              { itemId: box.id, number: 10 },
+              5000,
+            );
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} ${box.name} 开箱进度: ${(i + 1) * 10}/${count}`,
+              type: "info",
+            });
+            await new Promise((r) => setTimeout(r, delayConfig.action));
+          }
+
+          if (remainder > 0 && !shouldStop.value) {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "item_openbox",
+              { itemId: box.id, number: remainder },
+              5000,
+            );
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} ${box.name} 开箱进度: ${count}/${count}`,
+              type: "info",
+            });
+          }
+        }
+
+        await tokenStore.sendMessage(tokenId, "role_getroleinfo");
+        tokenStatus.value[tokenId] = "completed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== ${token.name} 按积分开箱完成 ===`,
+          type: "success",
+        });
+      } catch (error) {
+        console.error(error);
+        tokenStatus.value[tokenId] = "failed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `按积分开箱失败: ${error.message}`,
+          type: "error",
+        });
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+          type: "info",
+        });
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("按积分开箱结束");
+  };
+
   return {
     batchOpenBox,
+    batchOpenBoxByPoints,
     batchClaimBoxPointReward,
     batchFish,
     batchRecruit,
