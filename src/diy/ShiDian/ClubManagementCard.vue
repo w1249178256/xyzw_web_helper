@@ -1558,10 +1558,10 @@ const handleExportLegacyDetails = async () => {
     
     // 赠送数据部分
     lines.push('========== 赠送数据 ==========')
-    lines.push('昵称\troleId\t金卡数量\t红卡数量\t橙卡数量\t蓝卡数量\t紫卡数量\t绿卡数量\t功法残卷数量')
+    lines.push('昵称,roleId,金卡数量,红卡数量,橙卡数量,蓝卡数量,紫卡数量,绿卡数量,功法残卷数量')
     Object.values(sendStats).forEach(stat => {
       lines.push(
-        `${stat.name}\t${stat.roleId}\t${stat.金卡}\t${stat.红卡}\t${stat.橙卡}\t${stat.蓝卡}\t${stat.紫卡}\t${stat.绿卡}\t${stat.功法残卷}`
+        `${stat.name},${stat.roleId},${stat.金卡},${stat.红卡},${stat.橙卡},${stat.蓝卡},${stat.紫卡},${stat.绿卡},${stat.功法残卷}`
       )
     })
     
@@ -1570,10 +1570,10 @@ const handleExportLegacyDetails = async () => {
     
     // 接收数据部分
     lines.push('========== 接收数据 ==========')
-    lines.push('昵称\troleId\t金卡数量\t红卡数量\t橙卡数量\t蓝卡数量\t紫卡数量\t绿卡数量\t功法残卷数量')
+    lines.push('昵称,roleId,金卡数量,红卡数量,橙卡数量,蓝卡数量,紫卡数量,绿卡数量,功法残卷数量')
     Object.values(receiveStats).forEach(stat => {
       lines.push(
-        `${stat.name}\t${stat.roleId}\t${stat.金卡}\t${stat.红卡}\t${stat.橙卡}\t${stat.蓝卡}\t${stat.紫卡}\t${stat.绿卡}\t${stat.功法残卷}`
+        `${stat.name},${stat.roleId},${stat.金卡},${stat.红卡},${stat.橙卡},${stat.蓝卡},${stat.紫卡},${stat.绿卡},${stat.功法残卷}`
       )
     })
 
@@ -1717,11 +1717,11 @@ const handleExportClubInfo = async () => {
     // 生成导出内容
     const lines = []
     // 标题行
-    lines.push('昵称\t俱乐部名称\troleId')
+    lines.push('昵称,俱乐部名称,roleId')
     
     // 数据行
     clubInfoList.forEach(info => {
-      lines.push(`${info.nickname}\t${info.clubName}\t${info.roleId || '未获取到'}`)
+      lines.push(`${info.nickname},${info.clubName},${info.roleId || '未获取到'}`)
     })
 
     // 导出文件

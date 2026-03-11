@@ -39,7 +39,7 @@
           />
           <CustomizedCard 
             mode="name-switch"
-            name="一键竞技场战斗3次"
+            name="一键竞技场"
             v-model:switchValue="scheduledTasks.batcharenafight"
           />
           <CustomizedCard 
@@ -49,8 +49,18 @@
           />
           <CustomizedCard 
             mode="name-switch"
-            name="一键俱乐部BOSS"
+            name="一键俱乐部 BOSS"
             v-model:switchValue="scheduledTasks.legion_boss"
+          />
+          <CustomizedCard 
+            mode="name-switch"
+            name="一键每日免费礼包"
+            v-model:switchValue="scheduledTasks.freeGift"
+          />
+          <CustomizedCard 
+            mode="name-switch"
+            name="一键每日咸王"
+            v-model:switchValue="scheduledTasks.dailyBoss"
           />
 
           <CustomizedCard 
@@ -81,7 +91,6 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="定时任务"
-        :filter-operations="['批量黑市周']"
       />
     </template>
   </MyCard>
@@ -110,6 +119,13 @@ const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxRetries: 3
 });
 
+// 获取今日 BOSS ID 的函数（根据星期几返回不同的 BOSS ID）
+const getTodayBossId = () => {
+  const DAY_BOSS_MAP = [9904, 9905, 9901, 9902, 9903, 9904, 9905] // 周日~周六
+  const dayOfWeek = new Date().getDay()
+  return DAY_BOSS_MAP[dayOfWeek]
+}
+
 // 定时任务相关
 const isExecutingScheduledTasks = ref(false)
 const isBatchBlackMarketRunning = ref(false)
@@ -122,7 +138,9 @@ const scheduledTasks = ref({
   batchclubsign: false,
   batcharenafight: false,
   store_purchase: false,
-  legion_boss: false
+  legion_boss: false,
+  freeGift: false,
+  dailyBoss: false
 })
 
 // 处理定时任务执行范围输入
@@ -201,6 +219,14 @@ const handleExecuteScheduledTasks = async () => {
   
   const rangeText = scheduledExecutionTokens.value ? `范围${scheduledExecutionTokens.value}` : "全部"
   message.info(`开始执行定时任务（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '定时任务',
+    operation: '执行定时任务',
+    status: 'info',
+    message: `开始执行定时任务（${rangeText}），共${targetTokens.length}个Token`
+  })
   
   isExecutingScheduledTasks.value = true
   
@@ -417,36 +443,104 @@ const handleExecuteScheduledTasks = async () => {
           
           if (scheduledTasks.value.batcharenafight) {
             try {
-              // 竞技场战斗3次
-              for (let i = 0; i < 3; i++) {
-                await tokenStore.sendMessageWithPromise(
-                  token.id,
-                  'arena_fight',
-                  {},
-                  5000
-                )
+              // 一键竞技场：复制 dailyTaskRunner.js 中的竞技场逻辑
+              const hour = new Date().getHours()
+              
+              // 时间检查
+              if (hour < 6) {
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 当前时间未到 6 点，跳过竞技场`)
+                return
+              }
+              if (hour > 22) {
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 当前时间已过 22 点，跳过竞技场`)
+                return
+              }
+              
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 开始竞技场战斗流程`)
+              
+              // 开始竞技场
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'arena_startarea',
+                {},
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              // 进行 3 次战斗
+              for (let i = 1; i <= 3; i++) {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 竞技场战斗 ${i}/3`)
+                
+                // 获取对手列表
+                let targets
+                try {
+                  targets = await tokenStore.sendMessageWithPromise(
+                    token.id,
+                    'arena_getareatarget',
+                    {},
+                    5000
+                  )
+                } catch (err) {
+                  console.error(`[序号${tokenIndex}] 竞技场战斗${i} - 获取对手失败：${err.message}`)
+                  break
+                }
+                
+                // 选择对手 ID - 参考 dailyTaskRunner.js 的 pickArenaTargetId 逻辑
+                let targetId = null
+                if (targets) {
+                  if (Array.isArray(targets)) {
+                    // Handle if targets is an array directly
+                    const candidate = targets[0]
+                    targetId = candidate?.roleId || candidate?.id || candidate?.targetId
+                  } else {
+                    // Try different possible structures
+                    const candidate =
+                      targets?.rankList?.[0] ||
+                      targets?.roleList?.[0] ||
+                      targets?.targets?.[0] ||
+                      targets?.targetList?.[0] ||
+                      targets?.list?.[0]
+                    if (candidate) {
+                      targetId = candidate?.roleId || candidate?.id || candidate?.targetId
+                    }
+                  }
+                }
+                
+                if (targetId) {
+                  // 开始战斗
+                  await tokenStore.sendMessageWithPromise(
+                    token.id,
+                    'fight_startareaarena',
+                    { targetId },
+                    10000
+                  )
+                  message.info(`[序号${tokenIndex}] ${token.name || token.id} - 竞技场战斗${i}完成`)
+                } else {
+                  message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 竞技场战斗${i} - 未找到目标`)
+                }
+                
                 await new Promise(resolve => setTimeout(resolve, 1000))
               }
               
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
-                operation: '一键竞技场战斗3次',
+                operation: '一键竞技场',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键竞技场战斗3次成功`
+                message: `${tokenIndex}、${token.name || token.id}、一键竞技场成功`
               })
             } catch (error) {
-              console.error(`一键竞技场战斗3次失败: ${error.message}`, error)
+              console.error(`一键竞技场失败：${error.message}`, error)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
-                operation: '一键竞技场战斗3次',
+                operation: '一键竞技场',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键竞技场战斗3次失败`
+                message: `${tokenIndex}、${token.name || token.id}、一键竞技场失败`
               })
             }
           }
@@ -487,7 +581,7 @@ const handleExecuteScheduledTasks = async () => {
           
           if (scheduledTasks.value.legion_boss) {
             try {
-              // 一键俱乐部BOSS
+              // 一键俱乐部 BOSS
               await tokenStore.sendMessageWithPromise(
                 token.id,
                 'fight_startlegionboss',
@@ -499,31 +593,153 @@ const handleExecuteScheduledTasks = async () => {
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
-                operation: '一键俱乐部BOSS',
+                operation: '一键俱乐部 BOSS',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部BOSS成功`
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部 BOSS 成功`
               })
             } catch (error) {
-              console.error(`一键俱乐部BOSS失败: ${error.message}`, error)
+              console.error(`一键俱乐部 BOSS 失败：${error.message}`, error)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
-                operation: '一键俱乐部BOSS',
+                operation: '一键俱乐部 BOSS',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部BOSS失败`
+                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部 BOSS 失败`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.freeGift) {
+            let signinSuccess = false
+            let discountSuccess = false
+            let signinMsg = ''
+            let discountMsg = ''
+            
+            try {
+              // 一键每日免费礼包：先签到，再领取折扣奖励
+              // 签到失败不影响后续领取折扣奖励
+              try {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'system_signinreward',
+                  {},
+                  5000
+                )
+                signinSuccess = true
+                signinMsg = '签到成功'
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 每日签到成功`)
+              } catch (signinError) {
+                // 签到失败（如已签到），记录日志但继续执行
+                signinMsg = `签到跳过：${signinError.message}`
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 每日签到跳过：${signinError.message}`)
+              }
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              // 领取折扣奖励
+              try {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'discount_claimreward',
+                  { discountId: 1 },
+                  5000
+                )
+                discountSuccess = true
+                discountMsg = '领取成功'
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 免费礼包领取成功`)
+              } catch (discountError) {
+                // 领取失败，记录日志但继续执行其他操作
+                discountMsg = `领取失败：${discountError.message}`
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 免费礼包领取失败：${discountError.message}，继续执行其他操作`)
+              }
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              // 根据执行结果记录日志
+              const status = signinSuccess || discountSuccess ? 'success' : 'warning'
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键每日免费礼包',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: status,
+                message: `${tokenIndex}、${token.name || token.id}、一键每日免费礼包完成（${signinMsg}；${discountMsg}）`
+              })
+            } catch (error) {
+              console.error(`一键每日免费礼包执行异常：${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键每日免费礼包',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `${tokenIndex}、${token.name || token.id}、一键每日免费礼包执行异常：${error.message}`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.dailyBoss) {
+            try {
+              // 一键每日咸王：根据星期几获取今日 BOSS ID，挑战 3 次
+              const todayBossId = getTodayBossId()
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 今日咸王 BOSS ID: ${todayBossId}`)
+              
+              for (let i = 0; i < 3; i++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'fight_startboss',
+                  { bossId: todayBossId },
+                  12000
+                )
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 咸王挑战 ${i + 1}/3 完成`)
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              }
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键每日咸王',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、一键每日咸王成功（今日 BOSS: ${todayBossId}，挑战 3 次）`
+              })
+            } catch (error) {
+              console.error(`一键每日咸王失败：${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键每日咸王',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `${tokenIndex}、${token.name || token.id}、一键每日咸王失败`
               })
             }
           }
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 定时任务执行完成`)
+          
+          // 添加成功日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '执行定时任务',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、定时任务执行完成`
+          })
+          
           return { success: true, tokenId: token.id }
         } catch (error) {
           console.error(`执行定时任务失败: ${error.message}`, error)
           message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 定时任务执行失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '定时任务',
@@ -531,7 +747,7 @@ const handleExecuteScheduledTasks = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `定时任务执行失败: ${error.message}`
+            message: `${tokenIndex}、${token.name || token.id}、定时任务执行失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -638,10 +854,32 @@ const handleBatchBlackMarket = async () => {
               }
               
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 金砖: ${diamondCount}, 金竿: ${goldenRodCount}`)
+              
+              // 添加获取角色信息成功日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '批量黑市周',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `${tokenIndex}、${token.name || token.id}、获取角色信息成功（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
+              })
             }
           } catch (error) {
             console.error(`获取角色信息失败: ${error.message}`, error)
             message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
+            
+            // 添加获取角色信息失败日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、获取角色信息失败，继续执行`
+            })
           }
           
           try {
@@ -653,9 +891,31 @@ const handleBatchBlackMarket = async () => {
             )
             await new Promise(resolve => setTimeout(resolve, 500))
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买宝箱成功`)
+            
+            // 添加购买宝箱成功日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、购买宝箱成功`
+            })
           } catch (error) {
             console.error(`购买宝箱失败: ${error.message}`, error)
             message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买宝箱失败，继续执行`)
+            
+            // 添加购买宝箱失败日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、购买宝箱失败，继续执行`
+            })
           }
           
           if (goldenRodCount < 900) {
@@ -668,9 +928,31 @@ const handleBatchBlackMarket = async () => {
               )
               await new Promise(resolve => setTimeout(resolve, 500))
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿成功`)
+              
+              // 添加购买金竿成功日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '批量黑市周',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、购买金竿成功`
+              })
             } catch (error) {
               console.error(`购买金竿失败: ${error.message}`, error)
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿失败，继续执行`)
+              
+              // 添加购买金竿失败日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '批量黑市周',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `${tokenIndex}、${token.name || token.id}、购买金竿失败，继续执行`
+              })
             }
           }
           
@@ -684,12 +966,35 @@ const handleBatchBlackMarket = async () => {
               )
               await new Promise(resolve => setTimeout(resolve, 500))
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买灵贝成功`)
+              
+              // 添加购买灵贝成功日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '批量黑市周',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、购买灵贝成功`
+              })
             } catch (error) {
               console.error(`购买灵贝失败: ${error.message}`, error)
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买灵贝失败，继续执行`)
+              
+              // 添加购买灵贝失败日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '批量黑市周',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `${tokenIndex}、${token.name || token.id}、购买灵贝失败，继续执行`
+              })
             }
           }
           
+          // 添加批量黑市周完成日志
           logStore.addLog({
             page: 'fish-helper',
             cardType: '定时任务',
@@ -697,7 +1002,7 @@ const handleBatchBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `批量黑市周成功（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
+            message: `${tokenIndex}、${token.name || token.id}、批量黑市周执行完成（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
           })
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 批量黑市周执行完成`)
@@ -705,6 +1010,7 @@ const handleBatchBlackMarket = async () => {
         } catch (error) {
           console.error(`批量黑市周失败: ${error.message}`, error)
           message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 批量黑市周执行失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '定时任务',
@@ -712,7 +1018,7 @@ const handleBatchBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量黑市周执行失败: ${error.message}`
+            message: `${tokenIndex}、${token.name || token.id}、批量黑市周执行失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }

@@ -202,7 +202,7 @@
           />
           <CustomizedCard 
             mode="button"
-            :name="isBatchUpgradingLord ? '批量升级主公中...' : '批量升级主公'"
+            :name="isBatchUpgradingLord ? '批量升级主公武将中...' : '批量升级主公武将'"
             @button-click="handleBatchUpgradeLord"
             :disabled="isBatchUpgradingLord"
             :loading="isBatchUpgradingLord"
@@ -500,7 +500,7 @@ const handleUseTorch = async () => {
           // 执行100次 item_consume 命令
           for (let i = 0; i < 100; i++) {
             try {
-              await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity: 1 })
+              await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity: 50 })
               await new Promise(resolve => setTimeout(resolve, 500))
               successCount++
             } catch (error) {
@@ -514,7 +514,7 @@ const handleUseTorch = async () => {
             }
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用火把完成：成功${successCount}次，失败${failCount}次`)
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`)
 
           logStore.addLog({
             page: 'fish-helper',
@@ -523,7 +523,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、使用火把完成：成功${successCount}次，失败${failCount}次`
+            message: `${tokenIndex}、${token.name || token.id}、使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
           })
 
           return { success: true, tokenId: token.id, successCount, failCount }
@@ -635,7 +635,7 @@ const handleUpgradeCrystal = async () => {
 
               // 每次升级后等待500ms
               if (i < 19) {
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
             } catch (error) {
               console.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${i + 1}次升级水晶失败:`, error)
@@ -924,41 +924,141 @@ const handleBatchQuench = async () => {
 
           let allPartsCompleted = false
           let totalQuenchCount = 0
-          const maxQuenchCount = 1000
+          let maxQuenchCount = 0 // 最大洗练次数，根据白玉数量计算（白玉数量/100）
           const heroId = 107
+          const completedParts = new Set() // 记录已完成的部位
+          const partQuenches = {} // 存储各部位的 quenches 数据
+          let whiteJadeCount = 0 // 白玉数量
 
-          while (!allPartsCompleted && totalQuenchCount < maxQuenchCount) {
-            try {
-              for (let part = 1; part <= 4; part++) {
-                if (totalQuenchCount >= maxQuenchCount) {
-                  break
+          // 首先获取白玉数量，计算最大洗练次数
+          try {
+            const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 5000)
+            const role = roleInfo?.role || roleInfo
+            
+            // 获取白玉数量（物品 ID 1022）- 参考身份卡片代码
+            const items = role?.items
+            console.log(`[序号${tokenIndex}] role?.items 是否存在:`, !!items)
+            console.log(`[序号${tokenIndex}] items 类型:`, typeof items, Array.isArray(items) ? 'Array' : 'Object')
+            
+            if (items) {
+              // 复制身份卡片的 getItemCount 函数逻辑
+              const getItemCount = (items, id) => {
+                if (!items) {
+                  return 0
                 }
+                if (Array.isArray(items)) {
+                  const found = items.find(i => Number(i.id ?? i.itemId) === id)
+                  if (found) {
+                    return Number(found.num ?? found.count ?? found.quantity ?? 0)
+                  }
+                  return 0
+                }
+                // 对象结构：{ '1011': 3 } 或 { '1011': { num:3 } }
+                const node = items[String(id)] ?? items[id]
+                console.log(`[序号${tokenIndex}] 物品${id} 直接访问结果:`, node)
+                
+                if (node == null) {
+                  // 兼容值对象中含有 itemId/quantity 的结构
+                  const match = Object.values(items).find(v => Number(v?.itemId ?? v?.id) === id)
+                  console.log(`[序号${tokenIndex}] 物品${id} 遍历查找结果:`, match)
+                  if (match) {
+                    return Number(match.num ?? match.count ?? match.quantity ?? 0)
+                  }
+                  return 0
+                }
+                if (typeof node === 'number') return Number(node)
+                if (typeof node === 'object') {
+                  return Number(node.num ?? node.count ?? node.quantity ?? 0)
+                }
+                return Number(node) || 0
+              }
+              
+              whiteJadeCount = getItemCount(items, 1022)
+              console.log(`[序号${tokenIndex}] 白玉数量:`, whiteJadeCount)
+              
+              // 根据白玉数量计算最大洗练次数（每洗练一次消耗 100 白玉）
+              maxQuenchCount = Math.floor(whiteJadeCount / 100)
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 当前白玉数量：${whiteJadeCount}，最大洗练次数：${maxQuenchCount}`)
+            }
+          } catch (error) {
+            console.error(`[序号${tokenIndex}] 获取白玉数量失败:`, error)
+            maxQuenchCount = 10 // 如果获取失败，使用默认值 10
+          }
+
+          // 遍历每个部位，一直洗练直到满足条件
+          for (let part = 1; part <= 4; part++) {
+            if (totalQuenchCount >= maxQuenchCount) {
+              break
+            }
+
+            // 跳过已完成的部位
+            if (completedParts.has(part)) {
+              continue
+            }
+
+            const partName = PARTS.find(p => p.value === part)?.text || '未知'
+            let partCompleted = false
+
+            // 如果没有该部位的 quenches 数据，通过 role_getroleinfo 获取
+            if (!partQuenches[part]) {
+              try {
+                const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 5000)
+                const role = roleInfo?.role || roleInfo
+                
+                if (role && role.heroes && role.heroes[heroId] && role.heroes[heroId].equipment && role.heroes[heroId].equipment[part]) {
+                  partQuenches[part] = role.heroes[heroId].equipment[part].quenches || {}
+                  console.log(`[序号${tokenIndex}] ${partName}部位初始 quenches:`, partQuenches[part])
+                }
+              } catch (error) {
+                console.error(`[序号${tokenIndex}] 获取${partName}部位装备信息失败:`, error)
+              }
+            }
+
+            // 一直洗练当前部位，直到满足条件或达到最大次数
+            while (!partCompleted && totalQuenchCount < maxQuenchCount) {
+              try {
+                // 构建淬炼制请求参数，使用该部位的quenches
+                const quenchParams = {
+                  heroId: heroId,
+                  part: part,
+                  quenchId: 0,
+                  quenches: partQuenches[part] || {},
+                  seed: 0,
+                  skipOrange: false
+                }
+                
+                console.log(`[序号${tokenIndex}] ${partName}部位洗练参数:`, quenchParams)
 
                 const response = await tokenStore.sendMessageWithPromise(
                   token.id,
                   'equipment_quench',
-                  {
-                    heroId: heroId,
-                    part: part,
-                    quenchId: 0,
-                    quenches: {},
-                    seed: 0,
-                    skipOrange: false
-                  },
-                  10000
+                  quenchParams,
+                  15000
                 )
 
                 totalQuenchCount++
 
                 if (response && (response.code === 0 || response.code === undefined)) {
-                  const heroData = response?.role?.heroes?.[heroId]
-                  if (heroData && heroData.equipment && heroData.equipment[part]) {
-                    const equipment = heroData.equipment[part]
-                    const quenches = equipment.quenches || {}
-                    const partName = PARTS.find(p => p.value === part)?.text || '未知'
+                  let updatedEquipment = null
+                  
+                  // 从响应中获取更新后的装备信息
+                  if (response.equipment) {
+                    updatedEquipment = response.equipment
+                  } else if (response.role && response.role.heroes && response.role.heroes[heroId] && response.role.heroes[heroId].equipment) {
+                    updatedEquipment = response.role.heroes[heroId].equipment[part]
+                  }
+
+                  if (updatedEquipment) {
+                    // 更新该部位的quenches数据
+                    partQuenches[part] = updatedEquipment.quenches || {}
+                    console.log(`[序号${tokenIndex}] ${partName}部位更新后quenches:`, partQuenches[part])
+                    
+                    const quenches = partQuenches[part]
 
                     let quenchResults = []
                     let hasRedOrOrangeDamageReduction = false
+                    let redArmorPenCount = 0
+                    let redAttackCount = 0
 
                     for (const [slot, quench] of Object.entries(quenches)) {
                       const attrName = ATTRIBUTES.find(a => a.id === quench.attrId)?.name || '未知'
@@ -967,6 +1067,16 @@ const handleBatchQuench = async () => {
 
                       if (quench.attrId === 9 && (quench.colorId === 5 || quench.colorId === 6)) {
                         hasRedOrOrangeDamageReduction = true
+                      }
+                      
+                      // 统计红色破甲数量（属性ID 5，颜色ID 6）
+                      if (quench.attrId === 5 && quench.colorId === 6) {
+                        redArmorPenCount++
+                      }
+                      
+                      // 统计红色攻击数量（属性ID 1，颜色ID 6）
+                      if (quench.attrId === 1 && quench.colorId === 6) {
+                        redAttackCount++
                       }
                     }
 
@@ -977,70 +1087,49 @@ const handleBatchQuench = async () => {
                     if (hasRedOrOrangeDamageReduction) {
                       message.success(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得红色或橙色减伤`)
                     }
+                    
+                    // 判断是否完成该部位
+                    const totalRedAttributes = redArmorPenCount + redAttackCount
+                    const hasBothRedAttributes = redArmorPenCount >= 1 && redAttackCount >= 1
+                    
+                    if (hasRedOrOrangeDamageReduction || hasBothRedAttributes) {
+                      // 已获得红色或橙色减伤，或者同时有红攻击和红破甲，完成该部位
+                      partCompleted = true
+                      completedParts.add(part)
+                      if (hasRedOrOrangeDamageReduction) {
+                        message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得红色或橙色减伤，完成该部位`)
+                      } else if (hasBothRedAttributes) {
+                        message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得红攻击和红破甲，完成该部位`)
+                      }
+                    } else if (totalRedAttributes === 1) {
+                      // 只有 1 个红色破甲或红色攻击，完成该部位
+                      partCompleted = true
+                      completedParts.add(part)
+                      message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得 1 个红色破甲或攻击，完成该部位`)
+                    } else {
+                      // totalRedAttributes === 0 或 > 1，但没有同时满足红攻击和红破甲
+                      // 不完成该部位，继续洗练
+                      partCompleted = false
+                      message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位未满足完成条件（红减伤：${hasRedOrOrangeDamageReduction}, 红攻击：${redAttackCount}, 红破甲：${redArmorPenCount}），继续洗练`)
+                    }
                   }
                 } else {
                   const errorMsg = response?.msg || response?.message || '未知错误'
                   throw new Error(errorMsg)
                 }
 
-                await new Promise(resolve => setTimeout(resolve, 500))
-              }
-
-              const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 5000)
-              if (roleInfo && roleInfo.heroes && roleInfo.heroes[heroId]) {
-                const heroData = roleInfo.heroes[heroId]
-                if (heroData.equipment) {
-                  let allPartsHaveDamageReduction = true
-                  let allPartsResults = []
-
-                  for (let part = 1; part <= 4; part++) {
-                    const equipment = heroData.equipment[part]
-                    const partName = PARTS.find(p => p.value === part)?.text || '未知'
-
-                    if (!equipment || !equipment.quenches) {
-                      allPartsHaveDamageReduction = false
-                      allPartsResults.push(`${partName}:无洗练`)
-                      break
-                    }
-
-                    const quenches = equipment.quenches
-                    let hasDamageReduction = false
-                    let partResults = []
-
-                    for (const quench of Object.values(quenches)) {
-                      const attrName = ATTRIBUTES.find(a => a.id === quench.attrId)?.name || '未知'
-                      const colorName = COLORS.find(c => c.id === quench.colorId)?.name || '未知'
-                      partResults.push(`${attrName}${quench.attrNum || 0}${colorName}`)
-
-                      if (quench.attrId === 9 && (quench.colorId === 5 || quench.colorId === 6)) {
-                        hasDamageReduction = true
-                      }
-                    }
-
-                    allPartsResults.push(`${partName}:${partResults.join(',') || '无'}`)
-
-                    if (!hasDamageReduction) {
-                      allPartsHaveDamageReduction = false
-                    }
-                  }
-
-                  message.info(`[序号${tokenIndex}] ${token.name || token.id} - 当前洗练状态: ${allPartsResults.join(' | ')}`)
-
-                  if (allPartsHaveDamageReduction) {
-                    allPartsCompleted = true
-                    message.success(`[序号${tokenIndex}] ${token.name || token.id} - 所有部位已获得红色或橙色减伤`)
-                  }
-                }
-              }
-
-              await new Promise(resolve => setTimeout(resolve, 1000))
-            } catch (error) {
-              if (error.message.includes('服务器错误') || error.message.includes('server error')) {
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 服务器错误，停止洗练`)
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              } catch (error) {
+                console.error(`[序号${tokenIndex}] ${partName}部位洗练失败:`, error)
                 break
               }
-              console.error(`[序号${tokenIndex}] ${token.name || token.id} 洗练失败:`, error)
             }
+          }
+
+          // 检查是否所有部位都已完成
+          if (completedParts.size === 4) {
+            allPartsCompleted = true
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 所有部位已获得目标属性`)
           }
 
           if (allPartsCompleted) {
@@ -1146,13 +1235,39 @@ const handleBatchUpgradeHangup = async () => {
           let totalUpgradeCount = 0
 
           const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 5000)
-          if (roleInfo && roleInfo.items) {
-            const item1024 = roleInfo.items.find(item => Number(item.id || item.itemId) === 1024)
-            remainingCount = item1024 ? Number(item.count || item.num || 0) : 0
+          console.log('role_getroleinfo 响应:', roleInfo)
+          
+          // 参照身份卡的findItemCount函数实现
+          const findItemCount = (items, itemId) => {
+            if (!items) {
+              return 0
+            }
+            if (Array.isArray(items)) {
+              const item = items.find(i => Number(i.id ?? i.itemId) === itemId)
+              return item ? Number(item.num ?? item.count ?? item.quantity ?? 0) : 0
+            }
+            const item = items[String(itemId)] ?? items[itemId]
+            if (item == null) {
+              const found = Object.values(items).find(i => Number(i?.itemId ?? i?.id) === itemId)
+              return found ? Number(found.num ?? found.count ?? found.quantity ?? 0) : 0
+            }
+            return typeof item === 'number' ? Number(item) : typeof item === 'object' ? Number(item.quantity ?? item.num ?? item.count ?? 0) : Number(item) || 0
+          }
+          
+          if (roleInfo) {
+            const items = roleInfo.items || roleInfo.role?.items
+            console.log('items 来源:', items ? (roleInfo.items ? 'roleInfo.items' : 'roleInfo.role.items') : '无')
+            console.log('items 结构:', items)
+            remainingCount = findItemCount(items, 1024)
+            console.log('remainingCount:', remainingCount)
             message.info(`[序号${tokenIndex}] ${token.name || token.id} - 当前挂机升级道具数量: ${remainingCount}`)
+          } else {
+            console.log('roleInfo 不存在:', roleInfo)
           }
 
+          console.log('开始进入while循环，remainingCount:', remainingCount)
           while (remainingCount > 0) {
+            console.log('进入while循环，remainingCount:', remainingCount)
             let upgradeNum = 1
 
             if (remainingCount >= 50) {
@@ -1161,21 +1276,26 @@ const handleBatchUpgradeHangup = async () => {
               upgradeNum = 10
             }
 
+            console.log('准备执行system_hangupupgrade，upgradeNum:', upgradeNum)
             const response = await tokenStore.sendSystemHangupUpgrade(token.id, {
               upgradeNum: upgradeNum
             })
+            console.log('system_hangupupgrade 响应:', response)
 
             if (response && (response.code === 0 || response.code === undefined)) {
               remainingCount -= upgradeNum
               totalUpgradeCount += upgradeNum
+              console.log('升级成功，剩余数量:', remainingCount, '总使用数量:', totalUpgradeCount)
               message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升级挂机成功，使用${upgradeNum}个道具，剩余${remainingCount}个`)
             } else {
               const errorMsg = response?.msg || response?.message || '未知错误'
+              console.log('升级失败:', errorMsg)
               throw new Error(errorMsg)
             }
 
             await new Promise(resolve => setTimeout(resolve, 500))
           }
+          console.log('退出while循环，remainingCount:', remainingCount, 'totalUpgradeCount:', totalUpgradeCount)
 
           message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升级挂机完成，共使用${totalUpgradeCount}个道具`)
           logStore.addLog({
@@ -3909,10 +4029,12 @@ const handleBatchUpgrade900 = async () => {
                 if (heroesData) {
                   let updatedHero = null
                   if (Array.isArray(heroesData)) {
-                    updatedHero = heroesData.find(h => h.heroId === hero.heroId)
+                    updatedHero = heroesData.find(h => Number(h.heroId) === Number(hero.heroId))
                   } else if (typeof heroesData === 'object') {
-                    updatedHero = heroesData[hero.heroId] || 
-                                 Object.values(heroesData).find(h => h && h.heroId === hero.heroId)
+                    // 尝试直接通过键获取
+                    updatedHero = heroesData[hero.heroId] || heroesData[String(hero.heroId)] ||
+                                 // 尝试遍历对象值查找
+                                 Object.values(heroesData).find(h => h && Number(h.heroId) === Number(hero.heroId))
                   }
                   
                   if (updatedHero && updatedHero.level > currentLevel) {
@@ -5708,9 +5830,17 @@ const handleBatchActivateToys = async () => {
 }
 
 // 计算主公升级数量
-// 如果最后两位均为0，upgradeNum使用50
-// 如果不为0，执行upgradeNum使用10/5/1，升级到00，再执行upgradeNum使用50
+// 逻辑：
+// - 4000级：每次升级1级
+// - 4001级及以上：使用50/10/5/1规则
+// - 最后两位为00：升级50级
+// - 其他情况：根据剩余等级选择10/5/1级
 const calculateLordUpgradeNum = (currentLevel) => {
+  // 当主公等级达到4000级时，每次只升级1级
+  if (currentLevel === 4000) {
+    return 1
+  }
+  
   const lastTwoDigits = currentLevel % 100
   
   if (lastTwoDigits === 0) {
@@ -5729,7 +5859,23 @@ const calculateLordUpgradeNum = (currentLevel) => {
   }
 }
 
-// 批量升级主公
+// 计算武将升级数量（与主公相同逻辑）
+const calculateHeroUpgradeNum = calculateLordUpgradeNum
+
+// 批量升级主公武将
+// 流程说明：
+// 1. 按token昵称排序，获取目标tokens
+// 2. 对每个token执行以下操作：
+//    a. 使用role_getroleinfo获取当前主公和吕布等级、阶数
+//    b. 检查并执行升阶（如果需要）
+//    c. 进入循环升级：
+//       i. 比较阶数：
+//          - 主公阶数高 → 升级吕布
+//          - 同阶 → 先升级主公，再升级吕布
+//       ii. 升级参数：只能是50/10/5/1
+//       iii. 升级后检查并执行升阶
+//       iv. 循环直到物品数量不足或达到最大升级次数
+// 3. 统计结果并显示
 const handleBatchUpgradeLord = async () => {
   // 按token昵称排序的token列表
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
@@ -5758,14 +5904,17 @@ const handleBatchUpgradeLord = async () => {
     return index + 1
   }
   
+  // 升阶等级列表
+  const upgradeLevels = [100, 200, 300, 500, 700, 900, 1100, 1300, 1500, 1800, 2100, 2400, 2800, 3200, 3600, 4000, 4500, 5000, 5500, 6000]
+  
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量升级主公（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  message.info(`开始批量升级主公武将（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
   logStore.addLog({
     page: 'fish-helper',
     cardType: '养号',
-    operation: '批量升级主公',
+    operation: '批量升级主公武将',
     status: 'info',
-    message: `开始批量升级主公，${rangeText}，共${targetTokens.length}个Token`
+    message: `开始批量升级主公武将，${rangeText}，共${targetTokens.length}个Token`
   })
   
   try {
@@ -5777,321 +5926,520 @@ const handleBatchUpgradeLord = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行升级主公...`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行升级主公武将...`)
           
-          // 1. 使用role_getroleinfo获取当前主公等级
+          // 1. 使用role_getroleinfo获取当前主公和吕布等级
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
-            operation: '批量升级主公',
+            operation: '批量升级主公武将',
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '执行role_getroleinfo命令，获取主公等级'
+            message: '执行role_getroleinfo命令，获取主公和吕布等级'
           })
           
           const roleResult = await tokenStore.sendGetRoleInfo(token.id)
           await new Promise(resolve => setTimeout(resolve, 500))
           
-          // 2. 从响应中获取主公等级
+          // 调试日志：查看roleResult的结构
+          console.log('[批量升级主公武将] roleResult结构:', JSON.stringify(roleResult, null, 2).substring(0, 2000))
+          
+          // 2. 从响应中获取主公等级和阶数
           let lordLevel = 0
+          let lordOrder = 0
           if (roleResult && roleResult.role && roleResult.role.lord) {
             lordLevel = roleResult.role.lord.level || 0
+            lordOrder = roleResult.role.lord.order || 0
           } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.lord) {
             lordLevel = roleResult._raw.body.role.lord.level || 0
+            lordOrder = roleResult._raw.body.role.lord.order || 0
           } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.lord) {
             lordLevel = roleResult.body.role.lord.level || 0
+            lordOrder = roleResult.body.role.lord.order || 0
           }
           
           if (lordLevel === 0) {
             throw new Error('无法获取主公等级')
           }
           
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '批量升级主公',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `获取主公等级成功: 当前等级${lordLevel}`
-          })
+          // 3. 从响应中获取吕布等级和阶数
+          console.log('[批量升级主公武将] 检查heroes结构...')
           
-          // 3. 循环升级主公
-          let currentLevel = lordLevel
-          let upgradeCount = 0
-          const maxUpgrades = 100 // 最多升级次数，防止死循环
-          
-          while (upgradeCount < maxUpgrades) {
-            try {
-              // 根据当前等级计算升级参数
-              const upgradeNum = calculateLordUpgradeNum(currentLevel)
-              
-              // 执行主公升级
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量升级主公',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `执行hero_lordupgradelevel命令: 当前等级${currentLevel}，升级${upgradeNum}级`
-              })
-              
-              const upgradeRes = await tokenStore.sendHeroLordUpgradeLevel(
-                token.id,
-                {
-                  upgradeNum: upgradeNum
-                }
-              )
-              
-              // 检查响应中是否有错误消息
-              const errorMsg = upgradeRes?.hint || upgradeRes?.message || upgradeRes?.error || ''
-              const errorMsgStr = String(errorMsg).toLowerCase()
-              
-              // 检查是否包含"升阶"错误
-              if (errorMsgStr.includes('升阶') || errorMsgStr.includes('进阶') || errorMsgStr.includes('400060')) {
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `主公升级失败: 需要升阶，准备执行升阶命令`
-                })
-                
-                // 执行升阶命令
-                try {
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'info',
-                    message: `执行hero_lordupgradeorder命令进行升阶`
-                  })
-                  
-                  await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
-                  
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'success',
-                    message: `主公升阶成功`
-                  })
-                  
-                  await new Promise(resolve => setTimeout(resolve, 500))
-                  // 升阶后继续升级循环
-                  continue
-                } catch (orderError) {
-                  console.error(`主公升阶失败:`, orderError)
-                  const orderErrorMsg = String(orderError.message || '').toLowerCase()
-                  
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'error',
-                    message: `主公升阶失败: ${orderError.message || '未知错误'}`
-                  })
-                  
-                  // 如果升阶失败是因为物品数量不足，停止升级
-                  if (orderErrorMsg.includes('物品数量不足')) {
-                    logStore.addLog({
-                      page: 'fish-helper',
-                      cardType: '养号',
-                      operation: '批量升级主公',
-                      tokenId: token.id,
-                      tokenName: token.name,
-                      status: 'warning',
-                      message: `主公升阶失败: 物品数量不足，停止升级`
-                    })
-                    break
-                  }
-                  
-                  // 其他升阶错误，停止升级
-                  break
-                }
-              }
-              
-              // 检查是否包含"物品数量不足"
-              if (errorMsgStr.includes('物品数量不足')) {
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `主公升级失败: 物品数量不足，停止升级`
-                })
-                break
-              }
-              
-              // 更新主公等级
-              let updatedLevel = currentLevel
-              
-              // 尝试从不同的路径获取lord数据
-              let lordData = null
-              if (upgradeRes && upgradeRes.role && upgradeRes.role.lord) {
-                lordData = upgradeRes.role.lord
-              } else if (upgradeRes && upgradeRes._raw && upgradeRes._raw.body && upgradeRes._raw.body.role && upgradeRes._raw.body.role.lord) {
-                lordData = upgradeRes._raw.body.role.lord
-              } else if (upgradeRes && upgradeRes.body && upgradeRes.body.role && upgradeRes.body.role.lord) {
-                lordData = upgradeRes.body.role.lord
-              }
-              
-              if (lordData && lordData.level > currentLevel) {
-                const oldLevel = currentLevel
-                currentLevel = lordData.level
-                upgradeCount++
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'success',
-                  message: `主公升级成功: ${oldLevel} → ${currentLevel}`
-                })
-              } else {
-                // 等级没有变化，可能已达到上限或无法继续升级
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `主公等级没有变化，可能已达到上限`
-                })
-                break
-              }
-              
-              await new Promise(resolve => setTimeout(resolve, 500))
-            } catch (error) {
-              // 捕获升级命令的错误
-              const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
-              
-              // 检查是否包含"升阶"错误
-              if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `主公升级失败: 需要升阶，准备执行升阶命令`
-                })
-                
-                // 执行升阶命令
-                try {
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'info',
-                    message: `执行hero_lordupgradeorder命令进行升阶`
-                  })
-                  
-                  await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
-                  
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'success',
-                    message: `主公升阶成功`
-                  })
-                  
-                  await new Promise(resolve => setTimeout(resolve, 500))
-                  // 升阶后继续升级循环
-                  continue
-                } catch (orderError) {
-                  console.error(`主公升阶失败:`, orderError)
-                  const orderErrorMsg = String(orderError.message || '').toLowerCase()
-                  
-                  logStore.addLog({
-                    page: 'fish-helper',
-                    cardType: '养号',
-                    operation: '批量升级主公',
-                    tokenId: token.id,
-                    tokenName: token.name,
-                    status: 'error',
-                    message: `主公升阶失败: ${orderError.message || '未知错误'}`
-                  })
-                  
-                  if (orderErrorMsg.includes('物品数量不足')) {
-                    break
-                  }
-                  
-                  break
-                }
-              } else if (errorMsg.includes('物品数量不足')) {
-                // 物品数量不足，停止升级
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `主公升级失败: 物品数量不足`
-                })
-                break
-              } else {
-                // 其他错误，记录并继续
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量升级主公',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'error',
-                  message: `主公升级失败: ${error.message || '未知错误'}`
-                })
-                break
-              }
+          let luBuLevel = 0
+          let luBuOrder = 0
+          // 注意：字段名是heroes而不是heros
+          if (roleResult && roleResult.role && roleResult.role.heroes) {
+            console.log('[批量升级主公武将] roleResult.role.heroes:', JSON.stringify(roleResult.role.heroes).substring(0, 500))
+            // heroes是对象，直接通过键获取
+            const luBu = roleResult.role.heroes['107'] || roleResult.role.heroes[107]
+            console.log('[批量升级主公武将] 从roleResult.role.heroes获取的luBu:', luBu)
+            if (luBu) {
+              luBuLevel = luBu.level || 0
+              luBuOrder = luBu.order || 0
+            }
+          } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.heroes) {
+            console.log('[批量升级主公武将] roleResult._raw.body.role.heroes:', JSON.stringify(roleResult._raw.body.role.heroes).substring(0, 500))
+            // heroes是对象，直接通过键获取
+            const luBu = roleResult._raw.body.role.heroes['107'] || roleResult._raw.body.role.heroes[107]
+            console.log('[批量升级主公武将] 从roleResult._raw.body.role.heroes获取的luBu:', luBu)
+            if (luBu) {
+              luBuLevel = luBu.level || 0
+              luBuOrder = luBu.order || 0
+            }
+          } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.heroes) {
+            console.log('[批量升级主公武将] roleResult.body.role.heroes:', JSON.stringify(roleResult.body.role.heroes).substring(0, 500))
+            // heroes是对象，直接通过键获取
+            const luBu = roleResult.body.role.heroes['107'] || roleResult.body.role.heroes[107]
+            console.log('[批量升级主公武将] 从roleResult.body.role.heroes获取的luBu:', luBu)
+            if (luBu) {
+              luBuLevel = luBu.level || 0
+              luBuOrder = luBu.order || 0
+            }
+          } else if (roleResult && roleResult.heroes) {
+            // 顶层也有可能
+            console.log('[批量升级主公武将] roleResult.heroes:', JSON.stringify(roleResult.heroes).substring(0, 500))
+            const luBu = roleResult.heroes['107'] || roleResult.heroes[107]
+            console.log('[批量升级主公武将] 从roleResult.heroes获取的luBu:', luBu)
+            if (luBu) {
+              luBuLevel = luBu.level || 0
+              luBuOrder = luBu.order || 0
             }
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 升级主公完成，共升级${upgradeCount}次`)
+          console.log('[批量升级主公武将] 获取到的luBuLevel:', luBuLevel, 'luBuOrder:', luBuOrder)
+          
+          if (luBuLevel === 0) {
+            throw new Error('无法获取吕布等级')
+          }
+          
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
-            operation: '批量升级主公',
+            operation: '批量升级主公武将',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `获取等级成功: 主公${lordLevel}级，吕布${luBuLevel}级`
+          })
+          
+          // 4. 比较并升级，根据阶数决定升级顺序
+          let currentLordLevel = lordLevel
+          let currentLuBuLevel = luBuLevel
+          let currentLordOrder = lordOrder
+          let currentLuBuOrder = luBuOrder
+          let upgradeCount = 0
+          const maxUpgrades = 100 // 最多升级次数，防止死循环
+          
+          // 检查是否需要升阶
+          await checkAndUpgradeOrder(token, tokenIndex, 'lord', currentLordLevel)
+          await checkAndUpgradeOrder(token, tokenIndex, 'hero', currentLuBuLevel, 107)
+          
+          while (upgradeCount < maxUpgrades) {
+            // 比较阶数
+            if (currentLordOrder > currentLuBuOrder) {
+              // 主公阶数高，升级吕布
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量升级主公武将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `主公阶数${currentLordOrder}高于吕布阶数${currentLuBuOrder}，升级吕布`
+              })
+              
+              const nextLevel = getNextUpgradeLevel(currentLuBuLevel, upgradeLevels)
+              if (nextLevel === null) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公武将',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `吕布已达到最高等级${currentLuBuLevel}，停止升级`
+                })
+                break
+              }
+              
+              // 确保吕布等级不超过主公等级
+              if (currentLuBuLevel >= currentLordLevel) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公武将',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `吕布等级${currentLuBuLevel}已达到主公等级${currentLordLevel}，等待主公升级`
+                })
+                continue
+              }
+              
+              // 特别处理4000级
+              if (currentLuBuLevel === 4000) {
+                try {
+                  await upgradeHero(token, tokenIndex, 107, 1)
+                  currentLuBuLevel = 4001
+                  upgradeCount++
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公武将',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `吕布升级成功: 4000 → 4001`
+                  })
+                } catch (error) {
+                  const errorMsg = String(error.message || '').toLowerCase()
+                  if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                    await upgradeHeroOrder(token, tokenIndex, 107)
+                    await upgradeHero(token, tokenIndex, 107, 1)
+                    currentLuBuLevel = 4001
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `吕布升阶后升级成功: 4000 → 4001`
+                    })
+                  } else if (errorMsg.includes('物品数量不足')) {
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `吕布升级失败: 物品数量不足，停止执行`
+                    })
+                    throw new Error('吕布升级失败: 物品数量不足')
+                  } else {
+                    throw error
+                  }
+                }
+                break
+              }
+              
+              const upgradeNum = calculateHeroUpgradeNum(currentLuBuLevel)
+              try {
+                await upgradeHero(token, tokenIndex, 107, upgradeNum)
+                currentLuBuLevel = currentLuBuLevel + upgradeNum
+                upgradeCount++
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公武将',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `吕布升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
+                })
+                
+                // 到达指定等级后，执行一次升阶命令
+                await checkAndUpgradeOrder(token, tokenIndex, 'hero', currentLuBuLevel, 107)
+                
+                // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                // 如果升级到了新的阶数等级，更新阶数
+                if (upgradeLevels.includes(currentLuBuLevel)) {
+                  currentLuBuOrder = await getHeroOrder(token, tokenIndex, 107)
+                }
+              } catch (error) {
+                const errorMsg = String(error.message || '').toLowerCase()
+                if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                  await upgradeHeroOrder(token, tokenIndex, 107)
+                  await upgradeHero(token, tokenIndex, 107, upgradeNum)
+                  currentLuBuLevel = currentLuBuLevel + upgradeNum
+                  upgradeCount++
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公武将',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `吕布升阶后升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
+                  })
+                  
+                  // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                  // 如果升级到了新的阶数等级，更新阶数
+                  if (upgradeLevels.includes(currentLuBuLevel)) {
+                    currentLuBuOrder = await getHeroOrder(token, tokenIndex, 107)
+                  }
+                } else if (errorMsg.includes('物品数量不足')) {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公武将',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'warning',
+                    message: `吕布升级失败: 物品数量不足，停止执行`
+                  })
+                  throw new Error('吕布升级失败: 物品数量不足')
+                } else {
+                  throw error
+                }
+              }
+            } else if (currentLordOrder === currentLuBuOrder) {
+              // 同阶，先升级主公到下一阶等级
+              const nextLordLevel = getNextUpgradeLevel(currentLordLevel, upgradeLevels)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量升级主公武将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `主公和吕布同阶${currentLordOrder}，先升级主公到下一阶等级${nextLordLevel}级，再升级吕布。`
+              })
+              
+              if (nextLordLevel === null) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量升级主公武将',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `主公已达到最高等级${currentLordLevel}，停止升级`
+                })
+                break
+              }
+              
+              // 循环升级，直到达到下一阶等级
+              while (currentLordLevel < nextLordLevel) {
+                // 计算需要升级的级数（使用原来的升级规则）
+                const upgradeNum = calculateLordUpgradeNum(currentLordLevel)
+                
+                // 特别处理4000级
+                if (currentLordLevel === 4000) {
+                  try {
+                    await upgradeLord(token, tokenIndex, 1)
+                    currentLordLevel = 4001
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `主公升级成功: 4000 → 4001`
+                    })
+                  } catch (error) {
+                    const errorMsg = String(error.message || '').toLowerCase()
+                    if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                      await upgradeLordOrder(token, tokenIndex)
+                      await upgradeLord(token, tokenIndex, 1)
+                      currentLordLevel = 4001
+                      upgradeCount++
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '养号',
+                        operation: '批量升级主公武将',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `主公升阶后升级成功: 4000 → 4001`
+                      })
+                    } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '养号',
+                        operation: '批量升级主公武将',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'warning',
+                        message: `主公升级失败: 物品数量不足，停止执行`
+                      })
+                      throw new Error('主公升级失败: 物品数量不足')
+                    } else {
+                      throw error
+                    }
+                  }
+                  continue
+                }
+                
+                try {
+                  await upgradeLord(token, tokenIndex, upgradeNum)
+                  currentLordLevel = currentLordLevel + upgradeNum
+                  upgradeCount++
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公武将',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `主公升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
+                  })
+                  
+                  // 到达指定等级后，执行一次升阶命令
+                  await checkAndUpgradeOrder(token, tokenIndex, 'lord', currentLordLevel)
+                  
+                  // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                  // 如果升级到了新的阶数等级，更新阶数
+                  if (upgradeLevels.includes(currentLordLevel)) {
+                    currentLordOrder = await getLordOrder(token, tokenIndex)
+                  }
+                } catch (error) {
+                  const errorMsg = String(error.message || '').toLowerCase()
+                  if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                    await upgradeLordOrder(token, tokenIndex)
+                    await upgradeLord(token, tokenIndex, upgradeNum)
+                    currentLordLevel = currentLordLevel + upgradeNum
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `主公升阶后升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
+                    })
+                    
+                    // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                    // 如果升级到了新的阶数等级，更新阶数
+                    if (upgradeLevels.includes(currentLordLevel)) {
+                      currentLordOrder = await getLordOrder(token, tokenIndex)
+                    }
+                  } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `主公升级失败: 物品数量不足，停止执行`
+                    })
+                    throw new Error('主公升级失败: 物品数量不足')
+                  } else {
+                    throw error
+                  }
+                }
+              }
+              
+              // 主公升级完成后，升级吕布到与主公同等级
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量升级主公武将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `主公升级完成，现在升级吕布到与主公同等级${currentLordLevel}级`
+              })
+              
+              // 循环升级，直到吕布达到主公等级
+              while (currentLuBuLevel < currentLordLevel) {
+                const luBuUpgradeNum = calculateHeroUpgradeNum(currentLuBuLevel)
+                
+                // 确保不超过主公等级
+                const actualUpgradeNum = Math.min(luBuUpgradeNum, currentLordLevel - currentLuBuLevel)
+                
+                try {
+                  await upgradeHero(token, tokenIndex, 107, actualUpgradeNum)
+                  currentLuBuLevel = currentLuBuLevel + actualUpgradeNum
+                  upgradeCount++
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量升级主公武将',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `吕布升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
+                  })
+                  
+                  // 到达指定等级后，执行一次升阶命令
+                  await checkAndUpgradeOrder(token, tokenIndex, 'hero', currentLuBuLevel, 107)
+                  
+                  // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                  // 如果升级到了新的阶数等级，更新阶数
+                  if (upgradeLevels.includes(currentLuBuLevel)) {
+                    currentLuBuOrder = await getHeroOrder(token, tokenIndex, 107)
+                  }
+                } catch (error) {
+                  const errorMsg = String(error.message || '').toLowerCase()
+                  if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+                    await upgradeHeroOrder(token, tokenIndex, 107)
+                    await upgradeHero(token, tokenIndex, 107, actualUpgradeNum)
+                    currentLuBuLevel = currentLuBuLevel + actualUpgradeNum
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `吕布升阶后升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
+                    })
+                    
+                    // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
+                    // 如果升级到了新的阶数等级，更新阶数
+                    if (upgradeLevels.includes(currentLuBuLevel)) {
+                      currentLuBuOrder = await getHeroOrder(token, tokenIndex, 107)
+                    }
+                  } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '养号',
+                      operation: '批量升级主公武将',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `吕布升级失败: 物品数量不足，停止执行`
+                    })
+                    throw new Error('吕布升级失败: 物品数量不足')
+                  } else {
+                    throw error
+                  }
+                }
+              }
+
+
+
+
+
+
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 升级主公武将完成，共升级${upgradeCount}次`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升级主公武将',
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `升级主公完成，共升级${upgradeCount}次，最终等级${currentLevel}`
+            message: `升级主公武将完成，共升级${upgradeCount}次，最终等级：主公${currentLordLevel}级，吕布${currentLuBuLevel}级`
           })
           
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公失败: ${error.message || '未知错误'}`)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公武将失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 升级主公武将失败: ${error.message || '未知错误'}`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
-            operation: '批量升级主公',
+            operation: '批量升级主公武将',
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `升级主公失败: ${error.message || '未知错误'}`
+            message: `升级主公武将失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -6127,26 +6475,607 @@ const handleBatchUpgradeLord = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     
-    message.success(`批量升级主公完成：成功${successCount}个，失败${failCount}个`)
+    message.success(`批量升级主公武将完成：成功${successCount}个，失败${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '批量升级主公',
+      operation: '批量升级主公武将',
       status: 'success',
-      message: `批量升级主公完成：成功${successCount}个，失败${failCount}个`
+      message: `批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
-    console.error('批量升级主公失败:', error)
-    message.error(`批量升级主公失败: ${error.message || '未知错误'}`)
+    console.error('批量升级主公武将失败:', error)
+    message.error(`批量升级主公武将失败: ${error.message || '未知错误'}`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '批量升级主公',
+      operation: '批量升级主公武将',
       status: 'error',
-      message: `批量升级主公失败: ${error.message || '未知错误'}`
+      message: `批量升级主公武将失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgradingLord.value = false
+  }
+}
+
+// 获取下一个升级等级
+const getNextUpgradeLevel = (currentLevel, upgradeLevels) => {
+  for (const level of upgradeLevels) {
+    if (level > currentLevel) {
+      return level
+    }
+  }
+  return null
+}
+
+// 升级主公
+const upgradeLord = async (token, tokenIndex, upgradeNum) => {
+  try {
+    // 执行主公升级
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行hero_lordupgradelevel命令: 升级${upgradeNum}级`
+    })
+    
+    const upgradeRes = await tokenStore.sendHeroLordUpgradeLevel(
+      token.id,
+      {
+        upgradeNum: upgradeNum
+      }
+    )
+    
+    // 检查响应中是否有错误消息
+    const errorMsg = upgradeRes?.hint || upgradeRes?.message || upgradeRes?.error || ''
+    const errorMsgStr = String(errorMsg).toLowerCase()
+    
+    // 检查是否包含"升阶"错误
+    if (errorMsgStr.includes('升阶') || errorMsgStr.includes('进阶') || errorMsgStr.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `主公升级失败: 需要升阶，准备执行升阶命令`
+      })
+      
+      // 执行升阶命令
+      try {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行hero_lordupgradeorder命令进行升阶`
+        })
+        
+        await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `主公升阶成功`
+        })
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        // 升阶后重新执行升级
+        await upgradeLord(token, tokenIndex, upgradeNum)
+      } catch (orderError) {
+        console.error(`主公升阶失败:`, orderError)
+        const orderErrorMsg = String(orderError.message || '').toLowerCase()
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `主公升阶失败: ${orderError.message || '未知错误'}`
+        })
+        
+        // 如果升阶失败是因为物品数量不足，停止升级
+        if (orderErrorMsg.includes('物品数量不足')) {
+          throw new Error('主公升阶失败: 物品数量不足')
+        }
+        
+        throw orderError
+      }
+    }
+    
+    // 检查是否包含"物品数量不足"
+    if (errorMsgStr.includes('物品数量不足')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `主公升级失败: 物品数量不足`
+      })
+      throw new Error('主公升级失败: 物品数量不足')
+    }
+    
+    return upgradeRes
+  } catch (error) {
+    const errorMsg = String(error.message || '').toLowerCase()
+    
+    // 检查是否包含"升阶"错误
+    if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `主公升级失败: 需要升阶，准备执行升阶命令`
+      })
+      
+      // 执行升阶命令
+      try {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行hero_lordupgradeorder命令进行升阶`
+        })
+        
+        await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `主公升阶成功`
+        })
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        // 升阶后重新执行升级
+        return await upgradeLord(token, tokenIndex, upgradeNum)
+      } catch (orderError) {
+        console.error(`主公升阶失败:`, orderError)
+        const orderErrorMsg = String(orderError.message || '').toLowerCase()
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `主公升阶失败: ${orderError.message || '未知错误'}`
+        })
+        
+        if (orderErrorMsg.includes('物品数量不足') || orderErrorMsg.includes('金币数量不足')) {
+          throw new Error('主公升阶失败: 物品数量不足')
+        }
+        
+        throw orderError
+      }
+    } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
+      // 物品数量不足或金币不足，停止升级
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `主公升级失败: ${error.message || '物品数量不足'}`
+      })
+      throw new Error(`主公升级失败: ${error.message || '物品数量不足'}`)
+    } else {
+      // 其他错误，记录并继续
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'error',
+        message: `主公升级失败: ${error.message || '未知错误'}`
+      })
+      throw error
+    }
+  }
+}
+
+// 升级武将
+const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
+  try {
+    // 执行武将升级
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行hero_heroupgradelevel命令: 武将ID${heroId}，升级${upgradeNum}级`
+    })
+    
+    const upgradeRes = await tokenStore.sendHeroUpgradeLevel(
+      token.id,
+      {
+        heroId: heroId,
+        upgradeNum: upgradeNum
+      }
+    )
+    
+    // 检查响应中是否有错误消息
+    const errorMsg = upgradeRes?.hint || upgradeRes?.message || upgradeRes?.error || ''
+    const errorMsgStr = String(errorMsg).toLowerCase()
+    
+    // 检查是否包含"升阶"错误
+    if (errorMsgStr.includes('升阶') || errorMsgStr.includes('进阶') || errorMsgStr.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `武将升级失败: 需要升阶，准备执行升阶命令`
+      })
+      
+      // 执行升阶命令
+      try {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行hero_heroupgradeorder命令进行升阶`
+        })
+        
+        await tokenStore.sendHeroUpgradeOrder(token.id, {
+          heroId: heroId
+        })
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `武将升阶成功`
+        })
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        // 升阶后重新执行升级
+        await upgradeHero(token, tokenIndex, heroId, upgradeNum)
+      } catch (orderError) {
+        console.error(`武将升阶失败:`, orderError)
+        const orderErrorMsg = String(orderError.message || '').toLowerCase()
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `武将升阶失败: ${orderError.message || '未知错误'}`
+        })
+        
+        // 如果升阶失败是因为物品数量不足，停止升级
+        if (orderErrorMsg.includes('物品数量不足')) {
+          throw new Error('武将升阶失败: 物品数量不足')
+        }
+        
+        throw orderError
+      }
+    }
+    
+    // 检查是否包含"物品数量不足"
+    if (errorMsgStr.includes('物品数量不足')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `武将升级失败: 物品数量不足`
+      })
+      throw new Error('武将升级失败: 物品数量不足')
+    }
+    
+    return upgradeRes
+  } catch (error) {
+    const errorMsg = String(error.message || '').toLowerCase()
+    
+    // 检查是否包含"升阶"错误
+    if (errorMsg.includes('升阶') || errorMsg.includes('进阶') || errorMsg.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `武将升级失败: 需要升阶，准备执行升阶命令`
+      })
+      
+      // 执行升阶命令
+      try {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `执行hero_heroupgradeorder命令进行升阶`
+        })
+        
+        await tokenStore.sendHeroUpgradeOrder(token.id, {
+          heroId: heroId
+        })
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `武将升阶成功`
+        })
+        
+        await new Promise(resolve => setTimeout(resolve, 500))
+        // 升阶后重新执行升级
+        return await upgradeHero(token, tokenIndex, heroId, upgradeNum)
+      } catch (orderError) {
+        console.error(`武将升阶失败:`, orderError)
+        const orderErrorMsg = String(orderError.message || '').toLowerCase()
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升级主公武将',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `武将升阶失败: ${orderError.message || '未知错误'}`
+        })
+        
+        if (orderErrorMsg.includes('物品数量不足') || orderErrorMsg.includes('金币数量不足')) {
+          throw new Error('武将升阶失败: 物品数量不足')
+        }
+        
+        throw orderError
+      }
+    } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
+      // 物品数量不足或金币不足，停止升级
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `武将升级失败: ${error.message || '物品数量不足'}`
+      })
+      throw new Error(`武将升级失败: ${error.message || '物品数量不足'}`)
+    } else {
+      // 其他错误，记录并继续
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'error',
+        message: `武将升级失败: ${error.message || '未知错误'}`
+      })
+      throw error
+    }
+  }
+}
+
+// 检查并执行升阶命令
+const checkAndUpgradeOrder = async (token, tokenIndex, type, level, heroId = null) => {
+  // 升阶等级列表
+  const upgradeLevels = [100, 200, 300, 500, 700, 900, 1100, 1300, 1500, 1800, 2100, 2400, 2800, 3200, 3600, 4000, 4500, 5000, 5500, 6000]
+  
+  // 检查是否到达升阶等级
+  if (upgradeLevels.includes(level)) {
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `${type === 'lord' ? '主公' : '吕布'}达到${level}级，准备执行升阶命令`
+    })
+    
+    if (type === 'lord') {
+      await upgradeLordOrder(token, tokenIndex)
+    } else if (type === 'hero' && heroId) {
+      await upgradeHeroOrder(token, tokenIndex, heroId)
+    }
+  }
+}
+
+// 执行主公升阶命令
+const upgradeLordOrder = async (token, tokenIndex) => {
+  try {
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行hero_lordupgradeorder命令进行升阶`
+    })
+    
+    await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `主公升阶成功`
+    })
+    
+    await new Promise(resolve => setTimeout(resolve, 500))
+  } catch (error) {
+    console.error(`主公升阶失败:`, error)
+    const errorMsg = String(error.message || '').toLowerCase()
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'warning',
+      message: `主公升阶失败: ${error.message || '未知错误'}，继续执行升级`
+    })
+    
+    // 只有物品数量不足才停止执行
+    if (errorMsg.includes('物品数量不足')) {
+      throw new Error('主公升阶失败: 物品数量不足')
+    }
+    
+    // 其他错误（如400060）不抛出，继续执行升级
+  }
+}
+
+// 执行武将升阶命令
+const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
+  try {
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'info',
+      message: `执行hero_heroupgradeorder命令进行升阶`
+    })
+    
+    await tokenStore.sendHeroUpgradeOrder(token.id, {
+      heroId: heroId
+    })
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `武将升阶成功`
+    })
+    
+    await new Promise(resolve => setTimeout(resolve, 500))
+  } catch (error) {
+    console.error(`武将升阶失败:`, error)
+    const errorMsg = String(error.message || '').toLowerCase()
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升级主公武将',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'warning',
+      message: `武将升阶失败: ${error.message || '未知错误'}，继续执行升级`
+    })
+    
+    // 只有物品数量不足才停止执行
+    if (errorMsg.includes('物品数量不足')) {
+      throw new Error('武将升阶失败: 物品数量不足')
+    }
+    
+    // 其他错误不抛出，继续执行升级
+  }
+}
+
+// 获取主公阶数
+const getLordOrder = async (token, tokenIndex) => {
+  try {
+    const roleResult = await tokenStore.sendGetRoleInfo(token.id)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    if (roleResult && roleResult.role && roleResult.role.lord) {
+      return roleResult.role.lord.order || 0
+    } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.lord) {
+      return roleResult._raw.body.role.lord.order || 0
+    } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.lord) {
+      return roleResult.body.role.lord.order || 0
+    }
+    
+    return 0
+  } catch (error) {
+    console.error(`获取主公阶数失败:`, error)
+    return 0
+  }
+}
+
+// 获取武将阶数
+const getHeroOrder = async (token, tokenIndex, heroId) => {
+  try {
+    const roleResult = await tokenStore.sendGetRoleInfo(token.id)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // 注意：字段名是heroes而不是heros
+    if (roleResult && roleResult.role && roleResult.role.heroes) {
+      const hero = roleResult.role.heroes[String(heroId)] || roleResult.role.heroes[heroId]
+      if (hero) {
+        return hero.order || 0
+      }
+    } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.heroes) {
+      const hero = roleResult._raw.body.role.heroes[String(heroId)] || roleResult._raw.body.role.heroes[heroId]
+      if (hero) {
+        return hero.order || 0
+      }
+    } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.heroes) {
+      const hero = roleResult.body.role.heroes[String(heroId)] || roleResult.body.role.heroes[heroId]
+      if (hero) {
+        return hero.order || 0
+      }
+    } else if (roleResult && roleResult.heroes) {
+      const hero = roleResult.heroes[String(heroId)] || roleResult.heroes[heroId]
+      if (hero) {
+        return hero.order || 0
+      }
+    }
+    
+    return 0
+  } catch (error) {
+    console.error(`获取武将阶数失败:`, error)
+    return 0
   }
 }
 </script>

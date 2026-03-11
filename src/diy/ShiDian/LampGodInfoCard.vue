@@ -585,13 +585,13 @@ const switchToTeam1 = async () => {
   
   // 不再检查当前阵容，直接执行切换阵容1
   try {
+    const tokenIndex = getTokenIndex(token)
     message.info('正在切换到阵容1...')
     
     const saveTeamParams = { teamId: 1 }
     // 执行命令前等待400ms
     await new Promise(resolve => setTimeout(resolve, 400))
     await tokenStore.sendPresetteamSaveTeam(token.id, saveTeamParams)
-    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,
@@ -605,7 +605,6 @@ const switchToTeam1 = async () => {
     await refreshTeamInfo()
     
     message.success('已切换到阵容1')
-    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
       tokenId: token.id,

@@ -475,7 +475,7 @@ export class GameCommands {
   }
 
   /**
-   * 领取折扣奖励
+   * 领取每日免费礼包奖励
    */
   discount_claimreward(ack = 0, seq = 0, params = {}) {
     return {

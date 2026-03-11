@@ -18,6 +18,7 @@ const errorCodeMap = {
   3300060: "扫荡条件不满足",
   1300050: "请修改您的采购次数",
   200020: "出了点小问题，请尝试重启游戏解决～",
+  200050: "金币数量不足",
   200160: "模块未开启",
   7500140: "请先输入密码",
   7500100: "密码输入错误",
@@ -27,6 +28,7 @@ const errorCodeMap = {
   2300190: "今天已经签到过了",
   2300370: "俱乐部商品购买数量超出上限",
   400000: "物品不存在",
+  400060: "需要升阶",
   1500020: "能量不足",
   2300070: "未加入俱乐部",
   3500020: "没有可领取的奖励",
@@ -44,6 +46,7 @@ const errorCodeMap = {
   12300080: "未达到解锁条件",
   200330: "无效的ID",
   1500040: "上座塔的奖励未领取",
+  400090: "武将等级不能大于主公等级",
 };
 
 // 事件节流定义表，根据实际需要调整命令和节流时间
@@ -280,6 +283,8 @@ export function registerDefaultCommands(reg) {
     // 武将升级相关
     .register("hero_heroupgradelevel") //武将升级
     .register("hero_heroupgradeorder") //武将进阶
+    .register("hero_lordupgradelevel") //主公升级
+    .register("hero_lordupgradeorder") //主公进阶
 
     // 升星相关
     .register("hero_heroupgradestar")
@@ -977,6 +982,12 @@ export class XyzwWebSocketClient {
 
   /** 设置心跳 */
   _setupHeartbeat() {
+    // 清除现有的心跳定时器，避免重复设置
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+
     // 延迟3秒后开始发送第一个心跳，避免连接刚建立就发送
     setTimeout(() => {
       if (this.connected && this.socket?.readyState === WebSocket.OPEN) {
@@ -1132,6 +1143,8 @@ export class XyzwWebSocketClient {
       hero_recruitresp: "hero_recruit",
       friend_batchresp: "friend_batch",
       system_claimhanguprewardresp: "system_claimhangupreward",
+      system_signinrewardresp: "system_signinreward",
+      discount_claimrewardresp: "discount_claimreward",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
       bottlehelper_claimresp: "bottlehelper_claim",
       bottlehelper_startresp: "bottlehelper_start",
@@ -1140,6 +1153,7 @@ export class XyzwWebSocketClient {
       fight_startbossresp: "fight_startboss",
       fight_startlegionbossresp: "fight_startlegionboss",
       fight_startareaarenaresp: "fight_startareaarena",
+      fight_startlevelresp: "fight_startlevel",
       arena_startarearesp: "arena_startarea",
       arena_getareatargetresp: "arena_getareatarget",
       arena_getarearankresp: "arena_getarearank",

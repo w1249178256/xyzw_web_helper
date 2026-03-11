@@ -639,19 +639,19 @@ const exportBlackMarketSettings = async () => {
       }
     }
     
-    // 生成TXT文件
-    const header = '昵称\t购买次数\t青铜折扣\t黄金折扣\t铂金折扣\t金竿折扣\n'
+    // 生成CSV文件
+    const header = '昵称,购买次数,青铜折扣,黄金折扣,铂金折扣,金竿折扣\n'
     const content = results.map(r => 
-      `${r.nickname}\t${r.purchaseCnt}\t${r.bronzeDiscount}\t${r.goldenDiscount}\t${r.platinumDiscount}\t${r.rodDiscount}`
+      `${r.nickname},${r.purchaseCnt},${r.bronzeDiscount},${r.goldenDiscount},${r.platinumDiscount},${r.rodDiscount}`
     ).join('\n')
     
     const fullContent = header + content
-    const blob = new Blob(['\ufeff' + fullContent], { type: 'text/plain;charset=utf-8' })
+    const blob = new Blob(['\ufeff' + fullContent], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
     const date = new Date().toISOString().split('T')[0]
-    link.download = `黑市设置_${date}.txt`
+    link.download = `黑市设置_${date}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)

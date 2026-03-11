@@ -350,7 +350,7 @@ const formatNumber = (num) => {
   } else if (n >= tenThousand) {
     return (n / tenThousand).toFixed(1) + '万'
   }
-  return n.toLocaleString()
+  return n.toString()
 }
 
 // 处理null值（从ShiDian.vue复制）
@@ -3300,6 +3300,32 @@ const exportResources = async () => {
         
         // 获取roleId
         const roleId = roleInfo?.role?.roleId || '未获取到'
+        
+        // 获取十殿最高殿级（使用nightmare_getroleinfo命令）
+        let maxNightmareLevel = '-'  
+        try {
+          // 执行nightmare_getroleinfo获取killAward
+          await new Promise(resolve => setTimeout(resolve, 500))
+          const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) || token.id })
+          
+          if (nightmareInfo && nightmareInfo.killAward) {
+            const killAward = nightmareInfo.killAward
+            // 找出killAward中为true的最大键
+            const trueKeys = Object.keys(killAward).filter(key => killAward[key] === true)
+            if (trueKeys.length > 0) {
+              maxNightmareLevel = Math.max(...trueKeys.map(key => parseInt(key)))
+            }
+          } else if (nightmareInfo && nightmareInfo.nightMareData && nightmareInfo.nightMareData.killAward) {
+            // 兼容nightMareData中的killAward
+            const killAward = nightmareInfo.nightMareData.killAward
+            const trueKeys = Object.keys(killAward).filter(key => killAward[key] === true)
+            if (trueKeys.length > 0) {
+              maxNightmareLevel = Math.max(...trueKeys.map(key => parseInt(key)))
+            }
+          }
+        } catch (error) {
+          console.warn(`Token ${token.name || token.id} 获取十殿信息失败:`, error)
+        }
 
         results.push({
           tokenId: token.id,
@@ -3311,6 +3337,7 @@ const exportResources = async () => {
           chestScore: chestScore,
           recruitOrder: recruitOrder,
           roleId: roleId,
+          maxNightmareLevel: maxNightmareLevel,
           success: true
         })
 
@@ -3345,6 +3372,7 @@ const exportResources = async () => {
           chestScore: '-',
           recruitOrder: '-',
           roleId: roleId,
+          maxNightmareLevel: '-',
           success: false,
           error: error.message || '未知错误'
         })
@@ -3374,12 +3402,12 @@ const exportResources = async () => {
     lines.push(`Token数量: ${tokenIds.length}`)
     lines.push("=".repeat(80))
     lines.push("")
-    lines.push("序号\tToken名称\troleId\t白玉\t彩玉\t灵贝\t金砖\t宝箱总分数\t招募令\t状态")
+    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,宝箱总分数,招募令,十殿最高殿级,状态")
     lines.push("-".repeat(80))
 
     results.forEach((result, index) => {
       const status = result.success ? '成功' : `失败: ${result.error || '未知错误'}`
-      lines.push(`${index + 1}\t${result.tokenName}\t${result.roleId || '未获取到'}\t${result.whiteJade}\t${result.colorJade}\t${result.spiritShell}\t${result.goldBrick}\t${result.chestScore}\t${result.recruitOrder}\t${status}`)
+      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.chestScore},${result.recruitOrder},${result.maxNightmareLevel},${status}`)
     })
 
     lines.push("")

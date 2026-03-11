@@ -413,11 +413,12 @@ export const useTokenStore = defineStore("tokens", () => {
           }
           if (refreshSuccess) {
             wsLogger.info(`Token刷新成功，自动重新连接 [${tokenId}]`);
-            // 只在tokens或admin/game-features页面自动重连
+            // 在tokens、admin/game-features或fish-helper页面自动重连
             const currentPath = router.currentRoute.value.path;
             const shouldAutoReconnect = 
               currentPath === '/tokens' || 
-              currentPath === '/admin/game-features';
+              currentPath === '/admin/game-features' ||
+              currentPath === '/admin/fish-helper';
             
             if (shouldAutoReconnect) {
               selectToken(tokenId, true);
