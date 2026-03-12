@@ -724,6 +724,21 @@ const claimNightmareRewardsForCard = async (token) => {
       message.warning(`${token.name || token.id} 获取角色信息失败，继续执行后续操作`)
       console.error('获取角色信息失败:', error)
     }
+
+    // 增加一次执行：先执行1次nightmare_claimturnrewardtimes
+    if (roleId) {
+      try {
+        message.info(`正在为 ${token.name || token.id} 执行转盘奖励次数领取...`)
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400))
+        await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
+        message.success(`${token.name || token.id} 转盘奖励次数领取成功（前置执行）`)
+      } catch (error) {
+        message.warning(`${token.name || token.id} 转盘奖励次数领取失败，继续执行后续操作`)
+        console.error('转盘奖励次数领取失败:', error)
+      }
+    }
+
 // 获取十殿角色信息
     if (roleId) {
       try {
@@ -770,12 +785,32 @@ const claimNightmareRewardsForCard = async (token) => {
       try {
         message.info(`正在为 ${token.name || token.id} 执行转盘操作...`)
         
+        // 先获取初始十殿信息，包含bookScore
+        // 执行命令前等待400ms
+        await new Promise(resolve => setTimeout(resolve, 400))
+        const initialNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
+        
+        if (!initialNightmareInfo) {
+          message.warning(`${token.name || token.id} 无法获取十殿信息，停止转盘操作`)
+          return
+        }
+        
+        // 从nightMareData中获取bookScore
+        let bookScore = 0
+        if (initialNightmareInfo.nightMareData && initialNightmareInfo.nightMareData.bookScore !== undefined) {
+          bookScore = initialNightmareInfo.nightMareData.bookScore
+        } else if (initialNightmareInfo.bookScore !== undefined) {
+          bookScore = initialNightmareInfo.bookScore
+        }
+        
+        console.log(`${token.name || token.id} 初始bookScore:`, bookScore)
+        
         // 循环执行转盘直到 turntableLeftCnt = 0
         let maxIterations = 100 // 防止无限循环
         let iteration = 0
         
         while (iteration < maxIterations) {
-          // 获取十殿信息以检查转盘次数和bookScore
+          // 获取十殿信息以检查转盘次数
           // 执行命令前等待400ms
           await new Promise(resolve => setTimeout(resolve, 400))
           const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
@@ -785,7 +820,7 @@ const claimNightmareRewardsForCard = async (token) => {
             break
           }
           
-          // 获取 turntableLeftCnt 和 bookScore
+          // 获取 turntableLeftCnt
           // 从 nightmareInfo 中提取数据，可能需要根据实际返回结构调整
           const turntableLeftCnt = nightmareInfo.turntableLeftCnt || 
                                    nightmareInfo.weekAward?.turntableLeftCnt || 
@@ -793,16 +828,41 @@ const claimNightmareRewardsForCard = async (token) => {
                                      ? Object.values(nightmareInfo.weekAward)[0]?.turntableLeftCnt 
                                      : 0) || 0
           
-          const bookScore = nightmareInfo.bookScore || 
-                           nightmareInfo.weekAward?.bookScore || 
-                           (nightmareInfo.weekAward && typeof nightmareInfo.weekAward === 'object' 
-                             ? Object.values(nightmareInfo.weekAward)[0]?.bookScore 
-                             : 0) || 0
-          
           // 如果转盘次数为0，退出循环
           if (turntableLeftCnt === 0) {
             message.success(`${token.name || token.id} 转盘次数已用完`)
             break
+          }
+          
+          // 检查 bookScore 是否为5的倍数
+          if (bookScore > 0 && bookScore % 5 === 0) {
+            try {
+              message.info(`${token.name || token.id} bookScore为${bookScore}，是5的倍数，执行转盘奖励次数领取...`)
+              // 执行1次 nightmare_claimturnrewardtimes
+              // 执行命令前等待400ms
+              await new Promise(resolve => setTimeout(resolve, 400))
+              await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
+              message.success(`${token.name || token.id} 转盘奖励次数领取成功（执行1次）`)
+              // 执行转盘奖励次数领取后，转盘次数+1
+              message.info(`${token.name || token.id} 转盘次数+1`)
+            } catch (error) {
+              message.warning(`${token.name || token.id} 转盘奖励次数领取失败`)
+              console.error('转盘奖励次数领取失败:', error)
+            }
+          }
+          
+          // 如果bookScore=50，执行一次领取十殿图鉴奖励
+          if (bookScore === 50) {
+            try {
+              message.info(`${token.name || token.id} bookScore为${bookScore}，执行十殿图鉴奖励领取...`)
+              // 执行命令前等待400ms
+              await new Promise(resolve => setTimeout(resolve, 400))
+              await tokenStore.sendNightmareClaimBook(token.id)
+              message.success(`${token.name || token.id} 十殿图鉴奖励领取成功`)
+            } catch (error) {
+              message.warning(`${token.name || token.id} 十殿图鉴奖励领取失败，继续执行后续操作`)
+              console.error('十殿图鉴奖励领取失败:', error)
+            }
           }
           
           // 执行转盘
@@ -811,6 +871,10 @@ const claimNightmareRewardsForCard = async (token) => {
             await new Promise(resolve => setTimeout(resolve, 400))
             await tokenStore.sendNightmareClickTurntable(token.id, {})
             message.info(`${token.name || token.id} 转盘执行成功，剩余次数: ${turntableLeftCnt - 1}`)
+            
+            // 每执行1次转盘，bookScore自动加1
+            bookScore++
+            console.log(`${token.name || token.id} 执行转盘后bookScore:`, bookScore)
           } catch (error) {
             message.warning(`${token.name || token.id} 转盘执行失败，继续检查`)
             console.error('转盘执行失败:', error)
@@ -818,50 +882,6 @@ const claimNightmareRewardsForCard = async (token) => {
           
           // 等待一下再检查
           await new Promise(resolve => setTimeout(resolve, 500))
-          
-          // 重新获取十殿信息以更新数据
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
-          const updatedNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
-          
-          if (updatedNightmareInfo) {
-            const updatedTurntableLeftCnt = updatedNightmareInfo.turntableLeftCnt || 
-                                            updatedNightmareInfo.weekAward?.turntableLeftCnt || 
-                                            (updatedNightmareInfo.weekAward && typeof updatedNightmareInfo.weekAward === 'object' 
-                                              ? Object.values(updatedNightmareInfo.weekAward)[0]?.turntableLeftCnt 
-                                              : 0) || 0
-            
-            const updatedBookScore = updatedNightmareInfo.bookScore || 
-                                    updatedNightmareInfo.weekAward?.bookScore || 
-                                    (updatedNightmareInfo.weekAward && typeof updatedNightmareInfo.weekAward === 'object' 
-                                      ? Object.values(updatedNightmareInfo.weekAward)[0]?.bookScore 
-                                      : 0) || 0
-            
-            // 检查 bookScore 是否为5的倍数
-            if (updatedBookScore > 0 && updatedBookScore % 5 === 0) {
-              try {
-                message.info(`${token.name || token.id} bookScore为${updatedBookScore}，是5的倍数，执行转盘奖励次数领取...`)
-                // 执行两次 nightmare_claimturnrewardtimes
-                // 执行命令前等待400ms
-                await new Promise(resolve => setTimeout(resolve, 400))
-                await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
-                await new Promise(resolve => setTimeout(resolve, 300))
-                // 执行命令前等待400ms
-                await new Promise(resolve => setTimeout(resolve, 400))
-                await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
-                message.success(`${token.name || token.id} 转盘奖励次数领取成功（执行2次）`)
-              } catch (error) {
-                message.warning(`${token.name || token.id} 转盘奖励次数领取失败`)
-                console.error('转盘奖励次数领取失败:', error)
-              }
-            }
-            
-            // 如果转盘次数为0，退出循环
-            if (updatedTurntableLeftCnt === 0) {
-              message.success(`${token.name || token.id} 转盘次数已用完`)
-              break
-            }
-          }
           
           iteration++
         }

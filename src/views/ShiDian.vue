@@ -226,6 +226,7 @@ import BossTowerCard from '@/diy/ShiDian/BossTowerCard.vue'
 import SummerActivityCard from '@/diy/ShiDian/SummerActivityCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import { savePageTokenCards, loadPageTokenCards } from '@/utils/pageTokenStorage'
+import { logOperation } from '@/utils/operationLogger'
 
 const router = useRouter()
 const tokenStore = useTokenStore()
@@ -240,6 +241,12 @@ const connectingTokens = ref(new Set())
 const refreshingTokens = ref(new Set())
 const teamId = ref('')
 const shidianInfoCardRef = ref(null)
+
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const index = sortedTokens.value.findIndex(t => t.id === token.id)
+  return index + 1
+}
 
 // 下拉框选项数据
 const dianLevelOptions = [
@@ -1257,7 +1264,7 @@ const handleLegionIdInput = (value) => {
   // 可以在这里添加验证逻辑
 }
 
-// 加入俱乐部（带重试机制）
+// 加入俱乐部（使用连接池）
 const handleJoinLegion = async (legionTokensStr, legionId) => {
   if (!legionId) {
     message.warning('请输入俱乐部ID')
@@ -1275,7 +1282,7 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
     return
   }
   
-  const tokens = tokenStore.gameTokens
+  const tokens = sortedTokens.value
   if (tokens.length === 0) {
     message.warning('没有可用的Token')
     return
@@ -1297,53 +1304,144 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
   message.info(`开始批量加入俱乐部，共${targetTokens.length}个Token...`)
   
   try {
-    for (let i = 0; i < targetTokens.length; i++) {
-      const token = targetTokens[i]
-      
-      try {
-        let connected = false
-        let retryCount = 0
-        const maxRetries = 5
-        
-        while (!connected && retryCount < maxRetries) {
-          selectedTokenId.value = token.id
-          tokenStore.selectToken(token.id, true)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+    // 导入连接池管理器
+    const { ConnectionPoolManager } = await import('@/utils/connectionPoolManager.js')
+    const connectionPool = new ConnectionPoolManager(tokenStore, {
+      maxConnections: 20,
+      connectionTimeout: 30000,
+      idleTimeout: 60000,
+      queueTimeout: 120000,
+      reconnectDelay: 1000,
+      maxRetries: 3
+    })
+    
+    // 使用连接池进行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          // 使用sendMessageWithPromise获取响应
+          const response = await tokenStore.sendMessageWithPromise(
+            token.id, 
+            'legion_applyjoin', 
+            { legionId: parseInt(legionId) },
+            5000
+          )
           
-          const status = tokenStore.getWebSocketStatus(token.id)
-          if (status === 'connected') {
-            connected = true
-            message.success(`${token.name || token.id} 连接成功`)
+          let successMsg = ''
+          let status = 'success'
+          
+          // 检查响应结果
+          if (response && response.code !== undefined) {
+            if (response.code === 0) {
+              successMsg = `${token.name || token.id} 成功申请加入俱乐部 ${legionId}`
+              message.success(successMsg)
+            } else if (response.msg && response.msg.includes('已经加入')) {
+              successMsg = `${token.name || token.id} 已经加入俱乐部`
+              message.info(successMsg)
+              status = 'info'
+            } else {
+              successMsg = `${token.name || token.id} 加入俱乐部失败: ${response.msg || '未知错误'}`
+              message.error(successMsg)
+              status = 'error'
+            }
           } else {
-            retryCount++
-            if (retryCount < maxRetries) {
-              message.warning(`${token.name || token.id} 连接失败，重试 ${retryCount}/${maxRetries}...`)
-              await new Promise(resolve => setTimeout(resolve, 1000))
+            successMsg = `${token.name || token.id} 已申请加入俱乐部 ${legionId}`
+            message.success(successMsg)
+          }
+          
+          // 记录操作日志
+          const tokenIndex = getTokenIndex(token)
+          logOperation('shidian', '加入俱乐部', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: status,
+            message: `${tokenIndex}、${token.name || token.id}、${successMsg.replace(`${token.name || token.id} `, '')}`
+          })
+          
+          return { 
+            success: status !== 'error', 
+            status: status,
+            message: successMsg
+          }
+        } catch (error) {
+          const errorMsg = `加入俱乐部失败: ${error.message || '未知错误'}`
+          message.error(`${token.name || token.id}: ${errorMsg}`)
+          
+          // 记录操作日志
+          const tokenIndex = getTokenIndex(token)
+          logOperation('shidian', '加入俱乐部', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name || token.id}、加入俱乐部失败: ${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: errorMsg }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`[${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`[${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
             }
           }
         }
-        
-        if (!connected) {
-          message.error(`${token.name || token.id} 连接失败，已重试${maxRetries}次`)
-          continue
-        }
-        
-        await tokenStore.sendGameMessage(token.id, 'legion_applyjoin', {
-          legionId: parseInt(legionId)
-        })
-        
-        message.success(`${token.name || token.id} 已申请加入俱乐部 ${legionId}`)
-        
-        if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
-        }
-      } catch (error) {
-        console.error(`Token ${token.name || token.id} 加入俱乐部失败:`, error)
-        message.error(`${token.name || token.id}: 加入失败`)
       }
+    )
+    
+    // 销毁连接池
+    await connectionPool.destroy()
+    
+    // 汇总统计结果
+    const totalTokens = targetTokens.length
+    const successCount = results.filter(r => r.success).length
+    const alreadyJoinedCount = results.filter(r => r.status === 'info').length
+    const errorCount = results.filter(r => r.status === 'error' || !r.success).length
+    
+    // 生成汇总消息
+    let summaryMessage = `批量加入俱乐部完成，共处理${totalTokens}个Token`
+    if (successCount > 0) {
+      summaryMessage += `，成功申请${successCount}个`
+    }
+    if (alreadyJoinedCount > 0) {
+      summaryMessage += `，已经加入${alreadyJoinedCount}个`
+    }
+    if (errorCount > 0) {
+      summaryMessage += `，失败${errorCount}个`
     }
     
-    message.success('批量加入俱乐部完成')
+    message.success(summaryMessage)
+    
+    // 记录批量操作完成日志
+    logOperation('shidian', '加入俱乐部', {
+      cardType: '俱乐部管理',
+      status: 'success',
+      message: summaryMessage
+    })
+  } catch (error) {
+    console.error('批量加入俱乐部失败:', error)
+    message.error('批量加入俱乐部失败: ' + (error.message || '未知错误'))
+    
+    // 记录操作日志
+    logOperation('shidian', '加入俱乐部', {
+      cardType: '俱乐部管理',
+      status: 'error',
+      message: `批量加入俱乐部失败: ${error.message || '未知错误'}`
+    })
   } finally {
     isClubRunning.value = false
   }

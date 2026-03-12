@@ -99,6 +99,7 @@
           />
           <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量领取中...' : '批量领取功法礼物'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
+          <CustomizedCard mode="button" :name="isBatchRecruitWeekRunning ? '批量招募周中...' : '批量招募周'" :disabled="isBatchRecruitWeekRunning" @button-click="handleBatchRecruitWeek" />
         </CustomizedCard>
       </div>
       
@@ -106,7 +107,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴']"
+        :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
       />
     </template>
   </MyCard>
@@ -141,6 +142,7 @@ const isExportClubInfoRunning = ref(false)
 const isLegacyBookRunning = ref(false)
 const isBatchLegacyBookRunning = ref(false)
 const isRefreshLegacyInfoRunning = ref(false)
+const isBatchRecruitWeekRunning = ref(false)
 const legacyBookInfo = ref({
   books: {},
   storage: {}
@@ -2370,6 +2372,199 @@ const handleBatchLegacyBook = async () => {
     message.error(`批量功法图鉴失败: ${error.message || '未知错误'}`)
   } finally {
     isBatchLegacyBookRunning.value = false
+  }
+}
+
+// 批量招募周
+const handleBatchRecruitWeek = async () => {
+  try {
+    isBatchRecruitWeekRunning.value = true
+    message.info('开始批量招募周...')
+    logOperation('shidian', '批量招募周', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: '开始批量招募周...'
+    })
+
+    const tokenIndices = connectionPool.parseTokenRange(legionTokens.value)
+    const tokens = connectionPool.getTargetTokens(sortedTokens.value, tokenIndices)
+
+    if (tokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到Token`)
+      logOperation('shidian', '批量招募周', {
+        cardType: '俱乐部管理',
+        status: 'warning',
+        message: `执行范围${rangeText}内没有找到Token`
+      })
+      return
+    }
+    
+    const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+    message.info(`开始批量招募周，共 ${tokens.length} 个Token（${rangeText}）`)
+    logOperation('shidian', '批量招募周', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: `开始批量招募周，共 ${tokens.length} 个Token（${rangeText}）`
+    })
+
+    const results = await connectionPool.batchOperate(
+      tokens,
+      async (token, globalIndex) => {
+        try {
+          message.info(`[${globalIndex + 1}/${tokens.length}] ${token.name || token.id} 正在获取招募令数量...`)
+          
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          const recruitCount = roleInfo?.role?.items?.[1001]?.quantity || roleInfo?.role?.items?.[1001]?.num || 0
+          
+          if (recruitCount < 10) {
+            message.warning(`[${globalIndex + 1}] ${token.name || token.id} 招募令数量不足（${recruitCount}），跳过`)
+            logOperation('shidian', '批量招募周', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `招募令数量不足（${recruitCount}），跳过`
+            })
+            return { success: false, recruitCount, rounds: 0 }
+          }
+          
+          message.info(`[${globalIndex + 1}] ${token.name || token.id} 当前招募令数量: ${recruitCount}`)
+          
+          let currentRecruitCount = recruitCount
+          let totalRounds = 0
+          let totalRecruits = 0
+          let mailClaimCount = 0
+          
+          while (currentRecruitCount >= 10) {
+            const recruitNumber = Math.min(10, currentRecruitCount)
+            
+            try {
+              await tokenStore.sendGameMessage(token.id, 'hero_recruit', {
+                recruitNumber: recruitNumber,
+                recruitType: 3,
+                byClub: false
+              })
+              
+              currentRecruitCount -= recruitNumber
+              totalRecruits += recruitNumber
+              
+              message.success(`[${globalIndex + 1}] ${token.name || token.id} 使用${recruitNumber}个招募令进行招募`)
+              
+              await new Promise(resolve => setTimeout(resolve, 300))
+              
+              if (totalRecruits > 0 && totalRecruits % 100 === 0) {
+                try {
+                  await tokenStore.sendGameMessage(token.id, 'mail_claimallattachment', {})
+                  mailClaimCount++
+                  message.success(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件附件成功`)
+                  
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                } catch (mailError) {
+                  console.error(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件失败:`, mailError)
+                }
+              }
+              
+              if (totalRecruits > 0 && totalRecruits % 400 === 0) {
+                totalRounds++
+                currentRecruitCount += 40
+                message.info(`[${globalIndex + 1}] ${token.name || token.id} 完成第${totalRounds}轮招募周，获得40招募令奖励`)
+              }
+            } catch (recruitError) {
+              console.error(`[${globalIndex + 1}] ${token.name || token.id} 招募失败:`, recruitError)
+              message.error(`[${globalIndex + 1}] ${token.name || token.id} 招募失败: ${recruitError.message || '未知错误'}`)
+              break
+            }
+          }
+          
+          const successMsg = `${token.name || token.id} 招募周完成，共招募${totalRecruits}个，完成${totalRounds}轮，领取邮件${mailClaimCount}次，剩余招募令${currentRecruitCount}个`
+          message.success(successMsg)
+          logOperation('shidian', '批量招募周', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `招募周完成，共招募${totalRecruits}个，完成${totalRounds}轮，领取邮件${mailClaimCount}次，剩余招募令${currentRecruitCount}个`
+          })
+          
+          return { 
+            success: true, 
+            recruitCount, 
+            rounds: totalRounds, 
+            totalRecruits, 
+            mailClaimCount,
+            remainingRecruit: currentRecruitCount
+          }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 招募周失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 招募周失败: ${error.message || '未知错误'}`)
+          logOperation('shidian', '批量招募周', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `招募周失败: ${error.message || '未知错误'}`
+          })
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`[${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`[${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const totalTokens = results.length
+    const successCount = results.filter(r => r.success).length
+    const totalRounds = results.reduce((sum, r) => sum + (r.rounds || 0), 0)
+    const totalRecruits = results.reduce((sum, r) => sum + (r.totalRecruits || 0), 0)
+    const totalMailClaims = results.reduce((sum, r) => sum + (r.mailClaimCount || 0), 0)
+    
+    let summaryMessage = `批量招募周完成，共处理${totalTokens}个Token`
+    if (successCount > 0) {
+      summaryMessage += `，成功${successCount}个`
+    }
+    if (totalRounds > 0) {
+      summaryMessage += `，共完成${totalRounds}轮`
+    }
+    if (totalRecruits > 0) {
+      summaryMessage += `，共招募${totalRecruits}个`
+    }
+    if (totalMailClaims > 0) {
+      summaryMessage += `，领取邮件${totalMailClaims}次`
+    }
+    
+    message.success(summaryMessage)
+    logOperation('shidian', '批量招募周', {
+      cardType: '俱乐部管理',
+      status: 'success',
+      message: summaryMessage
+    })
+  } catch (error) {
+    console.error('批量招募周失败:', error)
+    message.error(`批量招募周失败: ${error.message || '未知错误'}`)
+    logOperation('shidian', '批量招募周', {
+      cardType: '俱乐部管理',
+      status: 'error',
+      message: `批量招募周失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchRecruitWeekRunning.value = false
   }
 }
 </script>
