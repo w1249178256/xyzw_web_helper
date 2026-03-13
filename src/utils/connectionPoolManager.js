@@ -1,22 +1,31 @@
 /**
- * WebSocket连接池管理器（简化版）
+ * WebSocket 连接池管理器（简化版）
  * 
  * 功能:
  * - 限制最大并发连接数
  * - 简化的连接管理机制
  * - 类似批量日常页面的高效连接管理
+ * - 支持 Token 自动刷新
  */
+
+import { useIndexedDB } from '@/hooks/useIndexedDB';
 
 export class ConnectionPoolManager {
     constructor(tokenStore, options = {}) {
         this.tokenStore = tokenStore;
+        
+        // 初始化 IndexedDB 工具（懒加载）
+        const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer } = useIndexedDB();
+        this.getArrayBuffer = getArrayBuffer;
+        this.storeArrayBuffer = storeArrayBuffer;
+        this.deleteArrayBuffer = deleteArrayBuffer;
 
         // 配置参数 - 与批量日常页面一致
         this.config = {
             maxConnections: options.maxConnections || 20,           // 最大并发连接数
-            connectionTimeout: options.connectionTimeout || 10000,  // 连接超时时间(ms)
-            reconnectDelay: options.reconnectDelay || 1000,        // 初始重连延迟(ms)
-            maxReconnectDelay: options.maxReconnectDelay || 30000, // 最大重连延迟(ms)
+            connectionTimeout: options.connectionTimeout || 10000,  // 连接超时时间 (ms)
+            reconnectDelay: options.reconnectDelay || 1000,        // 初始重连延迟 (ms)
+            maxReconnectDelay: options.maxReconnectDelay || 30000, // 最大重连延迟 (ms)
             maxRetries: options.maxRetries || 2,                   // 最大重试次数
         };
 
@@ -128,7 +137,45 @@ export class ConnectionPoolManager {
                 this.tokenStore.setBattleVersion(res.battleData.version);
             }
         } catch (e) {
-            console.warn(`[ConnectionPool] 初始化数据失败: ${tokenId}`, e.message);
+            console.warn(`[ConnectionPool] 初始化数据失败：${tokenId}`, e.message);
+            
+            // 检查是否是 "check token error"
+            if (e.message && e.message.includes('check token error')) {
+                console.warn(`[ConnectionPool] 检测到 Token 失效：${tokenId}，尝试自动刷新...`);
+                
+                // 尝试刷新 Token
+                const refreshed = await this.refreshToken(tokenId);
+                
+                if (refreshed) {
+                    console.log(`[ConnectionPool] Token 刷新成功，重新初始化：${tokenId}`);
+                    
+                    // 刷新成功后，重新尝试初始化
+                    try {
+                        await this.tokenStore.sendMessageWithPromise(
+                            tokenId,
+                            "role_getroleinfo",
+                            {},
+                            5000,
+                        );
+
+                        const res = await this.tokenStore.sendMessageWithPromise(
+                            tokenId,
+                            "fight_startlevel",
+                            {},
+                            5000,
+                        );
+                        if (res?.battleData?.version) {
+                            this.tokenStore.setBattleVersion(res.battleData.version);
+                        }
+                        
+                        console.log(`[ConnectionPool] Token 刷新后初始化成功：${tokenId}`);
+                    } catch (retryError) {
+                        console.error(`[ConnectionPool] Token 刷新后初始化仍失败：${tokenId}`, retryError.message);
+                    }
+                } else {
+                    console.error(`[ConnectionPool] Token 刷新失败，需要手动重新导入：${tokenId}`);
+                }
+            }
         }
 
         // 连接成功，槽位保持占用，直到任务完成后手动释放
@@ -482,6 +529,151 @@ export class ConnectionPoolManager {
             }
         }
 
+        return results;
+    }
+
+    /**
+     * 刷新 Token - 当遇到 "check token error" 时自动刷新 Token
+     * 支持多种导入方式的 Token 刷新
+     * @param {string} tokenId - Token ID
+     * @returns {Promise<boolean>} 是否刷新成功
+     */
+    async refreshToken(tokenId) {
+        console.log(`[ConnectionPool] 开始刷新 Token: ${tokenId}`);
+        
+        try {
+            const token = this.tokenStore.gameTokens.find(t => t.id === tokenId);
+            if (!token) {
+                console.error(`[ConnectionPool] Token 不存在：${tokenId}`);
+                return false;
+            }
+
+            // 检查 Token 的导入方式
+            if (token.importMethod === 'url' && token.sourceUrl) {
+                // 从 URL 重新获取 Token
+                console.log(`[ConnectionPool] 从 URL 刷新 Token: ${token.sourceUrl}`);
+                
+                const response = await fetch(token.sourceUrl, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                    mode: 'cors',
+                });
+
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.token) {
+                    throw new Error('返回数据中未找到 token 字段');
+                }
+
+                // 更新 Token
+                this.tokenStore.updateToken(tokenId, {
+                    token: data.token,
+                    server: data.server || token.server,
+                    lastRefreshed: Date.now(),
+                });
+
+                console.log(`[ConnectionPool] Token 刷新成功 (URL 方式): ${tokenId}`);
+                return true;
+
+            } else if (token.importMethod === 'wxQrcode' || token.importMethod === 'bin') {
+                // 从 IndexedDB 刷新 Token（微信二维码或二进制导入）
+                console.log(`[ConnectionPool] 从 IndexedDB 刷新 Token: ${tokenId}`);
+                
+                // 使用实例方法获取 ArrayBuffer
+                let userToken = await this.getArrayBuffer(tokenId);
+                let usedOldKey = false;
+                
+                if (!userToken) {
+                    userToken = await this.getArrayBuffer(token.name);
+                    usedOldKey = true;
+                }
+
+                if (userToken) {
+                    // 转换 Token
+                    const newToken = await this.transformToken(userToken);
+                    
+                    this.tokenStore.updateToken(tokenId, {
+                        token: newToken,
+                        lastRefreshed: Date.now(),
+                    });
+
+                    // 如果使用旧 key 获取的，迁移到新 key
+                    if (usedOldKey) {
+                        await this.storeArrayBuffer(tokenId, userToken);
+                        await this.deleteArrayBuffer(token.name);
+                        console.log(`[ConnectionPool] 已迁移 IndexedDB 数据：${token.name} -> ${tokenId}`);
+                    }
+
+                    console.log(`[ConnectionPool] Token 刷新成功 (IndexedDB 方式): ${tokenId}`);
+                    return true;
+                } else {
+                    throw new Error('未找到缓存的 Token 数据');
+                }
+
+            } else {
+                // 手动导入的 Token，无法自动刷新
+                console.warn(`[ConnectionPool] Token 为手动导入，无法自动刷新：${tokenId}`);
+                return false;
+            }
+
+        } catch (error) {
+            console.error(`[ConnectionPool] 刷新 Token 失败：${tokenId}`, error.message);
+            return false;
+        }
+    }
+
+    /**
+     * 转换 Token（从 ArrayBuffer 解码）
+     * 复制自 TokenImport/index.vue 中的 transformToken 函数
+     */
+    async transformToken(arrayBuffer) {
+        try {
+            const decoder = new TextDecoder('utf-8');
+            const jsonStr = decoder.decode(arrayBuffer);
+            const data = JSON.parse(jsonStr);
+            
+            if (data.token) {
+                return data.token;
+            } else if (data.sessId) {
+                return data.sessId;
+            } else {
+                throw new Error('Token 数据格式无效');
+            }
+        } catch (error) {
+            console.error('[ConnectionPool] Token 转换失败:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * 批量刷新 Token - 用于批量操作中遇到 "check token error" 时
+     * @param {Array} tokenIds - 需要刷新的 Token ID 列表
+     * @returns {Promise<Object>} 刷新结果
+     */
+    async batchRefreshTokens(tokenIds) {
+        console.log(`[ConnectionPool] 开始批量刷新 Token: ${tokenIds.length} 个`);
+        
+        const results = {
+            success: [],
+            failed: [],
+        };
+
+        for (const tokenId of tokenIds) {
+            const success = await this.refreshToken(tokenId);
+            if (success) {
+                results.success.push(tokenId);
+            } else {
+                results.failed.push(tokenId);
+            }
+        }
+
+        console.log(`[ConnectionPool] 批量刷新完成：成功 ${results.success.length}, 失败 ${results.failed.length}`);
         return results;
     }
 }

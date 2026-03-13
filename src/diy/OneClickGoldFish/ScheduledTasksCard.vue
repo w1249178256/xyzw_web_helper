@@ -12,6 +12,18 @@
       <div class="scheduled-tasks">
         <!-- 定时任务按钮区域 -->
         <CustomizedCard mode="container">
+          <!-- 快捷操作按钮 -->
+          <CustomizedCard 
+            mode="button"
+            name="打开日常"
+            @button-click="handleOpenDailyTasks"
+          />
+          <CustomizedCard 
+            mode="button"
+            name="打开领取"
+            @button-click="handleOpenClaimTasks"
+          />
+          
           <CustomizedCard 
             mode="name-switch"
             name="领取挂机"
@@ -157,6 +169,38 @@ const scheduledTasks = ref({
 // 处理定时任务执行范围输入
 const handleScheduledExecutionTokensInput = (value) => {
   scheduledExecutionTokens.value = value
+}
+
+// 打开日常任务：开启所有功能
+const handleOpenDailyTasks = () => {
+  scheduledTasks.value.claimHangUp = true       // 开启领取挂机
+  scheduledTasks.value.resetBottles = true      // 开启重置罐子
+  scheduledTasks.value.genieSweep = true        // 开启一键灯神扫荡
+  scheduledTasks.value.batchlingguanzi = true   // 开启领取罐子
+  scheduledTasks.value.batchclubsign = true     // 开启一键俱乐部签到
+  scheduledTasks.value.batcharenafight = true   // 开启一键竞技场
+  scheduledTasks.value.store_purchase = true    // 开启一键黑市采购
+  scheduledTasks.value.legion_boss = true       // 开启一键俱乐部 BOSS
+  scheduledTasks.value.freeGift = true          // 开启一键每日免费礼包
+  scheduledTasks.value.dailyBoss = true         // 开启一键每日咸王
+  
+  message.success('已打开日常任务开关')
+}
+
+// 打开领取任务：只开启领取挂机和重置罐子，关闭其他
+const handleOpenClaimTasks = () => {
+  scheduledTasks.value.claimHangUp = true       // 开启领取挂机
+  scheduledTasks.value.resetBottles = true      // 开启重置罐子
+  scheduledTasks.value.genieSweep = false       // 关闭一键灯神扫荡
+  scheduledTasks.value.batchlingguanzi = false  // 关闭领取罐子
+  scheduledTasks.value.batchclubsign = false    // 关闭一键俱乐部签到
+  scheduledTasks.value.batcharenafight = false  // 关闭一键竞技场
+  scheduledTasks.value.store_purchase = false   // 关闭一键黑市采购
+  scheduledTasks.value.legion_boss = false      // 关闭一键俱乐部 BOSS
+  scheduledTasks.value.freeGift = false         // 关闭一键每日免费礼包
+  scheduledTasks.value.dailyBoss = false        // 关闭一键每日咸王
+  
+  message.success('已打开领取任务开关')
 }
 
 // 解析执行范围
@@ -1128,7 +1172,7 @@ const handleBatchRecruitWeek = async () => {
             const activityInfo = await tokenStore.sendMessageWithPromise(
               token.id,
               'activity_get',
-              { actId: RECRUIT_WEEK_ACTIVITY_ID },
+              { },
               5000
             )
             
@@ -1213,7 +1257,7 @@ const handleBatchRecruitWeek = async () => {
                 totalRecruits += 10
                 remainingRecruits -= 10
                 
-                // 每 100 次招募领取一次邮件
+                // 每 10 次招募（使用 100 个招募令）领取一次邮件附件
                 if (totalRecruits % 100 === 0) {
                   try {
                     await tokenStore.sendMessageWithPromise(

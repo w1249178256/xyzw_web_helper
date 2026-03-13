@@ -67,9 +67,9 @@
       <div class="item-value">{{ count }}</div>
     </div>
     
-    <!-- 模式4：名称+输入框 -->
+    <!-- 模式 4：名称 + 输入框 -->
   <div v-if="mode === 'name-input'" class="card-item mode-name-input">
-    <div class="card-name">{{ name }}</div>
+    <div class="card-name" @click="handleNameClick" style="cursor: pointer;" title="点击清空">{{ name }}</div>
     <n-input
       :value="inputValue"
       @update:value="(value) => emit('update:inputValue', value)"
@@ -79,15 +79,30 @@
     />
   </div>
   
-  <!-- 模式6：按钮带输入框 -->
-  <div v-if="mode === 'button-with-input'" class="card-item mode-button-with-input">
+  <!-- 模式 15：名称 + 输入框 + 按钮 -->
+  <div v-if="mode === 'name-input-button'" class="card-item mode-name-input-button">
+    <div class="card-name">{{ name }}</div>
     <n-input
       :value="inputValue"
       @update:value="(value) => emit('update:inputValue', value)"
       size="small"
       :placeholder="placeholder"
-      class="button-input-field"
+      class="n-input"
     />
+    <n-button 
+      :type="disabled ? 'default' : 'error'" 
+      size="small" 
+      @click="onButtonClick"
+      :loading="loading"
+      :disabled="disabled"
+      class="n-button"
+    >
+      {{ buttonText }}
+    </n-button>
+  </div>
+  
+  <!-- 模式 6：按钮带输入框（按钮在前，输入框在后） -->
+  <div v-if="mode === 'button-with-input'" class="card-item mode-button-with-input">
     <n-button 
       :type="disabled ? 'default' : 'primary'" 
       size="small" 
@@ -98,6 +113,13 @@
     >
       {{ name }}
     </n-button>
+    <n-input
+      :value="inputValue"
+      @update:value="(value) => emit('update:inputValue', value)"
+      size="small"
+      :placeholder="placeholder"
+      class="button-input-field"
+    />
   </div>
 
   <!-- 模式7：名称加范围输入框（支持1-20和3,4,5格式） -->
@@ -228,7 +250,7 @@ const props = defineProps({
   mode: {
     type: String,
     required: true,
-    validator: (value) => ['container', 'name-count', 'name-switch', 'button-placeholder', 'name-input', 'button', 'button-with-input', 'name-range-input', 'button-number-input', 'button-switch', 'execution-range', 'name-select', 'select-only', 'button-count', 'button-with-select'].includes(value)
+    validator: (value) => ['container', 'name-count', 'name-switch', 'button-placeholder', 'name-input', 'button', 'button-with-input', 'name-range-input', 'button-number-input', 'button-switch', 'execution-range', 'name-select', 'select-only', 'button-count', 'button-with-select', 'name-input-button'].includes(value)
   },
   
   // 模式1：名称和数量
@@ -294,7 +316,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:switchValue', 'update:inputValue', 'update:selectValue', 'button-click'])
+const emit = defineEmits(['update:switchValue', 'update:inputValue', 'update:selectValue', 'button-click', 'name-click'])
 
 // 监听开关值变化（仅在需要时使用，避免循环更新）
 // watch(() => props.switchValue, (newValue) => {
@@ -309,6 +331,11 @@ const emit = defineEmits(['update:switchValue', 'update:inputValue', 'update:sel
 // 按钮点击事件
 const onButtonClick = () => {
   emit('button-click')
+}
+
+// 名称点击事件
+const handleNameClick = () => {
+  emit('name-click')
 }
 
 // 数字输入验证
@@ -589,7 +616,29 @@ const handleNumberInput = (value) => {
 .mode-button-number-input,
 .mode-button-switch,
 .mode-name-select,
-.mode-button-with-input {
+.mode-button-with-input,
+.mode-name-input-button {
   min-height: 50px;
+}
+
+/* 名称 + 输入框 + 按钮模式样式 */
+.mode-name-input-button {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.mode-name-input-button .card-name {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.mode-name-input-button .n-input {
+  min-width: 0;
+}
+
+.mode-name-input-button .n-button {
+  min-width: 60px;
 }
 </style>

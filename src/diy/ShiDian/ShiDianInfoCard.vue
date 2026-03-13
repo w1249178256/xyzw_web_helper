@@ -2863,7 +2863,7 @@ const getLocalPillowCount = (tokenId) => {
 }
 
 // 加入房间（从ShiDian.vue复制）
-const joinNightmareRoom = async (token) => {
+const joinNightmareRoom = async (token, teamIdParam = null) => {
   if (!token) {
     message.warning('请先选择Token')
     return
@@ -2874,8 +2874,8 @@ const joinNightmareRoom = async (token) => {
     return
   }
 
-  // 确定使用哪个teamId：优先使用props.teamId（十殿页面输入的），如果为空则使用displayTeamId.value（从游戏获取的）
-  const teamIdToUse = props.teamId || displayTeamId.value
+  // 确定使用哪个 teamId：优先使用传入的 teamIdParam，其次使用 props.teamId（十殿页面输入的），最后使用 displayTeamId.value（从游戏获取的）
+  const teamIdToUse = teamIdParam || props.teamId || displayTeamId.value
   
   // 检查是否有有效的teamId
   if (!teamIdToUse) {
@@ -2936,28 +2936,13 @@ const joinNightmareRoom = async (token) => {
     })
     message.success('十殿准备完成！')
     
-    // 第四步：获取所有token的roleId
-    message.info('正在获取所有token的roleId...')
-    const gameTokens = toRaw(tokenStore.gameTokens)
-    for (const t of gameTokens) {
-      try {
-        const roleInfo = await tokenStore.sendGetRoleInfo(t.id)
-        if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
-          tokenRoleIds.value[t.id] = roleInfo.role.roleId
-          console.log(`Token ${t.name} (${t.id}) 的roleId: ${roleInfo.role.roleId}`)
-        }
-      } catch (error) {
-        console.error(`获取Token ${t.name} (${t.id}) 的roleId失败:`, error)
-      }
-    }
-    message.success('所有token的roleId获取完成！')
     message.success('🎉 成功加入十殿并准备完成！')
     logOperation('shidian', '加入房间', {
       cardType: '十殿信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `成功加入十殿并准备完成，使用TeamID: ${teamIdToUse}`
+      message: `成功加入十殿并准备完成，使用 TeamID: ${teamIdToUse}`
     })
   } catch (error) {
     console.error('加入十殿失败:', error)

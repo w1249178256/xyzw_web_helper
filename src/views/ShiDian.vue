@@ -45,13 +45,54 @@
       <!-- 功能卡片区域 -->
       <div class="feature-cards-container" v-if="tokenStore.hasTokens">
         
-        <!-- 十殿信息卡片 -->
-        <ShiDianInfoCard 
-          ref="shidianInfoCardRef"
-          :selected-token-id="selectedTokenId"
-          :team-id="teamId"
-          @update-pillow-count="handleUpdatePillowCount"
-        />
+        <!-- 十殿 TeamID 卡片 -->
+        <MyCard status-class="active">
+          <template #icon>
+            <n-icon size="24">
+              <People />
+            </n-icon>
+          </template>
+          <template #title>
+            <h3>十殿 TeamID</h3>
+          </template>
+          <template #default>
+            <CustomizedCard mode="container">
+              <div style="grid-column: 1 / -1; font-size: 12px; color: #666; padding: 4px 0; margin-bottom: 4px;">
+                💡 提示：点击按钮可清空对应 TeamID
+              </div>
+              <CustomizedCard 
+                v-for="i in 5" 
+                :key="i"
+                mode="button-with-input"
+                :name="`十殿${['一', '二', '三', '四', '五'][i-1]}`"
+                :input-value="teamIds[i-1]"
+                @update:input-value="(value) => teamIds[i-1] = value"
+                :placeholder="`输入十殿${['一', '二', '三', '四', '五'][i-1]}的 TeamID`"
+                button-text="清除"
+                :disabled="!teamIds[i-1]"
+                @button-click="() => clearSingleTeamId(i-1)"
+              />
+              <CustomizedCard 
+                mode="button-placeholder"
+                button-text="全部清除"
+                :disabled="!teamIds.some(id => id)"
+                @button-click="clearAllTeamIds"
+              />
+              <CustomizedCard 
+                mode="button-placeholder"
+                button-text="自动加入十殿"
+                :disabled="!teamIds.some(id => id)"
+                @button-click="autoJoinShiDian"
+              />
+              <CustomizedCard 
+                mode="button-placeholder"
+                button-text="清空十殿标签"
+                :disabled="!tokenStore.hasTokens"
+                @button-click="clearAllNightmareLabels"
+              />
+            </CustomizedCard>
+          </template>
+        </MyCard>
 
         <!-- 俱乐部管理卡片 -->
         <ClubManagementCard
@@ -87,6 +128,14 @@
 
         <!-- 宝库助威卡片 -->
         <BossTowerCard />
+
+        <!-- 十殿信息卡片 -->
+        <ShiDianInfoCard 
+          ref="shidianInfoCardRef"
+          :selected-token-id="selectedTokenId"
+          :team-id="teamId"
+          @update-pillow-count="handleUpdatePillowCount"
+        />
       </div>
 
       <!-- Token选择区域 -->
@@ -106,15 +155,6 @@
               </template>
               刷新所有
             </n-button>
-            <div style="display: flex; align-items: center; gap: 8px; margin-left: 8px;">
-              <label style="font-weight: 500; margin-right: 4px;">TeamId：</label>
-              <n-input
-                v-model:value="teamId"
-                placeholder="输入TeamID"
-                size="small"
-                style="width: 200px;"
-              />
-            </div>
           </div>
         </div>
 
@@ -130,6 +170,14 @@
                 <a-tag color="red" v-if="token.server">{{ token.server }}</a-tag>
                 <a-badge v-if="getTokenStyle(token.id)" :status="getTokenStyle(token.id)" :text="getConnectionStatusText(token.id)" />
                 <span v-else class="connection-status">{{ getConnectionStatusText(token.id) }}</span>
+                <n-select
+                  v-model:value="tokenNightmareTeam[token.id]"
+                  :options="nightmareTeamOptions"
+                  size="small"
+                  style="width: 60px; margin-left: 8px;"
+                  placeholder="殿"
+                  @update:value="(value) => handleNightmareTeamChange(token.id, value)"
+                />
               </a-space>
             </template>
             <template #extra>
@@ -159,8 +207,8 @@
                   mode="button"
                   name="加入十殿"
                   :loading="connectingTokens.has(token.id)"
-                  :disabled="!teamId || connectingTokens.has(token.id)"
-                  @button-click="joinShiDian(token)"
+                  :disabled="!teamIds[tokenNightmareTeam[token.id] - 1] || connectingTokens.has(token.id)"
+                  @button-click="() => joinShiDian(token, tokenNightmareTeam[token.id])"
                   style="flex: 1;"
                 />
               </div>
@@ -212,7 +260,7 @@ import { useRouter } from 'vue-router'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useNightmareExecutionStore } from '@/stores/nightmareExecutionStore'
 import { useMessage, useDialog } from 'naive-ui'
-import { Add, Refresh, TrashBin, EllipsisHorizontal, Star, Home, Create, SyncCircle, Key, Gift } from '@vicons/ionicons5'
+import { Add, Refresh, TrashBin, EllipsisHorizontal, Star, Home, Create, SyncCircle, Key, Gift, People } from '@vicons/ionicons5'
 import ManualTokenForm from '@/views/TokenImport/manual.vue'
 import UrlTokenForm from '@/views/TokenImport/url.vue'
 import BinTokenForm from '@/views/TokenImport/bin.vue'
@@ -240,13 +288,67 @@ const selectedTokenId = ref(null)
 const connectingTokens = ref(new Set())
 const refreshingTokens = ref(new Set())
 const teamId = ref('')
+const teamIds = ref(['', '', '', '', '']) // 五个十殿的 teamId
 const shidianInfoCardRef = ref(null)
 
-// 辅助函数：获取token的序号（基于名称排序后的顺序）
+// 辅助函数：获取 token 的序号（基于名称排序后的顺序）
 const getTokenIndex = (token) => {
   const index = sortedTokens.value.findIndex(t => t.id === token.id)
   return index + 1
 }
+
+// 十殿队伍选项（一到五 + 空）
+const nightmareTeamOptions = [
+  { label: '空', value: null },
+  { label: '一', value: 1 },
+  { label: '二', value: 2 },
+  { label: '三', value: 3 },
+  { label: '四', value: 4 },
+  { label: '五', value: 5 }
+]
+
+// 从本地存储加载 teamIds
+const loadTeamIds = () => {
+  try {
+    const saved = localStorage.getItem('shidian_teamids')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed) && parsed.length === 5) {
+        teamIds.value = parsed
+      }
+    }
+  } catch (error) {
+    console.error('加载 TeamIDs 失败:', error)
+  }
+}
+
+// 保存 teamIds 到本地存储
+const saveTeamIds = () => {
+  try {
+    localStorage.setItem('shidian_teamids', JSON.stringify(teamIds.value))
+    message.success('TeamIDs 已保存')
+  } catch (error) {
+    console.error('保存 TeamIDs 失败:', error)
+    message.error('保存失败')
+  }
+}
+
+// 清除指定十殿的 teamId
+const clearSingleTeamId = (index) => {
+  teamIds.value[index] = ''
+  saveTeamIds()
+  message.success(`十殿${['一', '二', '三', '四', '五'][index]}的 TeamID 已清除`)
+}
+
+// 清除所有 teamId
+const clearAllTeamIds = () => {
+  teamIds.value = ['', '', '', '', '']
+  saveTeamIds()
+  message.success('所有 TeamIDs 已清除')
+}
+
+// 加载保存的 teamIds
+loadTeamIds()
 
 // 下拉框选项数据
 const dianLevelOptions = [
@@ -283,7 +385,8 @@ const teamMemberOptions = [
 // 每个token的下拉框选择值
 const tokenPassType = ref({}) // tokenId -> passType
 const tokenTreasureType = ref({}) // tokenId -> treasureType
-const tokenTeamMember = ref({}) // tokenId -> teamMember (殿0/2/5/7/8)
+const tokenTeamMember = ref({}) // tokenId -> teamMember (殿 0/2/5/7/8)
+const tokenNightmareTeam = ref({}) // tokenId -> nightmareTeam (1-5)
 const tokenPillowCount = ref({}) // tokenId -> pillowCount (十殿枕头数量，保存到localStorage)
 const pillowCount = ref(0) // 十殿枕头数量
 
@@ -292,7 +395,6 @@ const tokenInfoDisplay = ref({}) // tokenId -> boolean
 
 // 俱乐部相关状态
 const isClubRunning = ref(false)
-const clubNamesCache = ref({}) // tokenId -> clubName 缓存
 const legionTokens = ref('') // 批量执行范围（用于批量俱乐部和批量功法挂机）
 const hasClub = computed(() => {
   const token = tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)
@@ -696,82 +798,63 @@ const upgradeTokenToPermanent = (token) => {
   message.success('Token已升级为长期有效')
 }
 
-// 保存下拉框选择值和信息显示状态到localStorage
+// 保存下拉框选择值和信息显示状态到 localStorage
 const saveDropdownSettings = async () => {
   await savePageTokenCards('shidian', {
     dropdownSettings: {
-      tokenPassType: tokenPassType.value,
-      tokenTreasureType: tokenTreasureType.value,
-      tokenTeamMember: tokenTeamMember.value,
-      tokenInfoDisplay: tokenInfoDisplay.value,
+      tokenNightmareTeam: tokenNightmareTeam.value,
       tokenPillowCount: tokenPillowCount.value
     }
   })
 }
 
-// 从token的remark字段解析下拉框值
+// 从 token 的 remark 字段解析下拉框值
 const parseRemarkToDropdowns = () => {
   tokenStore.gameTokens.forEach(token => {
-    // 如果localStorage中已有该token的设置，优先使用localStorage的值
-    if (tokenPassType.value[token.id] !== undefined || 
-        tokenTreasureType.value[token.id] !== undefined) {
-      // localStorage中已有设置，跳过从remark解析
+    // 如果 localStorage 中已有该 token 的十殿队伍设置，优先使用 localStorage 的值
+    if (tokenNightmareTeam.value[token.id] !== undefined) {
+      // localStorage 中已有设置，跳过从 remark 解析
       return
     }
     
     if (token.remark) {
       const remark = token.remark.trim()
       
-      // 解析通行证类型（格式：通行证、功法、空）
-      if (remark.includes('通行证')) {
-        tokenPassType.value[token.id] = 'pass'
-      } else if (remark.includes('功法')) {
-        tokenPassType.value[token.id] = 'legacy'
-      } else if (remark.includes('空') && !remark.includes('宝库') && !remark.includes('跳过')) {
-        // 如果只有"空"且不包含"宝库"和"跳过"，则可能是通行证类型的空
-        // 但需要检查是否已经有宝库类型设置
-        if (!tokenTreasureType.value[token.id]) {
-          tokenPassType.value[token.id] = ''
-        }
-      }
-      
-      // 解析宝库类型（格式：宝库、跳过、空）
-      if (remark.includes('宝库')) {
-        tokenTreasureType.value[token.id] = 'treasure'
-      } else if (remark.includes('跳过')) {
-        tokenTreasureType.value[token.id] = 'skip'
-      } else if (remark.includes('空') && !tokenPassType.value[token.id]) {
-        // 如果只有"空"且通行证类型未设置，则可能是宝库类型的空
-        tokenTreasureType.value[token.id] = ''
+      // 解析十殿队伍标签（格式：殿一、殿二、殿三、殿四、殿五）
+      const teamMatch = remark.match(/殿 ([一二三四五])/)
+      if (teamMatch) {
+        const teamMap = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5 }
+        tokenNightmareTeam.value[token.id] = teamMap[teamMatch[1]]
       }
     }
   })
 }
 
-// 从localStorage和服务器加载下拉框选择值和信息显示状态
+// 从 localStorage 和服务器加载下拉框选择值和信息显示状态
 const loadDropdownSettings = async () => {
   const data = await loadPageTokenCards('shidian')
   if (data.dropdownSettings) {
-    // 确保null值也能正确加载（JSON.parse会保留null）
-    tokenPassType.value = data.dropdownSettings.tokenPassType || {}
-    tokenTreasureType.value = data.dropdownSettings.tokenTreasureType || {}
-    tokenTeamMember.value = data.dropdownSettings.tokenTeamMember || {}
-    tokenInfoDisplay.value = data.dropdownSettings.tokenInfoDisplay || {}
+    // 只加载 tokenNightmareTeam 和 tokenPillowCount
+    tokenNightmareTeam.value = data.dropdownSettings.tokenNightmareTeam || {}
     tokenPillowCount.value = data.dropdownSettings.tokenPillowCount || {}
-    console.log('下拉框设置已加载:', { tokenPassType: tokenPassType.value, tokenTreasureType: tokenTreasureType.value, tokenTeamMember: tokenTeamMember.value, tokenInfoDisplay: tokenInfoDisplay.value, tokenPillowCount: tokenPillowCount.value })
+    console.log('下拉框设置已加载:', { 
+      tokenNightmareTeam: tokenNightmareTeam.value, 
+      tokenPillowCount: tokenPillowCount.value 
+    })
   }
   // 注意：tokenResourceData 不需要加载，因为数据会从 gameData 实时获取
   
-  // 从token的remark字段解析下拉框值（如果localStorage中没有该token的设置，则从remark读取）
+  // 从 token 的 remark 字段解析下拉框值（如果 localStorage 中没有该 token 的设置，则从 remark 读取）
   parseRemarkToDropdowns()
 }
 
-// 更新token的remark标签
+// 更新 token 的 remark 标签
 const updateTokenRemark = (tokenId) => {
   const passType = tokenPassType.value[tokenId]
   const treasureType = tokenTreasureType.value[tokenId]
+  const nightmareTeam = tokenNightmareTeam.value[tokenId]
   
-  // 构建remark标签
+  // 构建 remark 标签
   const remarkParts = []
   if (passType && passType !== '') {
     const passLabel = passTypeOptions.find(opt => opt.value === passType)?.label || passType
@@ -782,14 +865,22 @@ const updateTokenRemark = (tokenId) => {
     remarkParts.push(treasureLabel)
   }
   
-  // 如果宝库类型为"跳过"，确保remark中包含"跳过"
+  // 如果宝库类型为"跳过"，确保 remark 中包含"跳过"
   if (treasureType === 'skip' && !remarkParts.includes('跳过')) {
     remarkParts.push('跳过')
   }
   
+  // 添加十殿队伍标签
+  if (nightmareTeam !== null && nightmareTeam !== undefined) {
+    const teamLabel = nightmareTeamOptions.find(opt => opt.value === nightmareTeam)?.label
+    if (teamLabel && teamLabel !== '空') {
+      remarkParts.push(`殿${teamLabel}`)
+    }
+  }
+  
   const remark = remarkParts.join(' ')
   
-  // 更新token的remark字段
+  // 更新 token 的 remark 字段
   if (tokenStore.updateToken) {
     tokenStore.updateToken(tokenId, { remark })
     console.log(`Token ${tokenId} 标签已更新:`, remark || '(空)')
@@ -837,7 +928,23 @@ const handleTeamMemberChange = async (tokenId, value) => {
     tokenTeamMember.value[tokenId] = value
   }
   console.log(`Token ${tokenId} 十殿队员选择:`, value)
-  // 保存到localStorage和服务器（不依赖连接状态）
+  // 保存到 localStorage 和服务器（不依赖连接状态）
+  try {
+    await saveDropdownSettings()
+  } catch (error) {
+    console.error('保存下拉框设置失败:', error)
+  }
+}
+
+// 处理十殿队伍变化
+const handleNightmareTeamChange = async (tokenId, value) => {
+  if (value === null || value === undefined) {
+    tokenNightmareTeam.value[tokenId] = null
+  } else {
+    tokenNightmareTeam.value[tokenId] = value
+  }
+  console.log(`Token ${tokenId} 十殿队伍选择:`, value)
+  // 保存到 localStorage 和服务器（不依赖连接状态）
   try {
     await saveDropdownSettings()
   } catch (error) {
@@ -855,32 +962,167 @@ const startShiDianManagement = (token) => {
 }
 
 // 加入十殿（调用子卡片的方法）
-const joinShiDian = async (token) => {
+const joinShiDian = async (token, teamIndex = null) => {
   if (!token) {
-    message.warning('请先选择Token')
+    message.warning('请先选择 Token')
     return
   }
   
   if (!token.id) {
-    message.error('Token信息不完整')
+    message.error('Token 信息不完整')
     return
   }
 
-  // 检查是否输入了teamId
-  if (!teamId.value) {
-    message.warning('请先输入TeamID')
+  // 如果没有指定队伍索引，使用 token 选择的队伍
+  const teamIdx = teamIndex || tokenNightmareTeam.value[token.id]
+  
+  if (!teamIdx) {
+    message.warning('请先选择十殿队伍（一到五）')
     return
   }
 
-  // 调用子卡片的方法
+  // 检查是否输入了对应队伍的 teamId
+  const currentTeamId = teamIds.value[teamIdx - 1]
+  if (!currentTeamId) {
+    message.warning(`请先在十殿 TeamID 卡片中输入十殿${['一', '二', '三', '四', '五'][teamIdx - 1]}的 TeamID`)
+    return
+  }
+
+  // 调用子卡片的方法，传入对应的 teamId
   if (shidianInfoCardRef.value && shidianInfoCardRef.value.joinNightmareRoom) {
-    await shidianInfoCardRef.value.joinNightmareRoom(token)
-    // 设置信息显示状态为true
+    await shidianInfoCardRef.value.joinNightmareRoom(token, currentTeamId)
+    // 设置信息显示状态为 true
     tokenInfoDisplay.value[token.id] = true
     await saveDropdownSettings()
   } else {
     message.error('无法调用十殿信息卡片的方法')
   }
+}
+
+// 清空所有 Token 的十殿标签
+const clearAllNightmareLabels = async () => {
+  const result = await dialog.warning({
+    title: '确认清空',
+    content: '确定要清空所有 Token 的十殿标签（一、二、三、四、五）吗？此操作不可恢复。',
+    positiveText: '确定',
+    negativeText: '取消'
+  })
+  
+  if (result === 'positive') {
+    // 清空所有 token 的十殿队伍选择
+    tokenStore.gameTokens.forEach(token => {
+      tokenNightmareTeam.value[token.id] = null
+    })
+    
+    // 保存到 localStorage
+    await saveDropdownSettings()
+    
+    message.success('已清空所有 Token 的十殿标签')
+  }
+}
+
+// 自动加入十殿
+const autoJoinShiDian = async () => {
+  const hasTeamIds = teamIds.value.some(id => id)
+  if (!hasTeamIds) {
+    message.warning('请先在十殿 TeamID 卡片中输入至少一个 TeamID')
+    return
+  }
+  
+  const result = await dialog.warning({
+    title: '确认自动加入',
+    content: '确定要自动分配 Token 加入十殿吗？这将根据枕头数量和现有标签自动分配。',
+    positiveText: '确定',
+    negativeText: '取消'
+  })
+  
+  if (result !== 'positive') {
+    return
+  }
+  
+  message.info('开始自动分配 Token 加入十殿...')
+  
+  try {
+    // 第一步：处理十殿五（从前往后，枕头=5 的 token）
+    if (teamIds.value[4]) { // 十殿五的 TeamID
+      await processNightmareTeam(5, 'forward')
+    }
+    
+    // 第二步：处理十殿一到四（从后往前）
+    for (let i = 3; i >= 0; i--) {
+      if (teamIds.value[i]) {
+        await processNightmareTeam(i + 1, 'backward')
+      }
+    }
+    
+    message.success('自动分配 Token 完成')
+  } catch (error) {
+    console.error('自动分配 Token 失败:', error)
+    message.error(`自动分配失败：${error.message}`)
+  }
+}
+
+// 处理指定十殿的 Token 分配
+const processNightmareTeam = async (teamIndex, direction) => {
+  const teamId = teamIds.value[teamIndex - 1]
+  if (!teamId) return
+  
+  message.info(`开始处理十殿${['一', '二', '三', '四', '五'][teamIndex - 1]}...`)
+  
+  // 获取所有 token，根据方向排序
+  const tokens = direction === 'forward' 
+    ? [...sortedTokens.value] 
+    : [...sortedTokens.value].reverse()
+  
+  // 排除昵称开头为 02/05/07 的 token
+  const filteredTokens = tokens.filter(token => {
+    const name = token.name || ''
+    return !name.startsWith('02') && !name.startsWith('05') && !name.startsWith('07')
+  })
+  
+  // 排除已有十殿标签的 token
+  const availableTokens = filteredTokens.filter(token => {
+    const currentTeam = tokenNightmareTeam.value[token.id]
+    // 排除已有十殿标签（一到五、空）的 token
+    return currentTeam === null || currentTeam === undefined
+  })
+  
+  let joinedCount = 0
+  const maxJoinCount = 2 // 每个 TeamID 最多加入 2 个 token
+  
+  for (const token of availableTokens) {
+    if (joinedCount >= maxJoinCount) {
+      break
+    }
+    
+    // 获取枕头数量
+    const pillowCount = tokenPillowCount.value[token.id] || 0
+    
+    // 所有十殿（包括一到五）都需要枕头=5
+    if (pillowCount !== 5) {
+      continue // 跳过枕头数量不为 5 的 token
+    }
+    
+    // 模拟点击加入十殿
+    try {
+      // 设置该 token 的十殿队伍标签
+      tokenNightmareTeam.value[token.id] = teamIndex
+      
+      // 保存设置
+      await saveDropdownSettings()
+      
+      await joinShiDian(token, teamIndex)
+      joinedCount++
+      message.success(`Token ${token.name || token.id} 已加入十殿${['一', '二', '三', '四', '五'][teamIndex - 1]}`)
+      
+      // 等待一下，避免过快
+      await new Promise(resolve => setTimeout(resolve, 500))
+    } catch (error) {
+      console.error(`Token ${token.name || token.id} 加入失败:`, error)
+    }
+  }
+  
+  message.info(`十殿${['一', '二', '三', '四', '五'][teamIndex - 1]}完成，加入 ${joinedCount}/${maxJoinCount} 个 Token`)
 }
 
 // 格式化数字
@@ -914,14 +1156,6 @@ const findItemCount = (items, itemId) => {
     return found ? Number(found.num ?? found.count ?? found.quantity ?? 0) : 0
   }
   return typeof item === 'number' ? Number(item) : typeof item === 'object' ? Number(item.num ?? item.count ?? item.quantity ?? 0) : Number(item) || 0
-}
-
-// 获取俱乐部名称
-const getClubName = (tokenId) => {
-  const token = tokenStore.gameTokens.find(t => t.id === tokenId)
-  if (!token || !token.gameData) return ''
-  const legionInfo = token.gameData.legionInfo
-  return legionInfo?.info?.name || ''
 }
 
 // 获取白玉数量
@@ -1213,22 +1447,10 @@ const handleBatchFetchClubInfo = async () => {
   }
 }
 
-// 保存俱乐部名称到服务器（已禁用，只使用localStorage）
-const saveClubNameToServer = async (tokenId, clubName) => {
-  // 不再保存到服务器，只使用localStorage
-  console.log('俱乐部名称已保存到localStorage:', tokenId, clubName)
-}
-
-// 从服务器加载俱乐部名称（已禁用，只使用localStorage）
-const loadClubNamesFromServer = async () => {
-  // 不再从服务器加载，只使用localStorage
-  console.log('俱乐部名称从localStorage加载')
-}
-
-// 解析执行范围（支持 1-20 或 1,2,3 格式，如果为空则返回null表示执行全部）
+// 解析执行范围（支持 1-20 或 1,2,3 格式，如果为空则返回 null 表示执行全部）
 const parseTokenRange = (rangeStr) => {
   if (!rangeStr || !rangeStr.trim()) {
-    return null // null表示执行全部
+    return null // null 表示执行全部
   }
   
   const tokens = []
@@ -1447,22 +1669,12 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
   }
 }
 
-// 监听legion_getinforesp事件来更新俱乐部名称
+// 监听 legion_getinforesp 事件来更新俱乐部名称
 watch(() => tokenStore.gameTokens, (tokens) => {
-  // 当token列表变化时，从remark字段解析下拉框值
+  // 当 token 列表变化时，从 remark 字段解析下拉框值
   parseRemarkToDropdowns()
-  tokens.forEach(token => {
-    if (token.gameData && token.gameData.legionInfo) {
-      const legionInfo = token.gameData.legionInfo
-      const clubName = legionInfo?.info?.name || null
-      if (clubName && clubName !== clubNamesCache.value[token.id]) {
-        clubNamesCache.value[token.id] = clubName
-        saveClubNameToServer(token.id, clubName)
-      }
-    }
-  })
   
-  // 当gameData更新时，自动保存资源数据（不依赖连接状态）
+  // 当 gameData 更新时，自动保存资源数据（不依赖连接状态）
   tokens.forEach(token => {
     if (token.gameData) {
       // 延迟保存，避免频繁保存（移除连接状态检查，允许未连接时也保存）

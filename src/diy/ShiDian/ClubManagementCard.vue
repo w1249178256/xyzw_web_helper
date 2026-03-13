@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -97,7 +97,9 @@
             :disabled="isExportClubInfoRunning"
             @button-click="handleExportClubInfo"
           />
-          <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量领取中...' : '批量领取功法礼物'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
+          <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
+          <CustomizedCard mode="button-number-input" name="一键领取" v-model:inputValue="autoAcceptGiftTokenIndex" placeholder="输入 Token 序号" @update:inputValue="handleAutoAcceptGiftTokenIndexInput" />
+          <CustomizedCard mode="button" :name="isAutoAcceptGiftRunning ? '领取中...' : '一键领取'" :disabled="isAutoAcceptGiftRunning || !autoAcceptGiftTokenIndex" @button-click="handleAutoAcceptGift" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
         </CustomizedCard>
       </div>
@@ -106,7 +108,11 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
+<<<<<<< Updated upstream
         :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部']"
+=======
+        :filter-operations="['功法挂机', '收集功法', '批量赠送功法', '接受礼物', '一键领取', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
+>>>>>>> Stashed changes
       />
     </template>
   </MyCard>
@@ -971,15 +977,15 @@ const handleBatchLegacyCollect = async () => {
   }
 }
 
-// 批量领取功法礼物
+// 批量赠送功法
 const handleBatchLegacyClaimGift = async () => {
   try {
     isLegacyClaimGiftRunning.value = true
-    message.info('开始批量领取功法礼物...')
-    logOperation('shidian', '批量领取功法礼物', {
+    message.info('开始批量赠送功法...')
+    logOperation('shidian', '批量赠送功法', {
       cardType: '俱乐部管理',
       status: 'info',
-      message: '开始批量领取功法礼物...'
+      message: '开始批量赠送功法...'
     })
 
     // 解析执行范围
@@ -991,7 +997,7 @@ const handleBatchLegacyClaimGift = async () => {
     if (legacyTokens.length === 0) {
       const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
       message.warning(`执行范围${rangeText}内没有找到Token`)
-      logOperation('shidian', '批量领取功法礼物', {
+      logOperation('shidian', '批量赠送功法', {
         cardType: '俱乐部管理',
         status: 'warning',
         message: `执行范围${rangeText}内没有找到Token`
@@ -1001,7 +1007,7 @@ const handleBatchLegacyClaimGift = async () => {
     
     const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
     message.info(`找到${legacyTokens.length}个Token（${rangeText}）`)
-    logOperation('shidian', '批量领取功法礼物', {
+    logOperation('shidian', '批量赠送功法', {
       cardType: '俱乐部管理',
       status: 'info',
       message: `找到${legacyTokens.length}个Token（${rangeText}）`
@@ -1015,14 +1021,14 @@ const handleBatchLegacyClaimGift = async () => {
     
     if (!passportToken) {
       message.warning('没有找到标签为"通行证"的Token，将跳过接受礼物步骤')
-      logOperation('shidian', '批量领取功法礼物', {
+      logOperation('shidian', '批量赠送功法', {
         cardType: '俱乐部管理',
         status: 'warning',
         message: '没有找到标签为"通行证"的Token，将跳过接受礼物步骤'
       })
     } else {
       console.log(`找到${legacyTokens.length}个Token，通行证Token: ${passportToken.name || passportToken.id}`)
-      logOperation('shidian', '批量领取功法礼物', {
+      logOperation('shidian', '批量赠送功法', {
         cardType: '俱乐部管理',
         status: 'info',
         message: `找到通行证Token: ${passportToken.name || passportToken.id}`
@@ -1035,7 +1041,7 @@ const handleBatchLegacyClaimGift = async () => {
       async (token, globalIndex) => {
         // 执行领取功法操作
         await tokenStore.sendLegacyClaimHangup(token.id, {})
-        logOperation('shidian', '批量领取功法礼物', {
+        logOperation('shidian', '批量赠送功法', {
           cardType: '俱乐部管理',
           tokenId: token.id,
           tokenName: token.name,
@@ -1055,7 +1061,7 @@ const handleBatchLegacyClaimGift = async () => {
 
         if (legacyFragmentCount < 100) {
           console.info(`[${globalIndex + 1}] ${token.name || token.id} 功法残卷数量(${legacyFragmentCount})小于100，跳过收集功法按钮`)
-          logOperation('shidian', '批量领取功法礼物', {
+          logOperation('shidian', '批量赠送功法', {
             cardType: '俱乐部管理',
             tokenId: token.id,
             tokenName: token.name,
@@ -1091,7 +1097,7 @@ const handleBatchLegacyClaimGift = async () => {
             if (giftRes && giftRes.code !== undefined && giftRes.code !== 0) {
               const errorMsg = giftRes.msg || giftRes.message || `错误码: ${giftRes.code}`
               console.error(`[${globalIndex + 1}] ${token.name || token.id} 赠送功法残卷失败: ${errorMsg}`)
-              logOperation('shidian', '批量领取功法礼物', {
+              logOperation('shidian', '批量赠送功法', {
                 cardType: '俱乐部管理',
                 tokenId: token.id,
                 tokenName: token.name,
@@ -1101,7 +1107,7 @@ const handleBatchLegacyClaimGift = async () => {
               return { collected: true, sentGift: false, fragmentCount: legacyFragmentCount, error: errorMsg }
             } else {
               console.info(`[${globalIndex + 1}] ${token.name || token.id} 模拟点击收集功法按钮完成，已赠送 ${sendCount} 个功法残卷`)
-              logOperation('shidian', '批量领取功法礼物', {
+              logOperation('shidian', '批量赠送功法', {
                 cardType: '俱乐部管理',
                 tokenId: token.id,
                 tokenName: token.name,
@@ -1112,7 +1118,7 @@ const handleBatchLegacyClaimGift = async () => {
             }
           } catch (error) {
             console.error(`[${globalIndex + 1}] ${token.name || token.id} 执行legacy_sendgift失败:`, error)
-            logOperation('shidian', '批量领取功法礼物', {
+            logOperation('shidian', '批量赠送功法', {
               cardType: '俱乐部管理',
               tokenId: token.id,
               tokenName: token.name,
@@ -1123,7 +1129,7 @@ const handleBatchLegacyClaimGift = async () => {
           }
         } else {
           console.info(`[${globalIndex + 1}] ${token.name || token.id} 功法残卷数量为0，跳过`)
-          logOperation('shidian', '批量领取功法礼物', {
+          logOperation('shidian', '批量赠送功法', {
             cardType: '俱乐部管理',
             tokenId: token.id,
             tokenName: token.name,
@@ -1167,7 +1173,7 @@ const handleBatchLegacyClaimGift = async () => {
             try {
               await tokenStore.sendLegacyClaimGift(token.id, {})
               message.success(`通行证Token ${token.name || token.id} 第${j + 1}次接受礼物成功`)
-              logOperation('shidian', '批量领取功法礼物', {
+              logOperation('shidian', '批量赠送功法', {
                 cardType: '俱乐部管理',
                 tokenId: token.id,
                 tokenName: token.name,
@@ -1178,7 +1184,7 @@ const handleBatchLegacyClaimGift = async () => {
             } catch (error) {
               console.error(`通行证Token ${token.name || token.id} 第${j + 1}次接受礼物失败:`, error)
               message.error(`通行证Token ${token.name || token.id} 第${j + 1}次接受礼物失败: ${error.message || error}`)
-              logOperation('shidian', '批量领取功法礼物', {
+              logOperation('shidian', '批量赠送功法', {
                 cardType: '俱乐部管理',
                 tokenId: token.id,
                 tokenName: token.name,
@@ -1207,19 +1213,19 @@ const handleBatchLegacyClaimGift = async () => {
       )
     }
 
-    message.success('批量领取功法礼物已完成')
-    logOperation('shidian', '批量领取功法礼物', {
+    message.success('批量赠送功法已完成')
+    logOperation('shidian', '批量赠送功法', {
       cardType: '俱乐部管理',
       status: 'success',
-      message: '批量领取功法礼物已完成'
+      message: '批量赠送功法已完成'
     })
   } catch (error) {
-    console.error('批量领取功法礼物失败:', error)
-    message.error(`批量领取功法礼物失败: ${error.message || error}`)
-    logOperation('shidian', '批量领取功法礼物', {
+    console.error('批量赠送功法失败:', error)
+    message.error(`批量赠送功法失败: ${error.message || error}`)
+    logOperation('shidian', '批量赠送功法', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量领取功法礼物失败: ${error.message || error}`
+      message: `批量赠送功法失败: ${error.message || error}`
     })
   } finally {
     isLegacyClaimGiftRunning.value = false

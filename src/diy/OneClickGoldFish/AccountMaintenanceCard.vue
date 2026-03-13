@@ -921,6 +921,17 @@ const handleBatchQuench = async () => {
         try {
           const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始洗练减伤...`)
+          
+          // 添加开始日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '洗练减伤',
+            tokenId: token.id,
+            tokenName: token.name || token.id,
+            status: 'info',
+            message: `${tokenIndex}、${token.name || token.id}、开始洗练减伤`
+          })
 
           let allPartsCompleted = false
           let totalQuenchCount = 0
@@ -979,6 +990,17 @@ const handleBatchQuench = async () => {
               // 根据白玉数量计算最大洗练次数（每洗练一次消耗 100 白玉）
               maxQuenchCount = Math.floor(whiteJadeCount / 100)
               message.info(`[序号${tokenIndex}] ${token.name || token.id} - 当前白玉数量：${whiteJadeCount}，最大洗练次数：${maxQuenchCount}`)
+              
+              // 添加白玉数量日志
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '洗练减伤',
+                tokenId: token.id,
+                tokenName: token.name || token.id,
+                status: 'info',
+                message: `${tokenIndex}、${token.name || token.id}、当前白玉数量：${whiteJadeCount}，最大洗练次数：${maxQuenchCount}`
+              })
             }
           } catch (error) {
             console.error(`[序号${tokenIndex}] 获取白玉数量失败:`, error)
@@ -1098,14 +1120,47 @@ const handleBatchQuench = async () => {
                       completedParts.add(part)
                       if (hasRedOrOrangeDamageReduction) {
                         message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得红色或橙色减伤，完成该部位`)
+                        
+                        // 添加部位完成日志（获得减伤）
+                        logStore.addLog({
+                          page: 'fish-helper',
+                          cardType: '养号',
+                          operation: '洗练减伤',
+                          tokenId: token.id,
+                          tokenName: token.name || token.id,
+                          status: 'success',
+                          message: `${tokenIndex}、${token.name || token.id}、${partName}部位已获得红色或橙色减伤，完成该部位，洗练结果：${quenchResults.join(', ')}`
+                        })
                       } else if (hasBothRedAttributes) {
                         message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得红攻击和红破甲，完成该部位`)
+                        
+                        // 添加部位完成日志（红攻击 + 红破甲）
+                        logStore.addLog({
+                          page: 'fish-helper',
+                          cardType: '养号',
+                          operation: '洗练减伤',
+                          tokenId: token.id,
+                          tokenName: token.name || token.id,
+                          status: 'success',
+                          message: `${tokenIndex}、${token.name || token.id}、${partName}部位已获得红攻击和红破甲，完成该部位，洗练结果：${quenchResults.join(', ')}`
+                        })
                       }
                     } else if (totalRedAttributes === 1) {
                       // 只有 1 个红色破甲或红色攻击，完成该部位
                       partCompleted = true
                       completedParts.add(part)
                       message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${partName}部位已获得 1 个红色破甲或攻击，完成该部位`)
+                      
+                      // 添加部位完成日志（1 个红色）
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '养号',
+                        operation: '洗练减伤',
+                        tokenId: token.id,
+                        tokenName: token.name || token.id,
+                        status: 'success',
+                        message: `${tokenIndex}、${token.name || token.id}、${partName}部位已获得 1 个红色破甲或攻击，完成该部位，洗练结果：${quenchResults.join(', ')}`
+                      })
                     } else {
                       // totalRedAttributes === 0 或 > 1，但没有同时满足红攻击和红破甲
                       // 不完成该部位，继续洗练
@@ -1183,13 +1238,66 @@ const handleBatchQuench = async () => {
     const completedCount = results.filter(r => r.success && r.completed !== false).length
     const failureCount = results.filter(r => !r.success).length
 
+    // 生成详细的洗练结果日志
+    const successResults = results.filter(r => r.success && r.completed !== false)
+    const incompleteResults = results.filter(r => r.success && r.completed === false)
+    const failureResults = results.filter(r => !r.success)
+
     message.success(`批量洗练减伤完成：完成 ${completedCount} 个，未完成 ${successCount - completedCount} 个，失败 ${failureCount} 个`)
+    
+    // 添加总览日志
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '洗练减伤',
       status: 'success',
       message: `批量洗练减伤完成，完成 ${completedCount} 个，未完成 ${successCount - completedCount} 个，失败 ${failureCount} 个`
+    })
+
+    // 添加每个 Token 的详细洗练结果
+    successResults.forEach(result => {
+      const tokenId = result.tokenId || result.token?.id
+      const token = targetTokens.find(t => t.id === tokenId) || result.token
+      const tokenIndex = token ? getTokenIndex(token) : '未知'
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '洗练减伤',
+        tokenId: tokenId,
+        tokenName: token?.name || token?.id || tokenId,
+        status: 'success',
+        message: `${tokenIndex}、${token?.name || token?.id || tokenId}、洗练完成，洗练${result.quenchCount || 0}次`
+      })
+    })
+
+    incompleteResults.forEach(result => {
+      const tokenId = result.tokenId || result.token?.id
+      const token = targetTokens.find(t => t.id === tokenId) || result.token
+      const tokenIndex = token ? getTokenIndex(token) : '未知'
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '洗练减伤',
+        tokenId: tokenId,
+        tokenName: token?.name || token?.id || tokenId,
+        status: 'warning',
+        message: `${tokenIndex}、${token?.name || token?.id || tokenId}、洗练未完成，已洗练${result.quenchCount || 0}次`
+      })
+    })
+
+    failureResults.forEach(result => {
+      const tokenId = result.tokenId || result.token?.id
+      const token = targetTokens.find(t => t.id === tokenId) || result.token
+      const tokenIndex = token ? getTokenIndex(token) : '未知'
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '洗练减伤',
+        tokenId: tokenId,
+        tokenName: token?.name || token?.id || tokenId,
+        status: 'error',
+        message: `${tokenIndex}、${token?.name || token?.id || tokenId}、洗练失败：${result.error || '未知错误'}`
+      })
     })
 
   } catch (error) {

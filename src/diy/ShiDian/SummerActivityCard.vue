@@ -1269,7 +1269,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             // 发送 towers_fight 命令进行战斗
             await logCommand(
               'shidian',
-              `一键战斗-战斗塔-${bossNumber}`,
+              `一键战斗 - 战斗塔-${bossNumber}`,
               tokenId,
               tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
               'towers_fight',
@@ -1283,10 +1283,16 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             // 战斗成功后继续下一次战斗
             fightAttempts++;
             if (fightAttempts < maxFightAttempts) {
-              await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+              await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
             }
           } catch (fightError) {
             console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
+            // 检查是否是"已经击杀所有 boss"的错误
+            const errorMsg = fightError.message || String(fightError);
+            if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+              console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行`);
+              return true; // 成功完成，停止执行
+            }
             // 战斗按钮失败，跳转到执行开始按钮逻辑
             break; // 跳出战斗循环，进入下一个开始按钮循环
           }
@@ -1389,7 +1395,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           // 发送 towers_fight 命令进行战斗
           const fightResponse = await logCommand(
             'shidian',
-            '一键战斗-战斗塔',
+            '一键战斗 - 战斗塔',
             tokenId,
             tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
             'towers_fight',
@@ -1403,10 +1409,16 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           // 战斗成功后继续下一次战斗
           fightAttempts++;
           if (fightAttempts < maxFightAttempts) {
-            await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+            await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
           }
         } catch (fightError) {
           console.log(`战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
+          // 检查是否是"已经击杀所有 boss"的错误
+          const errorMsg = fightError.message || String(fightError);
+          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+            console.log(`已经击杀所有 boss，停止执行`);
+            return true; // 成功完成，停止执行
+          }
           // 战斗按钮失败，跳转到执行开始按钮逻辑
           break; // 跳出战斗循环，进入下一个开始按钮循环
         }
