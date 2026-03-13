@@ -434,8 +434,8 @@ export class GameCommands {
     return {
       ack,
       body: this.g_utils.bon.encode({
-      	  genieId:params.genieId
-      	  sweepCnt:params.sweepCnt
+      	  genieId:params.genieId,
+      	  sweepCnt:params.sweepCnt,
         ...params,
       }),
       cmd: "genie_sweep",

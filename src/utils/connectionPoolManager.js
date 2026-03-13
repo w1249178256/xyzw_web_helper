@@ -386,6 +386,7 @@ export class ConnectionPoolManager {
                         onProgress({
                             type: 'token-start',
                             globalIndex: globalIndex + 1,
+                            tokenId: token.id,
                             tokenName: token.name || token.id,
                             totalTokens: tokens.length
                         });
@@ -402,6 +403,7 @@ export class ConnectionPoolManager {
                             onProgress({
                                 type: 'token-error',
                                 globalIndex: globalIndex + 1,
+                                tokenId: token.id,
                                 tokenName: token.name || token.id,
                                 message: '连接失败，跳过',
                                 status: 'warning'
@@ -414,6 +416,7 @@ export class ConnectionPoolManager {
                         onProgress({
                             type: 'token-success',
                             globalIndex: globalIndex + 1,
+                            tokenId: token.id,
                             tokenName: token.name || token.id,
                             message: '连接成功',
                             status: 'success'
@@ -446,6 +449,7 @@ export class ConnectionPoolManager {
                         onProgress({
                             type: 'token-error',
                             globalIndex: globalIndex + 1,
+                            tokenId: token.id,
                             tokenName: token.name || token.id,
                             message: `操作失败: ${error.message || error}`,
                             status: 'error'

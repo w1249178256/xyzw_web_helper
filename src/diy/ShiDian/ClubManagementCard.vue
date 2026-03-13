@@ -99,7 +99,6 @@
           />
           <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量领取中...' : '批量领取功法礼物'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
-          <CustomizedCard mode="button" :name="isBatchRecruitWeekRunning ? '批量招募周中...' : '批量招募周'" :disabled="isBatchRecruitWeekRunning" @button-click="handleBatchRecruitWeek" />
         </CustomizedCard>
       </div>
       
@@ -107,7 +106,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
+        :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部']"
       />
     </template>
   </MyCard>
