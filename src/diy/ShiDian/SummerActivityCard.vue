@@ -1255,6 +1255,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           );
           await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (startError) {
+          // 检查是否是"已经击杀所有 boss"的错误
+          const errorMsg = startError.message || String(startError);
+          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+            console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
+            return true; // 停止执行该 BOSS
+          }
           // 开始按钮点击失败，但继续执行
           console.log(`BOSS ${bossNumber} 开始按钮点击失败，但继续执行:`, startError);
         }
@@ -1286,15 +1292,38 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
             }
           } catch (fightError) {
-            console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
-            // 检查是否是"已经击杀所有 boss"的错误
+            console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，检查错误类型`);
+            // 检查错误信息
             const errorMsg = fightError.message || String(fightError);
-            if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
-              console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行`);
-              return true; // 成功完成，停止执行
+            
+            // 检查是否是 7900019 错误码（爬塔没有开启）
+            if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
+              console.log(`BOSS ${bossNumber} - 爬塔没有开启 (7900019)，尝试执行 towers_start...`);
+              try {
+                // 执行 towers_start 开启爬塔
+                await logCommand(
+                  'shidian',
+                  `一键战斗 - 重新开启塔-${bossNumber}`,
+                  tokenId,
+                  tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+                  'towers_start',
+                  { towerType: bossNumber },
+                  tokenStore.sendTowersStart(tokenId, { towerType: bossNumber }),
+                  true,
+                  '暑期活动'
+                );
+                console.log(`BOSS ${bossNumber} - 爬塔已重新开启，继续执行战斗`);
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                // 继续执行战斗，不 break
+                continue;
+              } catch (restartError) {
+                console.log(`BOSS ${bossNumber} - 重新开启爬塔失败:`, restartError);
+              }
             }
-            // 战斗按钮失败，跳转到执行开始按钮逻辑
-            break; // 跳出战斗循环，进入下一个开始按钮循环
+            
+            // 其他错误，跳出战斗循环，进入下一个开始按钮循环
+            console.log(`BOSS ${bossNumber} - 战斗失败，跳转到执行开始按钮`);
+            break;
           }
         }
 
@@ -1381,6 +1410,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         );
         await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (startError) {
+        // 检查是否是"已经击杀所有 boss"的错误
+        const errorMsg = startError.message || String(startError);
+        if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+          console.log(`已经击杀所有 boss，停止执行`);
+          return true; // 成功完成，停止执行
+        }
         // 开始按钮点击失败，但继续执行
         console.log("开始按钮点击失败，但继续执行");
       }
@@ -1412,15 +1447,38 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
           }
         } catch (fightError) {
-          console.log(`战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
-          // 检查是否是"已经击杀所有 boss"的错误
+          console.log(`战斗按钮点击失败，检查错误类型`);
+          // 检查错误信息
           const errorMsg = fightError.message || String(fightError);
-          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
-            console.log(`已经击杀所有 boss，停止执行`);
-            return true; // 成功完成，停止执行
+          
+          // 检查是否是 7900019 错误码（爬塔没有开启）
+          if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
+            console.log(`爬塔没有开启 (7900019)，尝试执行 towers_start...`);
+            try {
+              // 执行 towers_start 开启爬塔
+              await logCommand(
+                'shidian',
+                '一键战斗 - 重新开启塔',
+                tokenId,
+                tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
+                'towers_start',
+                { towerType: towerTypeValue },
+                tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+                true,
+                '暑期活动'
+              );
+              console.log(`爬塔已重新开启，继续执行战斗`);
+              await new Promise((resolve) => setTimeout(resolve, 500));
+              // 继续执行战斗，不 break
+              continue;
+            } catch (restartError) {
+              console.log(`重新开启爬塔失败:`, restartError);
+            }
           }
-          // 战斗按钮失败，跳转到执行开始按钮逻辑
-          break; // 跳出战斗循环，进入下一个开始按钮循环
+          
+          // 其他错误，跳出战斗循环，进入下一个开始按钮循环
+          console.log(`战斗失败，跳转到执行开始按钮`);
+          break;
         }
       }
 
@@ -2179,6 +2237,12 @@ const oneKeyBattle = async () => {
             );
             await new Promise((resolve) => setTimeout(resolve, 500));
           } catch (startError) {
+            // 检查是否是"已经击杀所有 boss"的错误
+            const errorMsg = startError.message || String(startError);
+            if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+              console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
+              return true; // 停止执行该 BOSS
+            }
             // 开始按钮点击失败，但继续执行
             console.log(`BOSS ${bossNumber} 开始按钮点击失败，但继续执行:`, startError);
           }
@@ -2210,9 +2274,38 @@ const oneKeyBattle = async () => {
                 await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
               }
             } catch (fightError) {
-              console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
-              // 战斗按钮失败，跳转到执行开始按钮逻辑
-              break; // 跳出战斗循环，进入下一个开始按钮循环
+              console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，检查错误类型`);
+              // 检查错误信息
+              const errorMsg = fightError.message || String(fightError);
+              
+              // 检查是否是 7900019 错误码（爬塔没有开启）
+              if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
+                console.log(`BOSS ${bossNumber} - 爬塔没有开启 (7900019)，尝试执行 towers_start...`);
+                try {
+                  // 执行 towers_start 开启爬塔
+                  await logCommand(
+                    'shidian',
+                    `一键战斗 - 重新开启塔-${bossNumber}`,
+                    selectedTokenId.value,
+                    tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
+                    'towers_start',
+                    { towerType: bossNumber },
+                    tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossNumber }),
+                    true,
+                    '暑期活动'
+                  );
+                  console.log(`BOSS ${bossNumber} - 爬塔已重新开启，继续执行战斗`);
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  // 继续执行战斗，不 break
+                  continue;
+                } catch (restartError) {
+                  console.log(`BOSS ${bossNumber} - 重新开启爬塔失败:`, restartError);
+                }
+              }
+              
+              // 其他错误，跳出战斗循环，进入下一个开始按钮循环
+              console.log(`BOSS ${bossNumber} - 战斗失败，跳转到执行开始按钮`);
+              break;
             }
           }
 
@@ -2364,6 +2457,12 @@ const oneKeyBattle = async () => {
             );
           await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (startError) {
+          // 检查是否是"已经击杀所有 boss"的错误
+          const errorMsg = startError.message || String(startError);
+          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+            console.log(`已经击杀所有 boss，停止执行`);
+            return true; // 成功完成，停止执行
+          }
           // 开始按钮点击失败，但继续执行
           console.log("开始按钮点击失败，但继续执行");
         }
@@ -2395,9 +2494,38 @@ const oneKeyBattle = async () => {
               await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
             }
           } catch (fightError) {
-            console.log(`战斗按钮点击失败，跳转到执行模拟点击开始按钮`);
-            // 战斗按钮失败，跳转到执行开始按钮逻辑
-            break; // 跳出战斗循环，进入下一个开始按钮循环
+            console.log(`战斗按钮点击失败，检查错误类型`);
+            // 检查错误信息
+            const errorMsg = fightError.message || String(fightError);
+            
+            // 检查是否是 7900019 错误码（爬塔没有开启）
+            if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
+              console.log(`爬塔没有开启 (7900019)，尝试执行 towers_start...`);
+              try {
+                // 执行 towers_start 开启爬塔
+                await logCommand(
+                  'shidian',
+                  '一键战斗 - 重新开启塔',
+                  selectedTokenId.value,
+                  tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
+                  'towers_start',
+                  { towerType: bossSelect.value },
+                  tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value }),
+                  true,
+                  '暑期活动'
+                );
+                console.log(`爬塔已重新开启，继续执行战斗`);
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                // 继续执行战斗，不 break
+                continue;
+              } catch (restartError) {
+                console.log(`重新开启爬塔失败:`, restartError);
+              }
+            }
+            
+            // 其他错误，跳出战斗循环，进入下一个开始按钮循环
+            console.log(`战斗失败，跳转到执行开始按钮`);
+            break;
           }
         }
 

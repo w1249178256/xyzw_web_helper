@@ -110,6 +110,24 @@
             :disabled="isBatchClaimRewardRunning"
             :loading="isBatchClaimRewardRunning"
           />
+          <CustomizedCard 
+            mode="button-with-select"
+            button-text="批量使用万能红"
+            :select-value="selectedUniversalRedHero"
+            @update:select-value="(val) => selectedUniversalRedHero = val"
+            :select-options="heroOptions"
+            placeholder="选择英雄"
+            :disabled="isUsingUniversalRed"
+            :loading="isUsingUniversalRed"
+            @button-click="handleUseUniversalRedAndUpgrade"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isXianJiangAwakeRunning ? '咸将觉醒中...' : '咸将觉醒'"
+            @button-click="handleXianJiangAwake"
+            :disabled="isXianJiangAwakeRunning"
+            :loading="isXianJiangAwakeRunning"
+          />
         </CustomizedCard>
       </div>
       
@@ -160,7 +178,10 @@ const isExecutingScheduledTasks = ref(false)
 const isBatchBlackMarketRunning = ref(false)
 const isBatchRecruitWeekRunning = ref(false)
 const isBatchClaimRewardRunning = ref(false)
+const isUsingUniversalRed = ref(false)
+const isXianJiangAwakeRunning = ref(false)
 const scheduledExecutionTokens = ref('')
+const selectedUniversalRedHero = ref('')
 const scheduledTasks = ref({
   claimHangUp: false,
   resetBottles: false,
@@ -1642,6 +1663,433 @@ const handleBatchClaimReward = async () => {
     })
   } finally {
     isBatchClaimRewardRunning.value = false
+  }
+}
+
+// 英雄选项（从 AccountMaintenanceCard.vue 复制）
+const heroOptions = [
+  { label: '吕布', value: '10001' },
+  { label: '关羽', value: '10002' },
+  { label: '司马懿', value: '10003' },
+  { label: '诸葛亮', value: '10004' },
+  { label: '曹操', value: '10005' },
+  { label: '孙策', value: '10006' },
+  { label: '周瑜', value: '10007' },
+  { label: '陆逊', value: '10008' },
+  { label: '貂蝉', value: '10009' },
+  { label: '董卓', value: '10010' }
+]
+
+// 批量使用万能红并执行武将升星
+const handleUseUniversalRedAndUpgrade = async () => {
+  if (!selectedUniversalRedHero.value) {
+    message.warning('请选择要升星的英雄')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(scheduledExecutionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(tokenStore.gameTokens, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的 Token')
+    return
+  }
+  
+  const rangeText = tokenIndices === null ? '全部' : `范围${scheduledExecutionTokens.value}`
+  const selectedHero = heroOptions.find(h => h.value === selectedUniversalRedHero.value)
+  const selectedHeroName = selectedHero?.label || '未知英雄'
+  
+  try {
+    isUsingUniversalRed.value = true
+    
+    message.info(`开始批量使用万能红（${rangeText}），目标英雄：${selectedHeroName}，共${targetTokens.length}个 Token...`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量使用万能红',
+      status: 'info',
+      message: `开始批量使用万能红，目标英雄：${selectedHeroName}，共${targetTokens.length}个 Token`
+    })
+    
+    // 逐个处理 Token
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      const tokenIndex = i + 1
+      
+      try {
+        // 1. 连接 Token
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始使用万能红...`)
+        
+        const status = tokenStore.getWebSocketStatus(token.id)
+        if (status !== 'connected') {
+          tokenStore.selectToken(token.id, true)
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            throw new Error('Token 连接失败')
+          }
+        }
+        
+        // 2. 获取角色信息
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在获取角色信息...`)
+        const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+        if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
+          throw new Error('获取角色信息失败')
+        }
+        
+        // 获取万能红数量和目标英雄星级
+        const universalRedCount = roleInfo.role.items['3201']?.quantity || 0
+        let heroStar = 0
+        const heroId = selectedUniversalRedHero.value
+        if (roleInfo.role.heroes && roleInfo.role.heroes[heroId]) {
+          heroStar = roleInfo.role.heroes[heroId].star || 0
+        }
+        
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 万能红数量：${universalRedCount}, ${selectedHeroName}星级：${heroStar}`)
+        
+        // 如果目标英雄 30 星，跳过使用万能红
+        if (heroStar >= 30) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已 30 星，跳过使用万能红`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量使用万能红',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、${selectedHeroName}已 30 星，跳过使用万能红`
+          })
+        } else if (universalRedCount === 0) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 没有万能红，跳过`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量使用万能红',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、没有万能红，跳过`
+          })
+        } else {
+          // 计算最多可使用的万能红数量：400*(30-当前星级）
+          const maxUseCount = 400 * (30 - heroStar)
+          const actualUseCount = Math.min(universalRedCount, maxUseCount)
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 最多可使用${actualUseCount}个万能红（400*(30-${heroStar})）`)
+          
+          // 分批使用万能红，每次最多 999 个
+          let remainingCount = actualUseCount
+          let totalUsed = 0
+          let batchCount = 0
+          
+          while (remainingCount > 0) {
+            const useCount = Math.min(remainingCount, 999)
+            batchCount++
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红：${useCount}个`)
+            
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'item_useuniversalred',
+                {
+                  heroId: heroId,
+                  count: useCount
+                },
+                5000
+              )
+              
+              remainingCount -= useCount
+              totalUsed += useCount
+              
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红成功：${useCount}个`)
+              
+              // 每批之间等待 500ms
+              if (remainingCount > 0) {
+                await new Promise(resolve => setTimeout(resolve, 500))
+              }
+            } catch (error) {
+              message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红失败：${error.message || '未知错误'}`)
+              throw error
+            }
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红完成，共使用${totalUsed}个`)
+          
+          // 添加操作日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量使用万能红',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、使用万能红完成，共使用${totalUsed}个（${selectedHeroName}${heroStar}星）`
+          })
+          
+          // 3. 使用万能红后执行武将升星，最多执行 10 次
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 开始执行武将升星，最多执行 10 次...`)
+          
+          let upgradeCount = 0
+          const maxUpgradeTimes = 10
+          
+          for (let upgradeAttempt = 0; upgradeAttempt < maxUpgradeTimes; upgradeAttempt++) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'hero_heroupgradestar',
+                {
+                  heroId: heroId
+                },
+                5000
+              )
+              
+              upgradeCount++
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeCount}次武将升星成功`)
+              
+              // 每次升星后等待 1 秒
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            } catch (upgradeError) {
+              // 检查是否是物品数量不足的错误
+              if (upgradeError.message && upgradeError.message.includes('物品数量不足')) {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 物品数量不足，停止武将升星`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '定时任务',
+                  operation: '武将升星',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `${tokenIndex}、${token.name || token.id}、物品数量不足，停止武将升星`
+                })
+                break
+              } else {
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt + 1}次武将升星失败：${upgradeError.message || '未知错误'}，继续尝试`)
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              }
+            }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 武将升星完成，共执行${upgradeCount}次`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '武将升星',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、武将升星完成，共执行${upgradeCount}次`
+          })
+        }
+        
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红失败:`, error)
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红失败：${error.message || '未知错误'}`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '定时任务',
+          operation: '批量使用万能红',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name || token.id}、使用万能红失败：${error.message || '未知错误'}`
+        })
+      } finally {
+        // 关闭 WebSocket 连接
+        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
+          await tokenStore.closeWebSocketConnection(token.id)
+        }
+      }
+      
+      // 处理完一个 Token 后，等待 3 秒再处理下一个
+      if (i < targetTokens.length - 1) {
+        message.info(`等待 3 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+    }
+    
+    message.success(`批量使用万能红完成，共处理${targetTokens.length}个 Token`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量使用万能红',
+      status: 'success',
+      message: `批量使用万能红完成，目标英雄：${selectedHeroName}，共处理${targetTokens.length}个 Token`
+    })
+    
+  } catch (error) {
+    console.error('批量使用万能红失败:', error)
+    message.error(`批量使用万能红失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量使用万能红',
+      status: 'error',
+      message: `批量使用万能红失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isUsingUniversalRed.value = false
+  }
+}
+
+// 咸将觉醒
+const handleXianJiangAwake = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(scheduledExecutionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(tokenStore.gameTokens, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的 Token')
+    return
+  }
+  
+  const rangeText = tokenIndices === null ? '全部' : `范围${scheduledExecutionTokens.value}`
+  
+  try {
+    isXianJiangAwakeRunning.value = true
+    
+    message.info(`开始咸将觉醒（${rangeText}），共${targetTokens.length}个 Token...`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '咸将觉醒',
+      status: 'info',
+      message: `开始咸将觉醒，共${targetTokens.length}个 Token`
+    })
+    
+    // 逐个处理 Token
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      const tokenIndex = i + 1
+      
+      try {
+        // 1. 连接 Token
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始咸将觉醒...`)
+        
+        const status = tokenStore.getWebSocketStatus(token.id)
+        if (status !== 'connected') {
+          tokenStore.selectToken(token.id, true)
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            throw new Error('Token 连接失败')
+          }
+        }
+        
+        // 2. 执行咸将觉醒命令，对 index -1, 0, 1, 2 各执行一次
+        const heroId = '107'
+        const indices = [-1, 0, 1, 2]
+        
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 开始执行咸将觉醒，heroId: ${heroId}, indices: ${indices.join(', ')}`)
+        
+        for (let j = 0; j < indices.length; j++) {
+          const index = indices[j]
+          
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_skillawake',
+              {
+                heroId: heroId,
+                index: index
+              },
+              5000
+            )
+            
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 咸将觉醒成功 (index: ${index})`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '咸将觉醒',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、咸将觉醒成功 (index: ${index})`
+            })
+            
+            // 每次执行后等待 1 秒
+            if (j < indices.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+          } catch (error) {
+            // 服务器错误也继续执行，不中断
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 咸将觉醒 (index: ${index}) 失败：${error.message || '服务器错误'}，继续执行下一个`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '咸将觉醒',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、咸将觉醒 (index: ${index}) 失败：${error.message || '服务器错误'}，继续执行`
+            })
+            // 继续执行下一个 index，等待 1 秒
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          }
+        }
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} - 咸将觉醒完成`)
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '定时任务',
+          operation: '咸将觉醒',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、咸将觉醒完成`
+        })
+        
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} - 咸将觉醒失败:`, error)
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} - 咸将觉醒失败：${error.message || '未知错误'}`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '定时任务',
+          operation: '咸将觉醒',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name || token.id}、咸将觉醒失败：${error.message || '未知错误'}`
+        })
+      } finally {
+        // 关闭 WebSocket 连接
+        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
+          await tokenStore.closeWebSocketConnection(token.id)
+        }
+      }
+      
+      // 处理完一个 Token 后，等待 3 秒再处理下一个
+      if (i < targetTokens.length - 1) {
+        message.info(`等待 3 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+    }
+    
+    message.success(`咸将觉醒完成，共处理${targetTokens.length}个 Token`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '咸将觉醒',
+      status: 'success',
+      message: `咸将觉醒完成，共处理${targetTokens.length}个 Token`
+    })
+    
+  } catch (error) {
+    console.error('咸将觉醒失败:', error)
+    message.error(`咸将觉醒失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '咸将觉醒',
+      status: 'error',
+      message: `咸将觉醒失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isXianJiangAwakeRunning.value = false
   }
 }
 </script>

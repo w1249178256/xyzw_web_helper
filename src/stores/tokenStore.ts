@@ -327,12 +327,22 @@ export const useTokenStore = defineStore("tokens", () => {
         return;
       }
       if (message.error) {
-        const errText = String(message.error).toLowerCase();
+        const errText = String(message.error);
         gameLogger.warn(`消息处理跳过 [${tokenId}]:`, message.error);
         
+        // 检查是否是游戏业务错误（如"已经击杀所有 boss"、"爬塔没有开启"）
+        const isGameError = errText.includes('已经击杀所有 boss') || 
+                           errText.includes('爬塔没有开启') ||
+                           errText.includes('击杀所有');
+        
+        if (isGameError) {
+          // 抛出异常，让调用方能捕获并处理
+          throw new Error(errText);
+        }
+        
         // 检测 "check token error" 或 "token expired"
-        const isTokenError = errText.includes("check token error") || 
-                            (errText.includes("token") && errText.includes("expired"));
+        const isTokenError = errText.toLowerCase().includes("check token error") || 
+                            (errText.toLowerCase().includes("token") && errText.toLowerCase().includes("expired"));
         
         if (isTokenError) {
           const conn = wsConnections.value[tokenId];

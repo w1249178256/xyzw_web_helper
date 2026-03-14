@@ -1048,7 +1048,7 @@ const handleBatchUpgrade = async () => {
           status: 'success',
           message: `[序号${tokenIndex}] ${token.name || token.id} 英雄升星完成`
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 3. 执行图鉴升星
         logStore.addLog({
@@ -1072,7 +1072,7 @@ const handleBatchUpgrade = async () => {
           status: 'success',
           message: `[序号${tokenIndex}] ${token.name || token.id} 图鉴升星完成`
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 4. 执行领取图鉴奖励
         logStore.addLog({
@@ -1098,7 +1098,7 @@ const handleBatchUpgrade = async () => {
         })
         
         if (i < sortedTargetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
         console.error(`Token [序号${tokenIndex}] ${token.name || token.id} 批量升星失败:`, error)
