@@ -1,0 +1,14 @@
+22:39:08 Send:
+activity_claimweekactreward
+{
+  "ack": 0,
+  "body": {
+    "selectRewardsMap": {
+      "1": 1
+    },
+    "typ": 1
+  },
+  "cmd": "activity_claimweekactreward",
+  "seq": 6,
+  "time": 1773412748293
+}

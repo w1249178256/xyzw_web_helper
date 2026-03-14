@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -108,11 +108,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-<<<<<<< Updated upstream
-        :filter-operations="['功法挂机', '收集功法', '批量领取功法礼物', '接受礼物', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部']"
-=======
         :filter-operations="['功法挂机', '收集功法', '批量赠送功法', '接受礼物', '一键领取', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
->>>>>>> Stashed changes
       />
     </template>
   </MyCard>
