@@ -1257,7 +1257,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         } catch (startError) {
           // 检查是否是"已经击杀所有 boss"的错误
           const errorMsg = startError.message || String(startError);
-          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+          if (errorMsg.includes('已经击杀所有 boss') || 
+              errorMsg.includes('击杀所有') || 
+              errorMsg.includes('7900022')) {
             console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
             return true; // 停止执行该 BOSS
           }
@@ -1412,7 +1414,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       } catch (startError) {
         // 检查是否是"已经击杀所有 boss"的错误
         const errorMsg = startError.message || String(startError);
-        if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+        if (errorMsg.includes('已经击杀所有 boss') || 
+            errorMsg.includes('击杀所有') || 
+            errorMsg.includes('7900022')) {
           console.log(`已经击杀所有 boss，停止执行`);
           return true; // 成功完成，停止执行
         }
@@ -2239,7 +2243,9 @@ const oneKeyBattle = async () => {
           } catch (startError) {
             // 检查是否是"已经击杀所有 boss"的错误
             const errorMsg = startError.message || String(startError);
-            if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+            if (errorMsg.includes('已经击杀所有 boss') || 
+                errorMsg.includes('击杀所有') || 
+                errorMsg.includes('7900022')) {
               console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
               return true; // 停止执行该 BOSS
             }
@@ -2459,7 +2465,9 @@ const oneKeyBattle = async () => {
         } catch (startError) {
           // 检查是否是"已经击杀所有 boss"的错误
           const errorMsg = startError.message || String(startError);
-          if (errorMsg.includes('已经击杀所有 boss') || errorMsg.includes('击杀所有')) {
+          if (errorMsg.includes('已经击杀所有 boss') || 
+              errorMsg.includes('击杀所有') || 
+              errorMsg.includes('7900022')) {
             console.log(`已经击杀所有 boss，停止执行`);
             return true; // 成功完成，停止执行
           }
