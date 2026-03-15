@@ -115,6 +115,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { defineProps, ref, computed, watch, onUnmounted } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
@@ -415,7 +417,7 @@ const startTowerClimb = async () => {
         message.success(`成功领取第${Math.floor(towerId / 10)}章通关奖励！`)
       }
 
-      await new Promise((res) => setTimeout(res, 400)) // 每次间隔400毫秒
+      await new Promise((res) => setTimeout(res, 1000)) // 每次间隔400毫秒
     }
     
     // 获取免费道具数量
@@ -444,7 +446,7 @@ const startTowerClimb = async () => {
       // 忽略免费道具领取失败
     }
     
-    await new Promise((res) => setTimeout(res, 500))
+    await new Promise((res) => setTimeout(res, 1000))
     
     // 获取最终状态
     const finalTowerId = currentTowerId.value
@@ -628,7 +630,7 @@ const batchClaimLegionPrivilege = async () => {
           try {
             await tokenStore.sendEvotowerClaimLegionPrivilege(token.id, {})
             successCount++
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise(resolve => setTimeout(resolve, 1000))
           } catch (error) {
             // 如果领取失败（如已领取过），跳过剩余领取
             console.log(`[序号${tokenIndex}] ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
@@ -997,7 +999,7 @@ const startUseItems = async () => {
       lotteryLeftCnt--
       processedCount++
 
-      await new Promise((res) => setTimeout(res, 500))
+      await new Promise((res) => setTimeout(res, 1000))
     }
 
     // 领取累计奖励
@@ -1118,7 +1120,7 @@ const autoMergeItems = async () => {
                { actType: 1, taskId: parseInt(taskId) },
                2000
              ).catch(() => {})
-             await new Promise((res) => setTimeout(res, 500))
+             await new Promise((res) => setTimeout(res, 1000))
           }
         }
       }
@@ -1176,7 +1178,7 @@ const autoMergeItems = async () => {
           { actType: 1 },
           10000 
         )
-        await new Promise((res) => setTimeout(res, 1500))
+        await new Promise((res) => setTimeout(res, 1000))
       } else {
         // 8级以下手动合成
         for (const id in groupedItems) {
@@ -1198,13 +1200,13 @@ const autoMergeItems = async () => {
               },
               1000
             ).catch(() => {})
-            await new Promise((res) => setTimeout(res, 300))
+            await new Promise((res) => setTimeout(res, 1000))
           }
         }
       }
       
       // 继续下一轮循环
-      await new Promise((res) => setTimeout(res, 500))
+      await new Promise((res) => setTimeout(res, 1000))
     }
 
     message.success("一键合成操作完成")
@@ -1340,7 +1342,7 @@ const handleBatchClimb = async () => {
         let currentEnergy = towerInfoRes?.evoTower?.energy || 0
         let currentTowerId = towerInfoRes?.evoTower?.towerId || 0
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 执行爬塔逻辑（模拟点击开始爬塔按钮）
         let climbCount = 0
@@ -1418,7 +1420,7 @@ const handleBatchClimb = async () => {
             )
           }
 
-          await new Promise((res) => setTimeout(res, 400))
+          await new Promise((res) => setTimeout(res, 1000))
         }
         
         // 计算显示层数

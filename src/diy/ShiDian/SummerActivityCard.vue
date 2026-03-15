@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="summer-activity" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -206,6 +206,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
@@ -373,7 +375,7 @@ const getUsedItems = async () => {
       { actId: Number(activityId.value) },
       (async () => {
         // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return tokenStore.sendActivityGetActeGameInfo(
           selectedTokenId.value,
           { actId: Number(activityId.value) }
@@ -433,7 +435,7 @@ const getRemainingItems = async () => {
       {},
       (async () => {
         // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return tokenStore.sendGetRoleInfo(selectedTokenId.value);
       })(),
       true,
@@ -571,7 +573,7 @@ const startTower = async () => {
       { towerType: bossSelect.value },
       (async () => {
         // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value });
       })(),
       true,
@@ -617,7 +619,7 @@ const fightTower = async () => {
       { towerType: bossSelect.value },
       (async () => {
         // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400));
+        await new Promise(resolve => setTimeout(resolve, 1000));
         return tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value });
       })(),
       true,
@@ -721,7 +723,7 @@ const useItemInternal = async (tokenId, actId, itemIdValue) => {
         break;
       }
 
-      await new Promise((r) => setTimeout(r, 500)); // 间隔500ms
+      await new Promise((r) => setTimeout(r, 1000)); // 间隔500ms
     } catch (error) {
       console.warn("使用道具失败:", error);
       break;
@@ -825,7 +827,7 @@ const claimItemRewardInternal = async (tokenId, actId) => {
 
         if (stageNum < usedCount) {
           console.log(`stageNum (${stageNum}) < usedCount (${usedCount})，继续领取...`);
-          await new Promise((r) => setTimeout(r, 500)); // 间隔500ms
+          await new Promise((r) => setTimeout(r, 1000)); // 间隔500ms
         } else {
           console.log(`stageNum (${stageNum}) >= usedCount (${usedCount})，停止领取`);
           break;
@@ -925,7 +927,7 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
         true,
         '暑期活动'
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
 
       // 模拟点击战斗按钮
       const fightResponse = await logCommand(
@@ -962,7 +964,7 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
       }
     }
 
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 1000));
   }
 
   // 3. 循环执行模拟点击使用道具按钮，模拟点击领取道具奖励按钮，直到道具数量为0
@@ -999,7 +1001,7 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
         console.log("使用道具失败或道具已用完");
         break;
       }
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
     } catch (error) {
       console.warn("使用道具失败:", error);
       break;
@@ -1008,7 +1010,7 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
     // 模拟点击领取道具奖励按钮（使用内部函数）
     try {
       await claimItemRewardInternal(tokenId, actId);
-      await new Promise((r) => setTimeout(r, 500));
+      await new Promise((r) => setTimeout(r, 1000));
     } catch (error) {
       console.warn("领取道具奖励失败:", error);
       break;
@@ -1199,7 +1201,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     // 模拟点击暑期活动子卡片切换阵2按钮
     console.log("正在切换到阵容2...");
     await switchToTeam2(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 使用fight_startlevel获取当前阵容
     console.log("正在获取当前阵容信息...");
@@ -1214,12 +1216,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       true,
       '暑期活动'
     );
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
     console.log("正在设置队伍...");
     await setTeam(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 遍历每个零胜场BOSS
     for (let i = 0; i < zeroWinBosses.length; i++) {
@@ -1253,14 +1255,16 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             true,
             '暑期活动'
           );
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (startError) {
-          // 检查是否是"已经击杀所有 boss"的错误
+          // 检查是否是"已经击杀所有 boss"或"次数已用完"的错误
           const errorMsg = startError.message || String(startError);
           if (errorMsg.includes('已经击杀所有 boss') || 
               errorMsg.includes('击杀所有') || 
-              errorMsg.includes('7900022')) {
-            console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
+              errorMsg.includes('7900022') ||
+              errorMsg.includes('次数已用完') ||
+              errorMsg.includes('7900023')) {
+            console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行该 BOSS`);
             return true; // 停止执行该 BOSS
           }
           // 开始按钮点击失败，但继续执行
@@ -1291,7 +1295,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             // 战斗成功后继续下一次战斗
             fightAttempts++;
             if (fightAttempts < maxFightAttempts) {
-              await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟 500ms
             }
           } catch (fightError) {
             console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，检查错误类型`);
@@ -1315,7 +1319,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                   '暑期活动'
                 );
                 console.log(`BOSS ${bossNumber} - 爬塔已重新开启，继续执行战斗`);
-                await new Promise((resolve) => setTimeout(resolve, 500));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
                 // 继续执行战斗，不 break
                 continue;
               } catch (restartError) {
@@ -1331,7 +1335,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
 
         // 无论战斗是否成功，都增加开始按钮点击计数
         startClickCount++;
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
       }
     }
   } else {
@@ -1339,7 +1343,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     // 1. 切换到阵容2
     console.log("正在切换到阵容2...");
     await switchToTeam2(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 2. 使用fight_startlevel获取当前阵容
     console.log("正在获取当前阵容信息...");
@@ -1354,12 +1358,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       true,
       '暑期活动'
     );
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 3. 设置队伍
     console.log("正在设置队伍...");
     await setTeam(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 4. 获取活动次数
     console.log("正在获取活动次数...");
@@ -1410,14 +1414,16 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           true,
           '暑期活动'
         );
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (startError) {
-        // 检查是否是"已经击杀所有 boss"的错误
+        // 检查是否是"已经击杀所有 boss"或"次数已用完"的错误
         const errorMsg = startError.message || String(startError);
         if (errorMsg.includes('已经击杀所有 boss') || 
             errorMsg.includes('击杀所有') || 
-            errorMsg.includes('7900022')) {
-          console.log(`已经击杀所有 boss，停止执行`);
+            errorMsg.includes('7900022') ||
+            errorMsg.includes('次数已用完') ||
+            errorMsg.includes('7900023')) {
+          console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
           return true; // 成功完成，停止执行
         }
         // 开始按钮点击失败，但继续执行
@@ -1448,7 +1454,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           // 战斗成功后继续下一次战斗
           fightAttempts++;
           if (fightAttempts < maxFightAttempts) {
-            await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟 500ms
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟 500ms
           }
         } catch (fightError) {
           console.log(`战斗按钮点击失败，检查错误类型`);
@@ -1472,7 +1478,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                 '暑期活动'
               );
               console.log(`爬塔已重新开启，继续执行战斗`);
-              await new Promise((resolve) => setTimeout(resolve, 500));
+              await new Promise((resolve) => setTimeout(resolve, 1000));
               // 继续执行战斗，不 break
               continue;
             } catch (restartError) {
@@ -1494,7 +1500,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         startClickCount++;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
     }
   }
 
@@ -1773,7 +1779,7 @@ const useFuCoin = async () => {
         message.info(`福币数量: ${fuCoinCount.value}`);
         
         // 等待一段时间避免请求过于频繁
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } catch (error) {
         console.error(`使用福币${timesToUse}次失败:`, error);
         message.error(`使用福币失败: ${error.message || error}`);
@@ -1885,7 +1891,7 @@ const batchMayDayActivity = async () => {
             connected = true;
             
             // 等待一下确保连接稳定
-            await new Promise((r) => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 1000));
             
             // 执行使用福币功能（使用内部函数，避免isRunning冲突）
             try {
@@ -2029,7 +2035,7 @@ const useFuCoinInternal = async (tokenId) => {
       currentFuCoinCount = Math.max(0, currentFuCoinCount - timesToUse);
       
       // 延迟一段时间再继续
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error(`Token ${tokenId} 使用福币失败:`, error);
       // 如果是服务器错误，可以尝试获取最新福币数量再决定是否继续
@@ -2185,7 +2191,7 @@ const oneKeyBattle = async () => {
       // 模拟点击暑期活动子卡片切换阵2按钮
       console.log("正在切换到阵容2...");
       await switchToTeam2(selectedTokenId.value);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 使用fight_startlevel获取当前阵容
       console.log("正在获取当前阵容信息...");
@@ -2200,12 +2206,12 @@ const oneKeyBattle = async () => {
         true,
         '暑期活动'
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
       console.log("正在设置队伍...");
       await setTeam(selectedTokenId.value);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 遍历每个零胜场BOSS
       for (let i = 0; i < zeroWinBosses.length; i++) {
@@ -2239,14 +2245,16 @@ const oneKeyBattle = async () => {
               true,
               '暑期活动'
             );
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           } catch (startError) {
-            // 检查是否是"已经击杀所有 boss"的错误
+            // 检查是否是"已经击杀所有 boss"或"次数已用完"的错误
             const errorMsg = startError.message || String(startError);
             if (errorMsg.includes('已经击杀所有 boss') || 
                 errorMsg.includes('击杀所有') || 
-                errorMsg.includes('7900022')) {
-              console.log(`BOSS ${bossNumber} - 已经击杀所有 boss，停止执行该 BOSS`);
+                errorMsg.includes('7900022') ||
+                errorMsg.includes('次数已用完') ||
+                errorMsg.includes('7900023')) {
+              console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行该 BOSS`);
               return true; // 停止执行该 BOSS
             }
             // 开始按钮点击失败，但继续执行
@@ -2277,7 +2285,7 @@ const oneKeyBattle = async () => {
               // 战斗成功后继续下一次战斗
               fightAttempts++;
               if (fightAttempts < maxFightAttempts) {
-                await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+                await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
               }
             } catch (fightError) {
               console.log(`BOSS ${bossNumber} - 战斗按钮点击失败，检查错误类型`);
@@ -2301,7 +2309,7 @@ const oneKeyBattle = async () => {
                     '暑期活动'
                   );
                   console.log(`BOSS ${bossNumber} - 爬塔已重新开启，继续执行战斗`);
-                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  await new Promise((resolve) => setTimeout(resolve, 1000));
                   // 继续执行战斗，不 break
                   continue;
                 } catch (restartError) {
@@ -2317,7 +2325,7 @@ const oneKeyBattle = async () => {
 
           // 无论战斗是否成功，都增加开始按钮点击计数
           startClickCount++;
-          await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+          await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
         }
       }
     } else {
@@ -2419,7 +2427,7 @@ const oneKeyBattle = async () => {
       // 5. 模拟点击暑期活动子卡片切换阵2按钮
       console.log("正在切换到阵容2...");
       await switchToTeam2(selectedTokenId.value);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 使用fight_startlevel获取当前阵容
       console.log("正在获取当前阵容信息...");
@@ -2434,12 +2442,12 @@ const oneKeyBattle = async () => {
         true,
         '暑期活动'
       );
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
       console.log("正在设置队伍...");
       await setTeam(selectedTokenId.value);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // 执行开始-战斗循环，直到完成8次开始点击
       let startClickCount = 0;
@@ -2461,14 +2469,16 @@ const oneKeyBattle = async () => {
               true,
               '暑期活动'
             );
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (startError) {
-          // 检查是否是"已经击杀所有 boss"的错误
+          // 检查是否是"已经击杀所有 boss"或"次数已用完"的错误
           const errorMsg = startError.message || String(startError);
           if (errorMsg.includes('已经击杀所有 boss') || 
               errorMsg.includes('击杀所有') || 
-              errorMsg.includes('7900022')) {
-            console.log(`已经击杀所有 boss，停止执行`);
+              errorMsg.includes('7900022') ||
+              errorMsg.includes('次数已用完') ||
+              errorMsg.includes('7900023')) {
+            console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
             return true; // 成功完成，停止执行
           }
           // 开始按钮点击失败，但继续执行
@@ -2499,7 +2509,7 @@ const oneKeyBattle = async () => {
             // 战斗成功后继续下一次战斗
             fightAttempts++;
             if (fightAttempts < maxFightAttempts) {
-              await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
             }
           } catch (fightError) {
             console.log(`战斗按钮点击失败，检查错误类型`);
@@ -2523,7 +2533,7 @@ const oneKeyBattle = async () => {
                   '暑期活动'
                 );
                 console.log(`爬塔已重新开启，继续执行战斗`);
-                await new Promise((resolve) => setTimeout(resolve, 500));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
                 // 继续执行战斗，不 break
                 continue;
               } catch (restartError) {
@@ -2539,7 +2549,7 @@ const oneKeyBattle = async () => {
 
         // 无论战斗是否成功，都增加开始按钮点击计数
         startClickCount++;
-        await new Promise((resolve) => setTimeout(resolve, 500)); // 每次操作间延迟500ms
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 每次操作间延迟500ms
       }
     }
 
@@ -2777,12 +2787,12 @@ const setTeam = async (tokenId = null) => {
       '暑期活动'
     );
       // 等待一下确保切换完成
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       console.log("切换阵容2成功");
     } catch (switchError) {
       console.warn("切换阵容2失败，继续执行后续操作:", switchError);
       // 切换失败时也等待一下，可能当前已经是阵容1
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     // 2. 获取当前阵容信息

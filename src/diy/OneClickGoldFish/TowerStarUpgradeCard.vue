@@ -108,6 +108,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { defineProps, ref, computed } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
@@ -313,7 +315,7 @@ const startTowerClimb = async () => {
         message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
       })
       message.success(`第${climbCount}次爬塔命令已发送`);
-      await new Promise((res) => setTimeout(res, 2000)); // 每次间隔2秒
+      await new Promise((res) => setTimeout(res, 1000)); // 每次间隔 1 秒
     }
     
     message.success(`已自动爬塔${climbCount}次，体力已耗尽或达到上限。`);
@@ -1537,7 +1539,7 @@ const startTowerClimbForToken = async (token) => {
         message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
       })
       message.success(`${token.name || token.id} 第${climbCount}次爬塔命令已发送`);
-      await new Promise((res) => setTimeout(res, 2000)); // 每次间隔2秒
+      await new Promise((res) => setTimeout(res, 1000)); // 每次间隔 1 秒
     }
     
     message.success(`${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限。`);

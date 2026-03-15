@@ -1,0 +1,2072 @@
+=
+----------------------------------------
+时间: 2026/3/15 11:28:18
+服务: TowersService
+方法: fight
+参数: [{"towerType":3}]
+结果:
+{
+  "_raw": {
+    "seq": 47,
+    "ack": 46,
+    "time": 1773545298668,
+    "resp": 47,
+    "cmd": "towers_fightresp",
+    "body": {
+      "todayUseTickCnt": 2,
+      "towerData": {
+        "towerType": 3,
+        "fighting": false,
+        "actTowerLv": 4,
+        "winCnt": 0,
+        "maxWinCnt": 3,
+        "curMonsterStateData": {
+          "61": {
+            "id": 250099,
+            "position": 61,
+            "curHp": 2644004903,
+            "curEnergy": 0,
+            "damage": 0,
+            "takeDamage": 0,
+            "treatment": 0
+          },
+          "62": {
+            "id": 250099,
+            "position": 62,
+            "curHp": 2644004903,
+            "curEnergy": 100,
+            "damage": 0,
+            "takeDamage": 0,
+            "treatment": 0
+          },
+          "63": {
+            "id": 250098,
+            "position": 63,
+            "curHp": 2644004903,
+            "curEnergy": 63,
+            "damage": 0,
+            "takeDamage": 0,
+            "treatment": 0
+          },
+          "64": {
+            "id": 250103,
+            "position": 64,
+            "curHp": 2644004903,
+            "curEnergy": 100,
+            "damage": 0,
+            "takeDamage": 0,
+            "treatment": 0
+          },
+          "65": {
+            "id": 250100,
+            "position": 65,
+            "curHp": 2644004903,
+            "curEnergy": 78,
+            "damage": 0,
+            "takeDamage": 0,
+            "treatment": 0
+          }
+        },
+        "curHeroStateData": {},
+        "monsterMaxHp": {
+          "61": 2644004903,
+          "62": 2644004903,
+          "63": 2644004903,
+          "64": 2644004903,
+          "65": 2644004903
+        },
+        "towerScore": 400000045290,
+        "pass": false
+      },
+      "battleData": {
+        "id": 73282653316,
+        "mode": 18,
+        "randomSeed": 1744,
+        "version": 240491,
+        "leftTeam": {
+          "roleId": 706685877,
+          "power": 422753504,
+          "tapAttack": 49983,
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 4022,
+              "attack": 130497074,
+              "defense": 49801232,
+              "curHp": 1155682690,
+              "hp": 1155682690,
+              "curEnergy": -1,
+              "speed": 2688,
+              "color": 3,
+              "star": 26,
+              "order": 16,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {
+                "51": 0.42,
+                "54": 0.15,
+                "56": 0.1725,
+                "57": 0.2,
+                "61": 0.342,
+                "65": 0.06,
+                "70": 0.008,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                206,
+                203,
+                204
+              ],
+              "recordFlag": false
+            },
+            "1": {
+              "id": 110,
+              "type": 0,
+              "index": 1,
+              "level": 850,
+              "attack": 497982,
+              "defense": 463253,
+              "curHp": 5049108,
+              "hp": 5049108,
+              "curEnergy": -1,
+              "speed": 443,
+              "color": 3,
+              "star": 13,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 1101,
+              "attribute": {
+                "53": 0.2,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1102,
+                1103,
+                1104
+              ],
+              "recordFlag": false
+            },
+            "2": {
+              "id": 204,
+              "type": 0,
+              "index": 2,
+              "level": 850,
+              "attack": 400713,
+              "defense": 384419,
+              "curHp": 3640436,
+              "hp": 3640436,
+              "curEnergy": -1,
+              "speed": 426,
+              "color": 2,
+              "star": 11,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 40001,
+              "attribute": {
+                "51": 0.1,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                40002,
+                40003,
+                40004
+              ],
+              "recordFlag": false
+            },
+            "3": {
+              "id": 106,
+              "type": 0,
+              "index": 3,
+              "level": 850,
+              "attack": 1820308,
+              "defense": 1484951,
+              "curHp": 21129228,
+              "hp": 21129228,
+              "curEnergy": -1,
+              "speed": 395,
+              "color": 3,
+              "star": 13,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 8000001,
+              "attribute": {
+                "57": 0.25,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                8000002,
+                8000003,
+                8000004
+              ],
+              "recordFlag": false
+            },
+            "4": {
+              "id": 217,
+              "type": 0,
+              "index": 4,
+              "level": 860,
+              "attack": 242015,
+              "defense": 263695,
+              "curHp": 2466547,
+              "hp": 2466547,
+              "curEnergy": -1,
+              "speed": 531,
+              "color": 2,
+              "star": 10,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 20001,
+              "attribute": {
+                "61": 0.65,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                20002,
+                20003,
+                20004
+              ],
+              "recordFlag": false
+            }
+          },
+          "name": "相符001-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "weaponId": 3,
+          "weaponActiveLevelId": 345,
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "61": {
+              "id": 250099,
+              "type": 2,
+              "index": 61,
+              "level": 25000184,
+              "attack": 57246836,
+              "defense": 17594,
+              "curHp": 2644004903,
+              "hp": 2644004903,
+              "curEnergy": 100,
+              "speed": 1,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": [
+                1,
+                1095,
+                1096,
+                1097,
+                1098
+              ],
+              "recordFlag": false
+            },
+            "62": {
+              "id": 250099,
+              "type": 2,
+              "index": 62,
+              "level": 25000184,
+              "attack": 57246836,
+              "defense": 17594,
+              "curHp": 2644004903,
+              "hp": 2644004903,
+              "curEnergy": 100,
+              "speed": 1,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": [
+                1,
+                1095,
+                1096,
+                1097,
+                1098
+              ],
+              "recordFlag": false
+            },
+            "63": {
+              "id": 250098,
+              "type": 2,
+              "index": 63,
+              "level": 25000184,
+              "attack": 57246836,
+              "defense": 17594,
+              "curHp": 2644004903,
+              "hp": 2644004903,
+              "curEnergy": 100,
+              "speed": 1,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": [
+                1,
+                1195,
+                1196,
+                1197,
+                1198
+              ],
+              "recordFlag": false
+            },
+            "64": {
+              "id": 250103,
+              "type": 2,
+              "index": 64,
+              "level": 25000184,
+              "attack": 57246836,
+              "defense": 17594,
+              "curHp": 2644004903,
+              "hp": 2644004903,
+              "curEnergy": 100,
+              "speed": 4,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": [
+                1,
+                1125,
+                1126,
+                1127,
+                1128
+              ],
+              "recordFlag": false
+            },
+            "65": {
+              "id": 250100,
+              "type": 2,
+              "index": 65,
+              "level": 25000184,
+              "attack": 57246836,
+              "defense": 17594,
+              "curHp": 2644004903,
+              "hp": 2644004903,
+              "curEnergy": 100,
+              "speed": 1,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": [
+                1,
+                1135,
+                1136,
+                1137,
+                1138
+              ],
+              "recordFlag": false
+            }
+          }
+        },
+        "outputCode": "b236b21f8904b1e6b07c5cd3a1d11053",
+        "result": {
+          "id": 73282653316,
+          "seed": 1744,
+          "totalFrame": 866,
+          "version": 240491,
+          "battleVersion": "e0747c3310",
+          "memoMode": 3,
+          "inputCode": "2276802c4a07d59bcefb9c7ac634d0a8",
+          "outputCode": "b236b21f8904b1e6b07c5cd3a1d11053",
+          "sponsor": {
+            "roleId": 706685877,
+            "name": "%E7%9B%B8%E7%AC%A6001-3",
+            "headImg": "https%3A%2F%2Fthirdwx.qlogo.cn%2Fmmopen%2Fvi_32%2FpPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0%2F132",
+            "power": 422753504,
+            "teamInfo": [
+              {
+                "heroId": 107,
+                "color": 3,
+                "level": 4022,
+                "order": 16,
+                "index": 0,
+                "rage": 0,
+                "club": 4,
+                "slot": 0,
+                "star": 26,
+                "damage": 3706136463,
+                "takeDamage": 1176797733,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10701,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 2475425766,
+                  "3": 1383326163,
+                  "4": 3706136463
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 110,
+                "color": 3,
+                "level": 850,
+                "order": 5,
+                "index": 1,
+                "rage": 0,
+                "club": 2,
+                "slot": 1,
+                "star": 13,
+                "damage": 179274,
+                "takeDamage": 273926111,
+                "treatment": 1264875,
+                "hp": 0,
+                "energy": 0,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 179274,
+                  "3": 179274,
+                  "4": 179274
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 204,
+                "color": 2,
+                "level": 850,
+                "order": 5,
+                "index": 2,
+                "rage": 0,
+                "club": 2,
+                "slot": 2,
+                "star": 11,
+                "damage": 1025826,
+                "takeDamage": 273926111,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 865541,
+                  "3": 173109,
+                  "4": 1025826
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 850,
+                "order": 5,
+                "index": 3,
+                "rage": 0,
+                "club": 3,
+                "slot": 3,
+                "star": 13,
+                "damage": 1179560,
+                "takeDamage": 273926111,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 1179560,
+                  "3": 589780,
+                  "4": 1179560
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 217,
+                "color": 2,
+                "level": 860,
+                "order": 5,
+                "index": 4,
+                "rage": 0,
+                "club": 2,
+                "slot": 4,
+                "star": 10,
+                "damage": 72605,
+                "takeDamage": 92739875,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": -1,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 72605,
+                  "3": 72605,
+                  "4": 72605
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              }
+            ],
+            "ext": {
+              "curHP": 0
+            }
+          },
+          "accept": {
+            "teamInfo": [
+              {
+                "heroId": 250099,
+                "color": 0,
+                "level": 84,
+                "order": 0,
+                "index": 61,
+                "rage": 0,
+                "club": 0,
+                "slot": 61,
+                "star": 0,
+                "damage": 417844656,
+                "takeDamage": 1544478582,
+                "treatment": 1144936720,
+                "hp": 2644004903,
+                "energy": 0,
+                "skin": 0,
+                "skinName": "",
+                "type": 2,
+                "maxAttr": {
+                  "2": 417844656,
+                  "3": 417844656,
+                  "4": 417844656
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 250099,
+                "color": 0,
+                "level": 84,
+                "order": 0,
+                "index": 62,
+                "rage": 100,
+                "club": 0,
+                "slot": 62,
+                "star": 0,
+                "damage": 286512114,
+                "takeDamage": 668323836,
+                "treatment": 1144936720,
+                "hp": 2644004903,
+                "energy": 100,
+                "skin": 0,
+                "skinName": "",
+                "type": 2,
+                "maxAttr": {
+                  "2": 174814664,
+                  "3": 92739875,
+                  "4": 286512114
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 250098,
+                "color": 0,
+                "level": 84,
+                "order": 0,
+                "index": 63,
+                "rage": 63,
+                "club": 0,
+                "slot": 63,
+                "star": 0,
+                "damage": 1003347924,
+                "takeDamage": 31695982,
+                "treatment": 0,
+                "hp": 2644004903,
+                "energy": 63,
+                "skin": 0,
+                "skinName": "",
+                "type": 2,
+                "maxAttr": {
+                  "2": 728066402,
+                  "3": 728066402,
+                  "4": 1003347924
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 250103,
+                "color": 0,
+                "level": 84,
+                "order": 0,
+                "index": 64,
+                "rage": 100,
+                "club": 0,
+                "slot": 64,
+                "star": 0,
+                "damage": 1026750628,
+                "takeDamage": 1306566199,
+                "treatment": 0,
+                "hp": 2644004903,
+                "energy": 100,
+                "skin": 0,
+                "skinName": "",
+                "type": 2,
+                "maxAttr": {
+                  "2": 821778331,
+                  "3": 273926111,
+                  "4": 1026750628
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              },
+              {
+                "heroId": 250100,
+                "color": 0,
+                "level": 84,
+                "order": 0,
+                "index": 65,
+                "rage": 78,
+                "club": 0,
+                "slot": 65,
+                "star": 0,
+                "damage": 178884914,
+                "takeDamage": 979553425,
+                "treatment": 0,
+                "hp": 2644004903,
+                "energy": 78,
+                "skin": 0,
+                "skinName": "",
+                "type": 2,
+                "maxAttr": {
+                  "2": 125920141,
+                  "3": 125920141,
+                  "4": 178884914
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {}
+              }
+            ],
+            "ext": {
+              "curHP": 13220024515
+            }
+          },
+          "type": 18,
+          "round": 3,
+          "memos": []
+        }
+      },
+      "levelRewardMap": {
+        "2001": true,
+        "2002": true,
+        "3001": true,
+        "3002": true,
+        "3003": true
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 77
+}
+异步: 是
+调用ID: call_1773545298350_c19kug1g8
+
+记录 #3:
+----------------------------------------
+时间: 2026/3/15 11:28:18
+服务: TowersService
+方法: start
+参数: [{"towerType":3}]
+结果:
+{
+  "_raw": {
+    "seq": 46,
+    "ack": 0,
+    "time": 1773545298587,
+    "resp": 46,
+    "cmd": "towers_startresp",
+    "body": {
+      "towerData": {
+        "actId": 2603131,
+        "season": 39,
+        "useTickCnt": 11,
+        "todayUseTickCnt": 2,
+        "towerData": {
+          "1": {
+            "towerType": 1,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "2": {
+            "towerType": 2,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "3": {
+            "towerType": 3,
+            "fighting": true,
+            "actTowerLv": 4,
+            "winCnt": 0,
+            "maxWinCnt": 3,
+            "curMonsterStateData": {
+              "61": {
+                "id": 250099,
+                "position": 61,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "62": {
+                "id": 250099,
+                "position": 62,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "63": {
+                "id": 250098,
+                "position": 63,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "64": {
+                "id": 250103,
+                "position": 64,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "65": {
+                "id": 250100,
+                "position": 65,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              }
+            },
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 2644004903,
+              "62": 2644004903,
+              "63": 2644004903,
+              "64": 2644004903,
+              "65": 2644004903
+            },
+            "towerScore": 400000045290,
+            "pass": false
+          },
+          "4": {
+            "towerType": 4,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "5": {
+            "towerType": 5,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "6": {
+            "towerType": 6,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          }
+        },
+        "levelRewardMap": {
+          "2001": true,
+          "2002": true,
+          "3001": true,
+          "3002": true,
+          "3003": true
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1773545298316_0snlg7zcj
+
+记录 #4:
+----------------------------------------
+时间: 2026/3/15 11:28:18
+服务: TeamService
+方法: setTeam
+参数: [{"teamType":6,"battleTeam":{},"lordWeaponId":3,"cCMonsterId":0}]
+结果:
+{
+  "_raw": {
+    "seq": 45,
+    "ack": 45,
+    "time": 1773545298552,
+    "resp": 45,
+    "cmd": "syncteamresp",
+    "body": {
+      "roleTeam": {
+        "roleId": 706685877,
+        "battleTeamInfo": {
+          "2": {
+            "0": {
+              "heroId": 107,
+              "level": 1800,
+              "order": 9,
+              "star": 14,
+              "color": 3,
+              "skinId": 0,
+              "power": 7893517,
+              "attack": 2206836,
+              "defense": 1302317,
+              "hp": 22366287,
+              "speed": 1155,
+              "artifactId": 0,
+              "pearlId": 0,
+              "attachmentUid": 1001,
+              "curTrump": 0,
+              "trumpId": 24,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 1.3579477071762085,
+              "defenseExt": 1.3579477071762085,
+              "hpExt": 1.3579477071762085,
+              "attribute": {
+                "54": 0.050000000745058,
+                "57": 0.20000000298023,
+                "61": 0.20000000298023,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {},
+              "battleTeamSlot": 0,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 202,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 203,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 204,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": null,
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 6,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            },
+            "2": {
+              "heroId": 204,
+              "level": 500,
+              "order": 3,
+              "star": 0,
+              "color": 2,
+              "skinId": 0,
+              "power": 98185,
+              "attack": 26687,
+              "defense": 25690,
+              "hp": 247492,
+              "speed": 255,
+              "artifactId": 0,
+              "pearlId": 0,
+              "attachmentUid": 1002,
+              "curTrump": 0,
+              "trumpId": 0,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 0.3310000002384186,
+              "defenseExt": 0.3310000002384186,
+              "hpExt": 0.3310000002384186,
+              "attribute": {
+                "51": 0.10000000149012,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {},
+              "battleTeamSlot": 2,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 40002,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 40003,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 40004,
+                  "level": 1,
+                  "active": false,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": null,
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 0,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            }
+          },
+          "6": {
+            "0": {
+              "heroId": 107,
+              "level": 4022,
+              "order": 16,
+              "star": 26,
+              "color": 3,
+              "skinId": 0,
+              "power": 411039368,
+              "attack": 130497074,
+              "defense": 49801232,
+              "hp": 1155682690,
+              "speed": 2688,
+              "artifactId": 13041,
+              "pearlId": 0,
+              "attachmentUid": 1001,
+              "curTrump": 0,
+              "trumpId": 43,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 3.594973087310791,
+              "defenseExt": 3.594973087310791,
+              "hpExt": 3.594973087310791,
+              "attribute": {
+                "51": 0.4200000062584877,
+                "54": 0.15000000596046448,
+                "56": 0.17250000685453415,
+                "57": 0.20000000298023224,
+                "61": 0.3419999983906746,
+                "65": 0.06000000089406967,
+                "70": 0.00800000011920929,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {
+                "1": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4000,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 45492,
+                  "defense": 0,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 292,
+                  "quenches": {
+                    "1": {
+                      "colorId": 6,
+                      "attrId": 1,
+                      "attrNum": 87,
+                      "isLocked": true
+                    },
+                    "2": {
+                      "colorId": 1,
+                      "attrId": 3,
+                      "attrNum": 1,
+                      "isLocked": false
+                    },
+                    "3": {
+                      "colorId": 2,
+                      "attrId": 14,
+                      "attrNum": 6,
+                      "isLocked": false
+                    }
+                  },
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 1377,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "706685877-22253646",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "2": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4000,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 198972,
+                  "curQuenchId": 0,
+                  "quenchTimes": 124,
+                  "quenches": {
+                    "1": {
+                      "colorId": 5,
+                      "attrId": 9,
+                      "attrNum": 61,
+                      "isLocked": true
+                    },
+                    "2": {
+                      "colorId": 2,
+                      "attrId": 5,
+                      "attrNum": 10,
+                      "isLocked": false
+                    },
+                    "3": {
+                      "colorId": 2,
+                      "attrId": 1,
+                      "attrNum": 9,
+                      "isLocked": false
+                    }
+                  },
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 2184,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "3": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4000,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 50679,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 1204,
+                  "quenches": {
+                    "1": {
+                      "colorId": 1,
+                      "attrId": 2,
+                      "attrNum": 3,
+                      "isLocked": false
+                    },
+                    "2": {
+                      "colorId": 1,
+                      "attrId": 21,
+                      "attrNum": 2,
+                      "isLocked": false
+                    },
+                    "3": {
+                      "colorId": 5,
+                      "attrId": 9,
+                      "attrNum": 54,
+                      "isLocked": false
+                    },
+                    "4": {
+                      "colorId": 3,
+                      "attrId": 16,
+                      "attrNum": 13,
+                      "isLocked": false
+                    }
+                  },
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 6030,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "706685877-22255730",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "4": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4000,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 183666,
+                  "curQuenchId": 0,
+                  "quenchTimes": 98,
+                  "quenches": {
+                    "1": {
+                      "colorId": 1,
+                      "attrId": 16,
+                      "attrNum": 2,
+                      "isLocked": false
+                    },
+                    "2": {
+                      "colorId": 6,
+                      "attrId": 1,
+                      "attrNum": 85,
+                      "isLocked": false
+                    }
+                  },
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 1800,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                }
+              },
+              "battleTeamSlot": 0,
+              "isActive": true,
+              "skill": [
+                {
+                  "skillId": 206,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 203,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 204,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": {
+                "0": true
+              },
+              "appendSkill": [],
+              "useSkin": 10701,
+              "skin": {
+                "10701": {
+                  "skinId": 10701,
+                  "name": "",
+                  "setNameTime": 0,
+                  "setNameCnt": 0,
+                  "expiration": -1
+                }
+              },
+              "bookStar": 26,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            },
+            "1": {
+              "heroId": 110,
+              "level": 850,
+              "order": 5,
+              "star": 13,
+              "color": 3,
+              "skinId": 0,
+              "power": 1910367,
+              "attack": 497982,
+              "defense": 463253,
+              "hp": 5049108,
+              "speed": 443,
+              "artifactId": -1,
+              "pearlId": 0,
+              "attachmentUid": 1002,
+              "curTrump": 0,
+              "trumpId": 0,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 0.610509991645813,
+              "defenseExt": 0.610509991645813,
+              "hpExt": 0.610509991645813,
+              "attribute": {
+                "53": 0.20000000298023224,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {
+                "1": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 32,
+                  "defense": 0,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "2": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 4,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 144,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "3": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 27,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "4": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 100,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                }
+              },
+              "battleTeamSlot": 2,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 1102,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 1103,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 1104,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": {},
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 13,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            },
+            "2": {
+              "heroId": 204,
+              "level": 850,
+              "order": 5,
+              "star": 11,
+              "color": 2,
+              "skinId": 0,
+              "power": 1457363,
+              "attack": 400713,
+              "defense": 384419,
+              "hp": 3640436,
+              "speed": 426,
+              "artifactId": -1,
+              "pearlId": 0,
+              "attachmentUid": 1044,
+              "curTrump": 0,
+              "trumpId": 0,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 0.610509991645813,
+              "defenseExt": 0.610509991645813,
+              "hpExt": 0.610509991645813,
+              "attribute": {
+                "51": 0.10000000149011612,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {
+                "1": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 9,
+                  "defense": 0,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "2": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 37,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "3": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 10,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "4": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 35,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                }
+              },
+              "battleTeamSlot": 3,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 40002,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 40003,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 40004,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": {},
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 11,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            },
+            "3": {
+              "heroId": 106,
+              "level": 850,
+              "order": 5,
+              "star": 13,
+              "color": 3,
+              "skinId": 0,
+              "power": 7386008,
+              "attack": 1820308,
+              "defense": 1484951,
+              "hp": 21129228,
+              "speed": 395,
+              "artifactId": -1,
+              "pearlId": 0,
+              "attachmentUid": 1062,
+              "curTrump": 0,
+              "trumpId": 0,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 0.610509991645813,
+              "defenseExt": 0.610509991645813,
+              "hpExt": 0.610509991645813,
+              "attribute": {
+                "57": 0.25,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {
+                "1": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3019,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 37465,
+                  "defense": 0,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "2": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3019,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 163866,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "3": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3019,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 41737,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "4": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 3019,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 151260,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                }
+              },
+              "battleTeamSlot": 1,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 8000002,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 8000003,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 8000004,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": {},
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 13,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            },
+            "4": {
+              "heroId": 217,
+              "level": 860,
+              "order": 5,
+              "star": 10,
+              "color": 2,
+              "skinId": 0,
+              "power": 960398,
+              "attack": 242015,
+              "defense": 263695,
+              "hp": 2466547,
+              "speed": 531,
+              "artifactId": -1,
+              "pearlId": 0,
+              "attachmentUid": 1055,
+              "curTrump": 0,
+              "trumpId": 0,
+              "transTrumpId": 0,
+              "trumpId2": 0,
+              "transTrumpId2": 0,
+              "attackExt": 0.610509991645813,
+              "defenseExt": 0.610509991645813,
+              "hpExt": 0.610509991645813,
+              "attribute": {
+                "61": 0.6499999761581421,
+                "101": 0,
+                "102": 0
+              },
+              "equipment": {
+                "1": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 9,
+                  "defense": 0,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "2": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 37,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "3": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 10,
+                  "hp": 0,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                },
+                "4": {
+                  "equipId": 0,
+                  "equipConfId": 0,
+                  "equipSlot": 0,
+                  "level": 1,
+                  "forgeExp": 0,
+                  "forge": 0,
+                  "star": 0,
+                  "attack": 0,
+                  "defense": 0,
+                  "hp": 35,
+                  "curQuenchId": 0,
+                  "quenchTimes": 0,
+                  "quenches": {},
+                  "quenchTimes2": 0,
+                  "quenches2": {},
+                  "quenchAttackExt": 0,
+                  "quenchDefenseExt": 0,
+                  "quenchHpExt": 0,
+                  "quenchLogId": "",
+                  "quenchLogId2": "",
+                  "seed": 0
+                }
+              },
+              "battleTeamSlot": 4,
+              "isActive": false,
+              "skill": [
+                {
+                  "skillId": 20002,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 20003,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                },
+                {
+                  "skillId": 20004,
+                  "level": 1,
+                  "active": true,
+                  "affiliated": 0
+                }
+              ],
+              "activeSkill": 0,
+              "awakeSkill": {},
+              "appendSkill": [],
+              "useSkin": 0,
+              "skin": {},
+              "bookStar": 10,
+              "bookLevel": 0,
+              "bookValue": 0,
+              "bookAttack": 0,
+              "bookHp": 0,
+              "recordFlag": false,
+              "forbidSNTime": 0,
+              "hB": null
+            }
+          }
+        },
+        "legacy": {},
+        "updateTimeInfo": {
+          "2": 1752214414,
+          "6": 1773545298
+        },
+        "powerInfo": {
+          "2": 7991702,
+          "6": 422753504
+        },
+        "weapon": {
+          "6": {
+            "weaponId": 3,
+            "attachmentUid": 1064,
+            "level": 45,
+            "passiveSkill": {},
+            "createTime": 1772500745
+          }
+        },
+        "lordSkin": {},
+        "cCMonsterId": 0
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 51
+}
+异步: 是
+调用ID: call_1773545298260_ot8kiz5ad
+
+记录 #5:
+----------------------------------------
+时间: 2026/3/15 11:28:16
+服务: HeroService
+方法: calcPowerByTeam
+参数: [{"battleTeam":{},"lordWeaponId":3}]
+结果:
+{
+  "_raw": {
+    "seq": 44,
+    "ack": 0,
+    "time": 1773545296602,
+    "resp": 44,
+    "cmd": "hero_calcpowerbyteamresp",
+    "body": {
+      "power": 422753504
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1773545296337_5bhzn5ud3
+
+记录 #6:
+----------------------------------------
+时间: 2026/3/15 11:28:06
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 43,
+    "ack": 42,
+    "time": 1773545286460,
+    "resp": 43,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 2
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 21
+}
+异步: 是
+调用ID: call_1773545286199_aeqlvdr5h
+
+记录 #7:
+----------------------------------------
+时间: 2026/3/15 11:28:05
+服务: HeroService
+方法: calcPowerByTeam
+参数: [{"battleTeam":{},"lordWeaponId":3}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 0,
+    "time": 1773545285762,
+    "resp": 42,
+    "cmd": "hero_calcpowerbyteamresp",
+    "body": {
+      "power": 421793106
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1773545285500_ffvahae7b
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -38,6 +38,13 @@
           />
           <CustomizedCard 
             mode="button"
+            :name="isUpgradingLuBuStar ? '批量升星吕布中...' : '批量升星吕布'"
+            @button-click="handleUpgradeLuBuStar"
+            :disabled="isUpgradingLuBuStar"
+            :loading="isUpgradingLuBuStar"
+          />
+          <CustomizedCard 
+            mode="button"
             :name="isUsingTorch ? '批量使用火把中...' : '批量使用火把'"
             @button-click="handleUseTorch"
             :disabled="isUsingTorch"
@@ -220,6 +227,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { ref, computed } from 'vue'
 import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
@@ -317,6 +326,7 @@ const props = defineProps({
 const isUsingTorch = ref(false)
 const isUpgradingCrystal = ref(false)
 const isUsingUniversalRed = ref(false)
+const isUpgradingLuBuStar = ref(false)
 const isBatchUpgradingEquipment = ref(false)
 const isBatchAwakingSkill = ref(false)
 const isBatchQuenching = ref(false)
@@ -501,7 +511,7 @@ const handleUseTorch = async () => {
           for (let i = 0; i < 100; i++) {
             try {
               await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity: 50 })
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               successCount++
             } catch (error) {
               console.error(`第${i + 1}次使用火把失败:`, error)
@@ -1039,13 +1049,58 @@ const handleBatchQuench = async () => {
             // 一直洗练当前部位，直到满足条件或达到最大次数
             while (!partCompleted && totalQuenchCount < maxQuenchCount) {
               try {
-                // 构建淬炼制请求参数，使用该部位的quenches
+                // 检查是否有高属性孔位（attrNum > 50 且未锁定）
+                const currentQuenches = partQuenches[part] || {}
+                const highAttrSlots = Object.values(currentQuenches).filter(slot => 
+                  slot.attrNum > 50 && !slot.isLocked
+                )
+                const hasHighAttrSlot = highAttrSlots.length > 0
+                
+                // 如果有高属性孔位，先发送 equipment_confirm 获取 seed
+                let seedFromConfirm = 0
+                if (hasHighAttrSlot) {
+                  try {
+                    const confirmParams = {
+                      heroId: heroId,
+                      part: part,
+                      quenchId: 0,
+                      quenches: currentQuenches
+                    }
+                    
+                    console.log(`[序号${tokenIndex}] ${partName}部位检测到高属性孔位，正在发送 equipment_confirm...`)
+                    
+                    const confirmResult = await tokenStore.sendMessageWithPromise(
+                      token.id,
+                      'equipment_confirm',
+                      confirmParams,
+                      15000
+                    )
+                    
+                    // 从确认响应中提取 seed 值
+                    if (confirmResult?.seed) {
+                      seedFromConfirm = confirmResult.seed
+                    } else if (confirmResult?.equipment?.seed) {
+                      seedFromConfirm = confirmResult.equipment.seed
+                    } else if (confirmResult?.role?.heroes) {
+                      const hero = confirmResult.role.heroes[String(heroId)]
+                      if (hero?.equipment?.[part]?.seed) {
+                        seedFromConfirm = hero.equipment[part].seed
+                      }
+                    }
+                    
+                    console.log(`[序号${tokenIndex}] ${partName}部位获取 seed:`, seedFromConfirm)
+                  } catch (confirmError) {
+                    console.error(`[序号${tokenIndex}] 获取 seed 失败:`, confirmError)
+                  }
+                }
+                
+                // 构建淬炼制请求参数，使用该部位的 quenches
                 const quenchParams = {
                   heroId: heroId,
                   part: part,
                   quenchId: 0,
                   quenches: partQuenches[part] || {},
-                  seed: 0,
+                  seed: seedFromConfirm,
                   skipOrange: false
                 }
                 
@@ -1401,7 +1456,7 @@ const handleBatchUpgradeHangup = async () => {
               throw new Error(errorMsg)
             }
 
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise(resolve => setTimeout(resolve, 1000))
           }
           console.log('退出while循环，remainingCount:', remainingCount, 'totalUpgradeCount:', totalUpgradeCount)
 
@@ -1585,7 +1640,7 @@ const handleUseUniversalRed = async () => {
 
               // 每批之间等待500ms
               if (remainingCount > 0) {
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
             } catch (error) {
               message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红失败: ${error.message || '未知错误'}`)
@@ -1595,16 +1650,68 @@ const handleUseUniversalRed = async () => {
 
           message.success(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红完成，共使用${totalUsed}个`)
 
-          // 添加操作日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '使用万能红',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、使用万能红完成，共使用${totalUsed}个（${selectedHeroName}${heroStar}星）`
-          })
+          // 只有在使用了 400 个万能红（升了一星）的情况下才执行升星操作
+          if (totalUsed >= 400) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已使用${totalUsed}个万能红，开始执行升星操作...`)
+            
+            // 等待 1 秒后开始升星
+            await new Promise(resolve => setTimeout(resolve, 1000))
+
+            // 开始升星，最多 10 次
+            let upgradeCount = 0
+            for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
+              try {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星...`)
+                
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'hero_heroupgradestar',
+                  { heroId: selectedUniversalRedHero.value },
+                  8000
+                )
+
+                upgradeCount++
+                message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星成功`)
+
+                // 升星后等待 1 秒
+                await new Promise(resolve => setTimeout(resolve, 1000))
+              } catch (error) {
+                const errorMsg = error.message || String(error)
+                // 检查是否是物品数量不足的错误
+                if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
+                  message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红碎片不足，停止升星`)
+                  break
+                }
+                // 其他错误也停止
+                message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星失败：${errorMsg}`)
+                break
+              }
+            }
+
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升星完成，共升星${upgradeCount}次`)
+
+            // 添加操作日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '使用万能红',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
+            })
+          } else {
+            // 添加操作日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '使用万能红',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
+            })
+          }
         }
 
       } catch (error) {
@@ -1626,10 +1733,10 @@ const handleUseUniversalRed = async () => {
         }
       }
 
-      // 处理完一个Token后，等待一段时间再处理下一个
+      // 处理完一个 Token 后，等待一段时间再处理下一个
       if (i < targetTokens.length - 1) {
-        message.info(`等待3秒后处理下一个Token...`)
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        message.info(`等待 1 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }
 
@@ -1654,6 +1761,173 @@ const handleUseUniversalRed = async () => {
     })
   } finally {
     isUsingUniversalRed.value = false
+  }
+}
+
+// 批量升星吕布（只升星，不使用万能红）
+const handleUpgradeLuBuStar = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的 Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+
+  try {
+    isUpgradingLuBuStar.value = true
+
+    message.info(`开始批量升星吕布（${rangeText}），共${targetTokens.length}个 Token...`)
+
+    // 逐个处理 Token
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      const tokenIndex = getTokenIndex(token)
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始升星吕布...`)
+
+      try {
+        // 连接 Token
+        const status = tokenStore.getWebSocketStatus(token.id)
+        if (status !== 'connected') {
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在连接 Token`)
+          await tokenStore.createWebSocketConnection(token.id, token.token, token.wsUrl)
+          let retryCount = 0
+          while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 30) {
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            retryCount++
+          }
+
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            throw new Error('Token 连接失败')
+          }
+        }
+
+        // 获取角色信息，获取吕布星级
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在获取角色信息...`)
+        const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+        if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
+          throw new Error('获取角色信息失败')
+        }
+
+        // 获取吕布星级
+        let luBuStar = 0
+        if (roleInfo.role.heroes['107']) {
+          luBuStar = roleInfo.role.heroes['107'].star || 0
+        }
+
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 吕布星级：${luBuStar}`)
+
+        // 等待 1 秒后开始升星
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 等待 1 秒后开始升星吕布...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        // 如果吕布 30 星，跳过
+        if (luBuStar >= 30) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 吕布已 30 星，跳过`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升星吕布',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、吕布已 30 星，跳过`
+          })
+        } else {
+          // 开始升星吕布，最多 10 次
+          let luBuUpgradeCount = 0
+          for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
+            try {
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星吕布...`)
+              
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'hero_heroupgradestar',
+                { heroId: 107 },
+                8000
+              )
+
+              luBuUpgradeCount++
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星吕布成功`)
+
+              // 升星后等待 1 秒
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            } catch (error) {
+              const errorMsg = error.message || String(error)
+              // 检查是否是物品数量不足的错误
+              if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红碎片不足，停止升星`)
+                break
+              }
+              // 其他错误也停止
+              message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星吕布失败：${errorMsg}`)
+              break
+            }
+          }
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升星吕布完成，共升星${luBuUpgradeCount}次`)
+
+          // 添加操作日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量升星吕布',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、升星吕布完成，共升星${luBuUpgradeCount}次（原${luBuStar}星）`
+          })
+        }
+
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} - 升星吕布失败:`, error)
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} - 升星吕布失败：${error.message || '未知错误'}`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '批量升星吕布',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name || token.id}、升星吕布失败：${error.message || '未知错误'}`
+        })
+      } finally {
+        // 关闭 WebSocket 连接
+        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
+          await tokenStore.closeWebSocketConnection(token.id)
+        }
+      }
+
+      // 处理完一个 Token 后，等待一段时间再处理下一个
+      if (i < targetTokens.length - 1) {
+        message.info(`等待 1 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+    }
+
+    message.success(`批量升星吕布完成，共处理${targetTokens.length}个 Token`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升星吕布',
+      status: 'success',
+      message: `批量升星吕布完成，共处理${targetTokens.length}个 Token`
+    })
+
+  } catch (error) {
+    console.error('批量升星吕布失败:', error)
+    message.error(`批量升星吕布失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升星吕布',
+      status: 'error',
+      message: `批量升星吕布失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isUpgradingLuBuStar.value = false
   }
 }
 
@@ -1816,7 +2090,7 @@ const handleExportDetails = async () => {
         }
 
         if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
         console.error(`[序号${tokenIndex}] 获取Token ${token.name || token.id} 详情失败:`, error)
@@ -1986,7 +2260,7 @@ const executeBoxWeekForToken = async (token) => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -2087,7 +2361,7 @@ const executeBoxWeekForToken = async (token) => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -2188,7 +2462,7 @@ const executeBoxWeekForToken = async (token) => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -2287,7 +2561,7 @@ const executeBoxWeekForToken = async (token) => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -2375,7 +2649,7 @@ const executeBoxWeekForToken = async (token) => {
         message: `${token.name} - 开宝箱阶段内领取宝箱奖励成功`,
         command: 'item_batchclaimboxpointreward'
       })
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 开宝箱阶段内领取邮件
       message.info(`${token.name} - 开宝箱阶段内领取邮件`)
@@ -2393,7 +2667,7 @@ const executeBoxWeekForToken = async (token) => {
         command: 'mail_claimallattachment',
         commandParams: { category: 0 }
       })
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 领取邮件后，重新获取宝箱数量
       message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量`)
@@ -2416,7 +2690,7 @@ const executeBoxWeekForToken = async (token) => {
           message: `${token.name} - 开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
         })
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 5. 检查阶段
       const activityInfoCheck = await tokenStore.sendActivityGet(token.id)
@@ -2511,7 +2785,7 @@ const executeBoxWeekForToken = async (token) => {
     // 6. 最终阶段
     // 领取邮件
     await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
     // 领取宝箱周奖励
     for (let i = 0; i < l + 1; i++) {
@@ -2545,7 +2819,7 @@ const executeBoxWeekForToken = async (token) => {
         })
         // 继续执行下一次领取，不停止
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
     
     message.success(`${token.name} - 一键宝箱周完成，执行了 ${boxWeekRounds} 轮开箱`)
@@ -2645,10 +2919,10 @@ const handleBatchBoxWeek = async () => {
         successfulClaimCount: result.successfulClaimCount
       })
       
-      // 处理完一个Token后，等待一段时间再处理下一个
+      // 处理完一个 Token 后，等待一段时间再处理下一个
       if (i < targetTokens.length - 1) {
-        message.info(`等待3秒后处理下一个Token...`)
-        await new Promise(resolve => setTimeout(resolve, 3000))
+        message.info(`等待 1 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }
     
@@ -2857,7 +3131,7 @@ const handleBatchSetStoryTeam = async () => {
           
           // 1. 使用fight_startlevel获取当前阵容
           const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 2. 检查0-4位置是否有缺失的英雄，如果有则使用未上阵英雄填充
           let battleTeam = null
@@ -2891,7 +3165,7 @@ const handleBatchSetStoryTeam = async () => {
           
           // 获取所有英雄信息（包括未上阵的）
           const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 过滤出未上阵的英雄
           const 上阵英雄Ids = new Set()
@@ -2950,7 +3224,7 @@ const handleBatchSetStoryTeam = async () => {
                       },
                       5000
                     )
-                    await new Promise(resolve => setTimeout(resolve, 500))
+                    await new Promise(resolve => setTimeout(resolve, 1000))
                     logStore.addLog({
                       page: 'fish-helper',
                       cardType: '养号',
@@ -2984,7 +3258,7 @@ const handleBatchSetStoryTeam = async () => {
           
           // 重新获取阵容信息
           const updatedFightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 3. 获取最高等级英雄heroid为A
           let highestLevelHero = null
@@ -3041,7 +3315,7 @@ const handleBatchSetStoryTeam = async () => {
                 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '养号',
@@ -3071,7 +3345,7 @@ const handleBatchSetStoryTeam = async () => {
           
           // 4. 再次使用fight_startlevel获取当前阵容
           const finalFightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
@@ -3157,7 +3431,7 @@ const handleBatchSetStoryTeam = async () => {
                         },
                         5000
                       )
-                      await new Promise(resolve => setTimeout(resolve, 500))
+                      await new Promise(resolve => setTimeout(resolve, 1000))
                       logStore.addLog({
                         page: 'fish-helper',
                         cardType: '养号',
@@ -3170,7 +3444,7 @@ const handleBatchSetStoryTeam = async () => {
                       
                       // 执行fight_startlevel获取更新后的阵容
                       const updatedResult = await tokenStore.sendFightStartLevel(token.id, {})
-                      await new Promise(resolve => setTimeout(resolve, 500))
+                      await new Promise(resolve => setTimeout(resolve, 1000))
                       
                       // 更新finalTeamData
                       if (updatedResult && updatedResult.body && updatedResult.body.battleData && updatedResult.body.battleData.leftTeam && updatedResult.body.battleData.leftTeam.team) {
@@ -3357,7 +3631,7 @@ const handleBatchSetTowerTeam = async () => {
           
           // 1. 使用fight_startlevel获取当前阵容
           const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 2. 检查0-4位置是否有缺失的英雄，如果有则使用未上阵英雄填充
           let battleTeam = null
@@ -3391,7 +3665,7 @@ const handleBatchSetTowerTeam = async () => {
           
           // 获取所有英雄信息（包括未上阵的）
           const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 过滤出未上阵的英雄
           const 上阵英雄Ids = new Set()
@@ -3468,7 +3742,7 @@ const handleBatchSetTowerTeam = async () => {
                       },
                       5000
                     )
-                    await new Promise(resolve => setTimeout(resolve, 500))
+                    await new Promise(resolve => setTimeout(resolve, 1000))
                     logStore.addLog({
                       page: 'fish-helper',
                       cardType: '养号',
@@ -3502,7 +3776,7 @@ const handleBatchSetTowerTeam = async () => {
           
           // 重新获取阵容信息
           const updatedFightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 尝试从不同的结构中获取阵容数据
           let teamData = null
@@ -3591,7 +3865,7 @@ const handleBatchSetTowerTeam = async () => {
                 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '养号',
@@ -3621,7 +3895,7 @@ const handleBatchSetTowerTeam = async () => {
           
           // 4. 再次使用fight_startlevel获取当前阵容
           const finalFightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
@@ -3707,7 +3981,7 @@ const handleBatchSetTowerTeam = async () => {
                         },
                         5000
                       )
-                      await new Promise(resolve => setTimeout(resolve, 500))
+                      await new Promise(resolve => setTimeout(resolve, 1000))
                       logStore.addLog({
                         page: 'fish-helper',
                         cardType: '养号',
@@ -3720,7 +3994,7 @@ const handleBatchSetTowerTeam = async () => {
                       
                       // 执行fight_startlevel获取更新后的阵容
                       const updatedResult = await tokenStore.sendFightStartLevel(token.id, {})
-                      await new Promise(resolve => setTimeout(resolve, 500))
+                      await new Promise(resolve => setTimeout(resolve, 1000))
 
                       // 更新finalTeamData
                       if (updatedResult && updatedResult.body && updatedResult.body.battleData && updatedResult.body.battleData.leftTeam && updatedResult.body.battleData.leftTeam.team) {
@@ -3942,7 +4216,7 @@ const handleBatchUpgrade900 = async () => {
             message: '执行fight_startlevel命令，获取当前阵容'
           })
           const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 2. 获取heroid和level
           const heroes = []
@@ -4086,7 +4360,7 @@ const handleBatchUpgrade900 = async () => {
                       status: 'success',
                       message: `武将${getHeroName(hero.heroId)}升阶成功`
                     })
-                    await new Promise(resolve => setTimeout(resolve, 500))
+                    await new Promise(resolve => setTimeout(resolve, 1000))
                     // 升阶后继续升级循环
                     continue
                   } catch (orderError) {
@@ -4197,7 +4471,7 @@ const handleBatchUpgrade900 = async () => {
                   break
                 }
                 
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               } catch (error) {
                 // 捕获升级命令的错误
                 const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
@@ -4241,7 +4515,7 @@ const handleBatchUpgrade900 = async () => {
                       status: 'success',
                       message: `武将${getHeroName(hero.heroId)}升阶成功`
                     })
-                    await new Promise(resolve => setTimeout(resolve, 500))
+                    await new Promise(resolve => setTimeout(resolve, 1000))
                     // 升阶后继续升级循环
                     continue
                   } catch (orderError) {
@@ -4316,7 +4590,7 @@ const handleBatchUpgrade900 = async () => {
           
           // 刷新角色信息
           await tokenStore.sendGetRoleInfo(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 升级900级完成`)
           logStore.addLog({
@@ -4467,7 +4741,7 @@ const handleExportTeam = async () => {
           
           // 执行fight_startlevel获取当前阵容
           const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 尝试从不同的结构中获取阵容数据
           let teamData = null
@@ -5147,7 +5421,7 @@ const handleOneClickBoxWeek = async () => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -5239,7 +5513,7 @@ const handleOneClickBoxWeek = async () => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -5331,7 +5605,7 @@ const handleOneClickBoxWeek = async () => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -5423,7 +5697,7 @@ const handleOneClickBoxWeek = async () => {
           status: 'info',
           message: openBoxLog
         })
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 检查YY是否超过目标，如果超过则获取Y进行验证
         if (YY > l * 8000) {
@@ -5502,7 +5776,7 @@ const handleOneClickBoxWeek = async () => {
         message: `${token.name} - 开宝箱阶段内领取宝箱奖励成功`,
         command: 'item_batchclaimboxpointreward'
       })
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 开宝箱阶段内领取邮件
       message.info(`${token.name} - 开宝箱阶段内领取邮件`)
@@ -5520,7 +5794,7 @@ const handleOneClickBoxWeek = async () => {
         command: 'mail_claimallattachment',
         commandParams: { category: 0 }
       })
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 领取邮件后，重新获取宝箱数量
       message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量`)
@@ -5543,7 +5817,7 @@ const handleOneClickBoxWeek = async () => {
           message: `${token.name} - 开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
         })
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
       // 5. 检查阶段
       const activityInfoCheck = await tokenStore.sendActivityGet(token.id)
@@ -5638,7 +5912,7 @@ const handleOneClickBoxWeek = async () => {
     // 6. 最终阶段
     // 领取邮件
     await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
     // 领取宝箱周奖励
     for (let i = 0; i < l + 1; i++) {
@@ -5671,7 +5945,7 @@ const handleOneClickBoxWeek = async () => {
         })
         // 继续执行下一次领取，不停止
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
     }
     
     message.success('一键宝箱周完成')
@@ -5769,7 +6043,7 @@ const handleBatchActivateToys = async () => {
           
           // 1. 获取角色信息，获取领主武器信息（lordWeapon就是玩具）
           const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           if (!roleInfo || !roleInfo.role) {
             throw new Error('获取角色信息失败')
@@ -5816,7 +6090,7 @@ const handleBatchActivateToys = async () => {
                 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -6048,7 +6322,7 @@ const handleBatchUpgradeLord = async () => {
           })
           
           const roleResult = await tokenStore.sendGetRoleInfo(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
           
           // 调试日志：查看roleResult的结构
           console.log('[批量升级主公武将] roleResult结构:', JSON.stringify(roleResult, null, 2).substring(0, 2000))
@@ -6521,7 +6795,7 @@ const handleBatchUpgradeLord = async () => {
 
             }
             
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise(resolve => setTimeout(resolve, 1000))
           }
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 升级主公武将完成，共升级${upgradeCount}次`)
@@ -6677,7 +6951,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           message: `主公升阶成功`
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         // 升阶后重新执行升级
         await upgradeLord(token, tokenIndex, upgradeNum)
       } catch (orderError) {
@@ -6757,7 +7031,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           message: `主公升阶成功`
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         // 升阶后重新执行升级
         return await upgradeLord(token, tokenIndex, upgradeNum)
       } catch (orderError) {
@@ -6872,7 +7146,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           message: `武将升阶成功`
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         // 升阶后重新执行升级
         await upgradeHero(token, tokenIndex, heroId, upgradeNum)
       } catch (orderError) {
@@ -6954,7 +7228,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           message: `武将升阶成功`
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         // 升阶后重新执行升级
         return await upgradeHero(token, tokenIndex, heroId, upgradeNum)
       } catch (orderError) {
@@ -7055,7 +7329,7 @@ const upgradeLordOrder = async (token, tokenIndex) => {
       message: `主公升阶成功`
     })
     
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
   } catch (error) {
     console.error(`主公升阶失败:`, error)
     const errorMsg = String(error.message || '').toLowerCase()
@@ -7106,7 +7380,7 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
       message: `武将升阶成功`
     })
     
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
   } catch (error) {
     console.error(`武将升阶失败:`, error)
     const errorMsg = String(error.message || '').toLowerCase()
@@ -7134,7 +7408,7 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
 const getLordOrder = async (token, tokenIndex) => {
   try {
     const roleResult = await tokenStore.sendGetRoleInfo(token.id)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
     if (roleResult && roleResult.role && roleResult.role.lord) {
       return roleResult.role.lord.order || 0
@@ -7155,7 +7429,7 @@ const getLordOrder = async (token, tokenIndex) => {
 const getHeroOrder = async (token, tokenIndex, heroId) => {
   try {
     const roleResult = await tokenStore.sendGetRoleInfo(token.id)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
     // 注意：字段名是heroes而不是heros
     if (roleResult && roleResult.role && roleResult.role.heroes) {

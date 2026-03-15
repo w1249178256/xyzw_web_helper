@@ -1,0 +1,75 @@
+{
+  "ack": 43,
+  "body": {
+    "cCMonsterId": 0,
+    "targetId": 439946069,
+    "teamType": 6
+  },
+  "cmd": "role_gettargetteam",
+  "seq": 44,
+  "time": 1773548117634
+}
+
+{
+  "ack": 43,
+  "body": {
+    "serverId": 8906,
+    "teamInfo": {
+      "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+      "legionName": "神州01",
+      "lordSkill": [],
+      "name": "相符006-1",
+      "power": 31390582,
+      "roleId": 439946069,
+      "tapAttack": 49411,
+      "team": {
+        "0": {
+          "activeSkill": 201,
+          "attack": 8539232,
+          "attribute": {},
+          "color": 3,
+          "curEnergy": -1,
+          "curHp": 89977127,
+          "defense": 4497515,
+          "hp": 89977127,
+          "id": 107,
+          "index": 0,
+          "level": 2783,
+          "order": 12,
+          "recordFlag": false,
+          "skill": [],
+          "skin": -1,
+          "skinName": "",
+          "speed": 0,
+          "star": 17,
+          "type": 0
+        },
+        "2": {
+          "activeSkill": 40001,
+          "attack": 136960,
+          "attribute": {},
+          "color": 2,
+          "curEnergy": -1,
+          "curHp": 1444495,
+          "defense": 128603,
+          "hp": 1444495,
+          "id": 204,
+          "index": 2,
+          "level": 411,
+          "order": 3,
+          "recordFlag": false,
+          "skill": [],
+          "skin": -1,
+          "skinName": "",
+          "speed": 0,
+          "star": 5,
+          "type": 0
+        }
+      }
+    }
+  },
+  "cmd": "Role_GetTargetTeamResp",
+  "resp": 44,
+  "seq": 44,
+  "time": 1773548117935
+}

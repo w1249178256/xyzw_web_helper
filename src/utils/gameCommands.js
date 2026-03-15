@@ -2216,6 +2216,24 @@ export class GameCommands {
   }
   
         /**
+   * 暑期活动队伍
+   */
+  role_gettargetteam(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  targetId:params.targetId,
+      	  teamType:6,
+      	  cCMonsterId:0,
+          ...params
+      }),
+      cmd: "role_gettargetteam",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+        /**
    * 活动周奖励
    */
   activity_claimweekactreward(ack = 0, seq = 0, params = {}) {
@@ -2225,7 +2243,7 @@ export class GameCommands {
       	     selectRewardsMap: {
       	     0: 1
       	     },
-      	     typ: 2，
+      	     typ: 2,
         ...params
       }),
       cmd: "activity_claimweekactreward",

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -141,6 +141,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { ref } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
@@ -332,7 +334,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 1200))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               // 挂机加钟4次
               for (let i = 0; i < 4; i++) {
@@ -342,7 +344,7 @@ const handleExecuteScheduledTasks = async () => {
                   { isSkipShareCard: true, type: 2 },
                   5000
                 )
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
               
               logStore.addLog({
@@ -377,7 +379,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               await tokenStore.sendMessageWithPromise(
                 token.id,
@@ -385,7 +387,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -420,7 +422,7 @@ const handleExecuteScheduledTasks = async () => {
                   {},
                   5000
                 )
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
               
               // 灯神扫荡 - 循环执行4次，每次使用不同的genieId（1-4）
@@ -431,7 +433,7 @@ const handleExecuteScheduledTasks = async () => {
                   { genieId: genieId, sweepCnt: 1 },
                   5000
                 )
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
               
               logStore.addLog({
@@ -466,7 +468,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -500,7 +502,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -549,7 +551,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               // 进行 3 次战斗
               for (let i = 1; i <= 3; i++) {
@@ -638,7 +640,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -672,7 +674,7 @@ const handleExecuteScheduledTasks = async () => {
                 {},
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               logStore.addLog({
                 page: 'fish-helper',
@@ -721,7 +723,7 @@ const handleExecuteScheduledTasks = async () => {
                 signinMsg = `签到跳过：${signinError.message}`
                 message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 每日签到跳过：${signinError.message}`)
               }
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               // 领取折扣奖励
               try {
@@ -739,7 +741,7 @@ const handleExecuteScheduledTasks = async () => {
                 discountMsg = `领取失败：${discountError.message}`
                 message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 免费礼包领取失败：${discountError.message}，继续执行其他操作`)
               }
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               
               // 根据执行结果记录日志
               const status = signinSuccess || discountSuccess ? 'success' : 'warning'
@@ -973,7 +975,7 @@ const handleBatchBlackMarket = async () => {
               { activityId: 9, goodsIndex: 4, buyNum: 1 },
               5000
             )
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise(resolve => setTimeout(resolve, 1000))
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买宝箱成功`)
             
             // 添加购买宝箱成功日志
@@ -1010,7 +1012,7 @@ const handleBatchBlackMarket = async () => {
                 { activityId: 9, goodsIndex: 6, buyNum: 1 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿成功`)
               
               // 添加购买金竿成功日志
@@ -1048,7 +1050,7 @@ const handleBatchBlackMarket = async () => {
                 { activityId: 9, goodsIndex: 8, buyNum: 1 },
                 5000
               )
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 购买灵贝成功`)
               
               // 添加购买灵贝成功日志
@@ -1330,7 +1332,7 @@ const handleBatchRecruitWeek = async () => {
                     }
                   }
                   
-                  await new Promise(resolve => setTimeout(resolve, 200))
+                  await new Promise(resolve => setTimeout(resolve, 1000))
                 } catch (recruitError) {
                   console.error(`招募失败：${recruitError.message}`, recruitError)
                   message.error(`[序号${tokenIndex}] ${token.name || token.id} 招募失败：${recruitError.message}`)
@@ -1343,7 +1345,7 @@ const handleBatchRecruitWeek = async () => {
               remainingRecruits += 40
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 完成第 ${completedRounds} 轮招募周，获得 40 招募令奖励`)
               
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             }
           } else {
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 跳过招募阶段，直接领取奖励`)
@@ -1370,12 +1372,12 @@ const handleBatchRecruitWeek = async () => {
               )
               claimSuccessRounds++
               message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励成功`)
-              await new Promise(resolve => setTimeout(resolve, 300))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             } catch (claimError) {
               console.error(`领取第 ${i + 1} 次奖励失败：${claimError.message}`, claimError)
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励失败：${claimError.message || '服务器错误'}，继续执行`)
               // 服务器错误也继续执行
-              await new Promise(resolve => setTimeout(resolve, 300))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             }
           }
           
@@ -1563,12 +1565,12 @@ const handleBatchClaimReward = async () => {
               )
               claimSuccessCount++
               message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励成功`)
-              await new Promise(resolve => setTimeout(resolve, 300))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             } catch (claimError) {
               console.error(`领取第 ${i + 1} 次奖励失败：${claimError.message}`, claimError)
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励失败：${claimError.message || '服务器错误'}，继续执行`)
               // 服务器错误也继续执行
-              await new Promise(resolve => setTimeout(resolve, 300))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             }
           }
           
@@ -1807,7 +1809,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
               
               // 每批之间等待 500ms
               if (remainingCount > 0) {
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await new Promise(resolve => setTimeout(resolve, 1000))
               }
             } catch (error) {
               message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红失败：${error.message || '未知错误'}`)

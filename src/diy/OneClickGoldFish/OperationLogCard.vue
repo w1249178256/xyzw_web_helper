@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="operation-log" status-class="active">
     <template #icon>
       <n-icon size="24">

@@ -1104,6 +1104,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "legacy_getinfo", params);
   };
 
+  // 发送获取目标阵容信息
+  const sendRoleGetTargetTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "role_gettargetteam", params);
+  };
+
   // 发送激活功法图鉴
   const sendLegacyActivate = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "legacy_activatebook", params);
@@ -2023,6 +2028,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegacySendGift,
     sendLegacyGetGifts,
     sendLegacyGetInfo,
+    sendRoleGetTargetTeam,
     sendLegacyActivate,
     sendLegionGetInfo,
     sendLegionGetOpponent,

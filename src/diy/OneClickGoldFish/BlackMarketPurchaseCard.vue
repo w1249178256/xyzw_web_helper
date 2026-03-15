@@ -104,6 +104,8 @@
 </template>
 
 <script setup>
+// @unocss-include
+// uno-css-ignore-file
 import { ref, onMounted } from 'vue'
 import { useTokenStore, selectedTokenId } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
@@ -474,7 +476,7 @@ const handleBatchSetBlackMarket = async () => {
         }
         
         if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
         console.error(`[序号${tokenIndex}] 设置Token ${token.name || token.id} 失败:`, error)
@@ -587,7 +589,7 @@ const exportBlackMarketSettings = async () => {
         
         // 获取黑市购买设置
         const purchaseInfo = await tokenStore.sendStoreGetPurchase(token.id, {})
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         if (!purchaseInfo || !purchaseInfo.purchaseItemList) {
           results.push({
@@ -625,7 +627,7 @@ const exportBlackMarketSettings = async () => {
           rodDiscount: String(rodDiscount)
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
       } catch (error) {
         console.error(`导出Token ${token.name || token.id} 黑市设置失败:`, error)
         results.push({
@@ -748,7 +750,7 @@ const exportResourceInfo = async () => {
         
         // 刷新角色信息
         await tokenStore.sendGetRoleInfo(token.id)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 优先从全局gameData获取（如果当前选中的是这个token）
         // 否则从token.gameData获取
@@ -839,7 +841,7 @@ const exportResourceInfo = async () => {
           boxPoints: String(boxPoints)
         })
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise(resolve => setTimeout(resolve, 1000))
       } catch (error) {
         console.error(`导出Token ${token.name || token.id} 资源信息失败:`, error)
         results.push({

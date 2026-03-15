@@ -31,11 +31,28 @@ export default defineConfig({
         "src/**.icon.json",
         "src/frames/menus.json",
       ],
+      exclude: [
+        // 排除 node_modules 和 dist 目录
+        /node_modules/,
+        /dist/,
+        /\.git/,
+        // 排除可能包含模板字符串的 JS/TS 文件内容
+        /\.log$/,
+        // 排除 JS/TS 文件中的模板字符串
+        /\$\{/,
+      ],
     },
   },
+  // 忽略某些可能被误解析的选择器
+  safelist: [
+    // 添加可能被误解析但实际需要的类名
+  ],
   presets: [
     presetWind(),
-    presetAttributify({ /* preset options */ }),
+    presetAttributify({ 
+      // 忽略某些属性，避免误解析模板字符串
+      // 注意：ignoreAttributes 应该是数组，不是函数
+    }),
     presetIcons({
       scale: 1.25,
       autoInstall: true,
@@ -67,4 +84,8 @@ export default defineConfig({
       },
     },
   },
+  // 添加 transformers 来处理 Vue 文件中的模板字符串
+  transformers: [
+    // 如果有 transformer 可以处理模板字符串，可以在这里添加
+  ],
 });
