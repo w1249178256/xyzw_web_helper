@@ -81,9 +81,9 @@ export class ConnectionPoolManager {
                 
                 // 获取重连状态，实现指数退避
                 const reconnectInfo = this.getReconnectInfo(tokenId);
-                console.log(`[ConnectionPool] 重连信息: ${tokenId} - 尝试次数: ${reconnectInfo.retries}, 延迟: ${reconnectInfo.delay}ms`);
+                console.log(`[ConnectionPool] 重连信息：${tokenId} - 尝试次数：${reconnectInfo.retries}, 延迟：${reconnectInfo.delay}ms`);
                 
-                await new Promise((resolve) => setTimeout(resolve, reconnectInfo.delay));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
 
                 console.log(`[ConnectionPool] 正在重连: ${tokenId}`);
 
@@ -312,7 +312,7 @@ export class ConnectionPoolManager {
         while (Date.now() - start < timeout) {
             const status = this.tokenStore.getWebSocketStatus(tokenId);
             if (status === "connected") return true;
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
         }
         return false;
     }
@@ -397,7 +397,7 @@ export class ConnectionPoolManager {
     async batchOperate(tokens, operationFn, options = {}) {
         const {
             batchSize = 20,
-            delayBetween = 100,  // 操作之间的延迟（从300ms减少到100ms）
+            delayBetween = 1000,  // 操作之间的延迟（1 秒）
             keepConnections = true,  // 保持连接，不频繁断开
             onProgress = null    // 进度回调函数
         } = options;
