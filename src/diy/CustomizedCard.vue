@@ -285,10 +285,10 @@ const props = defineProps({
     default: false
   },
   
-  // 模式4：名称和输入框
+  // 模式 4：名称和输入框
   inputValue: {
     type: [String, Number],
-    default: 1
+    default: ''
   },
   min: {
     type: Number,

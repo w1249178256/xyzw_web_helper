@@ -633,12 +633,12 @@ const batchClaimLegionPrivilege = async () => {
             await new Promise(resolve => setTimeout(resolve, 1000))
           } catch (error) {
             // 如果领取失败（如已领取过），跳过剩余领取
-            console.log(`[序号${tokenIndex}] ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
+            console.log(`序号 ${tokenIndex} ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
             break
           }
         }
         
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 军团特权领取完成，成功${successCount}次`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 军团特权领取完成，成功${successCount}次`)
         
         // 添加操作日志
         logStore.addLog({
@@ -656,8 +656,8 @@ const batchClaimLegionPrivilege = async () => {
         
         return { successCount }
       } catch (error) {
-        console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量特权领取失败:`, error)
-        message.error(`[序号${tokenIndex}] ${token.name || token.id}: 特权领取失败 - ${error.message || '未知错误'}`)
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量特权领取失败:`, error)
+        message.error(`序号 ${tokenIndex} ${token.name || token.id}: 特权领取失败 - ${error.message || '未知错误'}`)
         
         // 添加错误日志
         logStore.addLog({
@@ -1349,7 +1349,7 @@ const handleBatchClimb = async () => {
         const maxClimb = 100
         
         if (currentEnergy <= 0) {
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 能量不足，跳过爬塔`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 能量不足，跳过爬塔`)
           
           // 添加操作日志
           logStore.addLog({
@@ -1428,7 +1428,7 @@ const handleBatchClimb = async () => {
         const floor = (currentTowerId % 10) + 1
         const displayFloor = `${chapter}-${floor}`
         
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`)
 
         // 添加操作日志
         logStore.addLog({
@@ -1449,8 +1449,8 @@ const handleBatchClimb = async () => {
 
         return { climbCount, currentFloor: displayFloor, remainingEnergy: currentEnergy }
       } catch (error) {
-        console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败:`, error)
-        message.error(`[序号${tokenIndex}] ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败:`, error)
+        message.error(`序号 ${tokenIndex} ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
 
         // 添加错误日志
         logStore.addLog({

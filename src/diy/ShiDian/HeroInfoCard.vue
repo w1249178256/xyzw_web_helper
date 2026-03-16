@@ -908,10 +908,10 @@ const batchSwitchTower = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行切换爬塔...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行切换爬塔...`)
           
           // TODO: 实现切换爬塔功能
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 切换爬塔功能待实现`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 切换爬塔功能待实现`)
           
           logOperation('shidian', '批量切换爬塔', {
             cardType: '武将信息',
@@ -923,8 +923,8 @@ const batchSwitchTower = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量切换爬塔失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 批量切换爬塔失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换爬塔失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换爬塔失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量切换爬塔', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -944,18 +944,18 @@ const batchSwitchTower = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }
@@ -1037,10 +1037,10 @@ const batchSwitchStory = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行切换推图...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行切换推图...`)
           
           // TODO: 实现切换推图功能
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 切换推图功能待实现`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 切换推图功能待实现`)
           
           logOperation('shidian', '批量切换推图', {
             cardType: '武将信息',
@@ -1052,8 +1052,8 @@ const batchSwitchStory = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量切换推图失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 批量切换推图失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换推图失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换推图失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量切换推图', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -1073,18 +1073,18 @@ const batchSwitchStory = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }
@@ -1222,7 +1222,7 @@ const batchUpgradeOne = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行批量升级阵容1...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行批量升级阵容1...`)
           
           // 切换到阵容1
           await switchToTeam1Internal(token.id)
@@ -1230,7 +1230,7 @@ const batchUpgradeOne = async () => {
           // 执行武将升级
           await heroUpgradeInternal(token.id)
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 阵容1升级完成`)
+          message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容1升级完成`)
           logOperation('shidian', '批量升级阵容1', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -1241,8 +1241,8 @@ const batchUpgradeOne = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级阵容1失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级阵容1失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容1失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容1失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量升级阵容1', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -1262,18 +1262,18 @@ const batchUpgradeOne = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }
@@ -1379,7 +1379,7 @@ const batchUpgradeTwo = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行批量升级阵容2...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行批量升级阵容2...`)
           
           // 切换到阵容2
           await switchToTeam2Internal(token.id)
@@ -1387,7 +1387,7 @@ const batchUpgradeTwo = async () => {
           // 执行武将升级
           await heroUpgradeInternal(token.id)
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 阵容2升级完成`)
+          message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容2升级完成`)
           logOperation('shidian', '批量升级阵容2', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -1398,8 +1398,8 @@ const batchUpgradeTwo = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级阵容2失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级阵容2失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容2失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容2失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量升级阵容2', {
             cardType: '武将信息',
             tokenId: token.id,
@@ -1419,18 +1419,18 @@ const batchUpgradeTwo = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }
@@ -1936,7 +1936,7 @@ const batchUpgrade = async (teamId) => {
       
       try {
         // 连接Token
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在连接...`)
         tokenStore.selectToken(token.id, true)
         
         // 等待连接，最多重试5次
@@ -1950,32 +1950,32 @@ const batchUpgrade = async (teamId) => {
           retryCount++
           
           if (status !== 'connected' && retryCount < maxRetries) {
-            message.info(`[序号${tokenIndex}] 连接尝试 ${retryCount}/${maxRetries}...`)
+            message.info(`序号 ${tokenIndex} 连接尝试 ${retryCount}/${maxRetries}...`)
             tokenStore.selectToken(token.id, true)
           }
         }
         
         if (status !== 'connected') {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`)
           continue
         }
         
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 连接成功`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 连接成功`)
         
         // 连接成功后等待2秒再执行后续操作（避免操作太快错误）
         await new Promise(resolve => setTimeout(resolve, 2000))
         
         // 切换阵容
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在切换阵容${teamId}...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在切换阵容${teamId}...`)
         await tokenStore.sendPresetteamSaveTeam(token.id, { teamId })
         await new Promise(resolve => setTimeout(resolve, 500))
         
         // 获取阵容信息
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取阵容${teamId}信息...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在获取阵容${teamId}信息...`)
         const teamInfoRes = await tokenStore.sendPresetteamGetInfo(token.id, {})
         
         if (!teamInfoRes || !teamInfoRes.presetTeamInfo) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id}: 无法获取阵容信息，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id}: 无法获取阵容信息，跳过`)
           continue
         }
         
@@ -1983,7 +1983,7 @@ const batchUpgrade = async (teamId) => {
         const teamInfoData = presetTeamInfo[teamId]?.teamInfo || {}
         
         if (!teamInfoData || Object.keys(teamInfoData).length === 0) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id}: 阵容${teamId}为空，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id}: 阵容${teamId}为空，跳过`)
           continue
         }
         
@@ -2001,11 +2001,11 @@ const batchUpgrade = async (teamId) => {
         }
         
         if (heroes.length === 0) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id}: 阵容${teamId}中没有武将，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id}: 阵容${teamId}中没有武将，跳过`)
           continue
         }
         
-        message.info(`[序号${tokenIndex}] ${token.name || token.id}: 找到${heroes.length}个武将，开始升级...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id}: 找到${heroes.length}个武将，开始升级...`)
         
         // 对每个武将进行升级（按位置4-0顺序）
         let upgradeCount = 0
@@ -2140,13 +2140,13 @@ const batchUpgrade = async (teamId) => {
               }
             }
           } catch (error) {
-            console.error(`[序号${tokenIndex}] 武将${hero.heroId}升级失败:`, error)
+            console.error(`序号 ${tokenIndex} 武将${hero.heroId}升级失败:`, error)
             // 继续处理下一个武将
           }
         }
         
         if (upgradeCount > 0) {
-          message.success(`[序号${tokenIndex}] ${token.name || token.id}: 阵容${teamId}升级完成，共升级${upgradeCount}次`)
+          message.success(`序号 ${tokenIndex} ${token.name || token.id}: 阵容${teamId}升级完成，共升级${upgradeCount}次`)
           logOperation('shidian', `批量升级阵容${teamId}`, {
             cardType: '武将信息',
             tokenId: token.id,
@@ -2155,10 +2155,10 @@ const batchUpgrade = async (teamId) => {
             message: `阵容${teamId}升级完成，共升级${upgradeCount}次`
           })
         } else {
-          message.info(`[序号${tokenIndex}] ${token.name || token.id}: 阵容${teamId}无需升级`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id}: 阵容${teamId}无需升级`)
         }
       } catch (error) {
-        console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量升级失败:`, error)
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级失败:`, error)
         
         // 检查错误代码和消息
         const errorMsg = String(error.message || error.hint || error.error || '').toLowerCase()
@@ -2172,7 +2172,7 @@ const batchUpgrade = async (teamId) => {
           // 错误代码200020，忽视并继续执行操作，不中断流程
           // 不显示错误消息，静默继续
         } else {
-          message.error(`[序号${tokenIndex}] ${token.name || token.id}: 批量升级失败 - ${error.message || '未知错误'}`)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id}: 批量升级失败 - ${error.message || '未知错误'}`)
           logOperation('shidian', `批量升级阵容${teamId}`, {
             cardType: '武将信息',
             tokenId: token.id,

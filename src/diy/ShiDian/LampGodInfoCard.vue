@@ -1921,7 +1921,7 @@ const batchLampGodFight = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行灯神按钮...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行灯神按钮...`)
           
           // 保存原始选中的token
           const originalSelectedTokenId = tokenStore.selectedTokenId
@@ -1935,7 +1935,7 @@ const batchLampGodFight = async () => {
           // 恢复原始选中的token
           tokenStore.selectedTokenId = originalSelectedTokenId
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 灯神按钮执行完成`)
+          message.success(`序号 ${tokenIndex} ${token.name || token.id} 灯神按钮执行完成`)
           logOperation('shidian', '批量灯神按钮', {
             cardType: '灯神信息',
             tokenId: token.id,
@@ -1946,8 +1946,8 @@ const batchLampGodFight = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 灯神按钮执行失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 灯神按钮执行失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 灯神按钮执行失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 灯神按钮执行失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量灯神按钮', {
             cardType: '灯神信息',
             tokenId: token.id,
@@ -1967,18 +1967,18 @@ const batchLampGodFight = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }
@@ -2050,7 +2050,7 @@ const batchSweepAction = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行扫荡...`)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行扫荡...`)
           
           // 保存原始选中的token
           const originalSelectedTokenId = tokenStore.selectedTokenId
@@ -2064,7 +2064,7 @@ const batchSweepAction = async () => {
           // 恢复原始选中的token
           tokenStore.selectedTokenId = originalSelectedTokenId
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 扫荡执行完成`)
+          message.success(`序号 ${tokenIndex} ${token.name || token.id} 扫荡执行完成`)
           logOperation('shidian', '批量扫荡', {
             cardType: '灯神信息',
             tokenId: token.id,
@@ -2075,8 +2075,8 @@ const batchSweepAction = async () => {
           return { success: true, token: token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 扫荡执行失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 扫荡执行失败: ${error.message || '未知错误'}`)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 扫荡执行失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 扫荡执行失败: ${error.message || '未知错误'}`)
           logOperation('shidian', '批量扫荡', {
             cardType: '灯神信息',
             tokenId: token.id,
@@ -2096,18 +2096,18 @@ const batchSweepAction = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId)
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
             }
           }
         }

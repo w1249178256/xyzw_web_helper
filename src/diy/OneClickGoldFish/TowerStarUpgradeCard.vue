@@ -839,7 +839,7 @@ const connectTokenWithRetry = async (token, tokenIndex) => {
     return true
   }
   
-  message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
+  message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在连接...`)
   
   let retryCount = 0
   const maxRetries = 5
@@ -856,16 +856,16 @@ const connectTokenWithRetry = async (token, tokenIndex) => {
     retryCount++
     
     if (status !== 'connected' && retryCount < maxRetries) {
-      message.info(`[序号${tokenIndex}] 连接尝试 ${retryCount}/${maxRetries}...`)
+      message.info(`序号 ${tokenIndex} 连接尝试 ${retryCount}/${maxRetries}...`)
     }
   }
   
   if (status !== 'connected') {
-    message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败`)
+    message.warning(`序号 ${tokenIndex} ${token.name || token.id} 连接失败`)
     return false
   }
   
-  message.success(`[序号${tokenIndex}] ${token.name || token.id} 连接成功`)
+  message.success(`序号 ${tokenIndex} ${token.name || token.id} 连接成功`)
   return true
 }
 
@@ -1003,14 +1003,14 @@ const handleBatchUpgrade = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: [序号${tokenIndex}] ${token.name || token.id}`
+        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex} ${token.name || token.id}`
       })
       
       try {
         // 1. 连接Token（模拟点击token昵称，最多重试5次）
         const connected = await connectTokenWithRetry(token, tokenIndex)
         if (!connected) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '爬塔升星',
@@ -1018,7 +1018,7 @@ const handleBatchUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`
+            message: `序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1036,11 +1036,11 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 开始英雄升星...`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`
         })
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始英雄升星...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`)
         await executeHeroUpgrade(token)
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 英雄升星完成`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 英雄升星完成`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1048,7 +1048,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 英雄升星完成`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 英雄升星完成`
         })
         await new Promise(resolve => setTimeout(resolve, 1000))
         
@@ -1060,11 +1060,11 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 开始图鉴升星...`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`
         })
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始图鉴升星...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`)
         await executeBookUpgrade(token)
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 图鉴升星完成`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1072,7 +1072,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 图鉴升星完成`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`
         })
         await new Promise(resolve => setTimeout(resolve, 1000))
         
@@ -1084,11 +1084,11 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 开始领取图鉴奖励...`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 开始领取图鉴奖励...`
         })
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取图鉴奖励...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始领取图鉴奖励...`)
         await executeClaimBookReward(token)
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 图鉴奖励领取完成`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 图鉴奖励领取完成`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1096,15 +1096,15 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 图鉴奖励领取完成`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 图鉴奖励领取完成`
         })
         
         if (i < sortedTargetTokens.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
-        console.error(`Token [序号${tokenIndex}] ${token.name || token.id} 批量升星失败:`, error)
-        message.error(`[序号${tokenIndex}] ${token.name || token.id}: 批量升星失败`)
+        console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量升星失败:`, error)
+        message.error(`序号 ${tokenIndex} ${token.name || token.id}: 批量升星失败`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1112,7 +1112,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 批量升星失败: ${error.message || '未知错误'}`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 批量升星失败: ${error.message || '未知错误'}`
         })
         failedTokens.push({
           index: tokenIndex,
@@ -1251,14 +1251,14 @@ const handleBatchTower = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: [序号${tokenIndex}] ${token.name || token.id}`
+        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex} ${token.name || token.id}`
       })
       
       try {
         // 1. 连接Token（模拟点击token昵称，最多重试5次）
         const connected = await connectTokenWithRetry(token, tokenIndex)
         if (!connected) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '爬塔升星',
@@ -1266,7 +1266,7 @@ const handleBatchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`
+            message: `序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1284,14 +1284,14 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 开始爬塔...`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 开始爬塔...`
         })
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始爬塔...`)
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始爬塔...`)
         
         // 执行爬塔操作
         await startTowerClimbForToken(token)
         
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔完成`)
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 爬塔完成`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1306,8 +1306,8 @@ const handleBatchTower = async () => {
           await new Promise(resolve => setTimeout(resolve, 1000))
         }
       } catch (error) {
-        console.error(`Token [序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败:`, error)
-        message.error(`[序号${tokenIndex}] ${token.name || token.id}: 批量爬塔失败`)
+        console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败:`, error)
+        message.error(`序号 ${tokenIndex} ${token.name || token.id}: 批量爬塔失败`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1315,7 +1315,7 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `[序号${tokenIndex}] ${token.name || token.id} 批量爬塔失败: ${error.message || '未知错误'}`
+          message: `序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败: ${error.message || '未知错误'}`
         })
         failedTokens.push({
           index: tokenIndex,

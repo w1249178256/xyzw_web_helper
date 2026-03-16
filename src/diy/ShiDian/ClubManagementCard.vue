@@ -133,10 +133,12 @@ const exportClubInfoTokens = ref('')
 const legionId = ref('')
 const legacyTargetId = ref('111582820') // 默认赠送目标
 const legacyPassword = ref('946215') // 默认密码
+const autoAcceptGiftTokenIndex = ref('') // 一键领取的 Token 序号
 const isLegacyHangupRunning = ref(false)
 const isLegacyCollectRunning = ref(false)
 const isLegacyClaimGiftRunning = ref(false)
 const isAcceptGiftRunning = ref(false)
+const isAutoAcceptGiftRunning = ref(false)
 const isBatchAcceptGiftRunning = ref(false)
 const isExportLegacyDetailsRunning = ref(false)
 const isExportClubInfoRunning = ref(false)
@@ -273,6 +275,22 @@ const handleLegacyTargetIdInput = (value) => {
 // 处理密码输入
 const handleLegacyPasswordInput = (value) => {
   legacyPassword.value = value
+}
+
+// 处理一键领取 Token 序号输入
+const handleAutoAcceptGiftTokenIndexInput = (value) => {
+  autoAcceptGiftTokenIndex.value = value
+}
+
+// 一键领取
+const handleAutoAcceptGift = async () => {
+  if (!autoAcceptGiftTokenIndex.value) {
+    message.warning('请输入 Token 序号')
+    return
+  }
+  
+  // TODO: 实现一键领取功能
+  message.info('一键领取功能尚未实现')
 }
 
 // 加入俱乐部

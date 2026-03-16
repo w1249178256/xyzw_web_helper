@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="summer-activity" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -1556,7 +1556,7 @@ const batchActivity = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token);
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行一键战斗...`);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行一键战斗...`);
           
           // 执行一键战斗（使用内部函数，避免isRunning冲突）
           const success = await oneKeyBattleInternal(token.id, bossSelect.value);
@@ -1603,18 +1603,18 @@ const batchActivity = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`);
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`);
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`);
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`);
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             }
           }
         }
@@ -2612,7 +2612,7 @@ const batchBattle = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token);
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行一键战斗...`);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行一键战斗...`);
           
           // 执行一键战斗（使用内部函数，避免isRunning冲突）
           const success = await oneKeyBattleInternal(token.id, bossSelect.value);
@@ -2629,7 +2629,7 @@ const batchBattle = async () => {
             return { success: true, token: token };
           } else {
             console.log(`Token ${token.name} 一键战斗跳过执行`);
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 没有活动次数为0的BOSS，跳过执行`);
+            message.info(`序号 ${tokenIndex} ${token.name || token.id} 没有活动次数为0的BOSS，跳过执行`);
             logOperation('shidian', '批量战斗', {
               cardType: '暑期活动',
               tokenId: token.id,
@@ -2660,18 +2660,18 @@ const batchBattle = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`);
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`);
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`);
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`);
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             }
           }
         }
@@ -2945,7 +2945,7 @@ const batchUseFuCoin = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token);
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行使用福币...`);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行使用福币...`);
           
           // 执行使用福币（使用内部函数，避免isRunning冲突）
           const success = await useFuCoinInternal(token.id);
@@ -2992,18 +2992,18 @@ const batchUseFuCoin = async () => {
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`);
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`);
           } else if (progress.type === 'token-success') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`);
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`);
           } else if (progress.type === 'token-error') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
             if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`);
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
             }
           }
         }

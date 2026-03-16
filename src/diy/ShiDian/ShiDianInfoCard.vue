@@ -3504,19 +3504,65 @@ const getPillowCount = async () => {
   }
 }
 
-// 重置十殿标签，将空十殿标签改回正常标签
+// 重置十殿标签，将十殿标签改为"空"状态
 const resetDianLabels = () => {
   if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+    message.warning('请先选择 Token')
     return
   }
 
   message.info('正在重置十殿标签...')
   
-  // 触发事件通知父组件处理重置操作
-  emit('reset-dian-labels', props.selectedTokenId)
-  
-  message.success('十殿标签重置完成！空十殿标签已改为正常标签')
+  try {
+    // 获取所有 Token
+    const allTokens = tokenStore.gameTokens
+    
+    // 定义需要重置的十殿标签（殿一到殿五）
+    const dianLabels = ['殿一', '殿二', '殿三', '殿四', '殿五']
+    
+    let resetCount = 0
+    
+    // 遍历所有 Token，重置十殿标签
+    for (const token of allTokens) {
+      if (token.remark) {
+        const remark = token.remark.trim()
+        // 检查是否包含十殿标签（殿一到殿五）
+        if (dianLabels.some(label => remark.includes(label))) {
+          // 移除十殿标签部分
+          const newRemark = remark
+            .split(' ')
+            .filter(part => !dianLabels.some(label => part.includes(label)))
+            .join(' ')
+          
+          // 如果移除后为空字符串，则设为"空"
+          token.remark = newRemark.trim() || '空'
+          resetCount++
+          console.log(`重置 Token ${token.name || token.id} 的标签：${remark} -> ${token.remark}`)
+        }
+      }
+    }
+    
+    // 保存到 localStorage
+    const tokenData = allTokens.map(t => ({
+      id: t.id,
+      name: t.name,
+      token: t.token,
+      wsUrl: t.wsUrl,
+      remark: t.remark,
+      importMethod: t.importMethod,
+      sourceUrl: t.sourceUrl
+    }))
+    localStorage.setItem('gameTokens', JSON.stringify(tokenData))
+    
+    if (resetCount > 0) {
+      message.success(`十殿标签重置完成！共重置${resetCount}个标签为"空"状态`)
+    } else {
+      message.info('没有找到需要重置的十殿标签')
+    }
+  } catch (error) {
+    console.error('重置十殿标签失败:', error)
+    message.error(`重置十殿标签失败：${error.message || '未知错误'}`)
+  }
 }
 
 // 执行选定的殿级

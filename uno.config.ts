@@ -27,6 +27,7 @@ export default defineConfig({
   content: {
     pipeline: {
       include: [
+        // 只包含明确的 CSS 类和属性
         /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
         "src/**.icon.json",
         "src/frames/menus.json",
@@ -38,8 +39,19 @@ export default defineConfig({
         /\.git/,
         // 排除可能包含模板字符串的 JS/TS 文件内容
         /\.log$/,
-        // 排除 JS/TS 文件中的模板字符串
-        /\$\{/,
+        // 排除包含模板字符串的内容
+        /\$\{.*\}/,
+        // 排除包含序号的模板字符串
+        /\[序号.*\$\{.*\}\]/,
+        // 排除包含模板字符串的属性选择器
+        /\[.*\$\{.*\}.*\]/,
+        // 排除包含 tokenIndex 的内容
+        /tokenIndex/,
+        // 排除包含模板字符串的文件
+        /SummerActivityCard\.vue/,
+        /ShiDianInfoCard\.vue/,
+        /LampGodInfoCard\.vue/,
+        /HeroInfoCard\.vue/,
       ],
     },
   },
@@ -49,26 +61,12 @@ export default defineConfig({
   ],
   presets: [
     presetWind(),
-    presetAttributify({ 
-      // 忽略某些属性，避免误解析模板字符串
-      // 注意：ignoreAttributes 应该是数组，不是函数
-    }),
     presetIcons({
       scale: 1.25,
       autoInstall: true,
       extraProperties: {
         "display": "inline-block",
         "vertical-align": "text-bottom",
-      },
-      processor(css, meta) {
-        console.log("meta:", meta);
-        console.log("css:", css);
-        return css;
-        // 解决图标前缀问题
-        // if (meta.body.includes("i-")) {
-        //   return css.replace(/i-([a-z]+):/g, "i-$1:");
-        // }
-        // return css;
       },
     }),
   ],
@@ -84,8 +82,6 @@ export default defineConfig({
       },
     },
   },
-  // 添加 transformers 来处理 Vue 文件中的模板字符串
-  transformers: [
-    // 如果有 transformer 可以处理模板字符串，可以在这里添加
-  ],
+  // 添加 transformers 来处理模板字符串
+  transformers: [],
 });

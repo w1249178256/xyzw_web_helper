@@ -66,7 +66,7 @@
                 mode="button-with-input"
                 :name="`十殿${['一', '二', '三', '四', '五'][i-1]}`"
                 :input-value="teamIds[i-1]"
-                @update:input-value="(value) => teamIds[i-1] = value"
+                @update:input-value="(value) => handleTeamIdChange(i-1, value)"
                 :placeholder="`输入十殿${['一', '二', '三', '四', '五'][i-1]}的 TeamID`"
                 button-text="清除"
                 :disabled="!teamIds[i-1]"
@@ -75,13 +75,13 @@
               <CustomizedCard 
                 mode="button-placeholder"
                 button-text="全部清除"
-                :disabled="!teamIds.some(id => id)"
+                :disabled="!teamIds.value?.some(id => id)"
                 @button-click="clearAllTeamIds"
               />
               <CustomizedCard 
                 mode="button-placeholder"
                 button-text="自动加入十殿"
-                :disabled="!teamIds.some(id => id)"
+                :disabled="!teamIds.value?.some(id => id)"
                 @button-click="autoJoinShiDian"
               />
               <CustomizedCard 
@@ -168,15 +168,17 @@
                 <span class="token-index">{{ index + 1 }}.</span>
                 <span class="token-name-text" @click.stop="selectToken(token)">{{ token.name || '未命名' }}</span>
                 <a-tag color="red" v-if="token.server">{{ token.server }}</a-tag>
-                <a-badge v-if="getTokenStyle(token.id)" :status="getTokenStyle(token.id)" :text="getConnectionStatusText(token.id)" />
-                <span v-else class="connection-status">{{ getConnectionStatusText(token.id) }}</span>
+                <a-badge v-if="getTokenStyle(token?.id)" :status="getTokenStyle(token?.id)" :text="getConnectionStatusText(token?.id)" />
+                <span v-else class="connection-status">{{ getConnectionStatusText(token?.id) }}</span>
                 <n-select
-                  v-model:value="tokenNightmareTeam[token.id]"
+                  :value="getTokenNightmareTeamValue(token?.id)"
                   :options="nightmareTeamOptions"
                   size="small"
                   style="width: 60px; margin-left: 8px;"
-                  placeholder="殿"
-                  @update:value="(value) => handleNightmareTeamChange(token.id, value)"
+                  placeholder="空"
+                  clearable
+                  :disabled="!token?.id"
+                  @update:value="(value) => handleNightmareTeamChange(token?.id, value)"
                 />
               </a-space>
             </template>
@@ -197,8 +199,8 @@
                 <CustomizedCard
                   mode="button-count"
                   name="十殿枕头"
-                  :count="tokenPillowCount[token.id] || 0"
-                  :loading="connectingTokens.has(token.id)"
+                  :count="tokenPillowCount.value?.[token?.id] || 0"
+                  :loading="connectingTokens.has(token?.id)"
                   :disabled="false"
                   @button-click="getPillowCount(token.id)"
                   style="flex: 1;"
@@ -206,45 +208,15 @@
                 <CustomizedCard
                   mode="button"
                   name="加入十殿"
-                  :loading="connectingTokens.has(token.id)"
-                  :disabled="!teamIds[tokenNightmareTeam[token.id] - 1] || connectingTokens.has(token.id)"
-                  @button-click="() => joinShiDian(token, tokenNightmareTeam[token.id])"
+                  :loading="connectingTokens.has(token?.id)"
+                  :disabled="!teamIds.value?.[tokenNightmareTeam.value?.[token?.id] - 1] || connectingTokens.has(token?.id)"
+                  @button-click="() => joinShiDian(token, tokenNightmareTeam.value?.[token?.id])"
                   style="flex: 1;"
                 />
               </div>
               
               <!-- 下拉框区域（第二行，换行显示） -->
-              <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
-                <n-select
-                  v-model:value="tokenPassType[token.id]"
-                  :options="passTypeOptions"
-                  size="small"
-                  style="width: 80px;"
-                  placeholder="类型"
-                  @update:value="(value) => handlePassTypeChange(token.id, value)"
-                />
-                <n-select
-                  v-model:value="tokenTreasureType[token.id]"
-                  :options="treasureTypeOptions"
-                  size="small"
-                  style="width: 80px;"
-                  placeholder="宝库"
-                  @update:value="(value) => handleTreasureTypeChange(token.id, value)"
-                />
-                <n-select
-                  v-model:value="tokenTeamMember[token.id]"
-                  :options="teamMemberOptions"
-                  size="small"
-                  style="width: 100px;"
-                  placeholder="十殿队员"
-                  @update:value="(value) => handleTeamMemberChange(token.id, value)"
-                />
-              </div>
-              
-              <!-- 显示十殿队员执行次数 -->
-              <div v-if="tokenTeamMember[token.id] && [0, 2, 5, 7, 8].includes(tokenTeamMember[token.id])" style="font-size: 12px; color: #666; margin-top: 4px;">
-                本周执行次数: {{ executionStore.getExecutionCount(token.id) }}
-              </div>
+              <!-- 已移除类型、宝库、十殿队员下拉框 -->
               
             </template>
           </a-card>
@@ -255,7 +227,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useNightmareExecutionStore } from '@/stores/nightmareExecutionStore'
@@ -297,9 +269,22 @@ const getTokenIndex = (token) => {
   return index + 1
 }
 
-// 十殿队伍选项（一到五 + 空）
+// 辅助函数：获取 token 的十殿队伍值
+const getTokenNightmareTeamValue = (tokenId) => {
+  if (!tokenId) return null
+  const value = tokenNightmareTeam.value[tokenId]
+  // 如果值不存在或为 null，返回 null（对应"空"选项）
+  if (value === null || value === undefined) {
+    return null
+  }
+  // 否则返回实际的值（包括 0）
+  return value
+}
+
+// 十殿队伍选项（一到五 + 空 + 已打）
 const nightmareTeamOptions = [
   { label: '空', value: null },
+  { label: '已打', value: 0 },
   { label: '一', value: 1 },
   { label: '二', value: 2 },
   { label: '三', value: 3 },
@@ -307,87 +292,9 @@ const nightmareTeamOptions = [
   { label: '五', value: 5 }
 ]
 
-// 从本地存储加载 teamIds
-const loadTeamIds = () => {
-  try {
-    const saved = localStorage.getItem('shidian_teamids')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      if (Array.isArray(parsed) && parsed.length === 5) {
-        teamIds.value = parsed
-      }
-    }
-  } catch (error) {
-    console.error('加载 TeamIDs 失败:', error)
-  }
-}
-
-// 保存 teamIds 到本地存储
-const saveTeamIds = () => {
-  try {
-    localStorage.setItem('shidian_teamids', JSON.stringify(teamIds.value))
-    message.success('TeamIDs 已保存')
-  } catch (error) {
-    console.error('保存 TeamIDs 失败:', error)
-    message.error('保存失败')
-  }
-}
-
-// 清除指定十殿的 teamId
-const clearSingleTeamId = (index) => {
-  teamIds.value[index] = ''
-  saveTeamIds()
-  message.success(`十殿${['一', '二', '三', '四', '五'][index]}的 TeamID 已清除`)
-}
-
-// 清除所有 teamId
-const clearAllTeamIds = () => {
-  teamIds.value = ['', '', '', '', '']
-  saveTeamIds()
-  message.success('所有 TeamIDs 已清除')
-}
-
-// 加载保存的 teamIds
-loadTeamIds()
-
-// 下拉框选项数据
-const dianLevelOptions = [
-  { label: '空', value: null },
-  { label: '空十殿0', value: 'empty_0' },
-  { label: '殿0', value: 0 },
-  { label: '殿2', value: 2 },
-  { label: '殿5', value: 5 },
-  { label: '殿7', value: 7 },
-  { label: '殿8', value: 8 }
-]
-
-const passTypeOptions = [
-  { label: '通行证', value: 'pass' },
-  { label: '功法', value: 'legacy' },
-  { label: '空', value: '' }
-]
-
-const treasureTypeOptions = [
-  { label: '宝库', value: 'treasure' },
-  { label: '跳过', value: 'skip' },
-  { label: '空', value: '' }
-]
-
-const teamMemberOptions = [
-  { label: '空', value: null },
-  { label: '殿0', value: 0 },
-  { label: '殿2', value: 2 },
-  { label: '殿5', value: 5 },
-  { label: '殿7', value: 7 },
-  { label: '殿8', value: 8 }
-]
-
-// 每个token的下拉框选择值
-const tokenPassType = ref({}) // tokenId -> passType
-const tokenTreasureType = ref({}) // tokenId -> treasureType
-const tokenTeamMember = ref({}) // tokenId -> teamMember (殿 0/2/5/7/8)
+// 每个 token 的下拉框选择值
 const tokenNightmareTeam = ref({}) // tokenId -> nightmareTeam (1-5)
-const tokenPillowCount = ref({}) // tokenId -> pillowCount (十殿枕头数量，保存到localStorage)
+const tokenPillowCount = ref({}) // tokenId -> pillowCount (十殿枕头数量，保存到 localStorage)
 const pillowCount = ref(0) // 十殿枕头数量
 
 // 导出相关每个token的信息显示状态（加入十殿后显示）
@@ -584,8 +491,15 @@ const getPillowCount = async (targetTokenId) => {
         if (!targetTokenId) {
           pillowCount.value = pillowItem.quantity
         }
-        // 更新tokenPillowCount并保存到本地存储
+        // 更新 tokenPillowCount 并保存到本地存储
         tokenPillowCount.value[tokenId] = pillowItem.quantity
+        
+        // 如果枕头数量 < 5，自动将十殿队伍标签设置为已打
+        if (pillowItem.quantity < 5) {
+          tokenNightmareTeam.value[tokenId] = 0 // 0 表示"已打"
+          console.log(`Token ${tokenId} 枕头数量 ${pillowItem.quantity} < 5，已自动设置为已打`)
+        }
+        
         await saveDropdownSettings()
         message.success(`十殿枕头数量：${pillowItem.quantity}`)
         console.log('十殿枕头数量:', pillowItem.quantity)
@@ -593,7 +507,7 @@ const getPillowCount = async (targetTokenId) => {
         if (!targetTokenId) {
           pillowCount.value = 0
         }
-        // 更新tokenPillowCount并保存到本地存储
+        // 更新 tokenPillowCount 并保存到本地存储
         tokenPillowCount.value[tokenId] = 0
         await saveDropdownSettings()
         message.warning('未找到十殿枕头信息')
@@ -800,17 +714,26 @@ const upgradeTokenToPermanent = (token) => {
 
 // 保存下拉框选择值和信息显示状态到 localStorage
 const saveDropdownSettings = async () => {
+  console.log('准备保存下拉框设置:', {
+    tokenNightmareTeam: tokenNightmareTeam.value,
+    tokenPillowCount: tokenPillowCount.value
+  })
   await savePageTokenCards('shidian', {
     dropdownSettings: {
       tokenNightmareTeam: tokenNightmareTeam.value,
       tokenPillowCount: tokenPillowCount.value
     }
   })
+  console.log('下拉框设置已保存')
 }
 
 // 从 token 的 remark 字段解析下拉框值
 const parseRemarkToDropdowns = () => {
   tokenStore.gameTokens.forEach(token => {
+    if (!token || !token.id) {
+      console.warn('Invalid token:', token)
+      return
+    }
     // 如果 localStorage 中已有该 token 的十殿队伍设置，优先使用 localStorage 的值
     if (tokenNightmareTeam.value[token.id] !== undefined) {
       // localStorage 中已有设置，跳过从 remark 解析
@@ -841,108 +764,26 @@ const loadDropdownSettings = async () => {
       tokenNightmareTeam: tokenNightmareTeam.value, 
       tokenPillowCount: tokenPillowCount.value 
     })
+  } else {
+    console.log('没有保存的下拉框设置')
   }
-  // 注意：tokenResourceData 不需要加载，因为数据会从 gameData 实时获取
-  
   // 从 token 的 remark 字段解析下拉框值（如果 localStorage 中没有该 token 的设置，则从 remark 读取）
   parseRemarkToDropdowns()
+  console.log('最终 tokenNightmareTeam:', tokenNightmareTeam.value)
 }
 
-// 更新 token 的 remark 标签
-const updateTokenRemark = (tokenId) => {
-  const passType = tokenPassType.value[tokenId]
-  const treasureType = tokenTreasureType.value[tokenId]
-  const nightmareTeam = tokenNightmareTeam.value[tokenId]
-  
-  // 构建 remark 标签
-  const remarkParts = []
-  if (passType && passType !== '') {
-    const passLabel = passTypeOptions.find(opt => opt.value === passType)?.label || passType
-    remarkParts.push(passLabel)
-  }
-  if (treasureType && treasureType !== '') {
-    const treasureLabel = treasureTypeOptions.find(opt => opt.value === treasureType)?.label || treasureType
-    remarkParts.push(treasureLabel)
-  }
-  
-  // 如果宝库类型为"跳过"，确保 remark 中包含"跳过"
-  if (treasureType === 'skip' && !remarkParts.includes('跳过')) {
-    remarkParts.push('跳过')
-  }
-  
-  // 添加十殿队伍标签
-  if (nightmareTeam !== null && nightmareTeam !== undefined) {
-    const teamLabel = nightmareTeamOptions.find(opt => opt.value === nightmareTeam)?.label
-    if (teamLabel && teamLabel !== '空') {
-      remarkParts.push(`殿${teamLabel}`)
-    }
-  }
-  
-  const remark = remarkParts.join(' ')
-  
-  // 更新 token 的 remark 字段
-  if (tokenStore.updateToken) {
-    tokenStore.updateToken(tokenId, { remark })
-    console.log(`Token ${tokenId} 标签已更新:`, remark || '(空)')
-    // 确保更新立即生效
-    const token = tokenStore.gameTokens.find(t => t.id === tokenId)
-    if (token) {
-      token.remark = remark
-    }
-  }
-}
 
-// 处理通行证类型变化
-const handlePassTypeChange = async (tokenId, value) => {
-  tokenPassType.value[tokenId] = value
-  console.log(`Token ${tokenId} 通行证类型选择:`, value)
-  // 更新token标签（不依赖连接状态）
-  updateTokenRemark(tokenId)
-  // 保存到localStorage（不依赖连接状态）
-  try {
-    await saveDropdownSettings()
-  } catch (error) {
-    console.error('保存下拉框设置失败:', error)
-  }
-}
-
-// 处理宝库类型变化
-const handleTreasureTypeChange = async (tokenId, value) => {
-  tokenTreasureType.value[tokenId] = value
-  console.log(`Token ${tokenId} 宝库类型选择:`, value)
-  // 更新token标签（不依赖连接状态）
-  updateTokenRemark(tokenId)
-  // 保存到localStorage（不依赖连接状态）
-  try {
-    await saveDropdownSettings()
-  } catch (error) {
-    console.error('保存下拉框设置失败:', error)
-  }
-}
-
-// 处理十殿队员变化
-const handleTeamMemberChange = async (tokenId, value) => {
-  if (value === null || value === undefined) {
-    tokenTeamMember.value[tokenId] = null
-  } else {
-    tokenTeamMember.value[tokenId] = value
-  }
-  console.log(`Token ${tokenId} 十殿队员选择:`, value)
-  // 保存到 localStorage 和服务器（不依赖连接状态）
-  try {
-    await saveDropdownSettings()
-  } catch (error) {
-    console.error('保存下拉框设置失败:', error)
-  }
-}
 
 // 处理十殿队伍变化
 const handleNightmareTeamChange = async (tokenId, value) => {
-  if (value === null || value === undefined) {
-    tokenNightmareTeam.value[tokenId] = null
-  } else {
-    tokenNightmareTeam.value[tokenId] = value
+  if (!tokenId) {
+    console.warn('Invalid tokenId:', tokenId)
+    return
   }
+  
+  // 确保值被正确保存（包括 0）
+  tokenNightmareTeam.value[tokenId] = value
+  
   console.log(`Token ${tokenId} 十殿队伍选择:`, value)
   // 保存到 localStorage 和服务器（不依赖连接状态）
   try {
@@ -950,6 +791,25 @@ const handleNightmareTeamChange = async (tokenId, value) => {
   } catch (error) {
     console.error('保存下拉框设置失败:', error)
   }
+}
+
+// 处理 TeamID 输入变化
+const handleTeamIdChange = (index, value) => {
+  // 确保保存的是字符串
+  const stringValue = String(value || '')
+  teamIds.value[index] = stringValue
+  // 注意：TeamID 的变化不影响已保存的 token 十殿标签
+  // 标签只会在获取枕头数量或手动清空时改变
+}
+
+// 清空单个 TeamID
+const clearSingleTeamId = (index) => {
+  teamIds.value[index] = ''
+}
+
+// 清空所有 TeamID
+const clearAllTeamIds = () => {
+  teamIds.value = ['', '', '', '', '']
 }
 
 // 开始十殿管理
@@ -1001,23 +861,40 @@ const joinShiDian = async (token, teamIndex = null) => {
 
 // 清空所有 Token 的十殿标签
 const clearAllNightmareLabels = async () => {
-  const result = await dialog.warning({
-    title: '确认清空',
-    content: '确定要清空所有 Token 的十殿标签（一、二、三、四、五）吗？此操作不可恢复。',
-    positiveText: '确定',
-    negativeText: '取消'
-  })
+  console.log('clearAllNightmareLabels 被调用')
   
-  if (result === 'positive') {
-    // 清空所有 token 的十殿队伍选择
-    tokenStore.gameTokens.forEach(token => {
-      tokenNightmareTeam.value[token.id] = null
+  try {
+    await dialog.warning({
+      title: '确认清空',
+      content: '确定要清空所有 Token 的十殿标签（一、二、三、四、五、已打）吗？此操作不可恢复。',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        console.log('用户确认清空')
+        // 创建一个新的空对象来替换旧对象，确保触发响应式更新
+        const newTeamData = {}
+        tokenStore.gameTokens.forEach(token => {
+          if (token && token.id) {
+            newTeamData[token.id] = null
+          }
+        })
+        
+        // 替换整个对象
+        tokenNightmareTeam.value = newTeamData
+        
+        // 保存到 localStorage
+        await saveDropdownSettings()
+        
+        console.log('清空完成，新对象:', newTeamData)
+        
+        // 等待 DOM 更新
+        await nextTick()
+        
+        message.success('已清空所有 Token 的十殿标签')
+      }
     })
-    
-    // 保存到 localStorage
-    await saveDropdownSettings()
-    
-    message.success('已清空所有 Token 的十殿标签')
+  } catch (error) {
+    console.error('清空操作出错:', error)
   }
 }
 
@@ -1080,11 +957,12 @@ const processNightmareTeam = async (teamIndex, direction) => {
     return !name.startsWith('02') && !name.startsWith('05') && !name.startsWith('07')
   })
   
-  // 排除已有十殿标签的 token
+  // 排除已有十殿标签的 token（只选择没有标签或标签为 null 的）
   const availableTokens = filteredTokens.filter(token => {
+    if (!token || !token.id) return false
     const currentTeam = tokenNightmareTeam.value[token.id]
-    // 排除已有十殿标签（一到五、空）的 token
-    return currentTeam === null || currentTeam === undefined
+    // 跳过已有十殿标签（1-5）和已打（0）的 token，只处理没有标签或标签为 null 的
+    return currentTeam === undefined || currentTeam === null
   })
   
   let joinedCount = 0
@@ -1095,8 +973,13 @@ const processNightmareTeam = async (teamIndex, direction) => {
       break
     }
     
+    if (!token || !token.id) {
+      console.warn('Invalid token:', token)
+      continue
+    }
+    
     // 获取枕头数量
-    const pillowCount = tokenPillowCount.value[token.id] || 0
+    const pillowCount = tokenPillowCount.value?.[token.id] || 0
     
     // 所有十殿（包括一到五）都需要枕头=5
     if (pillowCount !== 5) {
@@ -1691,7 +1574,6 @@ watch(() => tokenStore.gameTokens, (tokens) => {
 onMounted(async () => {
   // 加载下拉框设置
   await loadDropdownSettings()
-  loadClubNamesFromServer()
 })
 
 // 处理十殿枕头数量更新事件
