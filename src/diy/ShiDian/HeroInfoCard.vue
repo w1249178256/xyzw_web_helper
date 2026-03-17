@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -1945,7 +1945,7 @@ const batchUpgrade = async (teamId) => {
         let status = tokenStore.getWebSocketStatus(token.id)
         
         while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
           

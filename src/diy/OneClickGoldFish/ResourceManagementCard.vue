@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -246,7 +246,7 @@ const useBag = async (itemId, count) => {
           5000
         )
         message.info(`使用 ${getItemName(itemId)}: ${(i + 1) * 999}/${count}`)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (error) {
         console.error(`使用 ${getItemName(itemId)} 失败 (批次 ${i + 1}):`, error)
         message.error(`使用 ${getItemName(itemId)} 失败 (批次 ${i + 1})`)
@@ -313,7 +313,7 @@ const useAllResources = async () => {
         const count = getItemCount(itemType.id)
         if (count > 0) {
           await useBag(itemType.id, count)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       }
       
@@ -397,7 +397,7 @@ const batchUseResources = async () => {
         let status = tokenStore.getWebSocketStatus(token.id)
         
         while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
           
@@ -419,7 +419,7 @@ const batchUseResources = async () => {
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在刷新物品信息...`)
         await tokenStore.sendGetRoleInfo(token.id)
         // 等待数据更新，确保数据已经同步到token对象和全局状态
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 重新获取token数据（刷新后）
         const refreshedToken = tokenStore.gameTokens.find(t => t.id === token.id)
@@ -466,7 +466,7 @@ const batchUseResources = async () => {
               message.info(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)}: ${count} 个`)
               await useBagForToken(token.id, itemType.id, count)
               // 使用后等待，确保数据已更新到token对象
-              await new Promise(resolve => setTimeout(resolve, 1000))
+              await new Promise(resolve => setTimeout(resolve, 500))
             } catch (error) {
               console.error(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)} 失败:`, error)
               message.warning(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)} 失败: ${error.message || '未知错误'}`)
@@ -477,13 +477,13 @@ const batchUseResources = async () => {
         
         // 最后刷新物品信息
         await tokenStore.sendGetRoleInfo(token.id)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 资源使用完成`)
         successCount++
         
         if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量使用资源失败:`, error)
@@ -522,7 +522,7 @@ const useBagForToken = async (tokenId, itemId, count) => {
           { itemId: itemId || 0, number: 999, index: 0 },
           5000
         )
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (error) {
         console.error(`使用 ${getItemName(itemId)} 失败 (批次 ${i + 1}):`, error)
         throw error
@@ -586,7 +586,7 @@ const refreshItemCounts = async () => {
     await tokenStore.sendGetRoleInfo(token.id)
     
     // 等待一下确保数据已更新
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     message.success('刷新物品数量成功')
   } catch (error) {
@@ -638,7 +638,7 @@ const handleBatchBuyBlackMarket = async (data) => {
       
       try {
         tokenStore.selectToken(token.id)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         const status = tokenStore.getWebSocketStatus(token.id)
         if (status !== 'connected') {
@@ -651,7 +651,7 @@ const handleBatchBuyBlackMarket = async (data) => {
         message.success(`${token.name || token.id} 黑市商品购买成功`)
         
         if (i < data.tokenIds.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`Token ${token.name || token.id} 购买失败:`, error)
@@ -707,7 +707,7 @@ const handleBatchCompleteTask = async (data) => {
       
       try {
         tokenStore.selectToken(token.id)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         const status = tokenStore.getWebSocketStatus(token.id)
         if (status !== 'connected') {
@@ -720,7 +720,7 @@ const handleBatchCompleteTask = async (data) => {
         message.success(`${token.name || token.id} 任务完成成功`)
         
         if (i < data.tokenIds.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`Token ${token.name || token.id} 任务完成失败:`, error)

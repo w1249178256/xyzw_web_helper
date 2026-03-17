@@ -1,0 +1,108 @@
+
+时间: 2026/3/17 08:06:52
+服务: EquipmentService
+方法: quench
+参数: [{"heroId":107,"part":1,"quenches":{},"quenchId":0,"skipOrange":false,"seed":867222}]
+结果:
+{
+  "_raw": {
+    "seq": 53,
+    "ack": 53,
+    "time": 1773706014676,
+    "resp": 53,
+    "cmd": "equipment_quenchresp",
+    "body": {
+      "role": {
+        "power": 2131163134,
+        "heroes": {
+          "107": {
+            "power": 1464033873,
+            "attack": 514690653,
+            "attribute": {
+              "51": 1,
+              "53": 0.00800000011920929,
+              "54": 0.1620000061392784,
+              "56": 0.3780000150203705,
+              "57": 0.7000000178813934,
+              "59": 0.4000000059604645,
+              "61": 0.41200000613927845,
+              "63": 0.0020000000298023225,
+              "66": 0.00800000011920929,
+              "69": 0.01600000023841858,
+              "70": 0.004000000059604645
+            },
+            "equipment": {
+              "1": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "level": 4000,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 45492,
+                "defense": 0,
+                "hp": 0,
+                "curQuenchId": 0,
+                "quenchTimes": 4251,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 20,
+                    "attrNum": 4,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 14,
+                    "attrNum": 2,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 15,
+                    "attrNum": 1,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 8,
+                    "attrNum": 3,
+                    "isLocked": false
+                  }
+                },
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 19188,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "115789831-21894304",
+                "quenchLogId2": "",
+                "seed": 0
+              }
+            }
+          }
+        },
+        "statistics": {
+          "last:quench:115789831-21894304": 1773706014667,
+          "task:complete:22": 2131163134,
+          "equip:today:quench:cnt": 15
+        },
+        "statisticsTime": {
+          "equip:today:quench:cnt": 1773706014
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1773706012555_d2bzch9tt
+
+
+
+
+
+

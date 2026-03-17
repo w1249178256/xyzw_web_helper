@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -416,7 +416,7 @@ const handleBatchSetBlackMarket = async () => {
         let status = tokenStore.getWebSocketStatus(token.id)
         
         while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
           
@@ -476,7 +476,7 @@ const handleBatchSetBlackMarket = async () => {
         }
         
         if (i < targetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`[序号${tokenIndex}] 设置Token ${token.name || token.id} 失败:`, error)
@@ -566,7 +566,7 @@ const exportBlackMarketSettings = async () => {
         let status = tokenStore.getWebSocketStatus(token.id)
         
         while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
           
@@ -589,7 +589,7 @@ const exportBlackMarketSettings = async () => {
         
         // 获取黑市购买设置
         const purchaseInfo = await tokenStore.sendStoreGetPurchase(token.id, {})
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         if (!purchaseInfo || !purchaseInfo.purchaseItemList) {
           results.push({
@@ -627,7 +627,7 @@ const exportBlackMarketSettings = async () => {
           rodDiscount: String(rodDiscount)
         })
         
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (error) {
         console.error(`导出Token ${token.name || token.id} 黑市设置失败:`, error)
         results.push({
@@ -728,7 +728,7 @@ const exportResourceInfo = async () => {
         let status = tokenStore.getWebSocketStatus(token.id)
         
         while (status !== 'connected' && retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
           
@@ -750,7 +750,7 @@ const exportResourceInfo = async () => {
         
         // 刷新角色信息
         await tokenStore.sendGetRoleInfo(token.id)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 优先从全局gameData获取（如果当前选中的是这个token）
         // 否则从token.gameData获取
@@ -841,7 +841,7 @@ const exportResourceInfo = async () => {
           boxPoints: String(boxPoints)
         })
         
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (error) {
         console.error(`导出Token ${token.name || token.id} 资源信息失败:`, error)
         results.push({

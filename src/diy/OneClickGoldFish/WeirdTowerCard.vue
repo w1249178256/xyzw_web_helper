@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -630,7 +630,7 @@ const batchClaimLegionPrivilege = async () => {
           try {
             await tokenStore.sendEvotowerClaimLegionPrivilege(token.id, {})
             successCount++
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            await new Promise(resolve => setTimeout(resolve, 500))
           } catch (error) {
             // 如果领取失败（如已领取过），跳过剩余领取
             console.log(`序号 ${tokenIndex} ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
@@ -1342,7 +1342,7 @@ const handleBatchClimb = async () => {
         let currentEnergy = towerInfoRes?.evoTower?.energy || 0
         let currentTowerId = towerInfoRes?.evoTower?.towerId || 0
         
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 执行爬塔逻辑（模拟点击开始爬塔按钮）
         let climbCount = 0

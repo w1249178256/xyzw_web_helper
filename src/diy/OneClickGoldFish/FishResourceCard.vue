@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -593,7 +593,7 @@ const openAllBoxes = async () => {
         
         // 每次间隔0.4s（最后一次不需要等待）
         if (i < batchesToOpen - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
         
         // 检查是否达到上限
@@ -647,7 +647,7 @@ const autoOpenAllBoxes = async () => {
     await tokenStore.sendGetRoleInfo(token.id)
     
     // 等待一下确保数据已更新
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     message.success('刷新资源成功')
   } catch (error) {
@@ -734,7 +734,7 @@ const startFishing = async () => {
       
       // 每次间隔0.5s（最后一次不需要等待）
       if (i < executeCount - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     
@@ -833,7 +833,7 @@ const startRecruit = async () => {
       
       // 每次间隔0.5s（最后一次不需要等待）
       if (i < executeCount - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     
@@ -948,7 +948,7 @@ const claimTaskRewards = async () => {
             missionid: missionId
           })
           totalSuccess++
-          await new Promise(resolve => setTimeout(resolve, 1000)) // 每次执行后等待200ms
+          await new Promise(resolve => setTimeout(resolve, 500)) // 每次执行后等待200ms
         } catch (error) {
           console.error(`领取任务奖励失败 (missionId: ${missionId}):`, error)
           totalFail++
@@ -958,7 +958,7 @@ const claimTaskRewards = async () => {
       
       // 每组之间稍作延迟
       if (group.end < 100) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     
@@ -1068,10 +1068,10 @@ const resetAllUsage = async () => {
         
         // 刷新角色信息以获取最新道具数量
         await tokenStore.sendGetRoleInfo(token.id)
-        await new Promise(resolve => setTimeout(resolve, 1000)) // 等待数据更新
+        await new Promise(resolve => setTimeout(resolve, 500)) // 等待数据更新
         
         // 等待一段时间再执行下一次
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       } catch (error) {
         console.error(`打开道具包失败 (itemId: ${itemId}, number: ${openPackSize}):`, error)
         // 如果打开失败，可能是道具不足或其他错误，停止循环
@@ -1212,7 +1212,7 @@ const batchOpenAllBoxes = async () => {
               
               // 每次间隔0.4s（最后一次不需要等待）
               if (i < canOpenBatches - 1) {
-                await new Promise(resolve => setTimeout(resolve, 1000))
+                await new Promise(resolve => setTimeout(resolve, 500))
               }
             }
           }
@@ -1344,7 +1344,7 @@ const batchStartFishing = async () => {
             
             // 每次间隔0.5s（最后一次不需要等待）
             if (i < executeCount - 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000))
+              await new Promise(resolve => setTimeout(resolve, 500))
             }
           }
           
@@ -1476,7 +1476,7 @@ const batchStartRecruit = async () => {
             
             // 每次间隔0.5s（最后一次不需要等待）
             if (i < executeCount - 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000))
+              await new Promise(resolve => setTimeout(resolve, 500))
             }
           }
           

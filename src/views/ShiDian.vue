@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="shidian-page">
     <div class="container">
       <!-- 页面头部 -->
@@ -344,7 +344,7 @@ const isClubSignedIn = computed(() => {
 const updateTokenResourceData = async (tokenId) => {
   try {
     // 等待一下确保数据已更新
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     // 获取最新的角色信息和十殿信息
     await tokenStore.sendGetRoleInfo(tokenId)
@@ -1246,11 +1246,11 @@ const handleFetchClubInfo = async () => {
     if (status !== 'connected') {
       selectedTokenId.value = token.id
       tokenStore.selectToken(token.id, false)
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
     
     await tokenStore.sendGameMessage(token.id, 'legion_getinfo', {})
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     const tokenData = tokenStore.gameTokens.find(t => t.id === token.id)
     if (tokenData && tokenData.gameData && tokenData.gameData.legionInfo) {
@@ -1312,7 +1312,7 @@ const handleBatchFetchClubInfo = async () => {
       try {
         selectedTokenId.value = token.id
         tokenStore.selectToken(token.id, false)
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         await handleFetchClubInfo()
       } catch (error) {
         console.error(`获取Token ${token.name} 俱乐部信息失败:`, error)

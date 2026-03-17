@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="boss-tower" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -397,7 +397,7 @@ const extractRewardListFromBossTower = (bossTower) => {
 const updateTokenResourceData = async (tokenId) => {
   try {
     // 等待一下确保数据已更新
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     // 获取最新的角色信息和十殿信息
     // 执行命令前等待400ms

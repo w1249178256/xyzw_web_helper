@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -695,7 +695,7 @@ const claimNightmareRewardsForCard = async (token) => {
       tokenStore.selectToken(token.id)
       let count = 0
       while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         count++
       }
       if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -1110,7 +1110,7 @@ const connectTokenByClick = async (token, maxRetries = 5) => {
         continue
       }
       
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       
       if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
         return true
@@ -1589,7 +1589,7 @@ const batchNightmare = async () => {
           message.success(`${dian2Token.name} 加入房间成功`)
         } catch (error) {
           message.warning(`${dian2Token.name} 加入房间失败，尝试再次加入...`)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       }
 
@@ -1657,7 +1657,7 @@ const batchNightmare = async () => {
                 break
               } catch (error) {
                 message.warning(`${token.name} 加入房间失败，尝试再次加入...`)
-                await new Promise(resolve => setTimeout(resolve, 1000))
+                await new Promise(resolve => setTimeout(resolve, 500))
               }
             }
             
@@ -3265,7 +3265,7 @@ const exportResources = async () => {
           // 等待连接，最多10秒
           let retryCount = 0
           while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 10) {
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            await new Promise(resolve => setTimeout(resolve, 500))
             retryCount++
           }
           
@@ -3637,7 +3637,7 @@ const executeDian1Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3694,7 +3694,7 @@ const executeDian2Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3788,7 +3788,7 @@ const executeDian3Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3840,7 +3840,7 @@ const executeDian4Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3896,7 +3896,7 @@ const executeDian5Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -4011,7 +4011,7 @@ const executeDian6Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -4135,7 +4135,7 @@ const executeDian7Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {

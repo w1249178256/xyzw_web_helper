@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -453,7 +453,7 @@ const startHeroUpgrade = async () => {
         tokenStore.selectToken(token.id, true)
         
         // 等待1秒
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 检查连接状态
         status = tokenStore.getWebSocketStatus(token.id)
@@ -541,7 +541,7 @@ const startHeroUpgrade = async () => {
         }
         
         // 每次升星后延迟1秒（无论成功还是失败）
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         if (shouldBreak) {
           break
@@ -648,11 +648,11 @@ const startBookUpgrade = async () => {
           )
         } catch (err) {
           // 失败后也执行延迟1秒
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           break
         }
         // 每次升星后延迟1秒（无论成功还是失败）
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     message.success('图鉴升星完成')
@@ -729,11 +729,11 @@ const claimBookReward = async () => {
         successCount++
       } catch (err) {
         // 失败后也执行延迟1秒
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         break
       }
       // 每次领取后延迟1秒（无论成功还是失败）
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
     message.success('图鉴奖励领取完成')
     
@@ -849,7 +849,7 @@ const connectTokenWithRetry = async (token, tokenIndex) => {
     tokenStore.selectToken(token.id, true)
     
     // 等待1秒
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
     
     // 检查连接状态
     status = tokenStore.getWebSocketStatus(token.id)
@@ -888,11 +888,11 @@ const executeHeroUpgrade = async (token) => {
         )
         } catch (err) {
           // 失败后也执行延迟1秒
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           break
         }
         // 每次升星后延迟1秒（无论成功还是失败）
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
     }
   }
 }
@@ -916,11 +916,11 @@ const executeBookUpgrade = async (token) => {
         )
         } catch (err) {
           // 失败后也执行延迟1秒
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           break
         }
         // 每次升星后延迟1秒（无论成功还是失败）
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
     }
   }
 }
@@ -937,11 +937,11 @@ const executeClaimBookReward = async (token) => {
       )
     } catch (err) {
       // 失败后也执行延迟1秒
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
       break
     }
     // 每次领取后延迟1秒（无论成功还是失败）
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 500))
   }
 }
 
@@ -1050,7 +1050,7 @@ const handleBatchUpgrade = async () => {
           status: 'success',
           message: `序号 ${tokenIndex} ${token.name || token.id} 英雄升星完成`
         })
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 3. 执行图鉴升星
         logStore.addLog({
@@ -1074,7 +1074,7 @@ const handleBatchUpgrade = async () => {
           status: 'success',
           message: `序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`
         })
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 4. 执行领取图鉴奖励
         logStore.addLog({
@@ -1100,7 +1100,7 @@ const handleBatchUpgrade = async () => {
         })
         
         if (i < sortedTargetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量升星失败:`, error)
@@ -1303,7 +1303,7 @@ const handleBatchTower = async () => {
         })
         
         if (i < sortedTargetTokens.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
         console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败:`, error)

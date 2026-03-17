@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -388,7 +388,7 @@ const handleLegacyHangup = async () => {
         tokenStore.selectToken(token.id, true)
         
         // 等待1秒
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
         // 检查连接状态
         status = tokenStore.getWebSocketStatus(token.id)
@@ -758,7 +758,7 @@ const handleLegacyCollect = async () => {
       
       while (status !== 'connected' && retryCount < maxRetries) {
         tokenStore.selectToken(token.id, true)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
         status = tokenStore.getWebSocketStatus(token.id)
         retryCount++
         
@@ -1660,7 +1660,7 @@ const handleExportClubInfo = async () => {
 
         while (status !== 'connected' && retryCount < maxRetries) {
           tokenStore.selectToken(token.id, true)
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          await new Promise(resolve => setTimeout(resolve, 500))
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
 
@@ -1829,7 +1829,7 @@ const handleBookUpgrade = async () => {
         } catch (err) {
           break
         }
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
     
@@ -1847,7 +1847,7 @@ const handleBookUpgrade = async () => {
       } catch (err) {
         break
       }
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
     
     message.success('图鉴升星和领取奖励完成')
@@ -1911,7 +1911,7 @@ const handleBatchBookUpgrade = async () => {
               } catch (err) {
                 break
               }
-              await new Promise(resolve => setTimeout(resolve, 1000))
+              await new Promise(resolve => setTimeout(resolve, 500))
             }
           }
           
@@ -1928,7 +1928,7 @@ const handleBatchBookUpgrade = async () => {
             } catch (err) {
               break
             }
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            await new Promise(resolve => setTimeout(resolve, 500))
           }
           
           message.success(`[${globalIndex + 1}] ${token.name || token.id} 图鉴完成`)
