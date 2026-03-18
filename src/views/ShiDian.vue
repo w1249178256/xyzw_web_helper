@@ -80,15 +80,6 @@
               />
               <CustomizedCard 
                 mode="button-placeholder"
-                button-text="清空十殿标签"
-                :disabled="!tokenStore.hasTokens"
-                @button-click="clearAllNightmareLabels"
-              />
-              <CustomizedCard 
-                mode="button-with-switch"
-                name="正序执行"
-                :checked="isForwardOrder"
-                @update:checked="(value) => isForwardOrder = value"
                 button-text="自动加入十殿"
                 :disabled="!teamIds?.some(id => id) || isAutoJoinRunning"
                 @button-click="autoJoinShiDian"
@@ -98,6 +89,12 @@
                 button-text="停止"
                 :disabled="!isAutoJoinRunning"
                 @button-click="stopAutoJoinShiDian"
+              />
+              <CustomizedCard 
+                mode="button-placeholder"
+                button-text="清空十殿标签"
+                :disabled="!tokenStore.hasTokens"
+                @button-click="clearAllNightmareLabels"
               />
             </CustomizedCard>
           </template>
@@ -312,7 +309,6 @@ const tokenInfoDisplay = ref({}) // tokenId -> boolean
 // 自动加入十殿控制
 const isAutoJoinRunning = ref(false) // 是否正在执行自动加入
 const abortController = ref(null) // 用于中断操作
-const isForwardOrder = ref(false) // 是否正序执行（按 Token 昵称顺序）
 
 // 俱乐部相关状态
 const isClubRunning = ref(false)
@@ -988,23 +984,17 @@ const autoJoinShiDian = async () => {
     isAutoJoinRunning.value = true
     
     try {
-      // 根据开关决定处理顺序
-      const order = isForwardOrder.value ? 'forward' : 'backward'
-      const reverseOrder = isForwardOrder.value ? 'backward' : 'forward'
-      
-      console.log(`执行顺序：${isForwardOrder.value ? '正序（从前往后）' : '倒序（从后往前）'}`)
-      
-      // 第一步：处理十殿五
+      // 第一步：处理十殿五（从前往后，枕头=5 的 token）
       if (teamIds.value[4]) { // 十殿五的 TeamID
         console.log('开始处理十殿五')
-        await processNightmareTeam(5, order)
+        await processNightmareTeam(5, 'forward')
       }
       
-      // 第二步：处理十殿一到四
+      // 第二步：处理十殿一到四（从后往前）
       for (let i = 3; i >= 0; i--) {
         if (teamIds.value[i]) {
           console.log(`开始处理十殿${['一', '二', '三', '四'][i]}`)
-          await processNightmareTeam(i + 1, reverseOrder)
+          await processNightmareTeam(i + 1, 'backward')
         }
       }
       
