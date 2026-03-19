@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -23,27 +23,20 @@
             <!-- 爬塔操作按钮 -->
             <CustomizedCard 
               mode="button" 
-              name="开始爬塔" 
-              :disabled="!selectedTokenId || isRunning || towerEnergy <= 0"
-              :loading="isRunning"
-              @button-click="startTowerClimb" 
-            />
-            <CustomizedCard 
-              mode="button" 
               name="停止爬塔" 
-              :disabled="!selectedTokenId || !isRunning"
-              @button-click="stopTowerClimb" 
+              :disabled="!selectedTokenId || !isBatchTowerRunning"
+              @button-click="stopBatchTower" 
             />
             <CustomizedCard 
               mode="button" 
               name="刷新信息" 
-              :disabled="!selectedTokenId || isRunning"
+              :disabled="!selectedTokenId || isBatchTowerRunning"
               @button-click="refreshTowerInfo" 
             />
             <CustomizedCard 
               mode="button" 
               name="领取奖励" 
-              :disabled="!selectedTokenId || isRunning"
+              :disabled="!selectedTokenId || isBatchTowerRunning"
               @button-click="claimTowerReward" 
             />
             
@@ -152,18 +145,18 @@ const getTokenIndex = (token) => {
   return index + 1
 }
 
-// 计算属性：当前层数（从tokenStore.gameData获取）
+// 计算属性：当前层数（从 tokenStore.gameData 获取）
 const currentFloor = computed(() => {
   const roleInfo = tokenStore.gameData.roleInfo
-  if (!roleInfo || !roleInfo.role) return '0 - 0'
+  if (!roleInfo || !roleInfo.role) return '0-0'
   const tower = roleInfo.role.tower
-  if (!tower || tower.id === undefined) return '0 - 0'
-  const floor = Math.floor(tower.id / 10) + 1
-  const layer = (tower.id % 10) + 1
-  return `${floor} - ${layer}`
+  if (!tower || tower.id === undefined) return '0-0'
+  const floor = Math.floor(tower.id / 10)
+  const layer = tower.id % 10
+  return `${floor}-${layer}`
 })
 
-// 计算属性：爬塔能量（从tokenStore.gameData获取）
+// 计算属性：爬塔能量（从 tokenStore.gameData 获取）
 const towerEnergy = computed(() => {
   const roleInfo = tokenStore.gameData.roleInfo
   if (!roleInfo || !roleInfo.role) return 0
@@ -351,34 +344,56 @@ const startTowerClimb = async () => {
   isRunning.value = false;
 }
 
-// 停止爬塔（从FishHelper.vue复制）
+// 停止爬塔（从 FishHelper.vue 复制）
 const stopTowerClimb = () => {
   isRunning.value = false
   message.info('已停止爬塔')
 }
 
+// 停止批量爬塔
+const stopBatchTower = () => {
+  isBatchTowerRunning.value = false
+  message.info('已停止批量爬塔')
+}
+
 // 刷新爬塔信息（从FishHelper.vue复制）
 const refreshTowerInfo = async () => {
   if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+    message.warning('请先选择 Token')
     return
   }
   const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
   if (!token) {
-    message.error('Token不存在')
+    message.error('Token 不存在')
     return
   }
   const status = tokenStore.getWebSocketStatus(token.id)
   if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接游戏')
+    message.error('WebSocket 未连接，请先连接游戏')
     return
   }
   
   try {
     message.info('正在刷新爬塔信息...')
+    
+    // 发送刷新命令
     await tokenStore.sendGameMessage(token.id, 'tower_getinfo', {})
-    await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
-    message.success('爬塔信息刷新成功')
+    const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+    
+    // 获取并显示详细信息
+    if (roleInfo && roleInfo.role && roleInfo.role.tower) {
+      const tower = roleInfo.role.tower
+      const towerId = tower.id
+      const energy = tower.energy || 0
+      const currentFloor = Math.floor(towerId / 10)
+      const smallFloor = towerId % 10
+      
+      console.log(`[刷新信息] Token: ${token.name || token.id}, 当前层数：${currentFloor}层${smallFloor}小层 (towerId: ${towerId}), 鱼干数：${energy}`)
+      
+      message.success(`刷新成功：${currentFloor}层${smallFloor}小层，鱼干数：${energy}`)
+    } else {
+      message.success('爬塔信息刷新成功')
+    }
   } catch (error) {
     console.error('刷新爬塔信息失败:', error)
     message.error('刷新爬塔信息失败')
@@ -1240,6 +1255,19 @@ const handleBatchTower = async () => {
     })
     
     for (let i = 0; i < sortedTargetTokens.length; i++) {
+      // 检查是否被停止
+      if (!isBatchTowerRunning.value) {
+        message.info('批量爬塔已停止')
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '批量爬塔',
+          status: 'info',
+          message: '批量爬塔已停止'
+        })
+        break
+      }
+      
       const token = sortedTargetTokens[i]
       const tokenIndex = getTokenIndex(token)
       
@@ -1255,7 +1283,7 @@ const handleBatchTower = async () => {
       })
       
       try {
-        // 1. 连接Token（模拟点击token昵称，最多重试5次）
+        // 1. 连接 Token（模拟点击 token 昵称，最多重试 5 次）
         const connected = await connectTokenWithRetry(token, tokenIndex)
         if (!connected) {
           message.warning(`序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`)
@@ -1302,6 +1330,7 @@ const handleBatchTower = async () => {
           message: `${tokenIndex}、${token.name || token.id}、爬塔完成`
         })
         
+        // 在每个 token 之间添加 500ms 间隔
         if (i < sortedTargetTokens.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 500))
         }
@@ -1396,47 +1425,35 @@ const handleBatchTower = async () => {
   }
 }
 
-// 为单个token执行爬塔操作（模拟点击开始爬塔按钮）
+// 为单个 token 执行爬塔操作（新逻辑）
 const startTowerClimbForToken = async (token) => {
-  // 模拟点击开始爬塔按钮的完整流程
+  const tokenIndex = getTokenIndex(token)
+  
   try {
-    // 检查WebSocket连接状态
+    // 检查 WebSocket 连接状态
     const status = tokenStore.getWebSocketStatus(token.id)
     if (status !== 'connected') {
-      throw new Error('WebSocket未连接')
+      throw new Error('WebSocket 未连接')
     }
     
-    // 获取爬塔能量
-    const roleInfo = tokenStore.gameData.roleInfo
+    // 步骤 1：使用 role_getroleinfo 获取当前层数和鱼干数
+    const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
     if (!roleInfo || !roleInfo.role) {
       throw new Error('角色信息不存在')
     }
+    
     const tower = roleInfo.role.tower
-    const energy = tower?.energy || 0
-    
-    if (energy <= 0) {
-      throw new Error('爬塔能量不足')
+    if (!tower) {
+      throw new Error('爬塔信息不存在')
     }
     
-    // 清除之前的超时
-    if (climbTimeout.value) {
-      clearTimeout(climbTimeout.value);
-      climbTimeout.value = null;
-    }
-
-    isRunning.value = true;
-    stopFlag = false;
-    let climbCount = 0;
-    let maxClimb = 600; // 最多批量次数，防止死循环
-    // 设置超时保护，60秒后自动重置状态
-    climbTimeout.value = setTimeout(() => {
-      isRunning.value = false;
-      climbTimeout.value = null;
-      stopFlag = true;
-      message.info("批量爬塔已超时自动停止");
-    }, 60000);
+    const towerId = tower.id
+    const energy = tower.energy || 0
+    let currentFloor = Math.floor(towerId / 10)  // 使用 let 以便后续更新
     
-    // 记录开始爬塔日志
+    // 在 console 显示获取的层数
+    console.log(`[爬塔] Token: ${token.name || token.id}, 当前层数：${currentFloor}层${towerId % 10}小层 (towerId: ${towerId}), 鱼干数：${energy}`)
+    
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
@@ -1444,70 +1461,71 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${token.name || token.id} 开始爬塔...`
+      message: `${tokenIndex}、${token.name || token.id}、当前层数：${currentFloor}层${towerId % 10}小层，鱼干数：${energy}`
     })
-    message.info(`${token.name || token.id} 开始爬塔...`)
+    message.info(`${token.name || token.id} 当前层数：${currentFloor}层${towerId % 10}小层，鱼干数：${energy}`)
     
-    // 检查并领取未领取的塔奖励
-    if (roleInfo && roleInfo.role && roleInfo.role.tower) {
-      const tower = roleInfo.role.tower
-      if (tower && tower.reward) {
-        let claimedCount = 0
-        for (let i = 0; i < 100; i++) {
-          if (!tower.reward[i]) {
-            try {
-              await tokenStore.sendMessageWithPromise(token.id, 'tower_claimreward', { rewardId: i }, 10000)
-              claimedCount++
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '爬塔升星',
-                operation: '领取塔奖励',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `${token.name || token.id} 成功领取第${i}章通关奖励`
-              })
-              message.success(`${token.name || token.id} 成功领取第${i}章通关奖励`)
-            } catch (error) {
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '爬塔升星',
-                operation: '领取塔奖励',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'error',
-                message: `${token.name || token.id} 领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
-              })
-            }
-          }
-        }
-        if (claimedCount > 0) {
-          message.info(`${token.name || token.id} 共领取了${claimedCount}个塔奖励`)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '爬塔升星',
-            operation: '领取塔奖励',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `${token.name || token.id} 共领取了${claimedCount}个塔奖励`
-          })
-        }
+    // 步骤 2：判断是否为 xx0 层
+    const isX0Floor = (towerId % 10 === 0)
+    
+    if (isX0Floor) {
+      // 是 xx0 层，先执行 tower_claimreward，参数 { rewardId: currentFloor }
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '领取塔奖励',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `${tokenIndex}、${token.name || token.id}、当前是 xx0 层，执行领取第${currentFloor}章奖励`
+      })
+      message.info(`${token.name || token.id} 当前是 xx0 层，执行领取第${currentFloor}章奖励`)
+      
+      try {
+        await tokenStore.sendMessageWithPromise(token.id, 'tower_claimreward', { rewardId: currentFloor }, 10000)
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '领取塔奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、成功领取第${currentFloor}章通关奖励`
+        })
+        message.success(`${token.name || token.id} 成功领取第${currentFloor}章通关奖励`)
+        
+        // 领取成功后更新 currentFloor
+        currentFloor = currentFloor + 1
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '领取塔奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${tokenIndex}、${token.name || token.id}、更新当前层数为：${currentFloor}`
+        })
+      } catch (claimError) {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '领取塔奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'warning',
+          message: `${tokenIndex}、${token.name || token.id}、领取第${currentFloor}章奖励失败：${claimError.message}`
+        })
       }
     }
     
-    for (let i = 0; i < maxClimb; i++) {
-      if (stopFlag) break;
-      
-      // 体力判断必须每次都刷新
-      const roleInfo = tokenStore.gameData.roleInfo
-      if (!roleInfo || !roleInfo.role) {
-        throw new Error('角色信息不存在')
-      }
-      const tower = roleInfo.role.tower
-      const energy = tower?.energy || 0;
-      if (energy <= 0) {
-        const tokenIndex = getTokenIndex(token)
+    // 步骤 3：循环执行 fight_starttower，最多 600 次
+    let climbCount = 0
+    const maxClimb = 600
+    
+    while (climbCount < maxClimb) {
+      // 检查是否被停止（批量爬塔时）
+      if (isBatchTowerRunning.value === false && climbCount > 0) {
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1515,34 +1533,176 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、体力已耗尽`
+          message: `${tokenIndex}、${token.name || token.id}、批量爬塔已停止，当前爬塔次数：${climbCount}`
         })
-        break;
+        message.info(`${token.name || token.id} 批量爬塔已停止`)
+        break
       }
       
-      await tokenStore.sendMessageWithPromise(
-        token.id,
-        "fight_starttower",
-        {},
-        10000,
-      );
-      climbCount++;
-      
-      // 记录每次爬塔日志
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '爬塔升星',
-        operation: '开始爬塔',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'success',
-        message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
-      })
-      message.success(`${token.name || token.id} 第${climbCount}次爬塔命令已发送`);
-      await new Promise((res) => setTimeout(res, 1000)); // 每次间隔 1 秒
+      try {
+        // 执行爬塔命令
+        await tokenStore.sendMessageWithPromise(token.id, 'fight_starttower', {}, 10000)
+        climbCount++
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '爬塔升星',
+          operation: '开始爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功`
+        })
+        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功`)
+        
+        // 每次爬塔后等待 1000ms，避免操作过快
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+      } catch (error) {
+        const errorMsg = error.message || ''
+        
+        // 包含"操作过快"或"未知错误" → 等待 5 分钟后继续
+        if (errorMsg.includes('操作过快') || (errorMsg.includes('未知错误') && errorMsg.includes('400340'))) {
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、操作过快 (400340)，等待 5 分钟后继续`
+          })
+          message.warning(`${token.name || token.id} 操作过快 (400340)，等待 5 分钟后继续`)
+          
+          // 等待 5 分钟 (300000ms)
+          await new Promise(resolve => setTimeout(resolve, 300000))
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `${tokenIndex}、${token.name || token.id}、等待完成，继续爬塔`
+          })
+          message.info(`${token.name || token.id} 等待完成，继续爬塔`)
+          continue
+        }
+        
+        // 包含"奖励/未领取" → 执行 tower_claimreward({ rewardId: currentFloor+1 }) → continue
+        if (errorMsg.includes('奖励') || errorMsg.includes('未领取')) {
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '领取塔奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `${tokenIndex}、${token.name || token.id}、检测到当前层数奖励未领取，执行领取`
+          })
+          message.info(`${token.name || token.id} 检测到当前层数奖励未领取，执行领取`)
+          
+          // 尝试领取奖励，从 currentFloor + 1 开始
+          let rewardClaimed = false
+          for (let rId = currentFloor + 1; rId <= currentFloor + 5; rId++) {
+            try {
+              await tokenStore.sendMessageWithPromise(token.id, 'tower_claimreward', { rewardId: rId }, 10000)
+              
+              // 领取奖励后等待 1000ms，避免操作过快
+              await new Promise(resolve => setTimeout(resolve, 1000))
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、成功领取第${rId}章通关奖励`
+              })
+              message.success(`${token.name || token.id} 成功领取第${rId}章通关奖励`)
+              rewardClaimed = true
+              
+              // 领取成功后更新 currentFloor
+              currentFloor = rId
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `${tokenIndex}、${token.name || token.id}、更新当前层数为：${currentFloor}`
+              })
+              
+              break
+              
+            } catch (claimError) {
+              // 如果领取失败（已领取或其他错误），继续尝试下一个
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '爬塔升星',
+                operation: '领取塔奖励',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `${tokenIndex}、${token.name || token.id}、第${rId}章奖励领取失败，继续尝试：${claimError.message}`
+              })
+              
+              // 领取失败后也等待 1000ms，避免操作过快
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+          }
+          
+          if (rewardClaimed) {
+            // 领取成功后继续爬塔
+            continue
+          } else {
+            // 所有奖励都领取失败，继续爬塔
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '爬塔升星',
+              operation: '领取塔奖励',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、无法领取奖励，继续爬塔`
+            })
+            continue
+          }
+        } else if (errorMsg.includes('能量不足')) {
+          // 包含"能量不足" → break 停止
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `${tokenIndex}、${token.name || token.id}、错误提示能量不足，停止爬塔`
+          })
+          message.warning(`${token.name || token.id} 错误提示能量不足，停止爬塔`)
+          break
+        } else {
+          // 其他错误 → 等待后继续执行
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、爬塔失败：${errorMsg}，等待 1 秒后继续执行`
+          })
+          
+          // 等待 1000ms 后继续，避免操作过快
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
+      }
     }
     
-    message.success(`${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限。`);
+    message.success(`${token.name || token.id} 爬塔完成，共执行${climbCount}次`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
@@ -1550,12 +1710,11 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限`
+      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共执行${climbCount}次`
     })
-  } catch (error) {
-    console.error(`${token.name || token.id} 爬塔失败:`, error)
-    message.error(`${token.name || token.id} 批量爬塔失败: ${error.message || "未知错误"}`);
     
+  } catch (error) {
+    console.error('爬塔失败:', error)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
@@ -1563,18 +1722,12 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${token.name || token.id} 爬塔失败: ${error.message || '未知错误'}`
+      message: `${tokenIndex}、${token.name || token.id}、爬塔失败：${error.message}`
     })
-    throw error
-  } finally {
-    // 清除超时并重置状态
-    if (climbTimeout.value) {
-      clearTimeout(climbTimeout.value);
-      climbTimeout.value = null;
-    }
-    isRunning.value = false;
+    message.error(`${token.name || token.id} 爬塔失败：${error.message}`)
   }
 }
+
 </script>
 
 <style scoped>

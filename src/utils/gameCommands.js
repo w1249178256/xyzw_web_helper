@@ -598,6 +598,7 @@ export class GameCommands {
     return {
       ack,
       body: this.g_utils.bon.encode({
+      	  rewardId:params.rewardId
         ...params,
       }),
       cmd: "tower_claimreward",
