@@ -3298,11 +3298,19 @@ const exportResources = async () => {
         const colorJade = formatValue(findItemCount(items, 1023))
         const spiritShell = formatValue(findItemCount(items, 1033))
         // 增加金砖、招募令数量
-        const goldBrick = formatValue(findItemCount(items, 1024)) // 假设金砖的物品ID是1024
-        const recruitOrder = formatValue(findItemCount(items, 1044)) // 假设招募令的物品ID是1044
-        // 宝箱总分数：这里假设从roleInfo的其他字段获取，或者设置为'-'如果无法获取
-        const chestScore = roleInfo?.role?.chestScore || '-' // 假设宝箱总分数存储在role.chestScore中
-        
+        const goldBrick = formatValue(findItemCount(items, 1024)) // 金砖的物品 ID 是 1024
+        const recruitOrder = formatValue(findItemCount(items, 1044)) // 招募令的物品 ID 是 1044
+
+        // 宝箱总分数：计算各种宝箱数量 × 对应分数
+        let chestScore = 0
+        if (items) {
+          const woodBox = items['2001']?.quantity || 0      // 木质宝箱，每个 1 分
+          const bronzeBox = items['2002']?.quantity || 0    // 青铜宝箱，每个 10 分
+          const goldenBox = items['2003']?.quantity || 0    // 黄金宝箱，每个 20 分
+          const platinumBox = items['2004']?.quantity || 0  // 铂金宝箱，每个 50 分
+          chestScore = woodBox + bronzeBox * 10 + goldenBox * 20 + platinumBox * 50
+        }
+        const chestScoreDisplay = chestScore > 0 ? chestScore : '-'
         // 获取roleId
         const roleId = roleInfo?.role?.roleId || '未获取到'
         
@@ -3339,7 +3347,7 @@ const exportResources = async () => {
           colorJade: colorJade,
           spiritShell: spiritShell,
           goldBrick: goldBrick,
-          chestScore: chestScore,
+          chestScore: chestScoreDisplay,
           recruitOrder: recruitOrder,
           roleId: roleId,
           maxNightmareLevel: maxNightmareLevel,
@@ -3353,7 +3361,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 宝箱总分数${chestScore}, 招募令${recruitOrder}`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)

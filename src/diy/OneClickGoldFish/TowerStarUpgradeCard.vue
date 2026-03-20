@@ -1335,6 +1335,31 @@ const handleBatchTower = async () => {
           await new Promise(resolve => setTimeout(resolve, 500))
         }
       } catch (error) {
+        const errorMsg = error.message || ''
+        
+        // WebSocket 连接失败，跳过当前 token，继续下一个
+        if (error.isWebSocketError || errorMsg.includes('WebSocket') || errorMsg.includes('连接') || errorMsg.includes('socket')) {
+          console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败:`, error)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败，跳过继续下一个`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '批量爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败，跳过继续下一个`
+          })
+          failedTokens.push({
+            index: tokenIndex,
+            name: token.name || token.id,
+            reason: 'WebSocket 连接失败'
+          })
+          
+          // 跳过当前 token，继续下一个
+          continue
+        }
+        
         console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败:`, error)
         message.error(`序号 ${tokenIndex} ${token.name || token.id}: 批量爬塔失败`)
         logStore.addLog({
@@ -1433,7 +1458,9 @@ const startTowerClimbForToken = async (token) => {
     // 检查 WebSocket 连接状态
     const status = tokenStore.getWebSocketStatus(token.id)
     if (status !== 'connected') {
-      throw new Error('WebSocket 未连接')
+      const error = new Error('WebSocket 未连接')
+      error.isWebSocketError = true  // 标记为 WebSocket 错误
+      throw error
     }
     
     // 步骤 1：使用 role_getroleinfo 获取当前层数和鱼干数
