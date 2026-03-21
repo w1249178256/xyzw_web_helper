@@ -304,11 +304,15 @@ export function registerDefaultCommands(reg) {
     .register("dungeon_buymerchant")
     // 活动/任务
     .register("activity_get")
+    .register("activity_buygoods", { type: 1, goodsId: 8304 })
     .register("activity_recyclewarorderrewardclaim")
     .register("legion_getpayloadtask")
     .register("legion_getpayloadkillrecord")
     .register("legion_getpayloadbf")
     .register("legion_getpayloadrecord")
+
+    // 神器相关
+    .register("artifact_upgradestar", { heroId: 107, itemId: 13041 })
 
     // 珍宝阁相关
     .register("collection_claimfreereward")
@@ -1128,6 +1132,8 @@ export class XyzwWebSocketClient {
       // 1:1 响应映射（优先级高）
       fight_startpvpresp: "fight_startpvp",
       activity_getresp: "activity_get",
+      activity_buygoodsresp: "activity_buygoods",
+      artifact_upgradestarresp: "artifact_upgradestar",
       collection_goodslistresp: "collection_goodslist",
       collection_claimfreerewardresp: "collection_claimfreereward",
       legion_storebuygoodsresp: "legion_storebuygoods",

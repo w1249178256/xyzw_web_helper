@@ -701,6 +701,40 @@ export class GameCommands {
   }
 
   /**
+   * 活动购买商品
+   */
+  activity_buygoods(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+       type:1,
+       goodsId:params.goodsId,
+        ...params,
+      }),
+      cmd: "activity_buygoods",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+  /**
+   * 升级鱼灵
+   */
+  artifact_upgradestar(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId:params.heroId,
+        itemId:params.itemId,
+        ...params,
+      }),
+      cmd: "artifact_upgradestar",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+  /**
    * 获取俱乐部战争详情
    */
   legionwar_getdetails(ack = 0, seq = 0, params = {}) {

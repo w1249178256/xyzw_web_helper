@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -49,6 +49,13 @@
             @button-click="handleUseTorch"
             :disabled="isUsingTorch"
             :loading="isUsingTorch"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isUpgradingChiYu ? '购买升级赤羽中...' : '购买升级赤羽'"
+            @button-click="handleUpgradeChiYu"
+            :disabled="isUpgradingChiYu"
+            :loading="isUpgradingChiYu"
           />
           <CustomizedCard 
             mode="button"
@@ -327,6 +334,7 @@ const isUsingTorch = ref(false)
 const isUpgradingCrystal = ref(false)
 const isUsingUniversalRed = ref(false)
 const isUpgradingLuBuStar = ref(false)
+const isUpgradingChiYu = ref(false)
 const isBatchUpgradingEquipment = ref(false)
 const isBatchAwakingSkill = ref(false)
 const isBatchQuenching = ref(false)
@@ -1928,6 +1936,146 @@ const handleUpgradeLuBuStar = async () => {
     })
   } finally {
     isUpgradingLuBuStar.value = false
+  }
+}
+
+// 购买升级赤羽
+const handleUpgradeChiYu = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的 Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+
+  try {
+    isUpgradingChiYu.value = true
+
+    message.info(`开始购买升级赤羽（${rangeText}），共${targetTokens.length}个 Token...`)
+
+    // 逐个处理 Token
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      const tokenIndex = getTokenIndex(token)
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始购买升级赤羽...`)
+
+      try {
+        // 连接 Token
+        const status = tokenStore.getWebSocketStatus(token.id)
+        if (status !== 'connected') {
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在连接 Token`)
+          await tokenStore.createWebSocketConnection(token.id, token.token, token.wsUrl)
+          let retryCount = 0
+          while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 30) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+            retryCount++
+          }
+
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} - Token 连接失败，跳过`)
+            continue
+          }
+        }
+
+        // 执行 activity_buygoods 2 次
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 执行 activity_buygoods 2 次`)
+        for (let j = 0; j < 2; j++) {
+          try {
+            await tokenStore.sendActivityBuyGoods(token.id, {
+              type: 1,
+              goodsId: 8304
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次购买赤羽成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次购买赤羽失败:`, error.message)
+            // 失败也继续执行
+          }
+          // 每次执行间隔 500ms
+          if (j < 1) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+        }
+
+        // 执行 artifact_upgradestar 2 次
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 执行 artifact_upgradestar 2 次`)
+        for (let j = 0; j < 2; j++) {
+          try {
+            await tokenStore.sendArtifactUpgradeStar(token.id, {
+              heroId: 107,
+              itemId: 13041
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次升级赤羽成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次升级赤羽失败:`, error.message)
+            // 失败也继续执行
+          }
+          // 每次执行间隔 500ms
+          if (j < 1) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+        }
+
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽完成`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '购买升级赤羽',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、购买升级赤羽完成`
+        })
+
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽失败:`, error)
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽失败：${error.message || '未知错误'}`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '购买升级赤羽',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'warning',
+          message: `${tokenIndex}、${token.name || token.id}、购买升级赤羽失败：${error.message || '未知错误'}`
+        })
+      } finally {
+        // 关闭 WebSocket 连接
+        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
+          await tokenStore.closeWebSocketConnection(token.id)
+        }
+      }
+
+      // 处理完一个 Token 后，等待一段时间再处理下一个
+      if (i < targetTokens.length - 1) {
+        message.info(`等待 1 秒后处理下一个 Token...`)
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+
+    message.success(`购买升级赤羽完成，共处理${targetTokens.length}个 Token`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '购买升级赤羽',
+      status: 'success',
+      message: `购买升级赤羽完成，共处理${targetTokens.length}个 Token`
+    })
+
+  } catch (error) {
+    console.error('购买升级赤羽失败:', error)
+    message.error(`购买升级赤羽失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '购买升级赤羽',
+      status: 'error',
+      message: `购买升级赤羽失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isUpgradingChiYu.value = false
   }
 }
 

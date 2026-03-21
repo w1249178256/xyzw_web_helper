@@ -1329,6 +1329,16 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "activity_get", params);
   };
 
+  // 发送活动购买商品
+  const sendActivityBuyGoods = (tokenId: string, params = { type: 1, goodsId: 8304 }) => {
+    return sendMessageWithPromise(tokenId, "activity_buygoods", params);
+  };
+
+  // 发送神器升星
+  const sendArtifactUpgradeStar = (tokenId: string, params = { heroId: 107, itemId: 13041 }) => {
+    return sendMessageWithPromise(tokenId, "artifact_upgradestar", params);
+  };
+
   // 发送领取活动周奖励
   const sendActivityClaimWeekActReward = (tokenId: string, params = {}) => {
     const defaultParams = {
@@ -2074,6 +2084,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendItemClaimBoxPointReward,
     sendBatchClaimBoxPointReward,
     sendActivityGet,
+    sendActivityBuyGoods,
+    sendArtifactUpgradeStar,
     sendActivityClaimWeekActReward,
     sendActivityClaimTaskReward,
     sendActivityGetActeGameInfo,
