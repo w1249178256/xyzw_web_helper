@@ -1,14 +1,14 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { useMessage } from 'naive-ui';
-import { useTokenStore } from '@/stores/tokenStore';
-import { XyzwLegionWarWebSocketClient } from '@/utils/xyzwLegionWarWebSocket';
-import { extractValidData } from '@/utils/legionWar';
-import { getCurrentTimeByFormat } from '@/utils/DateTimeUtils';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import { useMessage } from "naive-ui";
+import { useTokenStore } from "@/stores/tokenStore";
+import { XyzwLegionWarWebSocketClient } from "@/utils/xyzwLegionWarWebSocket";
+import { extractValidData } from "@/utils/legionWar";
+import { getCurrentTimeByFormat } from "@/utils/DateTimeUtils";
 
-export const useLegionWarStore = defineStore('legionWar', () => {
+export const useLegionWarStore = defineStore("legionWar", () => {
   const tokenStore = useTokenStore();
-  
+
   // 状态
   const isConnected = ref(false);
   const connecting = ref(false);
@@ -17,7 +17,7 @@ export const useLegionWarStore = defineStore('legionWar', () => {
   const legionDetails = ref({});
   const lastUpdateTime = ref("");
   const isJoined = ref(false); // 是否已进入战场
-  
+
   // 引用计数，用于管理连接生命周期
   const subscriberCount = ref(0);
   let disconnectTimer = null;
@@ -33,7 +33,7 @@ export const useLegionWarStore = defineStore('legionWar', () => {
   // 连接 WebSocket
   const connect = async () => {
     subscriberCount.value++;
-    
+
     // 如果有待执行的断开操作，取消它
     if (disconnectTimer) {
       clearTimeout(disconnectTimer);
@@ -49,9 +49,9 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     if (isConnected.value) {
       // 已经连接，如果还没进入战场（可能是之前的连接还在但状态不对），尝试重新进入
       if (!isJoined.value && !connecting.value) {
-         tryJoinBattlefield();
+        tryJoinBattlefield();
       }
-      return; 
+      return;
     }
 
     if (connecting.value) {
@@ -61,24 +61,15 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     connecting.value = true;
     try {
       const tokenId = tokenStore.selectedToken.id;
-      
+
       // 1. 获取战场信息
       // 如果已经有 battlefieldId 且 token 没变，是否需要重新获取？
       // 为了安全起见，每次连接前重新获取 sid 和 battlefieldId
-      const now = new Date();
-      const specialDates = [1, 6, 9, 11, 13, 17, 19, 21, 24, 26, 29];
-      const battlefieldCmd =
-        now.getFullYear() === 2026 &&
-        now.getMonth() === 2 &&
-        specialDates.includes(now.getDate())
-          ? 'league_getbattlefield'
-          : 'legion_getbattlefield';
-
       const getbattlefield = await tokenStore.sendMessageWithPromise(
-        tokenId, 
-        battlefieldCmd, 
-        {}, 
-        10000
+        tokenId,
+        "legion_getbattlefield",
+        {},
+        10000,
       );
 
       if (!getbattlefield || !getbattlefield.info) {
@@ -86,11 +77,12 @@ export const useLegionWarStore = defineStore('legionWar', () => {
       }
 
       battlefieldId.value = getbattlefield.info.battlefieldId;
-      
+
       // 2. 构建 WS URL
-      const baseWsUrl = 'wss://xxz-xyzw-new.hortorgames.com/agent' + 
-        `?p=${encodeURIComponent(tokenStore.selectedToken.token)}` + 
-        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese` + 
+      const baseWsUrl =
+        "wss://xxz-xyzw-new.hortorgames.com/agent" +
+        `?p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
+        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese` +
         `&sid2=${getbattlefield.info.sid}`;
 
       // 3. 建立连接
@@ -98,14 +90,14 @@ export const useLegionWarStore = defineStore('legionWar', () => {
         url: baseWsUrl,
         utils: null,
         hint: battlefieldId.value,
-        heartbeatMs: 5000
+        heartbeatMs: 5000,
       });
 
       legionWarWebSocket.onConnect = () => {
         console.log("战场WebSocket连接成功");
         isConnected.value = true;
         connecting.value = false;
-        
+
         // 延迟发送进入战场指令
         setTimeout(() => {
           tryJoinBattlefield();
@@ -113,7 +105,7 @@ export const useLegionWarStore = defineStore('legionWar', () => {
       };
 
       legionWarWebSocket.setMessageListener((msg) => {
-        const cmd = msg?.cmd || 'unknown';
+        const cmd = msg?.cmd || "unknown";
         // 1. war_getbattlefieldinfo: 完整的战场快照
         if (cmd.includes("war_getbattlefieldinfo")) {
           // 更新数据
@@ -121,9 +113,9 @@ export const useLegionWarStore = defineStore('legionWar', () => {
           if (extracted) {
             validData.value = extracted;
             lastUpdateTime.value = getCurrentTimeByFormat("HH:mm:ss");
-            
+
             // 获取俱乐部详情以获取公告
-            Object.values(extracted.legionInfo).forEach(legion => {
+            Object.values(extracted.legionInfo).forEach((legion) => {
               // 如果还没有该俱乐部的详情，则发送请求
               if (!legionDetails.value[legion.id]) {
                 fetchLegionDetail(legion.id);
@@ -151,7 +143,6 @@ export const useLegionWarStore = defineStore('legionWar', () => {
       };
 
       legionWarWebSocket.init();
-
     } catch (error) {
       console.error("连接失败:", error);
       connecting.value = false;
@@ -164,10 +155,10 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     if (legionWarWebSocket && isConnected.value) {
       legionWarWebSocket.send("war_enterbattlefield", {
         battlefieldId: battlefieldId.value,
-        useGzip: true
+        useGzip: true,
       });
       isJoined.value = true;
-      
+
       // 主动请求一次数据
       refreshData();
     }
@@ -185,7 +176,7 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     } else if (subscriberCount.value <= 0) {
       // 延迟断开，防止页面切换时频繁断连
       if (disconnectTimer) clearTimeout(disconnectTimer);
-      
+
       disconnectTimer = setTimeout(() => {
         if (subscriberCount.value <= 0) {
           performDisconnect();
@@ -193,18 +184,18 @@ export const useLegionWarStore = defineStore('legionWar', () => {
       }, 3000); // 3秒缓冲期
     }
   };
-  
+
   const performDisconnect = () => {
-      if (legionWarWebSocket) {
-        legionWarWebSocket.disconnect();
-        legionWarWebSocket = null;
-      }
-      isConnected.value = false;
-      isJoined.value = false;
-      connecting.value = false;
-      // validData.value = null; // 可选：是否清空数据
-      battlefieldId.value = null;
-      disconnectTimer = null;
+    if (legionWarWebSocket) {
+      legionWarWebSocket.disconnect();
+      legionWarWebSocket = null;
+    }
+    isConnected.value = false;
+    isJoined.value = false;
+    connecting.value = false;
+    // validData.value = null; // 可选：是否清空数据
+    battlefieldId.value = null;
+    disconnectTimer = null;
   };
 
   const refreshData = () => {
@@ -214,14 +205,14 @@ export const useLegionWarStore = defineStore('legionWar', () => {
       console.warn("请先连接到战场");
       return;
     }
-    
+
     if (!battlefieldId.value) {
       console.warn("未获取到战场ID");
       return;
     }
 
     legionWarWebSocket.send("war_getbattlefieldinfo", {
-      battlefieldId: battlefieldId.value
+      battlefieldId: battlefieldId.value,
     });
   };
 
@@ -229,11 +220,11 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     if (!tokenStore.selectedToken) return;
     try {
       const response = await tokenStore.sendMessageWithPromise(
-        tokenStore.selectedToken.id, 
-        'legion_getinfobyid', 
-        { legionId: legionId }
+        tokenStore.selectedToken.id,
+        "legion_getinfobyid",
+        { legionId: legionId },
       );
-      
+
       if (response && (response.legionData || response.info)) {
         legionDetails.value[legionId] = response.legionData || response.info;
       }
@@ -251,11 +242,11 @@ export const useLegionWarStore = defineStore('legionWar', () => {
     legionDetails,
     lastUpdateTime,
     isJoined,
-    
+
     // Actions
     connect,
     disconnect,
     refreshData,
-    fetchLegionDetail
+    fetchLegionDetail,
   };
 });

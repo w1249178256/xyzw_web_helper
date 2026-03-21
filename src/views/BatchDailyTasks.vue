@@ -52,11 +52,11 @@
                   导出配置
                 </n-button>
                 <n-upload
-                :show-file-list="false"
-                accept=".json"
-                :custom-request="importConfig"
+                  :show-file-list="false"
+                  accept=".json"
+                  :custom-request="importConfig"
                 >
-                <n-button size="small">导入配置</n-button>
+                  <n-button size="small">导入配置</n-button>
                 </n-upload>
               </div>
             </div>
@@ -343,7 +343,9 @@
                   size="small"
                   @click="batcharenafight"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isarenaActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isarenaActivityOpen
                   "
                 >
                   一键竞技场战斗3次
@@ -352,7 +354,9 @@
                   size="small"
                   @click="batchSmartSendCar"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isCarActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isCarActivityOpen
                   "
                 >
                   智能发车
@@ -361,7 +365,9 @@
                   size="small"
                   @click="batchClaimCars"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isCarActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isCarActivityOpen
                   "
                 >
                   一键收车
@@ -442,7 +448,9 @@
                   size="small"
                   @click="batchbaoku13"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isbaokuActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isbaokuActivityOpen
                   "
                 >
                   一键宝库前3层
@@ -451,7 +459,9 @@
                   size="small"
                   @click="batchbaoku45"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isbaokuActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isbaokuActivityOpen
                   "
                 >
                   一键宝库4,5层
@@ -611,7 +621,9 @@
                   size="small"
                   @click="batchTopUpArena"
                   :disabled="
-                    isRunning || selectedTokens.length === 0 || !isarenaActivityOpen
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isarenaActivityOpen
                   "
                 >
                   一键竞技场补齐
@@ -619,7 +631,11 @@
                 <n-button
                   size="small"
                   @click="openWarGuessModal"
-                  :disabled="isRunning || selectedTokens.length === 0 || !isWarGuessActivityOpen"
+                  :disabled="
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isWarGuessActivityOpen
+                  "
                   :title="isWarGuessActivityOpen ? '' : warGuessActivityTip"
                 >
                   月赛助威
@@ -875,9 +891,15 @@
           </div>
           <div class="setting-item">
             <label class="setting-label">选择账号</label>
-            
+
             <!-- 分组快速选择 -->
-            <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+            <div
+              style="
+                margin-bottom: 12px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 8px;
+              "
+            >
               <div style="font-size: 12px; color: #86909c; margin-bottom: 8px">
                 快速选择分组：
               </div>
@@ -898,13 +920,16 @@
                   "
                   :style="{
                     borderColor: group.color,
-                    color: group.color
+                    color: group.color,
                   }"
                   ghost
                 >
                   {{ group.name }}
                 </n-button>
-                <div v-if="tokenGroups.length === 0" style="font-size: 12px; color: #ccc;">
+                <div
+                  v-if="tokenGroups.length === 0"
+                  style="font-size: 12px; color: #ccc"
+                >
                   暂无分组
                 </div>
               </div>
@@ -1445,8 +1470,12 @@
               style="width: 100%"
             />
           </div>
-          <n-alert v-if="helperType === 'pointsBox'" type="info" style="margin-bottom: 12px">
-            开箱优先级: 木质宝箱(保留200个) → 青铜宝箱 → 黄金宝箱 → 铂金宝箱<br/>
+          <n-alert
+            v-if="helperType === 'pointsBox'"
+            type="info"
+            style="margin-bottom: 12px"
+          >
+            开箱优先级: 木质宝箱(保留200个) → 青铜宝箱 → 黄金宝箱 → 铂金宝箱<br />
             积分: 木质=1分, 青铜=10分, 黄金=20分, 铂金=50分
           </n-alert>
           <div class="setting-item" v-if="helperType !== 'pointsBox'">
@@ -1481,27 +1510,31 @@
           <n-alert type="info" show-icon style="margin-bottom: 12px">
             请勾选需要购买的商品。只会购买列表中存在的商品。
           </n-alert>
-          
+
           <div style="display: flex; gap: 12px; margin-bottom: 12px">
             <n-button size="small" type="warning" @click="selectGoldItems">
               一键勾选金币商品
             </n-button>
-            <n-button size="small" @click="selectAllItems">
-              全选所有
-            </n-button>
-            <n-button size="small" @click="clearAllItems">
-              清空选择
-            </n-button>
+            <n-button size="small" @click="selectAllItems"> 全选所有 </n-button>
+            <n-button size="small" @click="clearAllItems"> 清空选择 </n-button>
           </div>
 
-          <div v-for="(merchant, id) in merchantConfig" :key="id" style="margin-bottom: 16px">
-            <div style="font-weight: bold; margin-bottom: 8px">{{ merchant.name }}</div>
+          <div
+            v-for="(merchant, id) in merchantConfig"
+            :key="id"
+            style="margin-bottom: 16px"
+          >
+            <div style="font-weight: bold; margin-bottom: 8px">
+              {{ merchant.name }}
+            </div>
             <n-grid :cols="3" :x-gap="12" :y-gap="8">
               <n-grid-item v-for="(item, index) in merchant.items" :key="index">
                 <n-checkbox
                   :value="`${id}-${index}`"
                   :checked="dreamBuyList.includes(`${id}-${index}`)"
-                  @update:checked="(checked) => toggleDreamItem(`${id}-${index}`, checked)"
+                  @update:checked="
+                    (checked) => toggleDreamItem(`${id}-${index}`, checked)
+                  "
                 >
                   {{ item }}
                 </n-checkbox>
@@ -1510,8 +1543,14 @@
           </div>
         </div>
         <div class="modal-actions" style="margin-top: 20px; text-align: right">
-          <n-button @click="showDreamBuyModal = false" style="margin-right: 12px">取消</n-button>
-          <n-button type="primary" @click="saveDreamBuyConfig">保存配置</n-button>
+          <n-button
+            @click="showDreamBuyModal = false"
+            style="margin-right: 12px"
+            >取消</n-button
+          >
+          <n-button type="primary" @click="saveDreamBuyConfig"
+            >保存配置</n-button
+          >
         </div>
       </div>
     </n-modal>
@@ -1695,15 +1734,30 @@
 
             <!-- 分组快速选择 (仅在定时任务中显示) -->
             <div style="margin-bottom: 12px">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 8px;
+                "
+              >
                 <div style="font-size: 12px; color: #86909c">
                   快速选择分组：
                 </div>
-                <n-button type="primary" size="tiny" text @click="showGroupManageModal = true">
+                <n-button
+                  type="primary"
+                  size="tiny"
+                  text
+                  @click="showGroupManageModal = true"
+                >
                   管理分组
                 </n-button>
               </div>
-              <div v-if="tokenGroups.length === 0" style="font-size: 12px; color: #ccc;">
+              <div
+                v-if="tokenGroups.length === 0"
+                style="font-size: 12px; color: #ccc"
+              >
                 暂无分组
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap">
@@ -1711,18 +1765,25 @@
                   v-for="group in tokenGroups"
                   :key="group.id"
                   size="small"
-                  :type="taskScheduleSelectedGroupIds.includes(group.id) ? 'primary' : 'default'"
+                  :type="
+                    taskScheduleSelectedGroupIds.includes(group.id)
+                      ? 'primary'
+                      : 'default'
+                  "
                   @click="
                     () => {
-                      const index = taskScheduleSelectedGroupIds.indexOf(group.id);
+                      const index = taskScheduleSelectedGroupIds.indexOf(
+                        group.id,
+                      );
                       const groupTokenIds = getValidGroupTokenIds(group.id);
-                      
+
                       if (index > -1) {
                         // 取消选择该分组
                         taskScheduleSelectedGroupIds.splice(index, 1);
-                        taskForm.selectedTokens = taskForm.selectedTokens.filter(
-                          (id) => !groupTokenIds.includes(id),
-                        );
+                        taskForm.selectedTokens =
+                          taskForm.selectedTokens.filter(
+                            (id) => !groupTokenIds.includes(id),
+                          );
                       } else {
                         // 选择该分组
                         taskScheduleSelectedGroupIds.push(group.id);
@@ -1768,30 +1829,49 @@
                 </n-button>
               </n-space>
             </div>
-            
+
             <n-checkbox-group v-model:value="taskForm.selectedTasks">
-              <n-tabs type="line" animated size="small" pane-style="padding-top: 12px;" default-value="daily">
-                <n-tab-pane 
-                  v-for="group in taskGroupDefinitions" 
-                  :key="group.name" 
-                  :name="group.name" 
+              <n-tabs
+                type="line"
+                animated
+                size="small"
+                pane-style="padding-top: 12px;"
+                default-value="daily"
+              >
+                <n-tab-pane
+                  v-for="group in taskGroupDefinitions"
+                  :key="group.name"
+                  :name="group.name"
                   :tab="group.label"
                 >
                   <n-grid :cols="2" :x-gap="12" :y-gap="8">
-                    <n-grid-item v-for="task in groupedAvailableTasks[group.name]" :key="task.value">
-                      <n-checkbox :value="task.value">{{ task.label }}</n-checkbox>
+                    <n-grid-item
+                      v-for="task in groupedAvailableTasks[group.name]"
+                      :key="task.value"
+                    >
+                      <n-checkbox :value="task.value">{{
+                        task.label
+                      }}</n-checkbox>
                     </n-grid-item>
                   </n-grid>
                 </n-tab-pane>
-                
-                <n-tab-pane 
-                  v-if="groupedAvailableTasks['other'] && groupedAvailableTasks['other'].length > 0" 
-                  name="other" 
+
+                <n-tab-pane
+                  v-if="
+                    groupedAvailableTasks['other'] &&
+                    groupedAvailableTasks['other'].length > 0
+                  "
+                  name="other"
                   tab="其他"
                 >
                   <n-grid :cols="2" :x-gap="12" :y-gap="8">
-                    <n-grid-item v-for="task in groupedAvailableTasks['other']" :key="task.value">
-                      <n-checkbox :value="task.value">{{ task.label }}</n-checkbox>
+                    <n-grid-item
+                      v-for="task in groupedAvailableTasks['other']"
+                      :key="task.value"
+                    >
+                      <n-checkbox :value="task.value">{{
+                        task.label
+                      }}</n-checkbox>
                     </n-grid-item>
                   </n-grid>
                 </n-tab-pane>
@@ -1823,40 +1903,136 @@
               >批量操作设置</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">开箱数量(10倍)</label>
-                <n-input-number v-model:value="batchSettings.boxCount" :min="10" :max="10000" :step="10" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.boxCount"
+                  :min="10"
+                  :max="10000"
+                  :step="10"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">钓鱼数量(10倍)</label>
-                <n-input-number v-model:value="batchSettings.fishCount" :min="10" :max="10000" :step="10" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.fishCount"
+                  :min="10"
+                  :max="10000"
+                  :step="10"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">招募数量(10倍)</label>
-                <n-input-number v-model:value="batchSettings.recruitCount" :min="10" :max="10000" :step="10" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.recruitCount"
+                  :min="10"
+                  :max="10000"
+                  :step="10"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">默认宝箱类型</label>
-                <n-select v-model:value="batchSettings.defaultBoxType" :options="boxTypeOptions" size="small" style="width: 100px" />
+                <n-select
+                  v-model:value="batchSettings.defaultBoxType"
+                  :options="boxTypeOptions"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">默认鱼竿类型</label>
-                <n-select v-model:value="batchSettings.defaultFishType" :options="fishTypeOptions" size="small" style="width: 100px" />
+                <n-select
+                  v-model:value="batchSettings.defaultFishType"
+                  :options="fishTypeOptions"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">按积分开箱目标</label>
-                <n-input-number v-model:value="batchSettings.targetBoxPoints" :min="1" :max="1000000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.targetBoxPoints"
+                  :min="1"
+                  :max="1000000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">梦境商品购买配置</label>
-                <n-button size="small" @click="openDreamBuyModal">点击配置</n-button>
+                <n-button size="small" @click="openDreamBuyModal"
+                  >点击配置</n-button
+                >
               </div>
             </div>
             <n-divider title-placement="left" style="margin: 12px 0 8px 0"
               >智能发车条件设置(0为不限制)</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">保底车辆颜色</label>
                 <n-select
                   v-model:value="batchSettings.carMinColor"
@@ -1872,47 +2048,146 @@
                   style="width: 100px"
                 />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">车辆强制刷新保底</label>
-                <n-switch v-model:value="batchSettings.useGoldRefreshFallback"/>
+                <n-switch
+                  v-model:value="batchSettings.useGoldRefreshFallback"
+                />
               </div>
             </div>
-            <div class="settings-grid" v-if="batchSettings.useGoldRefreshFallback" style="margin-top: 12px">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+            <div
+              class="settings-grid"
+              v-if="batchSettings.useGoldRefreshFallback"
+              style="margin-top: 12px"
+            >
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">需同时满足所有条件</label>
-                <n-switch v-model:value="batchSettings.smartDepartureMatchAll"/>
+                <n-switch
+                  v-model:value="batchSettings.smartDepartureMatchAll"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">金砖 >=</label>
-                <n-input-number v-model:value="batchSettings.smartDepartureGoldThreshold" :min="0" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.smartDepartureGoldThreshold"
+                  :min="0"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">招募令 >=</label>
-                <n-input-number v-model:value="batchSettings.smartDepartureRecruitThreshold" :min="0" :step="10" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.smartDepartureRecruitThreshold"
+                  :min="0"
+                  :step="10"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">白玉 >=</label>
-                <n-input-number v-model:value="batchSettings.smartDepartureJadeThreshold" :min="0" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.smartDepartureJadeThreshold"
+                  :min="0"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">刷新卷 >=</label>
-                <n-input-number v-model:value="batchSettings.smartDepartureTicketThreshold" :min="0" :step="1" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.smartDepartureTicketThreshold"
+                  :min="0"
+                  :step="1"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
             </div>
             <n-divider title-placement="left" style="margin: 12px 0 8px 0"
               >功法赠送设置</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">接收者ID</label>
-                <n-input-number v-model:value="batchSettings.receiverId" placeholder="ID" size="small" style="width: 100px" :show-button="false" />
+                <n-input-number
+                  v-model:value="batchSettings.receiverId"
+                  placeholder="ID"
+                  size="small"
+                  style="width: 100px"
+                  :show-button="false"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">密码</label>
-                <n-input v-model:value="batchSettings.password" type="password" placeholder="密码" size="small" style="width: 100px" />
+                <n-input
+                  v-model:value="batchSettings.password"
+                  type="password"
+                  placeholder="密码"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
             </div>
-
           </n-grid-item>
           <!-- 右列：延迟与连接设置 -->
           <n-grid-item>
@@ -1920,67 +2195,243 @@
               >延迟设置(ms)</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">命令延迟</label>
-                <n-input-number v-model:value="batchSettings.commandDelay" :min="100" :max="2000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.commandDelay"
+                  :min="100"
+                  :max="2000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">任务间延迟</label>
-                <n-input-number v-model:value="batchSettings.taskDelay" :min="100" :max="2000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.taskDelay"
+                  :min="100"
+                  :max="2000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">操作延迟</label>
-                <n-input-number v-model:value="batchSettings.actionDelay" :min="100" :max="2000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.actionDelay"
+                  :min="100"
+                  :max="2000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">战斗延迟</label>
-                <n-input-number v-model:value="batchSettings.battleDelay" :min="100" :max="2000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.battleDelay"
+                  :min="100"
+                  :max="2000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">刷新延迟</label>
-                <n-input-number v-model:value="batchSettings.refreshDelay" :min="500" :max="3000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.refreshDelay"
+                  :min="500"
+                  :max="3000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">长延迟</label>
-                <n-input-number v-model:value="batchSettings.longDelay" :min="1000" :max="10000" :step="500" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.longDelay"
+                  :min="1000"
+                  :max="10000"
+                  :step="500"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
             </div>
             <n-divider title-placement="left" style="margin: 12px 0 8px 0"
               >连接设置</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">最大并发数</label>
-                <n-input-number v-model:value="batchSettings.maxActive" :min="1" :max="20" :step="1" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.maxActive"
+                  :min="1"
+                  :max="20"
+                  :step="1"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">连接超时(ms)</label>
-                <n-input-number v-model:value="batchSettings.connectionTimeout" :min="1000" :max="30000" :step="1000" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.connectionTimeout"
+                  :min="1000"
+                  :max="30000"
+                  :step="1000"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">重连等待(ms)</label>
-                <n-input-number v-model:value="batchSettings.reconnectDelay" :min="100" :max="5000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.reconnectDelay"
+                  :min="100"
+                  :max="5000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
             </div>
             <n-divider title-placement="left" style="margin: 12px 0 8px 0"
               >系统设置</n-divider
             >
             <div class="settings-grid">
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">列表每行数量</label>
-                <n-input-number v-model:value="batchSettings.tokenListColumns" :min="1" :max="10" :step="1" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.tokenListColumns"
+                  :min="1"
+                  :max="10"
+                  :step="1"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">最大日志条目</label>
-                <n-input-number v-model:value="batchSettings.maxLogEntries" :min="100" :max="5000" :step="100" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.maxLogEntries"
+                  :min="100"
+                  :max="5000"
+                  :step="100"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
                 <label class="setting-label">定时刷新页面</label>
                 <n-switch v-model:value="batchSettings.enableRefresh" />
               </div>
-              <div class="setting-item" style="flex-direction: row; justify-content: space-between; align-items: center;" v-if="batchSettings.enableRefresh">
+              <div
+                class="setting-item"
+                style="
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+                v-if="batchSettings.enableRefresh"
+              >
                 <label class="setting-label">刷新间隔(分钟)</label>
-                <n-input-number v-model:value="batchSettings.refreshInterval" :min="10" :max="1440" :step="30" size="small" style="width: 100px" />
+                <n-input-number
+                  v-model:value="batchSettings.refreshInterval"
+                  :min="10"
+                  :max="1440"
+                  :step="30"
+                  size="small"
+                  style="width: 100px"
+                />
               </div>
             </div>
           </n-grid-item>
@@ -2006,28 +2457,49 @@
       style="width: 90%; max-width: 800px"
     >
       <div class="settings-content">
-        <div class="settings-grid" style="display: block;">
-          <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px;">
+        <div class="settings-grid" style="display: block">
+          <div
+            style="
+              margin-bottom: 16px;
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
             <span style="font-size: 16px">拍手器:</span>
-             <n-input-number v-model:value="warGuessCoin" placeholder="拍手器" :min="1" :max="20" style="width: 120px" >
-             </n-input-number>
-             <n-button type="primary" @click="handleWarGuessCheer" :disabled="!selectedWarGuessLegionId || isRunning">
-               助威
-             </n-button>
-             <n-button @click="fetchWarGuessRank" :loading="warGuessLoading">
-               刷新数据
-             </n-button>
+            <n-input-number
+              v-model:value="warGuessCoin"
+              placeholder="拍手器"
+              :min="1"
+              :max="20"
+              style="width: 120px"
+            >
+            </n-input-number>
+            <n-button
+              type="primary"
+              @click="handleWarGuessCheer"
+              :disabled="!selectedWarGuessLegionId || isRunning"
+            >
+              助威
+            </n-button>
+            <n-button @click="fetchWarGuessRank" :loading="warGuessLoading">
+              刷新数据
+            </n-button>
           </div>
-          
+
           <n-data-table
             :columns="warGuessColumns"
             :data="warGuessList"
             :loading="warGuessLoading"
-            :row-key="row => row.id"
-            :checked-row-keys="selectedWarGuessLegionId ? [selectedWarGuessLegionId] : []"
-            @update:checked-row-keys="(keys) => selectedWarGuessLegionId = keys[0]"
+            :row-key="(row) => row.id"
+            :checked-row-keys="
+              selectedWarGuessLegionId ? [selectedWarGuessLegionId] : []
+            "
+            @update:checked-row-keys="
+              (keys) => (selectedWarGuessLegionId = keys[0])
+            "
             :row-props="warGuessRowProps"
-            style="height: 400px; flex: 1;"
+            style="height: 400px; flex: 1"
             flex-height
           />
         </div>
@@ -2050,7 +2522,15 @@
           创建新分组
         </n-divider>
         <div style="margin-bottom: 24px">
-          <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+          <div
+            style="
+              display: flex;
+              gap: 12px;
+              align-items: center;
+              margin-bottom: 12px;
+              flex-wrap: wrap;
+            "
+          >
             <n-input
               v-model:value="newGroupName"
               placeholder="输入分组名称"
@@ -2068,7 +2548,10 @@
                     height: '24px',
                     backgroundColor: color,
                     borderRadius: '4px',
-                    border: newGroupColor === color ? '3px solid #000' : '2px solid #ddd',
+                    border:
+                      newGroupColor === color
+                        ? '3px solid #000'
+                        : '2px solid #ddd',
                     cursor: 'pointer',
                     transition: 'transform 0.2s',
                   }"
@@ -2082,17 +2565,34 @@
               创建分组
             </n-button>
           </div>
-          
+
           <!-- 选择包含的账号 -->
-          <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #eee;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-              <span style="font-size: 13px; font-weight: bold;">包含账号 ({{ newGroupSelectedTokens.length }})</span>
+          <div
+            style="
+              background: #f9f9f9;
+              padding: 12px;
+              border-radius: 8px;
+              border: 1px solid #eee;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+              "
+            >
+              <span style="font-size: 13px; font-weight: bold"
+                >包含账号 ({{ newGroupSelectedTokens.length }})</span
+              >
               <n-space size="small">
                 <n-button size="tiny" @click="selectAllNewGroup">全选</n-button>
-                <n-button size="tiny" @click="deselectAllNewGroup">全不选</n-button>
+                <n-button size="tiny" @click="deselectAllNewGroup"
+                  >全不选</n-button
+                >
               </n-space>
             </div>
-            <div style="max-height: 150px; overflow-y: auto;">
+            <div style="max-height: 150px; overflow-y: auto">
               <n-checkbox-group v-model:value="newGroupSelectedTokens">
                 <n-grid :cols="3" :x-gap="12" :y-gap="8">
                   <n-grid-item v-for="token in sortedTokens" :key="token.id">
@@ -2157,7 +2657,10 @@
                         height: '20px',
                         backgroundColor: color,
                         borderRadius: '4px',
-                        border: editingGroupColor === color ? '3px solid #000' : '2px solid #ddd',
+                        border:
+                          editingGroupColor === color
+                            ? '3px solid #000'
+                            : '2px solid #ddd',
                         cursor: 'pointer',
                       }"
                       @click="editingGroupColor = color"
@@ -2312,6 +2815,7 @@ import {
   h,
 } from "vue";
 import { useTokenStore, gameTokens, tokenGroups } from "@/stores/tokenStore";
+import { $emit } from "@/stores/events/index.ts";
 import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
 import { preloadQuestions } from "@/utils/studyQuestionsFromJSON.js";
 import { useMessage } from "naive-ui";
@@ -2525,49 +3029,53 @@ const getFourthSundayOfMonth = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  
+
   // 当月第一天
   const firstDay = new Date(year, month, 1);
   const dayOfWeek = firstDay.getDay(); // 0-6
-  
+
   // 计算第一个周日的日期 (1号是周日则为1，否则为 1 + 7 - dayOfWeek)
-  let firstSundayDate = 1 + (7 - dayOfWeek) % 7;
+  let firstSundayDate = 1 + ((7 - dayOfWeek) % 7);
 
   // 仅针对2026年3月进行特殊处理
   if (year === 2026 && month === 2 && dayOfWeek === 0) {
     firstSundayDate = 8;
   }
-  
+
   // 第四个周日 = 第一个周日 + 21天
   return new Date(year, month, firstSundayDate + 21);
 };
 
 const isWarGuessActivityOpen = computed(() => {
   const now = new Date();
-  
+
   // 手动修正：2026年3月1日开放
-  if (now.getFullYear() === 2026 && now.getMonth() === 2 && now.getDate() === 1) {
+  if (
+    now.getFullYear() === 2026 &&
+    now.getMonth() === 2 &&
+    now.getDate() === 1
+  ) {
     const hour = now.getHours();
     const minute = now.getMinutes();
     if (hour < 19 || (hour === 19 && minute <= 55)) return true;
   }
 
   const fourthSunday = getFourthSundayOfMonth();
-  
+
   // 检查是否是今天
   if (now.getDate() !== fourthSunday.getDate()) return false;
-  
+
   // 检查时间 00:00 - 19:55
   const hour = now.getHours();
   const minute = now.getMinutes();
   if (hour > 19 || (hour === 19 && minute > 55)) return false;
-  
+
   return true;
 });
 
 const warGuessActivityTip = computed(() => {
   if (isWarGuessActivityOpen.value) return "";
-  
+
   const fourthSunday = getFourthSundayOfMonth();
   const month = fourthSunday.getMonth() + 1;
   const date = fourthSunday.getDate();
@@ -2626,23 +3134,41 @@ const formatPower = (power) => {
 
 const warGuessColumns = [
   {
-    type: 'selection',
+    type: "selection",
     multiple: false,
   },
-  { title: 'ID', key: 'id', width: 100 },
-  { title: '头像', key: 'logo', render(row) {
-      return h('img', { src: row.logo, style: { width: '30px', height: '30px', borderRadius: '50%' } });
-  }, width: 60 },
-  { title: '区服', key: 'serverId', width: 80 },
-  { title: '俱乐部', key: 'name', width: 120 },
-  { title: '战力', key: 'power', render(row) {
-    return formatPower(row.power);
-  }, width: 100 },
-  { title: '红淬', key: 'quenchNum' },
-  { title: '已助威', key: 'guessNum' },
-  { title: '总热度', key: 'totalNum',render(row) {
-    return formatPower(row.totalNum || 0);
-  }, width: 100 },
+  { title: "ID", key: "id", width: 100 },
+  {
+    title: "头像",
+    key: "logo",
+    render(row) {
+      return h("img", {
+        src: row.logo,
+        style: { width: "30px", height: "30px", borderRadius: "50%" },
+      });
+    },
+    width: 60,
+  },
+  { title: "区服", key: "serverId", width: 80 },
+  { title: "俱乐部", key: "name", width: 120 },
+  {
+    title: "战力",
+    key: "power",
+    render(row) {
+      return formatPower(row.power);
+    },
+    width: 100,
+  },
+  { title: "红淬", key: "quenchNum" },
+  { title: "已助威", key: "guessNum" },
+  {
+    title: "总热度",
+    key: "totalNum",
+    render(row) {
+      return formatPower(row.totalNum || 0);
+    },
+    width: 100,
+  },
 ];
 
 const warGuessRowProps = (row) => {
@@ -2659,10 +3185,10 @@ const openWarGuessModal = () => {
   // Reset selection
   selectedWarGuessLegionId.value = null;
   warGuessList.value = [];
-  
+
   // Auto fetch if tokens selected
   if (selectedTokens.value.length > 0) {
-      fetchWarGuessRank();
+    fetchWarGuessRank();
   }
 };
 
@@ -2671,10 +3197,10 @@ const fetchWarGuessRank = async () => {
     message.warning("请先选择一个账号用于获取月赛助威数据");
     return;
   }
-  
+
   const tokenId = selectedTokens.value[0];
-  const token = tokens.value.find(t => t.id === tokenId);
-  
+  const token = tokens.value.find((t) => t.id === tokenId);
+
   warGuessLoading.value = true;
   try {
     addLog({
@@ -2682,17 +3208,22 @@ const fetchWarGuessRank = async () => {
       message: `正在使用 ${token.name} 获取月赛助威数据...`,
       type: "info",
     });
-    
+
     // Ensure connection
     const status = tokenStore.getWebSocketStatus(tokenId);
     if (status !== "connected") {
-        tokenStore.createWebSocketConnection(tokenId, token.token, token.wsUrl);
-        await new Promise(r => setTimeout(r, 2000)); // Wait for connection
+      tokenStore.createWebSocketConnection(tokenId, token.token, token.wsUrl);
+      await new Promise((r) => setTimeout(r, 2000)); // Wait for connection
     }
-    
+
     // Fetch rank
-    const res = await tokenStore.sendMessageWithPromise(tokenId, "warguess_getrank", { bfId: '' }, 5000);
-    
+    const res = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "warguess_getrank",
+      { bfId: "" },
+      5000,
+    );
+
     if (res && res.list) {
       let list = [];
       if (Array.isArray(res.list)) {
@@ -2700,13 +3231,14 @@ const fetchWarGuessRank = async () => {
       } else {
         list = Object.values(res.list);
       }
-      
+
       // Sort by totalNum desc
-      warGuessList.value = list.sort((a, b) => (b.totalNum || 0) - (a.totalNum || 0)).slice(0, 20);
+      warGuessList.value = list
+        .sort((a, b) => (b.totalNum || 0) - (a.totalNum || 0))
+        .slice(0, 20);
     } else {
       message.warning("获取月赛助威数据为空");
     }
-    
   } catch (error) {
     console.error("Fetch rank error:", error);
     message.error("获取月赛助威数据失败: " + error.message);
@@ -2721,16 +3253,14 @@ const fetchWarGuessRank = async () => {
 };
 
 const handleWarGuessCheer = async () => {
-    if (!selectedWarGuessLegionId.value) {
-        message.warning("请先选择一个俱乐部");
-        return;
-    }
-    // Close modal
-    showWarGuessModal.value = false;
-    // Call the batch function
-    await batchWarGuessCheer(selectedWarGuessLegionId.value, warGuessCoin.value);
-    
-    
+  if (!selectedWarGuessLegionId.value) {
+    message.warning("请先选择一个俱乐部");
+    return;
+  }
+  // Close modal
+  showWarGuessModal.value = false;
+  // Call the batch function
+  await batchWarGuessCheer(selectedWarGuessLegionId.value, warGuessCoin.value);
 };
 
 // Settings Modal State
@@ -2811,7 +3341,12 @@ const helperSettings = reactive({
 });
 
 const helperModalTitle = computed(() => {
-  const titles = { box: "批量开宝箱", fish: "批量钓鱼", recruit: "批量招募", pointsBox: "按积分开箱" };
+  const titles = {
+    box: "批量开宝箱",
+    fish: "批量钓鱼",
+    recruit: "批量招募",
+    pointsBox: "按积分开箱",
+  };
   return titles[helperType.value] || "批量助手";
 });
 
@@ -2838,12 +3373,12 @@ const batchSettings = reactive({
   tokenListColumns: 2,
   useGoldRefreshFallback: false,
   // 延迟配置（毫秒）
-  commandDelay: 500,        // 命令间延迟
-  taskDelay: 500,           // 任务间延迟
-  actionDelay: 300,         // 一般操作延迟（开箱、钓鱼、招募等）
-  battleDelay: 500,         // 战斗延迟（宝库、竞技场等）
-  refreshDelay: 1000,       // 刷新延迟（发车刷新等）
-  longDelay: 3000,          // 长延迟（功法赠送等）
+  commandDelay: 500, // 命令间延迟
+  taskDelay: 500, // 任务间延迟
+  actionDelay: 300, // 一般操作延迟（开箱、钓鱼、招募等）
+  battleDelay: 500, // 战斗延迟（宝库、竞技场等）
+  refreshDelay: 1000, // 刷新延迟（发车刷新等）
+  longDelay: 3000, // 长延迟（功法赠送等）
   // 其他配置
   maxActive: 2,
   carMinColor: 4,
@@ -2931,29 +3466,89 @@ const taskForm = reactive({
 
 // 任务分组定义
 const taskGroupDefinitions = [
-  { name: 'daily', label: '日常', tasks: ['startBatch', 'claimHangUpRewards', 'batchAddHangUpTime', 'resetBottles', 'batchlingguanzi', 'batchclubsign', 'batchStudy', 'batcharenafight', 'batchSmartSendCar', 'batchClaimCars', 'store_purchase', 'collection_claimfreereward', 'batchGenieSweep'] },
-  { name: 'dungeon', label: '副本', tasks: ['climbTower', 'batchmengjing', 'skinChallenge', 'batchClaimPeachTasks', 'batchBuyDreamItems'] },
-  { name: 'baoku', label: '宝库', tasks: ['batchbaoku13', 'batchbaoku45'] },
-  { name: 'weirdTower', label: '怪异塔', tasks: ['climbWeirdTower', 'batchUseItems', 'batchMergeItems', 'batchClaimFreeEnergy'] },
-  { name: 'resource', label: '资源', tasks: ['batchOpenBox', 'batchOpenBoxByPoints', 'batchClaimBoxPointReward', 'batchFish', 'batchRecruit', 'legion_storebuygoods'] },
-  { name: 'legacy', label: '功法', tasks: ['batchLegacyClaim', 'batchLegacyGiftSendEnhanced'] },
-  { name: 'monthly', label: '月度', tasks: ['batchTopUpFish', 'batchTopUpArena'] }
+  {
+    name: "daily",
+    label: "日常",
+    tasks: [
+      "startBatch",
+      "claimHangUpRewards",
+      "batchAddHangUpTime",
+      "resetBottles",
+      "batchlingguanzi",
+      "batchclubsign",
+      "batchStudy",
+      "batcharenafight",
+      "batchSmartSendCar",
+      "batchClaimCars",
+      "store_purchase",
+      "collection_claimfreereward",
+      "batchGenieSweep",
+    ],
+  },
+  {
+    name: "dungeon",
+    label: "副本",
+    tasks: [
+      "climbTower",
+      "batchmengjing",
+      "skinChallenge",
+      "batchClaimPeachTasks",
+      "batchBuyDreamItems",
+    ],
+  },
+  { name: "baoku", label: "宝库", tasks: ["batchbaoku13", "batchbaoku45"] },
+  {
+    name: "weirdTower",
+    label: "怪异塔",
+    tasks: [
+      "climbWeirdTower",
+      "batchUseItems",
+      "batchMergeItems",
+      "batchClaimFreeEnergy",
+    ],
+  },
+  {
+    name: "resource",
+    label: "资源",
+    tasks: [
+      "batchOpenBox",
+      "batchOpenBoxByPoints",
+      "batchClaimBoxPointReward",
+      "batchFish",
+      "batchRecruit",
+      "legion_storebuygoods",
+    ],
+  },
+  {
+    name: "legacy",
+    label: "功法",
+    tasks: ["batchLegacyClaim", "batchLegacyGiftSendEnhanced"],
+  },
+  {
+    name: "monthly",
+    label: "月度",
+    tasks: ["batchTopUpFish", "batchTopUpArena"],
+  },
 ];
 
 // 计算属性，根据 taskGroupDefinitions 将 availableTasks 分组
 const groupedAvailableTasks = computed(() => {
   const groups = {};
-  taskGroupDefinitions.forEach(group => {
-    groups[group.name] = availableTasks.filter(task => group.tasks.includes(task.value));
+  taskGroupDefinitions.forEach((group) => {
+    groups[group.name] = availableTasks.filter((task) =>
+      group.tasks.includes(task.value),
+    );
   });
-  
+
   // 处理未分组的任务
-  const groupedTaskValues = taskGroupDefinitions.flatMap(g => g.tasks);
-  const otherTasks = availableTasks.filter(task => !groupedTaskValues.includes(task.value));
+  const groupedTaskValues = taskGroupDefinitions.flatMap((g) => g.tasks);
+  const otherTasks = availableTasks.filter(
+    (task) => !groupedTaskValues.includes(task.value),
+  );
   if (otherTasks.length > 0) {
-    groups['other'] = otherTasks;
+    groups["other"] = otherTasks;
   }
-  
+
   return groups;
 });
 
@@ -2973,12 +3568,12 @@ const executingTaskIds = ref([]);
 // Manual execute task
 const manualExecuteTask = async (task) => {
   if (executingTaskIds.value.includes(task.id)) return;
-  
+
   // Reset stop flag if not running, to allow manual execution
   if (!isRunning.value && shouldStop.value) {
     shouldStop.value = false;
   }
-  
+
   executingTaskIds.value.push(task.id);
   try {
     message.info(`开始执行任务: ${task.name}`);
@@ -2988,7 +3583,9 @@ const manualExecuteTask = async (task) => {
     console.error(`执行任务 ${task.name} 失败:`, e);
     message.error(`任务 ${task.name} 执行失败`);
   } finally {
-    executingTaskIds.value = executingTaskIds.value.filter(id => id !== task.id);
+    executingTaskIds.value = executingTaskIds.value.filter(
+      (id) => id !== task.id,
+    );
   }
 };
 
@@ -3250,10 +3847,15 @@ const exportConfig = () => {
     const validTokenIds = new Set(tokens.value.map((t) => t.id));
 
     // Filter scheduled tasks: remove invalid token IDs from selectedTokens
-    const filteredScheduledTasks = scheduledTasks.value.map((task) => ({
-      ...task,
-      selectedTokens: task.selectedTokens?.filter((tokenId) => validTokenIds.has(tokenId)) || [],
-    })).filter((task) => task.selectedTokens.length > 0); // Remove tasks with no valid tokens
+    const filteredScheduledTasks = scheduledTasks.value
+      .map((task) => ({
+        ...task,
+        selectedTokens:
+          task.selectedTokens?.filter((tokenId) =>
+            validTokenIds.has(tokenId),
+          ) || [],
+      }))
+      .filter((task) => task.selectedTokens.length > 0); // Remove tasks with no valid tokens
 
     // Gather token settings
     const tokenSettings = [];
@@ -3305,9 +3907,11 @@ const exportConfig = () => {
         tokenListColumns: batchSettings.tokenListColumns,
         useGoldRefreshFallback: batchSettings.useGoldRefreshFallback,
         smartDepartureGoldThreshold: batchSettings.smartDepartureGoldThreshold,
-        smartDepartureRecruitThreshold: batchSettings.smartDepartureRecruitThreshold,
+        smartDepartureRecruitThreshold:
+          batchSettings.smartDepartureRecruitThreshold,
         smartDepartureJadeThreshold: batchSettings.smartDepartureJadeThreshold,
-        smartDepartureTicketThreshold: batchSettings.smartDepartureTicketThreshold,
+        smartDepartureTicketThreshold:
+          batchSettings.smartDepartureTicketThreshold,
         smartDepartureMatchAll: batchSettings.smartDepartureMatchAll,
       },
       tokenSettings: tokenSettings,
@@ -3326,7 +3930,7 @@ const exportConfig = () => {
     URL.revokeObjectURL(url);
 
     message.success(
-      `导出成功: ${exportData.tokens.length} 个账号, ${exportData.scheduledTasks.length} 个定时任务`
+      `导出成功: ${exportData.tokens.length} 个账号, ${exportData.scheduledTasks.length} 个定时任务`,
     );
   } catch (error) {
     console.error("Export failed:", error);
@@ -3343,7 +3947,11 @@ const importConfig = async ({ file }) => {
         const importData = JSON.parse(e.target.result);
 
         // Validate structure
-        if (!importData.version || !importData.tokens || !importData.scheduledTasks) {
+        if (
+          !importData.version ||
+          !importData.tokens ||
+          !importData.scheduledTasks
+        ) {
           message.error("无效的配置文件格式");
           return;
         }
@@ -3356,12 +3964,14 @@ const importConfig = async ({ file }) => {
           importData.tokens.forEach((token) => {
             // Check if token already exists
             const exists = gameTokens.value.some(
-              (t) => t.token === token.token || t.id === token.id
+              (t) => t.token === token.token || t.id === token.id,
             );
             if (!exists && token.token) {
               // Add new token directly to gameTokens (useLocalStorage)
               gameTokens.value.push({
-                id: token.id || "token_" + Date.now() + Math.random().toString(36).slice(2),
+                id:
+                  token.id ||
+                  "token_" + Date.now() + Math.random().toString(36).slice(2),
                 name: token.name || "",
                 token: token.token,
                 server: token.server || "",
@@ -3405,14 +4015,14 @@ const importConfig = async ({ file }) => {
             if (item.tokenId && item.settings) {
               localStorage.setItem(
                 `daily-settings:${item.tokenId}`,
-                JSON.stringify(item.settings)
+                JSON.stringify(item.settings),
               );
             }
           });
         }
 
         message.success(
-          `导入成功: ${importedTokens} 个新账号, ${importedTasks} 个新定时任务`
+          `导入成功: ${importedTokens} 个新账号, ${importedTasks} 个新定时任务`,
         );
       } catch (parseError) {
         console.error("Parse error:", parseError);
@@ -3574,10 +4184,14 @@ const healthCheck = () => {
     const elapsedMinutes = (Date.now() - pageLoadTime) / 1000 / 60;
     if (elapsedMinutes >= batchSettings.refreshInterval) {
       if (!isRunning.value) {
-        console.log(`[${new Date().toISOString()}] Refreshing page as scheduled (Interval: ${batchSettings.refreshInterval}m, Elapsed: ${elapsedMinutes.toFixed(1)}m)`);
+        console.log(
+          `[${new Date().toISOString()}] Refreshing page as scheduled (Interval: ${batchSettings.refreshInterval}m, Elapsed: ${elapsedMinutes.toFixed(1)}m)`,
+        );
         window.location.reload();
       } else {
-         console.log(`[${new Date().toISOString()}] Scheduled refresh postponed due to running task`);
+        console.log(
+          `[${new Date().toISOString()}] Scheduled refresh postponed due to running task`,
+        );
       }
     }
   }
@@ -3625,7 +4239,7 @@ const startScheduler = () => {
         } else if (task.runType === "cron") {
           // Improved cron expression parsing using shared utility
           try {
-             shouldRun = matchesCronExpression(task.cronExpression, now);
+            shouldRun = matchesCronExpression(task.cronExpression, now);
           } catch (error) {
             console.error(
               `[${new Date().toISOString()}] Error parsing cron expression ${task.cronExpression}:`,
@@ -3641,27 +4255,27 @@ const startScheduler = () => {
         }
 
         if (shouldRun) {
-            // Check if the task was already executed in the last minute to avoid duplicate execution
-            const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
-            const lastExecutionKey = localStorage.getItem(
+          // Check if the task was already executed in the last minute to avoid duplicate execution
+          const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
+          const lastExecutionKey = localStorage.getItem(
+            `lastTaskExecution_${task.id}`,
+          );
+
+          if (lastExecutionKey !== taskExecutionKey) {
+            // Update last execution time
+            localStorage.setItem(
               `lastTaskExecution_${task.id}`,
+              taskExecutionKey,
             );
 
-            if (lastExecutionKey !== taskExecutionKey) {
-              // Update last execution time
-              localStorage.setItem(
-                `lastTaskExecution_${task.id}`,
-                taskExecutionKey,
-              );
-
-              // Execute the task
-              lastTaskExecution = Date.now();
-              executeScheduledTask(task);
-            } else {
-              // Only log once per minute to avoid spamming logs
-              // But since we check every 10s, this might log multiple times if we don't track logged state
-              // For now, we can skip logging "already executed" to keep logs clean
-            }
+            // Execute the task
+            lastTaskExecution = Date.now();
+            executeScheduledTask(task);
+          } else {
+            // Only log once per minute to avoid spamming logs
+            // But since we check every 10s, this might log multiple times if we don't track logged state
+            // For now, we can skip logging "already executed" to keep logs clean
+          }
         }
       });
     } catch (error) {
@@ -3678,6 +4292,15 @@ const startScheduler = () => {
   }, 10000); // Check every 10 seconds
 };
 
+// Token刷新等待处理函数
+const handleTokenRefreshWaiting = (data) => {
+  addLog({
+    time: new Date().toLocaleTimeString(),
+    message: `Token刷新限流等待中，预计等待 ${data.waitSeconds} 秒（队列: ${data.queueSize}）`,
+    type: "warning",
+  });
+};
+
 // Debug: Log initial state when component mounts
 onMounted(() => {
   // Start the task scheduler after all functions are initialized
@@ -3685,6 +4308,8 @@ onMounted(() => {
   // Start countdown timer
   startCountdown();
   loadTaskTemplates();
+  // 监听Token刷新等待事件
+  $emit.on("token:refresh:waiting", handleTokenRefreshWaiting);
 });
 
 // Cleanup countdown interval on unmount
@@ -3693,6 +4318,9 @@ onBeforeUnmount(() => {
     clearInterval(countdownInterval);
     countdownInterval = null;
   }
+
+  // 移除Token刷新等待事件监听
+  $emit.off("token:refresh:waiting", handleTokenRefreshWaiting);
 
   // Cleanup task scheduler intervals
   if (intervalId.value) {
@@ -4219,7 +4847,7 @@ const confirmLegacyGift = async () => {
 };
 
 const executeHelper = () => {
-  if (helperType.value !== 'pointsBox') {
+  if (helperType.value !== "pointsBox") {
     if (helperSettings.count % 10 !== 0 || helperSettings.count < 10) {
       message.warning("消耗数量必须是10的整数倍，最小为10");
       return;
@@ -4253,7 +4881,7 @@ const toggleDreamItem = (itemKey, checked) => {
       dreamBuyList.value.push(itemKey);
     }
   } else {
-    dreamBuyList.value = dreamBuyList.value.filter(k => k !== itemKey);
+    dreamBuyList.value = dreamBuyList.value.filter((k) => k !== itemKey);
   }
 };
 
@@ -4261,34 +4889,34 @@ const saveDreamBuyConfig = () => {
   // Save settings
   batchSettings.dreamPurchaseList = [...dreamBuyList.value];
   saveBatchSettings();
-  
+
   showDreamBuyModal.value = false;
   message.success("梦境购买配置已保存");
 };
 
 const selectGoldItems = () => {
   const newSelection = new Set(dreamBuyList.value);
-  
+
   for (const merchantId in goldItemsConfig) {
     const items = goldItemsConfig[merchantId];
-    items.forEach(index => {
+    items.forEach((index) => {
       newSelection.add(`${merchantId}-${index}`);
     });
   }
-  
+
   dreamBuyList.value = Array.from(newSelection);
 };
 
 const selectAllItems = () => {
   const newSelection = new Set(dreamBuyList.value);
-  
+
   for (const merchantId in merchantConfig) {
     const items = merchantConfig[merchantId].items;
     items.forEach((_, index) => {
       newSelection.add(`${merchantId}-${index}`);
     });
   }
-  
+
   dreamBuyList.value = Array.from(newSelection);
 };
 
@@ -4676,11 +5304,14 @@ const createNewGroup = () => {
     return;
   }
 
-  const newGroup = tokenStore.createTokenGroup(newGroupName.value.trim(), newGroupColor.value);
-  
+  const newGroup = tokenStore.createTokenGroup(
+    newGroupName.value.trim(),
+    newGroupColor.value,
+  );
+
   // 添加选中的Token到新分组
   if (newGroupSelectedTokens.value.length > 0) {
-    newGroupSelectedTokens.value.forEach(tokenId => {
+    newGroupSelectedTokens.value.forEach((tokenId) => {
       tokenStore.addTokenToGroup(newGroup.id, tokenId);
     });
   }
@@ -4692,7 +5323,7 @@ const createNewGroup = () => {
 };
 
 const selectAllNewGroup = () => {
-  newGroupSelectedTokens.value = sortedTokens.value.map(t => t.id);
+  newGroupSelectedTokens.value = sortedTokens.value.map((t) => t.id);
 };
 
 const deselectAllNewGroup = () => {
@@ -5071,13 +5702,26 @@ const createTaskDeps = () => ({
 
 // 初始化任务模块
 const tasksHangUp = createTasksHangUp(createTaskDeps());
-const { claimHangUpRewards, batchAddHangUpTime, batchStudy, batchclubsign, batchWarGuessCheer } = tasksHangUp;
+const {
+  claimHangUpRewards,
+  batchAddHangUpTime,
+  batchStudy,
+  batchclubsign,
+  batchWarGuessCheer,
+} = tasksHangUp;
 
 const tasksBottle = createTasksBottle(createTaskDeps());
 const { resetBottles, batchlingguanzi } = tasksBottle;
 
 const tasksTower = createTasksTower(createTaskDeps());
-const { climbTower, climbWeirdTower, batchClaimFreeEnergy, skinChallenge, batchUseItems, batchMergeItems } = tasksTower;
+const {
+  climbTower,
+  climbWeirdTower,
+  batchClaimFreeEnergy,
+  skinChallenge,
+  batchUseItems,
+  batchMergeItems,
+} = tasksTower;
 
 const tasksCar = createTasksCar(createTaskDeps());
 const { batchSmartSendCar, batchClaimCars } = tasksCar;
@@ -5097,13 +5741,19 @@ const {
 } = tasksItem;
 
 const tasksDungeon = createTasksDungeon(createTaskDeps());
-const { batchbaoku13, batchbaoku45, batchmengjing, batchBuyDreamItems } = tasksDungeon;
+const { batchbaoku13, batchbaoku45, batchmengjing, batchBuyDreamItems } =
+  tasksDungeon;
 
 const tasksArena = createTasksArena(createTaskDeps());
 const { batcharenafight, batchTopUpFish, batchTopUpArena } = tasksArena;
 
 const tasksStore = createTasksStore(createTaskDeps());
-const { legion_storebuygoods, legionStoreBuySkinCoins, store_purchase, collection_claimfreereward } = tasksStore;
+const {
+  legion_storebuygoods,
+  legionStoreBuySkinCoins,
+  store_purchase,
+  collection_claimfreereward,
+} = tasksStore;
 
 const tasksLegacy = createTasksLegacy(createTaskDeps());
 const { batchLegacyClaim, batchLegacyGiftSendEnhanced } = tasksLegacy;
@@ -5537,6 +6187,7 @@ const stopBatch = () => {
     align-items: flex-start;
     gap: 4px;
   }
+
   /* 批量功法残卷赠送样式 */
   .recipient-info:hover {
     transform: translateY(-2px);
@@ -5554,6 +6205,7 @@ const stopBatch = () => {
     0% {
       transform: rotate(0deg);
     }
+
     100% {
       transform: rotate(360deg);
     }

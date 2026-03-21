@@ -144,7 +144,7 @@ export function registerDefaultCommands(reg) {
     .registerHeartbeat()
     // 角色/系统
     .register("role_getroleinfo", {
-      clientVersion: "2.10.3-f10a39eaa0c409f4-wx",
+      clientVersion: "2.20.1-e249aa927a8ffe4c-wx",
       inviteUid: 0,
       platform: "hortor",
       platformExt: "mix",
@@ -211,6 +211,7 @@ export function registerDefaultCommands(reg) {
     .register("saltroad_getsaltroadwargrouprank")
     .register("league_getbattlefield")
     .register("league_getgroupopponent")
+    .register("legion_signup") // 盐场报名
 
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
@@ -305,6 +306,7 @@ export function registerDefaultCommands(reg) {
     .register("warguess_getrank")
     .register("warguess_startguess")
     .register("warguess_getguesscoinreward")
+    .register("legion_payloadsignup") // 蟠桃报名
 
     // 珍宝阁相关
     .register("collection_claimfreereward")
@@ -1074,6 +1076,8 @@ export class XyzwWebSocketClient {
       warguess_getguesscoinrewardresp: "warguess_getguesscoinreward",
       league_getbattlefieldresp: "league_getbattlefield",
       league_getgroupopponentresp: "league_getgroupopponent",
+      legion_signupresp: "legion_signup",
+      legion_payloadsignupresp: "legion_payloadsignup",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",

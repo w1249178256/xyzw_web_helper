@@ -4,7 +4,11 @@
       <!-- 头部信息区 -->
       <div class="header-section">
         <div class="header-left">
-          <img src="/icons/moonPalace.png" alt="俱乐部图标" class="header-icon" />
+          <img
+            src="/icons/moonPalace.png"
+            alt="俱乐部图标"
+            class="header-icon"
+          />
           <div class="header-title">
             <h2>盐场匹配信息详情</h2>
             <p>俱乐部盐场匹配详情</p>
@@ -12,7 +16,10 @@
         </div>
 
         <!-- 数据统计区 -->
-        <div class="stats-section" v-if="battleRecords1 && battleRecords1.legionRankList">
+        <div
+          class="stats-section"
+          v-if="battleRecords1 && battleRecords1.legionRankList"
+        >
           <div class="stat-item">
             <span class="stat-label">查询日期:</span>
             <n-tag type="info">{{ formatTimestamp1(inputDate1) }}</n-tag>
@@ -30,7 +37,11 @@
       <div class="function-section">
         <div class="function-left">
           <div class="export-options">
-            <n-checkbox-group v-model:value="exportmethod" name="group-exportmethod" size="small">
+            <n-checkbox-group
+              v-model:value="exportmethod"
+              name="group-exportmethod"
+              size="small"
+            >
               <n-checkbox value="1">表格导出</n-checkbox>
               <n-checkbox value="2">图片导出</n-checkbox>
             </n-checkbox-group>
@@ -38,21 +49,46 @@
         </div>
 
         <div class="function-right">
-          <a-date-picker v-model:value="inputDate1" :defaultValue="inputDate1" @change="fetchBattleRecordsByDate"
-            valueFormat="YYYY/MM/DD" format="YYYY/MM/DD" :disabled-date="disabledDate" />
-          <n-button size="small" :disabled="loading1" @click="handleRefresh1" class="action-btn refresh-btn">
+          <a-date-picker
+            v-model:value="inputDate1"
+            :defaultValue="inputDate1"
+            @change="fetchBattleRecordsByDate"
+            valueFormat="YYYY/MM/DD"
+            format="YYYY/MM/DD"
+            :disabled-date="disabledDate"
+          />
+          <n-button
+            size="small"
+            :disabled="loading1"
+            @click="handleRefresh1"
+            class="action-btn refresh-btn"
+          >
             <template #icon>
               <n-icon>
                 <Refresh />
-              </n-icon> </template>刷新</n-button>
-          <n-button type="primary" size="small" :disabled="!battleRecords1 || loading1" @click="handleExport1"
-            class="action-btn export-btn">
+              </n-icon> </template
+            >刷新</n-button
+          >
+          <n-button
+            type="primary"
+            size="small"
+            :disabled="!battleRecords1 || loading1"
+            @click="handleExport1"
+            class="action-btn export-btn"
+          >
             <template #icon>
               <n-icon>
                 <Copy />
-              </n-icon> </template>导出</n-button>
-          <n-button :type="isEditMode ? 'warning' : 'default'" size="small" :disabled="!battleRecords1 || loading1"
-            @click="toggleEditMode" class="action-btn edit-btn">
+              </n-icon> </template
+            >导出</n-button
+          >
+          <n-button
+            :type="isEditMode ? 'warning' : 'default'"
+            size="small"
+            :disabled="!battleRecords1 || loading1"
+            @click="toggleEditMode"
+            class="action-btn edit-btn"
+          >
             <template #icon>
               <n-icon>
                 <CreateOutline />
@@ -60,53 +96,106 @@
             </template>
             {{ isEditMode ? "退出编辑" : "调整排名" }}
           </n-button>
-          <n-button type="info" size="small" :disabled="!battleRecords1 || loading1" @click="hcSort"
-            class="action-btn sort-btn">
-            红淬排序</n-button>
-          <n-button type="info" size="small" :disabled="!battleRecords1 || loading1" @click="scoreSort"
-            class="action-btn sort-btn" v-if="ScoreShow === 1">
-            积分排序</n-button>
+          <n-button
+            type="info"
+            size="small"
+            :disabled="!battleRecords1 || loading1"
+            @click="hcSort"
+            class="action-btn sort-btn"
+          >
+            红淬排序</n-button
+          >
+          <n-button
+            type="info"
+            size="small"
+            :disabled="!battleRecords1 || loading1"
+            @click="scoreSort"
+            class="action-btn sort-btn"
+            v-if="ScoreShow === 1"
+          >
+            积分排序</n-button
+          >
         </div>
       </div>
 
       <!-- 表格内容区 -->
       <div ref="exportDom" class="table-content">
         <!-- 公告区域 -->
-        <div v-if="battleRecords1 && battleRecords1.legionRankList" class="announcement-section">
+        <div
+          v-if="battleRecords1 && battleRecords1.legionRankList"
+          class="announcement-section"
+        >
           <div class="announcement-content">
-            <span class="announcement-text">盐场匹配信息实时更新中，请关注最新排名变化</span>
+            <span class="announcement-text"
+              >盐场匹配信息实时更新中，请关注最新排名变化</span
+            >
           </div>
         </div>
 
         <!-- 联盟分类标签栏 -->
-        <div v-if="battleRecords1 && battleRecords1.legionRankList" class="alliance-tabs-section">
-          <div class="alliance-tab" :class="{ active: activeAlliance === '大联盟' }" @click="setActiveAlliance('大联盟')">
+        <div
+          v-if="battleRecords1 && battleRecords1.legionRankList"
+          class="alliance-tabs-section"
+        >
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '大联盟' }"
+            @click="setActiveAlliance('大联盟')"
+          >
             <span class="tab-text">大联盟</span>
             <span class="tab-count">{{
               getActiveAllianceCount("大联盟")
             }}</span>
           </div>
-          <div class="alliance-tab" :class="{ active: activeAlliance === '梦盟' }" @click="setActiveAlliance('梦盟')">
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '梦盟' }"
+            @click="setActiveAlliance('梦盟')"
+          >
             <span class="tab-text">梦盟</span>
             <span class="tab-count">{{ getActiveAllianceCount("梦盟") }}</span>
           </div>
-          <div class="alliance-tab" :class="{ active: activeAlliance === '正义联盟' }" @click="setActiveAlliance('正义联盟')">
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '正义联盟' }"
+            @click="setActiveAlliance('正义联盟')"
+          >
             <span class="tab-text">正义联盟</span>
             <span class="tab-count">{{
               getActiveAllianceCount("正义联盟")
             }}</span>
           </div>
-          <div class="alliance-tab" :class="{ active: activeAlliance === '龙盟' }" @click="setActiveAlliance('龙盟')">
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '龙盟' }"
+            @click="setActiveAlliance('龙盟')"
+          >
             <span class="tab-text">龙盟</span>
             <span class="tab-count">{{ getActiveAllianceCount("龙盟") }}</span>
           </div>
-          <div class="alliance-tab" :class="{ active: activeAlliance === '未知联盟' }" @click="setActiveAlliance('未知联盟')">
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '曦盟' }"
+            @click="setActiveAlliance('曦盟')"
+          >
+            <span class="tab-text">曦盟</span>
+            <span class="tab-count">{{ getActiveAllianceCount("曦盟") }}</span>
+          </div>
+          <div
+            class="alliance-tab"
+            :class="{ active: activeAlliance === '未知联盟' }"
+            @click="setActiveAlliance('未知联盟')"
+          >
             <span class="tab-text">未知联盟</span>
             <span class="tab-count">{{
               getActiveAllianceCount("未知联盟")
             }}</span>
           </div>
-          <div class="alliance-tab all" :class="{ active: activeAlliance === 'all' }" @click="setActiveAlliance('all')">
+          <div
+            class="alliance-tab all"
+            :class="{ active: activeAlliance === 'all' }"
+            @click="setActiveAlliance('all')"
+          >
             <span class="tab-text">全部</span>
             <span class="tab-count">{{
               battleRecords1.legionRankList.length
@@ -121,7 +210,10 @@
         </div>
 
         <!-- 匹配列表 -->
-        <div v-else-if="battleRecords1 && battleRecords1.legionRankList" class="table-container">
+        <div
+          v-else-if="battleRecords1 && battleRecords1.legionRankList"
+          class="table-container"
+        >
           <!-- 表格标题行 -->
           <div class="table-header">
             <div class="table-cell rank">排名</div>
@@ -138,18 +230,39 @@
           </div>
 
           <!-- 表格数据行 -->
-          <div v-for="(member, index) in filteredLegionList" :key="member.id" class="table-row"
-            :class="getAllianceClass(getMemberAlliance(member))">
+          <div
+            v-for="(member, index) in filteredLegionList"
+            :key="member.id"
+            class="table-row"
+            :class="getAllianceClass(getMemberAlliance(member))"
+          >
             <div class="table-cell rank">
               <div v-if="isEditMode" class="edit-rank">
-                <n-input-number v-model:value="manualRankings[member.id]" size="small" :min="1" :max="20"
-                  style="width: 70px" :show-button="false" @focus="handleRankFocus(member)"
-                  @blur="handleRankBlur(member)" @keydown.enter="$event.target.blur()" />
+                <n-input-number
+                  v-model:value="manualRankings[member.id]"
+                  size="small"
+                  :min="1"
+                  :max="20"
+                  style="width: 70px"
+                  :show-button="false"
+                  @focus="handleRankFocus(member)"
+                  @blur="handleRankBlur(member)"
+                  @keydown.enter="$event.target.blur()"
+                />
               </div>
               <div v-else class="rank-container">
-                <span v-if="getMemberRank(member) === 1" class="rank-medal gold"></span>
-                <span v-else-if="getMemberRank(member) === 2" class="rank-medal silver"></span>
-                <span v-else-if="getMemberRank(member) === 3" class="rank-medal bronze"></span>
+                <span
+                  v-if="getMemberRank(member) === 1"
+                  class="rank-medal gold"
+                ></span>
+                <span
+                  v-else-if="getMemberRank(member) === 2"
+                  class="rank-medal silver"
+                ></span>
+                <span
+                  v-else-if="getMemberRank(member) === 3"
+                  class="rank-medal bronze"
+                ></span>
                 <span v-else class="rank-number">{{
                   getMemberRank(member)
                 }}</span>
@@ -157,8 +270,12 @@
             </div>
             <div class="table-cell alliance">
               <div v-if="isEditMode" class="edit-alliance">
-                <n-select v-model:value="manualAlliances[member.id]" :options="allianceOptions" size="small"
-                  style="width: 110px" />
+                <n-select
+                  v-model:value="manualAlliances[member.id]"
+                  :options="allianceOptions"
+                  size="small"
+                  style="width: 110px"
+                />
               </div>
               <span v-else class="alliance-tag">{{
                 getMemberAlliance(member)
@@ -166,8 +283,13 @@
             </div>
             <div class="table-cell server">{{ member.serverId || 0 }}</div>
             <div class="table-cell avatar">
-              <img v-if="member.logo" :src="member.logo" :alt="member.name" class="member-avatar"
-                @error="handleImageError" />
+              <img
+                v-if="member.logo"
+                :src="member.logo"
+                :alt="member.name"
+                class="member-avatar"
+                @error="handleImageError"
+              />
               <div v-else class="member-avatar-placeholder">
                 {{ member.name?.charAt(0) || "?" }}
               </div>
@@ -179,9 +301,21 @@
             <div class="table-cell red-quench">{{ member.redQuench || 0 }}</div>
             <div class="table-cell first-3">
               <div class="hero-avatars">
-                <div v-for="(hero, index) in member.topHeroes" :key="index" class="hero-card">
-                  <div class="hero-avatar-container" @click="handleHeroClick(hero)">
-                    <img v-if="hero.headImg" :src="hero.headImg" :alt="hero.name" class="hero-avatar" />
+                <div
+                  v-for="(hero, index) in member.topHeroes"
+                  :key="index"
+                  class="hero-card"
+                >
+                  <div
+                    class="hero-avatar-container"
+                    @click="handleHeroClick(hero)"
+                  >
+                    <img
+                      v-if="hero.headImg"
+                      :src="hero.headImg"
+                      :alt="hero.name"
+                      class="hero-avatar"
+                    />
                     <div v-else class="hero-avatar-placeholder">
                       {{ hero.name?.charAt(0) || "?" }}
                     </div>
@@ -196,8 +330,11 @@
                       <span class="hero-power">{{
                         formatPower(hero.power)
                       }}</span>
-                      <span class="hero-redquench" :class="getRedQuenchClass(hero.redQuench)">{{ hero.redQuench
-                        }}红</span>
+                      <span
+                        class="hero-redquench"
+                        :class="getRedQuenchClass(hero.redQuench)"
+                        >{{ hero.redQuench }}红</span
+                      >
                     </div>
                   </div>
                 </div>
@@ -229,22 +366,39 @@
     </div>
 
     <!-- 玩家信息模态框 -->
-    <n-modal v-model:show="showPlayerInfoModal" preset="card" title="对手信息" :style="{ width: '800px' }" :bordered="false"
-      :segmented="{ content: 'soft', footer: 'soft' }" :show-close="false">
+    <n-modal
+      v-model:show="showPlayerInfoModal"
+      preset="card"
+      title="对手信息"
+      :style="{ width: '800px' }"
+      :bordered="false"
+      :segmented="{ content: 'soft', footer: 'soft' }"
+      :show-close="false"
+    >
       <template #header-extra>
         <span v-if="playerInfo" class="player-id">ID: {{ playerInfo.id }}</span>
       </template>
 
       <div v-if="playerInfo" class="player-info-content">
         <div class="player-info-main">
-          <n-avatar round :size="60" :src="playerInfo.headImg" class="player-avatar" />
+          <n-avatar
+            round
+            :size="60"
+            :src="playerInfo.headImg"
+            class="player-avatar"
+          />
           <div class="player-info-detail">
             <h3>
               {{ playerInfo.name }}
-              <n-tag v-if="playerInfo.legacy > 0" :style="{
-                color: '#fff',
-                backgroundColor: legacycolor[playerInfo.legacy]?.value,
-              }" size="small" style="margin-left: 8px">
+              <n-tag
+                v-if="playerInfo.legacy > 0"
+                :style="{
+                  color: '#fff',
+                  backgroundColor: legacycolor[playerInfo.legacy]?.value,
+                }"
+                size="small"
+                style="margin-left: 8px"
+              >
                 {{ legacycolor[playerInfo.legacy]?.name || "未知" }}
               </n-tag>
             </h3>
@@ -264,16 +418,37 @@
         <div class="action-section">
           <div style="display: flex; align-items: center; gap: 8px; flex: 1">
             <div class="fight-count-container">
-              <label for="fightCount" class="fight-count-label">切磋次数:</label>
-              <n-input id="fightCount" v-model:value="fightCount" type="number" placeholder="请输入切磋次数" min="1" max="100"
-                :step="1" class="fight-count-input" size="small" @input="validateFightCount" />
+              <label for="fightCount" class="fight-count-label"
+                >切磋次数:</label
+              >
+              <n-input
+                id="fightCount"
+                v-model:value="fightCount"
+                type="number"
+                placeholder="请输入切磋次数"
+                min="1"
+                max="100"
+                :step="1"
+                class="fight-count-input"
+                size="small"
+                @input="validateFightCount"
+              />
               <div class="fight-count-hint">范围: 1-100</div>
             </div>
-            <n-button type="tertiary" @click="showPlayerInfoModal = false" size="small" style="margin-right: 8px">
+            <n-button
+              type="tertiary"
+              @click="showPlayerInfoModal = false"
+              size="small"
+              style="margin-right: 8px"
+            >
               关闭
             </n-button>
           </div>
-          <n-button type="primary" @click="handleDuel" :disabled="!isFightCountValid">
+          <n-button
+            type="primary"
+            @click="handleDuel"
+            :disabled="!isFightCountValid"
+          >
             切磋
           </n-button>
         </div>
@@ -290,8 +465,13 @@
               <span>负: {{ fightProgress.lossCount }}</span>
             </div>
           </div>
-          <n-progress type="line" :percentage="fightProgress.percentage" :show-indicator="false" :stroke-width="8"
-            status="processing" />
+          <n-progress
+            type="line"
+            :percentage="fightProgress.percentage"
+            :show-indicator="false"
+            :stroke-width="8"
+            status="processing"
+          />
         </div>
 
         <!-- 最终结果统计 -->
@@ -318,39 +498,48 @@
               </div>
               <div class="summary-item">
                 <span class="summary-label">胜率：</span>
-                <span class="summary-value">{{
-                  (
-                    (fightResult.winCount / fightResult.totalCount) *
-                    100
-                  ).toFixed(2)
-                }}%</span>
+                <span class="summary-value"
+                  >{{
+                    (
+                      (fightResult.winCount / fightResult.totalCount) *
+                      100
+                    ).toFixed(2)
+                  }}%</span
+                >
               </div>
               <div class="summary-item">
                 <span class="summary-label">我方掉将率：</span>
-                <span class="summary-value">{{
-                  (
-                    (dieStats.ourDieHeroGameCount / fightResult.totalCount) *
-                    100
-                  ).toFixed(2)
-                }}%</span>
+                <span class="summary-value"
+                  >{{
+                    (
+                      (dieStats.ourDieHeroGameCount / fightResult.totalCount) *
+                      100
+                    ).toFixed(2)
+                  }}%</span
+                >
               </div>
               <div class="summary-item">
                 <span class="summary-label">敌方掉将率：</span>
-                <span class="summary-value">{{
-                  (
-                    (dieStats.enemyDieHeroGameCount /
-                      fightResult.totalCount) *
-                    100
-                  ).toFixed(2)
-                }}%</span>
+                <span class="summary-value"
+                  >{{
+                    (
+                      (dieStats.enemyDieHeroGameCount /
+                        fightResult.totalCount) *
+                      100
+                    ).toFixed(2)
+                  }}%</span
+                >
               </div>
             </div>
           </div>
 
           <!-- 战斗结果列表 -->
           <div class="result-list">
-            <div v-for="(battle, index) in fightResult.resultCount" :key="index"
-              :class="['battle-result-item', battle.isWin ? 'win' : 'loss']">
+            <div
+              v-for="(battle, index) in fightResult.resultCount"
+              :key="index"
+              :class="['battle-result-item', battle.isWin ? 'win' : 'loss']"
+            >
               <div class="battle-header">
                 <span class="battle-index">第 {{ index + 1 }} 场</span>
                 <n-tag :type="battle.isWin ? 'success' : 'error'" size="small">
@@ -360,26 +549,42 @@
 
               <div class="battle-details">
                 <div class="battle-side left-side">
-                  <n-avatar round :size="32" :src="battle.leftheadImg" class="side-avatar" />
+                  <n-avatar
+                    round
+                    :size="32"
+                    :src="battle.leftheadImg"
+                    class="side-avatar"
+                  />
                   <div class="side-info">
                     <span class="side-name">{{
                       battle.leftName || "未知"
                     }}</span>
                     <span class="side-power">战力: {{ battle.leftpower }}</span>
-                    <span class="side-die">掉将: {{ battle.leftDieHero }} 个</span>
+                    <span class="side-die"
+                      >掉将: {{ battle.leftDieHero }} 个</span
+                    >
                   </div>
                 </div>
 
                 <div class="battle-vs">VS</div>
 
                 <div class="battle-side right-side">
-                  <n-avatar round :size="32" :src="battle.rightheadImg" class="side-avatar" />
+                  <n-avatar
+                    round
+                    :size="32"
+                    :src="battle.rightheadImg"
+                    class="side-avatar"
+                  />
                   <div class="side-info">
                     <span class="side-name">{{
                       battle.rightName || "未知"
                     }}</span>
-                    <span class="side-power">战力: {{ battle.rightpower }}</span>
-                    <span class="side-die">掉将: {{ battle.rightDieHero }} 个</span>
+                    <span class="side-power"
+                      >战力: {{ battle.rightpower }}</span
+                    >
+                    <span class="side-die"
+                      >掉将: {{ battle.rightDieHero }} 个</span
+                    >
                   </div>
                 </div>
               </div>
@@ -387,7 +592,9 @@
           </div>
 
           <div class="result-actions">
-            <n-button type="primary" @click="resetFightResult">重新切磋</n-button>
+            <n-button type="primary" @click="resetFightResult"
+              >重新切磋</n-button
+            >
             <n-button @click="fightResult.visible = false">关闭结果</n-button>
           </div>
         </div>
@@ -395,13 +602,29 @@
         <div class="player-heroes">
           <h4>武将阵容</h4>
           <!-- 添加调试信息 -->
-          <div v-if="playerInfo.heroList" class="debug-info" style="font-size: 12px; color: #999; margin-bottom: 10px">
+          <div
+            v-if="playerInfo.heroList"
+            class="debug-info"
+            style="font-size: 12px; color: #999; margin-bottom: 10px"
+          >
             武将数量: {{ playerInfo.heroList.length }}
           </div>
-          <div class="hero-list" v-if="playerInfo.heroList && playerInfo.heroList.length > 0">
-            <div v-for="(hero, index) in playerInfo.heroList" :key="hero.heroId || index" class="hero-item"
-              @click="selectHeroInfo(hero)">
-              <n-avatar round :size="40" :src="hero.heroAvate" style="cursor: pointer" />
+          <div
+            class="hero-list"
+            v-if="playerInfo.heroList && playerInfo.heroList.length > 0"
+          >
+            <div
+              v-for="(hero, index) in playerInfo.heroList"
+              :key="hero.heroId || index"
+              class="hero-item"
+              @click="selectHeroInfo(hero)"
+            >
+              <n-avatar
+                round
+                :size="40"
+                :src="hero.heroAvate"
+                style="cursor: pointer"
+              />
               <div class="hero-info">
                 <span class="hero-name">{{ hero.heroName }}</span>
                 <div class="hero-stats">
@@ -412,7 +635,9 @@
                   <span :class="hero.HolyBeast ? 'opened' : 'closed'">
                     {{ hero.HolyBeast ? "已开四圣" : "未开四圣" }}
                   </span>
-                  <span v-if="hero.HolyBeast">四圣等级: {{ hero.HBlevel || 0 }}</span>
+                  <span v-if="hero.HolyBeast"
+                    >四圣等级: {{ hero.HBlevel || 0 }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -420,7 +645,10 @@
           <div v-else class="empty-heroes">
             <p>未查询到武将信息</p>
             <!-- 添加调试信息 -->
-            <div v-if="playerInfo.heroList" style="font-size: 12px; color: #999; margin-top: 10px">
+            <div
+              v-if="playerInfo.heroList"
+              style="font-size: 12px; color: #999; margin-top: 10px"
+            >
               武将列表为空
             </div>
             <div v-else style="font-size: 12px; color: #999; margin-top: 10px">
@@ -432,8 +660,17 @@
     </n-modal>
 
     <!-- 武将详情模态框 -->
-    <n-modal v-model:show="showHeroModal" class="hero-detail-modal" preset="card" title="武将信息" size="large"
-      :bordered="false" :segmented="{ content: 'soft', footer: 'soft' }" :style="{ width: '600px' }" :show-close="true">
+    <n-modal
+      v-model:show="showHeroModal"
+      class="hero-detail-modal"
+      preset="card"
+      title="武将信息"
+      size="large"
+      :bordered="false"
+      :segmented="{ content: 'soft', footer: 'soft' }"
+      :style="{ width: '600px' }"
+      :show-close="true"
+    >
       <template #header-extra>
         <span class="hero-id">武将ID: {{ heroModealTemp?.heroId }}</span>
       </template>
@@ -441,7 +678,11 @@
       <div v-if="heroModealTemp" class="hero-modal-content">
         <div class="hero-modal-header">
           <div class="hero-modal-avatar">
-            <img v-if="heroModealTemp.heroAvate" :src="heroModealTemp.heroAvate" :alt="heroModealTemp.heroName" />
+            <img
+              v-if="heroModealTemp.heroAvate"
+              :src="heroModealTemp.heroAvate"
+              :alt="heroModealTemp.heroName"
+            />
             <div v-else class="hero-placeholder">
               {{ heroModealTemp.heroName?.substring(0, 2) || "?" }}
             </div>
@@ -481,7 +722,10 @@
             <n-descriptions-item label="四圣状态">
               {{ heroModealTemp.HolyBeast ? "已激活" : "未激活" }}
             </n-descriptions-item>
-            <n-descriptions-item label="四圣等级" v-if="heroModealTemp.HolyBeast">
+            <n-descriptions-item
+              label="四圣等级"
+              v-if="heroModealTemp.HolyBeast"
+            >
               {{ heroModealTemp.HBlevel }}
             </n-descriptions-item>
             <n-descriptions-item label="鱼灵">
@@ -500,8 +744,12 @@
             </n-descriptions-item>
             <n-descriptions-item label="鱼灵洗练">
               <div v-if="heroModealTemp?.PearlInfo?.slotMap?.length > 0">
-                <div v-for="item in heroModealTemp.PearlInfo.slotMap" :key="item.id" class="ModalEquipment"
-                  :style="'background-color:' + item.value"></div>
+                <div
+                  v-for="item in heroModealTemp.PearlInfo.slotMap"
+                  :key="item.id"
+                  class="ModalEquipment"
+                  :style="'background-color:' + item.value"
+                ></div>
               </div>
               <div v-else>无</div>
             </n-descriptions-item>
@@ -514,33 +762,53 @@
             <div class="equipment-item">
               <span class="equipment-label">武器:</span>
               <div class="equipment-slots">
-                <div v-for="(item, idx) in Object.values(
-                  Object.values(heroModealTemp.equipment)[0]?.quenches || {},
-                )" :key="idx" class="equipment-slot" :class="{ 'red-slot': item.colorId === 6 }"></div>
+                <div
+                  v-for="(item, idx) in Object.values(
+                    Object.values(heroModealTemp.equipment)[0]?.quenches || {},
+                  )"
+                  :key="idx"
+                  class="equipment-slot"
+                  :class="{ 'red-slot': item.colorId === 6 }"
+                ></div>
               </div>
             </div>
             <div class="equipment-item">
               <span class="equipment-label">衣服:</span>
               <div class="equipment-slots">
-                <div v-for="(item, idx) in Object.values(
-                  Object.values(heroModealTemp.equipment)[1]?.quenches || {},
-                )" :key="idx" class="equipment-slot" :class="{ 'red-slot': item.colorId === 6 }"></div>
+                <div
+                  v-for="(item, idx) in Object.values(
+                    Object.values(heroModealTemp.equipment)[1]?.quenches || {},
+                  )"
+                  :key="idx"
+                  class="equipment-slot"
+                  :class="{ 'red-slot': item.colorId === 6 }"
+                ></div>
               </div>
             </div>
             <div class="equipment-item">
               <span class="equipment-label">头盔:</span>
               <div class="equipment-slots">
-                <div v-for="(item, idx) in Object.values(
-                  Object.values(heroModealTemp.equipment)[2]?.quenches || {},
-                )" :key="idx" class="equipment-slot" :class="{ 'red-slot': item.colorId === 6 }"></div>
+                <div
+                  v-for="(item, idx) in Object.values(
+                    Object.values(heroModealTemp.equipment)[2]?.quenches || {},
+                  )"
+                  :key="idx"
+                  class="equipment-slot"
+                  :class="{ 'red-slot': item.colorId === 6 }"
+                ></div>
               </div>
             </div>
             <div class="equipment-item">
               <span class="equipment-label">坐骑:</span>
               <div class="equipment-slots">
-                <div v-for="(item, idx) in Object.values(
-                  Object.values(heroModealTemp.equipment)[3]?.quenches || {},
-                )" :key="idx" class="equipment-slot" :class="{ 'red-slot': item.colorId === 6 }"></div>
+                <div
+                  v-for="(item, idx) in Object.values(
+                    Object.values(heroModealTemp.equipment)[3]?.quenches || {},
+                  )"
+                  :key="idx"
+                  class="equipment-slot"
+                  :class="{ 'red-slot': item.colorId === 6 }"
+                ></div>
               </div>
             </div>
           </div>
@@ -643,6 +911,7 @@ const allianceOptions = [
   { label: "梦盟", value: "梦盟" },
   { label: "正义联盟", value: "正义联盟" },
   { label: "龙盟", value: "龙盟" },
+  { label: "曦盟", value: "曦盟" },
   { label: "未知联盟", value: "未知联盟" },
 ];
 
@@ -712,7 +981,8 @@ const handleRankBlur = (member) => {
 
   // 查找占用新排名的俱乐部
   const targetMemberId = Object.keys(manualRankings.value).find(
-    (id) => String(id) !== String(member.id) && manualRankings.value[id] === newRank
+    (id) =>
+      String(id) !== String(member.id) && manualRankings.value[id] === newRank,
   );
 
   if (targetMemberId) {
@@ -729,7 +999,7 @@ const handleRankBlur = (member) => {
 // 获取成员名称辅助函数
 const getMemberName = (id) => {
   const member = battleRecords1.value?.legionRankList.find(
-    (m) => String(m.id) === String(id)
+    (m) => String(m.id) === String(id),
   );
   return member ? member.name : "未知俱乐部";
 };
@@ -1386,21 +1656,9 @@ const handleImageError = (event) => {
 };
 
 const disabledDate = (current) => {
-  const specialDates = [1, 6, 9, 11, 13, 17, 19, 21, 24, 26, 29];
-  const isSpecialDate =
-    current.getFullYear() === 2026 &&
-    current.getMonth() === 2 &&
-    specialDates.includes(current.getDate());
-
-  if (current > Date.now()) {
-    return true;
-  }
-
-  if (isSpecialDate) {
-    return false;
-  }
-
-  return current.getDay() != 6 && current.getDay() != 0;
+  return (
+    (current.getDay() != 6 && current.getDay() != 0) || current > Date.now()
+  );
 };
 
 // 联盟样式类
@@ -1414,6 +1672,8 @@ const getAllianceClass = (alliance) => {
       return "alliance-xin-justice";
     case "龙盟":
       return "alliance-dragon";
+    case "曦盟":
+      return "alliance-xi";
     case "未知联盟":
       return "alliance-unknown";
     default:
@@ -1462,23 +1722,9 @@ const fetchBattleRecords1 = async () => {
   queryDate.value = formatTimestamp1(inputDate1.value);
 
   if (gettoday() == queryDate.value && new Date().getHours() < 21) {
-    const now = new Date();
-    const specialDates = [1, 6, 9, 11, 13, 17, 19, 21, 24, 26, 29];
-    const battlefieldCmd =
-      now.getFullYear() === 2026 &&
-        now.getMonth() === 2 &&
-        specialDates.includes(now.getDate())
-        ? 'league_getbattlefield'
-        : 'legion_getbattlefield';
-    const getopponentCmd =
-      now.getFullYear() === 2026 &&
-        now.getMonth() === 2 &&
-        specialDates.includes(now.getDate())
-        ? 'league_getgroupopponent'
-        : 'legion_getopponent';
     const getbattlefield = await tokenStore.sendMessageWithPromise(
       tokenId,
-      battlefieldCmd,
+      "legion_getbattlefield",
       {},
       10000,
     );
@@ -1488,27 +1734,13 @@ const fetchBattleRecords1 = async () => {
       return;
     }
     try {
-      const isGroupOpponentCmd = getopponentCmd === "league_getgroupopponent";
-      const rawPhase = getbattlefield.info.phase;
-      const requestPhase = isGroupOpponentCmd && typeof rawPhase === "string"
-        ? rawPhase.split("-").pop()
-        : rawPhase;
-      const requestBattlefieldId = isGroupOpponentCmd
-        ? (getbattlefield.info.battlefieldNumber ?? getbattlefield.info.battlefieldId)
-        : getbattlefield.info.battlefieldId;
-
       const result = await tokenStore.sendMessageWithPromise(
         tokenId,
-        getopponentCmd,
-        isGroupOpponentCmd
-          ? {
-            phase: requestPhase,
-            groupId: requestBattlefieldId,
-          }
-          : {
-            phase: requestPhase,
-            battlefieldId: requestBattlefieldId,
-          },
+        "legion_getopponent",
+        {
+          phase: getbattlefield.info.phase,
+          battlefieldId: getbattlefield.info.battlefieldId,
+        },
         10000,
       );
 
@@ -1972,7 +2204,7 @@ const exportToImage = async () => {
   }
 
   // 获取 table-container
-  const tableContainer = exportDom.value.querySelector('.table-container');
+  const tableContainer = exportDom.value.querySelector(".table-container");
   // 保存滚动位置
   const scrollTop = tableContainer ? tableContainer.scrollTop : 0;
 
@@ -2007,27 +2239,29 @@ const exportToImage = async () => {
     });
 
     // 6. Canvas转图片链接并下载
-    const filename = queryDate.value.replace("/", "年").replace("/", "月") + "日盐场匹配信息.png";
+    const filename =
+      queryDate.value.replace("/", "年").replace("/", "月") +
+      "日盐场匹配信息.png";
     downloadCanvasAsImage(canvas, filename);
   } catch (err) {
     console.error("DOM转图片失败：", err);
     alert("导出图片失败，请重试");
   } finally {
     // 恢复原始样式
-    exportDom.value.style.removeProperty('height');
-    exportDom.value.style.removeProperty('overflow');
+    exportDom.value.style.removeProperty("height");
+    exportDom.value.style.removeProperty("overflow");
 
     if (tableContainer) {
       if (tableContainer.dataset.originalHeight) {
         tableContainer.style.height = tableContainer.dataset.originalHeight;
       } else {
-        tableContainer.style.removeProperty('height');
+        tableContainer.style.removeProperty("height");
       }
 
       if (tableContainer.dataset.originalOverflow) {
         tableContainer.style.overflow = tableContainer.dataset.originalOverflow;
       } else {
-        tableContainer.style.removeProperty('overflow');
+        tableContainer.style.removeProperty("overflow");
       }
 
       // 清理 dataset
@@ -2801,9 +3035,11 @@ onMounted(() => {
 
 // 公告区域
 .announcement-section {
-  background: linear-gradient(135deg,
-      var(--primary-color-light) 0%,
-      var(--primary-color) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color-light) 0%,
+    var(--primary-color) 100%
+  );
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
   border-radius: var(--border-radius-md);
@@ -2970,9 +3206,11 @@ onMounted(() => {
     // 表格标题行
     .table-header {
       display: flex;
-      background: linear-gradient(180deg,
-          var(--bg-secondary) 0%,
-          var(--bg-primary) 100%);
+      background: linear-gradient(
+        180deg,
+        var(--bg-secondary) 0%,
+        var(--bg-primary) 100%
+      );
       border-bottom: 2px solid var(--border-medium);
       font-weight: var(--font-weight-bold);
       color: var(--text-primary);
@@ -3030,6 +3268,12 @@ onMounted(() => {
       &.alliance-dragon {
         .alliance-tag {
           background: var(--error-color);
+        }
+      }
+
+      &.alliance-xi {
+        .alliance-tag {
+          background: #9c27b0;
         }
       }
 
@@ -3169,9 +3413,11 @@ onMounted(() => {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg,
-              var(--primary-color) 0%,
-              var(--primary-color-light) 100%);
+          background: linear-gradient(
+            135deg,
+            var(--primary-color) 0%,
+            var(--primary-color-light) 100%
+          );
           color: white;
           display: flex;
           align-items: center;
@@ -3302,9 +3548,11 @@ onMounted(() => {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background: linear-gradient(135deg,
-              var(--primary-color) 0%,
-              var(--primary-color-light) 100%);
+          background: linear-gradient(
+            135deg,
+            var(--primary-color) 0%,
+            var(--primary-color-light) 100%
+          );
           color: white;
           display: flex;
           align-items: center;
@@ -3436,9 +3684,11 @@ onMounted(() => {
         span {
           display: inline-block;
           padding: 2px 8px;
-          background: linear-gradient(135deg,
-              var(--primary-color-light) 0%,
-              var(--primary-color) 100%);
+          background: linear-gradient(
+            135deg,
+            var(--primary-color-light) 0%,
+            var(--primary-color) 100%
+          );
           color: white;
           border-radius: var(--border-radius-full);
           font-weight: var(--font-weight-bold);

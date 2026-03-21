@@ -31,6 +31,7 @@
           <n-radio-group v-model:value="viewMode" size="small">
             <n-radio-button value="legion">战队战况</n-radio-button>
             <n-radio-button value="individual">个人战况</n-radio-button>
+            <n-radio-button value="all_individual">全部战况</n-radio-button>
           </n-radio-group>
           
           <div class="stat-item">
@@ -91,6 +92,20 @@
             </template>
             导出图片
           </n-button>
+
+          <n-button 
+            size="small" 
+            type="success" 
+            @click="exportExcel"
+            :disabled="!validData"
+          >
+            <template #icon>
+              <n-icon>
+                <DownloadOutline />
+              </n-icon>
+            </template>
+            导出表格
+          </n-button>
         </div>
       </div>
 
@@ -136,13 +151,51 @@
 
         <!-- 个人战况表格 -->
         <n-data-table
-          v-else
+          v-else-if="viewMode === 'individual'"
           :columns="individualColumns"
           :data="individualData"
           :loading="false"
           :pagination="{ pageSize: 30 }"
           size="small"
           :max-height="tableMaxHeight"
+        >
+          <template #empty>
+            <div class="empty-state">
+              <template v-if="connecting">
+                <div class="loading-container">
+                  <n-spin size="large" />
+                  <p>正在连接战场...</p>
+                </div>
+              </template>
+              <template v-else-if="isConnected">
+                <div class="loading-container">
+                  <n-spin size="large" />
+                  <p>正在获取战况数据...</p>
+                </div>
+              </template>
+              <template v-else>
+                <n-empty description="暂无战场数据，请手动刷新数据">
+                  <template #icon>
+                    <n-icon>
+                      <StatsChart />
+                    </n-icon>
+                  </template>
+                </n-empty>
+              </template>
+            </div>
+          </template>
+        </n-data-table>
+
+        <!-- 全部战况表格 -->
+        <n-data-table
+          v-else-if="viewMode === 'all_individual'"
+          :columns="allIndividualColumns"
+          :data="allIndividualData"
+          :loading="false"
+          :pagination="false"
+          size="small"
+          :row-class-name="rowClassName"
+          :max-height="600"
         >
           <template #empty>
             <div class="empty-state">
@@ -177,7 +230,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
 import { useLegionWarStore } from "@/stores/legionWarStore";
@@ -186,12 +239,14 @@ import { getCurrentTimeByFormat } from "@/utils/DateTimeUtils";
 import { isLegionWarAccessible } from "@/utils/clubBattleUtils";
 import { storeToRefs } from "pinia";
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
 import { 
   LogInOutline, 
   MegaphoneOutline, 
   StatsChart,
   RefreshOutline,
-  ImageOutline
+  ImageOutline,
+  DownloadOutline
 } from "@vicons/ionicons5";
 
 const message = useMessage();
@@ -215,6 +270,71 @@ const {
 const viewMode = ref("legion"); // legion | individual
 const exporting = ref(false);
 const tableMaxHeight = ref(600);
+const exportExcel = () => {
+  if (!validData.value) {
+    message.warning("无数据可导出");
+    return;
+  }
+  
+  let dataToExport = [];
+  let fileNamePrefix = "";
+  
+  if (viewMode.value === 'legion') {
+    fileNamePrefix = "俱乐部战况";
+    dataToExport = legionData.value.map((item, index) => ({
+      "排名": index + 1,
+      "俱乐部名称": item.name,
+      "击杀数": item.killCnt,
+      "免费复活": `${item.reviveCount}/150`,
+      "积分": item.score,
+      "红数": item.redCount,
+      "战力": formatPower(item.power),
+      "人数": `${item.participantsCount}/30`,
+      "花费总丹": item.danCount,
+      "四圣": `${item.blessingCount}个共${item.blessingScore}分`
+    }));
+  } else if (viewMode.value === 'individual') {
+    fileNamePrefix = "个人战况";
+    dataToExport = individualData.value.map((item, index) => ({
+      "排名": index + 1,
+      "名称": item.name,
+      "击杀数": item.kill,
+      "死亡次数": item.die,
+      "已复活次数": `${item.revive}/5`,
+      "积分": item.score,
+      "刨地": item.digGround,
+      "复活丹": item.dan,
+      "K/D": item.kd
+    }));
+  } else if (viewMode.value === 'all_individual') {
+    fileNamePrefix = "全部战况";
+    dataToExport = allIndividualData.value.map((item, index) => ({
+      "排名": index + 1,
+      "名称": item.name,
+      "俱乐部": item.clubName,
+      "击杀数": item.kill,
+      "死亡次数": item.die,
+      "已复活次数": `${item.revive}/5`,
+      "积分": item.score,
+      "刨地": item.digGround,
+      "复活丹": item.dan,
+      "K/D": item.kd
+    }));
+  }
+  
+  if (dataToExport.length === 0) {
+    message.warning("当前列表无数据");
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(dataToExport);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  
+  const fileName = `盐场${fileNamePrefix}_${getCurrentTimeByFormat("yyyyMMdd_HHmmss")}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  message.success(`导出成功: ${fileName}`);
+};
 
 const exportImage = async () => {
   const element = document.querySelector(".legion-war-statistics-card .table-content");
@@ -240,7 +360,7 @@ const exportImage = async () => {
     });
 
     const link = document.createElement("a");
-    const modeName = viewMode.value === "legion" ? "俱乐部战况" : "个人战况";
+    const modeName = viewMode.value === "legion" ? "俱乐部战况" : (viewMode.value === "individual" ? "个人战况" : "全部战况");
     link.download = `盐场${modeName}_${getCurrentTimeByFormat("yyyyMMdd_HHmmss")}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
@@ -287,6 +407,26 @@ const individualData = computed(() => {
       key: index,
       kd: item.die > 0 ? (item.kill / item.die).toFixed(2) : item.kill.toFixed(2)
     }))
+    .sort((a, b) => b.kill - a.kill);
+});
+
+// 全部个人数据处理
+const allIndividualData = computed(() => {
+  if (!validData.value?.memberInfo) return [];
+  
+  return Object.values(validData.value.memberInfo)
+    .map((item, index) => {
+      // 获取俱乐部名称
+      const legionInfo = validData.value.legionInfo?.[item.legionId];
+      const clubName = legionInfo ? legionInfo.name : "未知俱乐部";
+      
+      return {
+        ...item,
+        key: item.id || index,
+        clubName: clubName,
+        kd: item.die > 0 ? (item.kill / item.die).toFixed(2) : item.kill.toFixed(2)
+      };
+    })
     .sort((a, b) => b.kill - a.kill);
 });
 
@@ -398,13 +538,76 @@ const individualColumns = [
   }
 ];
 
+const allIndividualColumns = [
+  { 
+    title: "排名", 
+    key: "rank", 
+    width: 60,
+    render: (_, index) => index + 1
+  },
+  { 
+    title: "名称", 
+    key: "name",
+    width: 120
+  },
+  { 
+    title: "俱乐部", 
+    key: "clubName",
+    width: 150
+  },
+  { 
+    title: "击杀数", 
+    key: "kill", 
+    sorter: (a, b) => a.kill - b.kill 
+  },
+  { 
+    title: "死亡次数", 
+    key: "die", 
+    sorter: (a, b) => a.die - b.die 
+  },
+  { 
+    title: "已复活次数", 
+    key: "revive", 
+    render: (row) => `${row.revive}/5` 
+  },
+  { 
+    title: "积分", 
+    key: "score", 
+    sorter: (a, b) => a.score - b.score 
+  },
+  { 
+    title: "刨地", 
+    key: "digGround", 
+    sorter: (a, b) => a.digGround - b.digGround 
+  },
+  { 
+    title: "复活丹", 
+    key: "dan", 
+    sorter: (a, b) => a.dan - b.dan 
+  },
+  { 
+    title: "K/D", 
+    key: "kd", 
+    sorter: (a, b) => parseFloat(a.kd) - parseFloat(b.kd) 
+  }
+];
+
 // 行样式
 const rowClassName = (row) => {
   // 可以根据俱乐部ID高亮显示自己的俱乐部
   const myLegionId = tokenStore.gameData?.roleInfo?.role?.legionId;
-  if (row.id == myLegionId) {
+  
+  // 如果有 legionId 字段，说明是成员数据
+  if (row.legionId !== undefined) {
+    if (row.legionId == myLegionId) {
+      return 'my-legion-row';
+    }
+  } 
+  // 否则认为是俱乐部数据
+  else if (row.id == myLegionId) {
     return 'my-legion-row';
   }
+  
   return '';
 };
 

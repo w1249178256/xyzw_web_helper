@@ -8,11 +8,16 @@ import { XyzwWebSocketClient } from "@/utils/xyzwWebSocket";
 
 import useIndexedDB from "@/hooks/useIndexedDB";
 import { generateRandomSeed } from "@/utils/randomSeed";
-import { transformToken } from "@/utils/token";
-import { emitPlus } from "./events/index.js";
+import {
+  transformToken,
+  setAuthUserRateLimiterCallback,
+  scheduleAuthUserRequest,
+} from "@/utils/token";
+import { emitPlus, $emit } from "./events/index.js";
 import router from "@/router";
 
-const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } = useIndexedDB();
+const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } =
+  useIndexedDB();
 
 declare interface TokenData {
   id: string;
@@ -76,7 +81,6 @@ const activeConnections = useLocalStorage("activeConnections", {});
 // Token分组管理
 export const tokenGroups = useLocalStorage<TokenGroup[]>("tokenGroups", []);
 
-
 /**
  * 重构后的Token管理存储
  * 以名称-token列表形式管理多个游戏角色
@@ -103,7 +107,6 @@ export const useTokenStore = defineStore("tokens", () => {
     },
     lastUpdated: null as string | null,
   });
-
 
   // 获取当前选中token的角色信息
   const selectedTokenRoleInfo = computed(() => {
@@ -200,7 +203,9 @@ export const useTokenStore = defineStore("tokens", () => {
 
   // Token管理
   const addToken = (tokenData: TokenData) => {
-    let id = tokenData.id || `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    let id =
+      tokenData.id ||
+      `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const newToken = {
       id: id,
       name: tokenData.name,
@@ -319,7 +324,10 @@ export const useTokenStore = defineStore("tokens", () => {
   const tokenRefreshAttempts = ref<Record<string, number>>({});
 
   // 尝试自动刷新Token
-  const attemptTokenRefresh = async (tokenId: string, forceReconnect = false) => {
+  const attemptTokenRefresh = async (
+    tokenId: string,
+    forceReconnect = false,
+  ) => {
     // 检查冷却时间 (10秒)
     const lastAttempt = tokenRefreshAttempts.value[tokenId] || 0;
     const now = Date.now();
@@ -338,14 +346,20 @@ export const useTokenStore = defineStore("tokens", () => {
     try {
       if (gameToken.importMethod === "url" && gameToken.sourceUrl) {
         // URL形式token刷新
-        const response = await fetch(gameToken.sourceUrl);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.token) {
-            updateToken(tokenId, { ...gameToken, token: data.token });
-            wsLogger.info(`从URL获取token成功: ${gameToken.name}`);
-            refreshSuccess = true;
+        const token = await scheduleAuthUserRequest(async () => {
+          const response = await fetch(gameToken.sourceUrl!);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.token) {
+              return data.token;
+            }
           }
+          return null;
+        });
+        if (token) {
+          updateToken(tokenId, { ...gameToken, token });
+          wsLogger.info(`从URL获取token成功: ${gameToken.name}`);
+          refreshSuccess = true;
         }
       } else if (
         gameToken.importMethod === "bin" ||
@@ -354,7 +368,7 @@ export const useTokenStore = defineStore("tokens", () => {
         // Bin形式token刷新
         let userToken: ArrayBuffer | null = await getArrayBuffer(tokenId);
         let usedOldKey = false;
-        
+
         if (!userToken) {
           const tokenByName = await getArrayBuffer(gameToken.name);
           if (tokenByName) {
@@ -383,18 +397,18 @@ export const useTokenStore = defineStore("tokens", () => {
 
     if (refreshSuccess) {
       wsLogger.info(`Token刷新成功 [${tokenId}]`);
-      
+
       const currentPath = router.currentRoute.value.path;
-      const shouldReconnect = 
-        forceReconnect || 
-        currentPath === '/tokens' || 
-        currentPath === '/admin/game-features';
-      
+      const shouldReconnect =
+        forceReconnect ||
+        currentPath === "/tokens" ||
+        currentPath === "/admin/game-features";
+
       if (shouldReconnect) {
         wsLogger.info(`触发自动重连 [${tokenId}]`);
         // 重置重连状态以允许立即重连
         if (wsConnections.value[tokenId]) {
-           wsConnections.value[tokenId].reconnectAttempts = 0;
+          wsConnections.value[tokenId].reconnectAttempts = 0;
         }
         selectToken(tokenId, true);
       }
@@ -411,7 +425,6 @@ export const useTokenStore = defineStore("tokens", () => {
     message: ProtoMsg,
     client: any,
   ) => {
-
     try {
       if (!message) {
         gameLogger.warn(`消息处理跳过 [${tokenId}]: 无效消息`);
@@ -435,7 +448,9 @@ export const useTokenStore = defineStore("tokens", () => {
             // 调用统一的Token刷新逻辑
             const refreshed = await attemptTokenRefresh(tokenId);
             if (!refreshed) {
-              wsLogger.error(`Token 已过期且无法自动刷新，请重新导入 [${tokenId}]`);
+              wsLogger.error(
+                `Token 已过期且无法自动刷新，请重新导入 [${tokenId}]`,
+              );
             }
           }
         }
@@ -447,10 +462,10 @@ export const useTokenStore = defineStore("tokens", () => {
 
       if (cmd === "role_getroleinforesp") {
         syncRandomSeedFromStatistics(tokenId, body, client);
-        
+
         // 更新头像
         if (body?.role?.headImg) {
-          const token = gameTokens.value.find(t => t.id === tokenId);
+          const token = gameTokens.value.find((t) => t.id === tokenId);
           if (token && token.avatar !== body.role.headImg) {
             updateToken(tokenId, { avatar: body.role.headImg });
             wsLogger.debug(`更新头像 [${tokenId}]: ${body.role.headImg}`);
@@ -1061,12 +1076,24 @@ export const useTokenStore = defineStore("tokens", () => {
 
   //发送消息到世界
   const sendMessageToWorld = (tokenId: string, message: string) => {
-    return sendMessageWithPromise(tokenId, 'system_sendchatmessage', { channel: 1, emojiId: 0, extra: null, msg: message, msgType: 1 })
-  }
+    return sendMessageWithPromise(tokenId, "system_sendchatmessage", {
+      channel: 1,
+      emojiId: 0,
+      extra: null,
+      msg: message,
+      msgType: 1,
+    });
+  };
   //发送消息到俱乐部
   const sendMessageToLegion = (tokenId: string, message: string) => {
-    return sendMessageWithPromise(tokenId, 'system_sendchatmessage', { channel: 2, emojiId: 0, extra: null, msg: message, msgType: 1 })
-  }
+    return sendMessageWithPromise(tokenId, "system_sendchatmessage", {
+      channel: 2,
+      emojiId: 0,
+      extra: null,
+      msg: message,
+      msgType: 1,
+    });
+  };
 
   // 发送自定义游戏消息
   const sendGameMessage = (
@@ -1166,7 +1193,7 @@ export const useTokenStore = defineStore("tokens", () => {
   const cleanExpiredTokens = async () => {
     const now = new Date();
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    
+
     // 找出需要清理的token
     const tokensToRemove = gameTokens.value.filter((token) => {
       // URL和bin文件导入的token设为长期有效，不会过期
@@ -1185,12 +1212,12 @@ export const useTokenStore = defineStore("tokens", () => {
     });
 
     const cleanedCount = tokensToRemove.length;
-    
+
     // 逐个删除，触发清理逻辑（WebSocket断开、IndexedDB删除等）
     for (const token of tokensToRemove) {
       await removeToken(token.id);
     }
-    
+
     return cleanedCount;
   };
 
@@ -1404,6 +1431,18 @@ export const useTokenStore = defineStore("tokens", () => {
 
     // 设置跨标签页监听
     setupCrossTabListener();
+
+    // 设置限流等待回调
+    setAuthUserRateLimiterCallback((waitTimeMs: number, queueSize: number) => {
+      const waitSeconds = Math.ceil(waitTimeMs / 1000);
+      $emit.emit("token:refresh:waiting", {
+        waitTimeMs,
+        waitSeconds,
+        queueSize,
+        timestamp: Date.now(),
+      });
+    });
+
     tokenLogger.info("Token Store 初始化完成，连接监控已启动");
   };
   const setBattleVersion = (version: number | null) => {
@@ -1448,10 +1487,7 @@ export const useTokenStore = defineStore("tokens", () => {
   /**
    * 更新分组信息
    */
-  const updateTokenGroup = (
-    groupId: string,
-    updates: Partial<TokenGroup>
-  ) => {
+  const updateTokenGroup = (groupId: string, updates: Partial<TokenGroup>) => {
     const group = tokenGroups.value.find((g) => g.id === groupId);
     if (group) {
       Object.assign(group, updates, {
@@ -1557,7 +1593,6 @@ export const useTokenStore = defineStore("tokens", () => {
     sendClaimDailyReward,
     sendGetTeamInfo,
     sendGameMessage,
-
 
     // 工具方法
     exportTokens,
