@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>XYZW 游戏管理系统</title>
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
     <style>
       * {
         margin: 0;
@@ -51,5 +52,14 @@
     <script type="module" src="/src/xyzw/cocos2d-js-min.js"></script>
     <script type="module" src="/src/xyzw/game-defines.js"></script>
     <script type="module" src="/src/xyzw/index.js"></script>
+  <script>
+document.addEventListener('deviceready', function() {
+  console.log('Cordova 初始化成功');
+}, false);
+
+window.addEventListener('error', function(e) {
+  alert('加载错误: ' + e.message + '\n文件: ' + e.filename + '\n行号: ' + e.lineno);
+});
+  </script>
   </body>
 </html>
