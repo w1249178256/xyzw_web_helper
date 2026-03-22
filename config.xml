@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <widget xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+   <name>咸鱼之王助手</name>
+   <description>XYZW 游戏管理系统</description>
+   <author email="your@email.com">作者</author>
+   <content src="index.html" />
+   <!-- 放开网络权限，解决加载阻塞 -->
+   <access origin="*" />
+   <allow-navigation href="*" />
+   <allow-intent href="*" />
+   <preference name="Fullscreen" value="false" />
+   <preference name="Orientation" value="default" />
+ </widget>
