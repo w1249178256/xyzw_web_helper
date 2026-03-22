@@ -53,14 +53,15 @@
     <script type="module" src="./src/xyzw/game-defines.js"></script>
     <script type="module" src="./src/xyzw/index.js"></script>
 <script>
- document.addEventListener('deviceready', function() {
-   console.log('Cordova 初始化成功');
-   // 自动隐藏加载提示
-   document.querySelector('.loading').style.display = 'none';
- }, false);
- window.addEventListener('error', function(e) {
-   alert('加载错误: ' + e.message + '\n文件: ' + e.filename + '\n行号: ' + e.lineno);
- });
+document.addEventListener('deviceready', function() {
+  console.log('Cordova 初始化成功');
+  // 自动隐藏加载提示
+  document.querySelector('.loading').style.display = 'none';
+}, false);
+
+window.addEventListener('error', function(e) {
+  alert('加载错误: ' + e.message + '\n文件: ' + e.filename + '\n行号: ' + e.lineno);
+});
 </script>
   </body>
 </html>
