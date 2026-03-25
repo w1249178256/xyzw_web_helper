@@ -42,6 +42,20 @@ export function createTasksCar(deps) {
   const batchSmartSendCar = async () => {
     if (selectedTokens.value.length === 0) return;
 
+    // 发车限制：仅周一到周三 6:00~20:00
+    const now = new Date();
+    const day = now.getDay(); // 0=日,1=一,2=二,3=三
+    const hour = now.getHours();
+    if (day < 1 || day > 3 || hour < 6 || hour >= 20) {
+      addLog({
+        time: now.toLocaleTimeString(),
+        message: "智能发车仅限每周一到周三 06:00~20:00 执行，当前时间不在范围内，已跳过",
+        type: "warning",
+      });
+      message.warning("发车时间限制：每周一到周三 06:00~20:00");
+      return;
+    }
+
     isRunning.value = true;
     shouldStop.value = false;
 

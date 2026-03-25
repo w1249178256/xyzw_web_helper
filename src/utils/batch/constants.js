@@ -78,16 +78,30 @@ export const CarresearchItem = [
 export const FISH_TARGET = 320;
 export const ARENA_TARGET = 240;
 
+// 将分钟数格式化为可读字符串
+export function formatIntervalMinutes(minutes) {
+  if (!minutes) return '-';
+  if (minutes % 60 === 0) return `每${minutes / 60}小时`;
+  if (minutes >= 60) {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `每${h}小时${m}分钟`;
+  }
+  return `每${minutes}分钟`;
+}
+
 // 任务表列配置
 export const taskColumns = [
   { title: "任务名称", key: "name", width: 150 },
   { title: "运行类型", key: "runType", width: 100 },
   {
-    title: "运行时间",
+    title: "运行时间/间隔",
     key: "runTime",
     width: 150,
     render: (row) => {
-      return row.runType === "daily" ? row.runTime : row.cronExpression;
+      if (row.runType === "daily") return row.runTime;
+      if (row.runType === "interval") return formatIntervalMinutes(row.intervalMinutes);
+      return row.cronExpression;
     },
   },
   {
@@ -173,9 +187,16 @@ export const defaultTaskForm = {
   runType: "daily",
   runTime: undefined,
   cronExpression: "",
+  intervalMinutes: 120,
   selectedTokens: [],
   selectedTasks: [],
   enabled: true,
+  timeWindow: {
+    enabled: false,
+    startTime: null, // n-time-picker 使用的时间戳，保存时转为 "HH:mm"
+    endTime: null,
+    days: [1, 2, 3, 4, 5, 6, 0], // 1=周一...6=周六, 0=周日，默认全选
+  },
 };
 
 // 默认助手设置

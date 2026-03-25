@@ -143,6 +143,11 @@ export default defineConfig(async () => {
       open: true,
       host: true,
       proxy: {
+        // 认证后端代理（本地开发时需启动 backend 服务）
+        "/api/auth": {
+          target: "http://localhost:3001",
+          changeOrigin: true,
+        },
         // 微信登录接口代理
         "/api/weixin": {
           target: "https://open.weixin.qq.com",
@@ -186,6 +191,21 @@ export default defineConfig(async () => {
             Origin: "https://open.weixin.qq.com",
             Referer: "https://open.weixin.qq.com/",
           },
+        },
+        // 游戏 WebSocket 代理（本地开发）
+        "/ws-proxy": {
+          target: "https://xxz-xyzw.hortorgames.com",
+          changeOrigin: true,
+          ws: true,
+          rewrite: (path) => path.replace(/^\/ws-proxy/, ""),
+          secure: true,
+        },
+        // Hortor 服务器列表 / authuser
+        "/api/xyzw": {
+          target: "https://xxz-xyzw.hortorgames.com",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/xyzw/, ""),
+          secure: true,
         },
       },
     },

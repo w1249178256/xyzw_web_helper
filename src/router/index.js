@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as autoRoutes from "vue-router/auto-routes";
-import { useTokenStore } from '@/stores/tokenStore'
+import { useTokenStore, hasTokens, selectedToken } from '@/stores/tokenStore'
 import { isNowInLegionWarTime } from "@/utils/clubBattleUtils"
 
 const generatedRoutes = autoRoutes.routes ?? [];
@@ -113,14 +113,17 @@ const my_routes = [
       requiresToken: true
     }
   },
-  // 兼容旧路由，重定向到新的token管理页面
   {
     path: '/login',
-    redirect: '/tokens'
+    name: 'AuthLogin',
+    component: () => import('@/views/Login.vue'),
+    meta: { public: true }
   },
   {
     path: '/register',
-    redirect: '/tokens'
+    name: 'AuthRegister',
+    component: () => import('@/auth/RegisterPage.vue'),
+    meta: { public: true }
   },
   {
     path: '/game-roles',
@@ -155,7 +158,13 @@ autoRoutes.handleHotUpdate?.(router);
 
 // 导航守卫
 router.beforeEach((to, from, next) => {
-  const tokenStore = useTokenStore()
+  // 登录检查（auth 模块使用 auth_token 键）
+  const PUBLIC_PATHS = ['/login', '/register'];
+  const isLoggedIn = !!localStorage.getItem('auth_token');
+  if (!isLoggedIn && !PUBLIC_PATHS.includes(to.path)) {
+    next({ path: '/login', query: { redirect: to.fullPath } });
+    return;
+  }
 
   // 设置页面标题
   document.title = to.meta.title ? `${to.meta.title} - XYZW 游戏管理系统` : 'XYZW 游戏管理系统'
@@ -164,17 +173,24 @@ router.beforeEach((to, from, next) => {
     next('/admin/dashboard');
     return;
   }
-  // 检查是否需要Token
-  // if (to.meta.requiresToken  && tokenStore.getWebSocketStatus(tokenStore.selectedToken.id)=="disconnected") {
-    if (to.meta.requiresToken  && !tokenStore.hasTokens) {
-    next('/tokens')
-  } else if (to.path === '/' && tokenStore.hasTokens) {
-    // 首页重定向逻辑
-    if (tokenStore.selectedToken) {
+
+  // 首页重定向：管理员→用户管理，普通用户有token→dashboard，无token→token管理
+  if (to.path === '/') {
+    const authUser = localStorage.getItem('auth_user')
+    const user = authUser ? JSON.parse(authUser) : null
+    if (user?.is_admin) {
+      next('/admin/system-admin')
+    } else if (hasTokens.value && selectedToken.value) {
       next('/admin/dashboard')
     } else {
       next('/tokens')
     }
+    return
+  }
+
+  // 检查是否需要Token
+  if (to.meta.requiresToken && !hasTokens.value) {
+    next('/tokens')
   } else {
     next()
   }

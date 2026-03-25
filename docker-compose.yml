@@ -1,0 +1,28 @@
+# 生产部署使用预构建 ACR 镜像（通过 deploy/docker/deploy-compose.sh 推送）
+# 本地开发可改用 build: context 替换 image 字段
+services:
+  backend:
+    image: ${ACR_REGISTRY_VPC:-crpi-ijyip3mvrstcfvh2-vpc.cn-heyuan.personal.cr.aliyuncs.com}/agnosis/xyzw_auth_backend:latest
+    container_name: xyzw-backend
+    restart: unless-stopped
+    volumes:
+      - /root/xyzw/data:/app/data
+    environment:
+      JWT_SECRET: ${JWT_SECRET:-xyzw-please-change-this-secret-in-production}
+    networks:
+      - xyzw-net
+
+  frontend:
+    image: ${ACR_REGISTRY_VPC:-crpi-ijyip3mvrstcfvh2-vpc.cn-heyuan.personal.cr.aliyuncs.com}/agnosis/xyzw_web_helper:latest
+    container_name: xyzw-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - xyzw-net
+
+networks:
+  xyzw-net:
+    driver: bridge

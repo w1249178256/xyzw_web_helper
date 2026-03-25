@@ -9,6 +9,9 @@ docker/**/*.zip
 docker/**/*.tar
 docker/**/*.tar.gz
 docker/**/*.tgz
+deploy/docker/image/
+deploy/bare/*.tar.gz
+deploy/database/
 
 
 # Production builds

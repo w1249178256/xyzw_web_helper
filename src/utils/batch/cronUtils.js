@@ -674,6 +674,15 @@ export const calculateNextExecutionTime = (task) => {
     }
 
     return null;
+  } else if (task.runType === "interval" && task.intervalMinutes) {
+    // For interval tasks, next run = lastRunAt + intervalMinutes (or now if never run)
+    const intervalMs = task.intervalMinutes * 60 * 1000;
+    if (task.lastRunAt) {
+      const lastRun = new Date(task.lastRunAt);
+      const nextRun = new Date(lastRun.getTime() + intervalMs);
+      return nextRun > now ? nextRun : new Date(now.getTime() + intervalMs);
+    }
+    return new Date(now.getTime() + intervalMs);
   }
 
   return null;

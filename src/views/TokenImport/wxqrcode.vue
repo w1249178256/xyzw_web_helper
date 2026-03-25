@@ -258,25 +258,27 @@ const addSelectedRole = async (roleInfo: any) => {
  * 生成微信登录二维码
  */
 const generateQRCode = async () => {
-  try {
-    isProcessing.value = true;
-    updateStatus("正在获取二维码...", "info");
+  isProcessing.value = true;
+  updateStatus("正在获取二维码...", "info");
+  resetQRCode();
 
-    // 重置状态
-    resetQRCode();
-
-    // 调用获取二维码接口
-    const success = await tryGetWeixinQR();
-
-    if (!success) {
-      throw new Error("二维码获取失败");
+  const maxAttempts = 3;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await tryGetWeixinQR();
+      isProcessing.value = false;
+      return;
+    } catch (error) {
+      console.error(`获取二维码失败 (第${attempt}次):`, error);
+      if (attempt < maxAttempts) {
+        updateStatus(`获取失败，正在重试(${attempt}/${maxAttempts})...`, "info");
+        await new Promise((r) => setTimeout(r, 1000));
+      } else {
+        updateStatus("二维码获取失败：" + error.message, "error");
+      }
     }
-  } catch (error) {
-    updateStatus("二维码获取失败：" + error.message, "error");
-    console.error("获取二维码失败:", error);
-  } finally {
-    isProcessing.value = false;
   }
+  isProcessing.value = false;
 };
 
 /**
@@ -332,8 +334,7 @@ const tryGetWeixinQR = async () => {
     return true;
   } catch (err) {
     console.error("二维码解析失败:", err);
-    updateStatus("二维码获取失败：" + err.message, "error");
-    return false;
+    throw err;
   }
 };
 

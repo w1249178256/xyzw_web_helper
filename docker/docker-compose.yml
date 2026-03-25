@@ -1,0 +1,17 @@
+services:
+  frontend:
+    image: xyzw_web_helper:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: xyzw-backend:latest
+    volumes:
+      - backend-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  backend-data:

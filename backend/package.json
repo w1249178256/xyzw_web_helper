@@ -1,0 +1,19 @@
+{
+  "name": "xyzw-auth-backend",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.10.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0",
+    "ws": "^8.0.0",
+    "lz4js": "^0.2.0"
+  }
+}

@@ -14,64 +14,27 @@
             gap: 12px;
           "
         >
-          <div style="display: flex; align-items: center; gap: 16px">
-            <h2>批量日常任务</h2>
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 8px 12px;
-                background-color: #f8f9fa;
-                border-radius: 8px;
-                border: 1px solid #e9ecef;
-              "
-            >
-              <div style="font-size: 14px; color: #495057">
-                共 {{ scheduledTasks.length }} 个定时任务
+          <div class="header-left">
+            <h2 class="header-title">批量日常任务</h2>
+            <div class="task-info-card">
+              <div class="task-stat-row">
+                <span class="task-count">共 {{ scheduledTasks.length }} 个定时任务</span>
+                <span v-if="shortestCountdownTask" class="task-countdown">
+                  即将执行：{{ shortestCountdownTask.task.name }} ({{ shortestCountdownTask.countdown.formatted }})
+                </span>
+                <span v-else class="task-empty">暂无定时任务</span>
               </div>
-              <div
-                v-if="shortestCountdownTask"
-                style="font-size: 14px; font-weight: 500; color: #1677ff"
-              >
-                即将执行：{{ shortestCountdownTask.task.name }} ({{
-                  shortestCountdownTask.countdown.formatted
-                }})
-              </div>
-              <div v-else style="font-size: 14px; color: #6c757d">
-                暂无定时任务
-              </div>
-              <div style="display: flex; gap: 8px">
-                <n-button type="primary" size="small" @click="openTaskModal">
-                  新增定时任务
-                </n-button>
-                <n-button size="small" @click="showTasksModal = true">
-                  查看定时任务
-                </n-button>
-                <n-button size="small" @click="exportConfig">
-                  导出配置
-                </n-button>
-                <n-upload
-                  :show-file-list="false"
-                  accept=".json"
-                  :custom-request="importConfig"
-                >
+              <div class="task-mgmt-buttons">
+                <n-button type="primary" size="small" @click="openTaskModal">新增定时任务</n-button>
+                <n-button size="small" @click="showTasksModal = true">查看定时任务</n-button>
+                <n-button size="small" @click="exportConfig">导出配置</n-button>
+                <n-upload :show-file-list="false" accept=".json" :custom-request="importConfig">
                   <n-button size="small">导入配置</n-button>
                 </n-upload>
               </div>
             </div>
           </div>
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              gap: 12px;
-              padding: 8px 12px;
-              background-color: #f8f9fa;
-              border-radius: 8px;
-              border: 1px solid #e9ecef;
-            "
-          >
+          <div class="exec-action-card">
             <n-button
               type="primary"
               @click="startBatch"
@@ -80,27 +43,10 @@
             >
               {{ isRunning ? "执行中..." : "开始执行" }}
             </n-button>
-            <n-button
-              @click="stopBatch"
-              :disabled="!isRunning"
-              type="error"
-              size="medium"
-            >
-              停止
-            </n-button>
-            <n-button
-              @click="openTemplateManagerModal"
-              type="info"
-              size="medium"
-            >
-              任务模板
-            </n-button>
+            <n-button @click="stopBatch" :disabled="!isRunning" type="error" size="medium">停止</n-button>
+            <n-button @click="openTemplateManagerModal" type="info" size="medium">任务模板</n-button>
             <n-button @click="openBatchSettings" type="default" size="medium">
-              <template #icon>
-                <n-icon>
-                  <Settings />
-                </n-icon>
-              </template>
+              <template #icon><n-icon><Settings /></n-icon></template>
               设置
             </n-button>
           </div>
@@ -354,9 +300,7 @@
                   size="small"
                   @click="batchSmartSendCar"
                   :disabled="
-                    isRunning ||
-                    selectedTokens.length === 0 ||
-                    !isCarActivityOpen
+                    isRunning || selectedTokens.length === 0
                   "
                 >
                   智能发车
@@ -365,9 +309,7 @@
                   size="small"
                   @click="batchClaimCars"
                   :disabled="
-                    isRunning ||
-                    selectedTokens.length === 0 ||
-                    !isCarActivityOpen
+                    isRunning || selectedTokens.length === 0
                   "
                 >
                   一键收车
@@ -1592,14 +1534,22 @@
           <div style="margin-bottom: 4px">
             <span style="color: #6b7280">运行类型：</span>
             <span>{{
-              task.runType === "daily" ? "每天固定时间" : "Cron表达式"
+              task.runType === "daily" ? "每天固定时间" :
+              task.runType === "interval" ? "间隔执行" : "Cron表达式"
             }}</span>
           </div>
           <div style="margin-bottom: 4px">
             <span style="color: #6b7280">运行时间：</span>
             <span>{{
-              task.runType === "daily" ? task.runTime : task.cronExpression
+              task.runType === "daily" ? task.runTime :
+              task.runType === "interval" ? formatIntervalMinutes(task.intervalMinutes) :
+              task.cronExpression
             }}</span>
+          </div>
+          <div v-if="task.timeWindow?.enabled" style="margin-bottom: 4px">
+            <span style="color: #6b7280">时间窗口：</span>
+            <span>{{ task.timeWindow.startTime }}~{{ task.timeWindow.endTime }}
+              {{ formatTimeWindowDays(task.timeWindow.days) }}</span>
           </div>
           <div style="margin-bottom: 4px">
             <span style="color: #6b7280">下次执行：</span>
@@ -1674,8 +1624,25 @@
               @update:value="resetRunType"
             >
               <n-radio value="daily">每天固定时间</n-radio>
+              <n-radio value="interval">间隔执行</n-radio>
               <n-radio value="cron">Cron表达式</n-radio>
             </n-radio-group>
+          </div>
+          <div class="setting-item" v-if="taskForm.runType === 'interval'">
+            <label class="setting-label">间隔时间</label>
+            <n-input-group>
+              <n-input-number
+                v-model:value="taskForm.intervalMinutes"
+                :min="1"
+                :max="1440"
+                style="width: 120px"
+                placeholder="分钟数"
+              />
+              <n-input-group-label>分钟</n-input-group-label>
+            </n-input-group>
+            <div style="margin-top: 6px; font-size: 12px; color: #6b7280">
+              常用：30分钟 / 60分钟（1小时）/ 120分钟（2小时）/ 240分钟（4小时）
+            </div>
           </div>
           <div class="setting-item" v-if="taskForm.runType === 'daily'">
             <label class="setting-label">运行时间</label>
@@ -1712,6 +1679,49 @@
               </div>
             </div>
           </div>
+          <!-- 执行时间窗口 -->
+          <div class="setting-item">
+            <label class="setting-label">执行时间窗口</label>
+            <n-switch v-model:value="taskForm.timeWindow.enabled">
+              <template #checked>已启用</template>
+              <template #unchecked>不限制</template>
+            </n-switch>
+          </div>
+          <template v-if="taskForm.timeWindow.enabled">
+            <div class="setting-item">
+              <label class="setting-label">时间段</label>
+              <n-space align="center">
+                <n-time-picker
+                  v-model:value="taskForm.timeWindow.startTime"
+                  format="HH:mm"
+                  placeholder="开始时间"
+                  style="width: 110px"
+                />
+                <span style="color: #86909c">至</span>
+                <n-time-picker
+                  v-model:value="taskForm.timeWindow.endTime"
+                  format="HH:mm"
+                  placeholder="结束时间"
+                  style="width: 110px"
+                />
+              </n-space>
+            </div>
+            <div class="setting-item">
+              <label class="setting-label">执行星期</label>
+              <n-checkbox-group v-model:value="taskForm.timeWindow.days">
+                <n-space>
+                  <n-checkbox :value="1">周一</n-checkbox>
+                  <n-checkbox :value="2">周二</n-checkbox>
+                  <n-checkbox :value="3">周三</n-checkbox>
+                  <n-checkbox :value="4">周四</n-checkbox>
+                  <n-checkbox :value="5">周五</n-checkbox>
+                  <n-checkbox :value="6">周六</n-checkbox>
+                  <n-checkbox :value="0">周日</n-checkbox>
+                </n-space>
+              </n-checkbox-group>
+            </div>
+          </template>
+
           <div class="setting-item">
             <div
               style="
@@ -2815,7 +2825,7 @@ import {
   h,
 } from "vue";
 import { useTokenStore, gameTokens, tokenGroups } from "@/stores/tokenStore";
-import { $emit } from "@/stores/events/index.ts";
+import { useUserAuthStore } from "@/auth/store";
 import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
 import { preloadQuestions } from "@/utils/studyQuestionsFromJSON.js";
 import { useMessage } from "naive-ui";
@@ -2838,6 +2848,7 @@ import {
   defaultTemplate,
   defaultTaskForm,
   defaultHelperSettings,
+  formatIntervalMinutes,
   // Cron utilities
   validateCronField,
   validateCronExpression,
@@ -2876,10 +2887,21 @@ import {
 } from "@/utils/batch";
 
 import { merchantConfig, goldItemsConfig } from "@/utils/dreamConstants";
+import { batchSettings } from "@/composables/useBatchSettings";
+import { authApi } from "@/auth/api";
 
 // Initialize token store, message service, and task runner
 const tokenStore = useTokenStore();
+const userAuthStore = useUserAuthStore();
 const message = useMessage();
+
+// 用户绑定的 localStorage key，用户名变化时自动切换
+const userStoragePrefix = computed(
+  () => userAuthStore.currentUser.username,
+);
+const tasksStorageKey = computed(
+  () => `scheduledTasks:${userStoragePrefix.value}`,
+);
 
 // 排序配置（从localStorage读取，与TokenImport共享）
 const savedSortConfig = localStorage.getItem("tokenSortConfig");
@@ -2972,13 +2994,6 @@ const getSortIcon = (field) => {
 };
 
 const tokens = computed(() => tokenStore.gameTokens);
-const isCarActivityOpen = computed(() => {
-  const now = new Date();
-  const day = now.getDay();
-  const hour = now.getHours();
-  // 1=Mon, 2=Tue, 3=Wed; 6点之后
-  return day >= 1 && day <= 3 && hour >= 6;
-});
 const ismengjingActivityOpen = computed(() => {
   const day = new Date().getDay();
   return day === 0 || day === 1 || day === 3 || day === 4;
@@ -3353,65 +3368,10 @@ const helperModalTitle = computed(() => {
 // Batch Settings State
 const showBatchSettingsModal = ref(false);
 
-const defaultDreamPurchaseList = [];
-for (const merchantId in goldItemsConfig) {
-  goldItemsConfig[merchantId].forEach((index) => {
-    defaultDreamPurchaseList.push(`${merchantId}-${index}`);
-  });
-}
-
-const batchSettings = reactive({
-  dreamPurchaseList: defaultDreamPurchaseList,
-  boxCount: 100,
-  fishCount: 100,
-  recruitCount: 100,
-  defaultBoxType: 2001,
-  defaultFishType: 1,
-  targetBoxPoints: 1000,
-  receiverId: "",
-  password: "",
-  tokenListColumns: 2,
-  useGoldRefreshFallback: false,
-  // 延迟配置（毫秒）
-  commandDelay: 500, // 命令间延迟
-  taskDelay: 500, // 任务间延迟
-  actionDelay: 300, // 一般操作延迟（开箱、钓鱼、招募等）
-  battleDelay: 500, // 战斗延迟（宝库、竞技场等）
-  refreshDelay: 1000, // 刷新延迟（发车刷新等）
-  longDelay: 3000, // 长延迟（功法赠送等）
-  // 其他配置
-  maxActive: 2,
-  carMinColor: 4,
-  connectionTimeout: 10000,
-  reconnectDelay: 1000,
-  maxLogEntries: 1000,
-  // 页面刷新配置
-  enableRefresh: false,
-  refreshInterval: 360, // 分钟
-  smartDepartureGoldThreshold: 0,
-  smartDepartureRecruitThreshold: 0,
-  smartDepartureJadeThreshold: 0,
-  smartDepartureTicketThreshold: 0,
-  smartDepartureMatchAll: false,
-});
-
-// Load batch settings from localStorage
-const loadBatchSettings = () => {
+// Save batch settings to backend
+const saveBatchSettings = async () => {
   try {
-    const saved = localStorage.getItem("batchSettings");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      Object.assign(batchSettings, parsed);
-    }
-  } catch (error) {
-    console.error("Failed to load batch settings:", error);
-  }
-};
-
-// Save batch settings to localStorage
-const saveBatchSettings = () => {
-  try {
-    localStorage.setItem("batchSettings", JSON.stringify(batchSettings));
+    await authApi.saveSettings({ ...batchSettings });
     message.success("定时批量任务设置已保存");
     showBatchSettingsModal.value = false;
   } catch (error) {
@@ -3422,12 +3382,8 @@ const saveBatchSettings = () => {
 
 // Open batch settings modal
 const openBatchSettings = () => {
-  loadBatchSettings();
   showBatchSettingsModal.value = true;
 };
-
-// Load settings on component mount
-loadBatchSettings();
 
 // ======================
 // Legacy Gift Feature
@@ -3456,12 +3412,14 @@ const showTasksModal = ref(false); // Control the visibility of the tasks list m
 const editingTask = ref(null); // Currently editing task
 const taskForm = reactive({
   name: "", // Task name
-  runType: "daily", // 'daily' or 'cron'
+  runType: "daily", // 'daily', 'cron', or 'interval'
   runTime: null, // Daily run time (HH:mm format)
   cronExpression: "", // Cron expression for complex scheduling
+  intervalMinutes: 120, // Interval in minutes for interval tasks
   selectedTokens: [], // Selected token IDs
   selectedTasks: [], // Selected task function names
   enabled: true, // Whether the task is enabled
+  timeWindow: { enabled: false, startTime: null, endTime: null, days: [1, 2, 3, 4, 5, 6, 0] },
 });
 
 // 任务分组定义
@@ -3590,34 +3548,60 @@ const manualExecuteTask = async (task) => {
 };
 
 // Load scheduled tasks from localStorage
-const loadScheduledTasks = () => {
+// 后端任务格式 → 前端格式
+const backendToFrontend = (t) => ({
+  id: t.id,
+  name: t.name,
+  runType: t.run_type,
+  runTime: t.run_time,
+  cronExpression: t.cron_expression || "",
+  intervalMinutes: t.interval_minutes || 120,
+  selectedTokens: JSON.parse(t.selected_token_ids || "[]"),
+  selectedTasks: JSON.parse(t.selected_tasks || "[]"),
+  enabled: t.enabled === 1 || t.enabled === true,
+  timeWindow: t.time_window
+    ? JSON.parse(t.time_window)
+    : { enabled: false, startTime: null, endTime: null, days: [1, 2, 3, 4, 5, 6, 0] },
+  lastRunAt: t.last_run_at,
+});
+
+// 前端任务格式 → 后端格式
+const frontendToBackend = (t) => ({
+  name: t.name,
+  run_type: t.runType,
+  run_time: t.runTime || null,
+  cron_expression: t.cronExpression || null,
+  interval_minutes: t.runType === 'interval' ? (t.intervalMinutes || 120) : null,
+  selected_token_ids: t.selectedTokens || [],
+  selected_tasks: t.selectedTasks || [],
+  enabled: t.enabled !== false,
+  time_window: t.timeWindow?.enabled ? t.timeWindow : null,
+  task_params: t.taskParams || {},
+});
+
+const loadScheduledTasks = async () => {
   try {
-    const saved = localStorage.getItem("scheduledTasks");
-
-    if (saved) {
-      const parsed = JSON.parse(saved);
-
-      // Ensure we have an array
-      scheduledTasks.value = Array.isArray(parsed) ? parsed : [];
-    } else {
+    const { data } = await authApi.getTasks();
+    scheduledTasks.value = data.tasks.map(backendToFrontend);
+    // 本地缓存，用于页面快速渲染
+    localStorage.setItem(tasksStorageKey.value, JSON.stringify(scheduledTasks.value));
+  } catch (error) {
+    console.warn("从后台加载任务失败，使用本地缓存:", error.message);
+    try {
+      const saved = localStorage.getItem(tasksStorageKey.value);
+      scheduledTasks.value = saved ? (JSON.parse(saved) || []) : [];
+    } catch {
       scheduledTasks.value = [];
     }
-  } catch (error) {
-    console.error("Failed to load scheduled tasks:", error);
-    scheduledTasks.value = [];
   }
 };
 
-// Save scheduled tasks to localStorage
+// 仅写本地缓存（后台为主，缓存为辅）
 const saveScheduledTasks = () => {
   try {
-    const dataToSave = JSON.stringify(scheduledTasks.value);
-
-    localStorage.setItem("scheduledTasks", dataToSave);
-    // Verify save was successful
-    const saved = localStorage.getItem("scheduledTasks");
+    localStorage.setItem(tasksStorageKey.value, JSON.stringify(scheduledTasks.value));
   } catch (error) {
-    console.error("Failed to save scheduled tasks:", error);
+    console.error("Failed to cache scheduled tasks:", error);
   }
 };
 
@@ -3629,9 +3613,11 @@ const openTaskModal = () => {
     runType: "daily",
     runTime: undefined,
     cronExpression: "",
+    intervalMinutes: 120,
     selectedTokens: [],
     selectedTasks: [],
     enabled: true,
+    timeWindow: { enabled: false, startTime: null, endTime: null, days: [1, 2, 3, 4, 5, 6, 0] },
   });
   taskScheduleSelectedGroupIds.value = [];
   showTaskModal.value = true;
@@ -3655,6 +3641,23 @@ const editTask = (task) => {
       hours,
       minutes,
     );
+  }
+  // 还原 timeWindow 的 "HH:mm" → 时间戳供 n-time-picker 使用
+  const hhmmToTs = (hhmm) => {
+    if (!hhmm) return null;
+    const [h, m] = hhmm.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return d.getTime();
+  };
+  if (task.timeWindow?.enabled) {
+    taskData.timeWindow = {
+      ...task.timeWindow,
+      startTime: hhmmToTs(task.timeWindow.startTime),
+      endTime: hhmmToTs(task.timeWindow.endTime),
+    };
+  } else {
+    taskData.timeWindow = { ...defaultTaskForm.timeWindow };
   }
   Object.assign(taskForm, taskData);
   taskScheduleSelectedGroupIds.value = [];
@@ -3694,7 +3697,7 @@ const parseCronExpression = (expression) => {
 // 注: calculateNextRuns 已从 @/utils/batch 导入
 
 // Save task (create or update)
-const saveTask = () => {
+const saveTask = async () => {
   if (!taskForm.name) {
     message.warning("请输入任务名称");
     return;
@@ -3715,6 +3718,13 @@ const saveTask = () => {
     const validation = validateCronExpression(taskForm.cronExpression);
     if (!validation.valid) {
       message.warning(validation.message);
+      return;
+    }
+  }
+
+  if (taskForm.runType === "interval") {
+    if (!taskForm.intervalMinutes || taskForm.intervalMinutes < 1) {
+      message.warning("请设置有效的间隔时间（最少1分钟）");
       return;
     }
   }
@@ -3740,45 +3750,64 @@ const saveTask = () => {
     });
   }
 
-  const taskData = {
-    id: editingTask.value?.id || "task_" + Date.now(),
+  // 格式化 timeWindow（时间戳 → "HH:mm"）
+  const formatTsToHHmm = (ts) => {
+    if (!ts) return null;
+    const d = new Date(ts);
+    return d.toLocaleTimeString("zh-CN", { hour12: false, hour: "2-digit", minute: "2-digit" });
+  };
+  const formattedTimeWindow = taskForm.timeWindow?.enabled
+    ? {
+        enabled: true,
+        startTime: formatTsToHHmm(taskForm.timeWindow.startTime),
+        endTime: formatTsToHHmm(taskForm.timeWindow.endTime),
+        days: [...(taskForm.timeWindow.days || [])],
+      }
+    : { enabled: false };
+
+  const frontendTask = {
+    id: editingTask.value?.id,
     name: taskForm.name,
     runType: taskForm.runType,
     runTime: formattedRunTime,
     cronExpression: taskForm.runType === "cron" ? taskForm.cronExpression : "",
+    intervalMinutes: taskForm.runType === "interval" ? taskForm.intervalMinutes : null,
     selectedTokens: [...taskForm.selectedTokens],
     selectedTasks: [...taskForm.selectedTasks],
     enabled: taskForm.enabled,
+    timeWindow: formattedTimeWindow,
   };
 
-  let isNew = !editingTask.value;
+  const isNew = !editingTask.value;
 
-  if (editingTask.value) {
-    // Update existing task
-    const index = scheduledTasks.value.findIndex(
-      (t) => t.id === editingTask.value.id,
-    );
-    if (index !== -1) {
-      scheduledTasks.value[index] = taskData;
+  try {
+    let saved;
+    if (editingTask.value) {
+      const { data } = await authApi.updateTask(editingTask.value.id, frontendToBackend(frontendTask));
+      saved = backendToFrontend(data.task);
+      const index = scheduledTasks.value.findIndex((t) => t.id === saved.id);
+      if (index !== -1) scheduledTasks.value[index] = saved;
+    } else {
+      const { data } = await authApi.createTask(frontendToBackend(frontendTask));
+      saved = backendToFrontend(data.task);
+      scheduledTasks.value.push(saved);
     }
-  } else {
-    // Add new task
-    scheduledTasks.value.push(taskData);
+    saveScheduledTasks();
+    addTaskSaveLog(saved, isNew, addLog);
+    showTaskModal.value = false;
+    message.success("定时任务已保存");
+  } catch (err) {
+    console.error("保存任务失败:", err);
+    message.error("保存失败: " + (err.response?.data?.error || err.message));
   }
-
-  saveScheduledTasks();
-
-  // Add log entry for task save
-  addTaskSaveLog(taskData, isNew, addLog);
-
-  showTaskModal.value = false;
-  message.success("定时任务已保存");
 };
 
 // Delete task
-const deleteTask = (taskId) => {
+const deleteTask = async (taskId) => {
   const task = scheduledTasks.value.find((t) => t.id === taskId);
-  if (task) {
+  if (!task) return;
+  try {
+    await authApi.deleteTask(taskId);
     scheduledTasks.value = scheduledTasks.value.filter((t) => t.id !== taskId);
     saveScheduledTasks();
     addLog({
@@ -3787,13 +3816,18 @@ const deleteTask = (taskId) => {
       type: "info",
     });
     message.success("定时任务已删除");
+  } catch (err) {
+    console.error("删除任务失败:", err);
+    message.error("删除失败: " + (err.response?.data?.error || err.message));
   }
 };
 
 // Toggle task enabled state
-const toggleTaskEnabled = (taskId, enabled) => {
+const toggleTaskEnabled = async (taskId, enabled) => {
   const task = scheduledTasks.value.find((t) => t.id === taskId);
-  if (task) {
+  if (!task) return;
+  try {
+    await authApi.updateTask(taskId, { enabled });
     task.enabled = enabled;
     saveScheduledTasks();
     message.success(`定时任务已${enabled ? "启用" : "禁用"}`);
@@ -3802,6 +3836,9 @@ const toggleTaskEnabled = (taskId, enabled) => {
       message: `=== 定时任务 ${task.name} 已${enabled ? "启用" : "禁用"} ===`,
       type: "info",
     });
+  } catch (err) {
+    console.error("更新任务状态失败:", err);
+    message.error("操作失败: " + (err.response?.data?.error || err.message));
   }
 };
 
@@ -3811,8 +3848,13 @@ const toggleTaskEnabled = (taskId, enabled) => {
 const resetRunType = () => {
   if (taskForm.runType === "daily") {
     taskForm.cronExpression = "";
+    taskForm.intervalMinutes = 120;
+  } else if (taskForm.runType === "cron") {
+    taskForm.runTime = undefined;
+    taskForm.intervalMinutes = 120;
   } else {
     taskForm.runTime = undefined;
+    taskForm.cronExpression = "";
   }
 };
 
@@ -4006,7 +4048,6 @@ const importConfig = async ({ file }) => {
         // Import batch settings if provided
         if (importData.batchSettings) {
           Object.assign(batchSettings, importData.batchSettings);
-          saveBatchSettings();
         }
 
         // Import token settings
@@ -4017,6 +4058,7 @@ const importConfig = async ({ file }) => {
                 `daily-settings:${item.tokenId}`,
                 JSON.stringify(item.settings),
               );
+              syncAccountSettingsToServer(item.tokenId, item.settings);
             }
           });
         }
@@ -4058,10 +4100,11 @@ const updateCountdowns = () => {
     }
 
     if (
+      task.runType === "interval" ||
       !nextExecutionTimes.value[task.id] ||
       nextExecutionTimes.value[task.id] <= now
     ) {
-      // Calculate next execution time if not set or passed
+      // Always recalculate for interval tasks (depends on lastRunAt); recalculate others when expired
       nextExecutionTimes.value[task.id] = calculateNextExecutionTime(task);
     }
 
@@ -4122,6 +4165,17 @@ const startCountdown = () => {
 
 // Initialize scheduled tasks from localStorage
 loadScheduledTasks();
+
+// 用户切换时重新加载各自的数据
+watch(
+  () => userAuthStore.currentUser?.username,
+  (newUsername, oldUsername) => {
+    if (newUsername !== oldUsername) {
+      loadScheduledTasks();
+      loadTaskTemplates();
+    }
+  },
+);
 
 // Watch for changes to scheduledTasks for debugging
 watch(
@@ -4197,6 +4251,28 @@ const healthCheck = () => {
   }
 };
 
+// 判断当前时间是否在任务时间窗口内
+const isWithinTimeWindow = (now, timeWindow) => {
+  if (!timeWindow?.enabled) return true;
+  const day = now.getDay(); // 0=周日, 1=周一 ... 6=周六
+  if (timeWindow.days?.length && !timeWindow.days.includes(day)) return false;
+  if (!timeWindow.startTime || !timeWindow.endTime) return true;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const [sh, sm] = timeWindow.startTime.split(":").map(Number);
+  const [eh, em] = timeWindow.endTime.split(":").map(Number);
+  return nowMin >= sh * 60 + sm && nowMin < eh * 60 + em;
+};
+
+// 格式化星期列表为中文显示
+const DAY_LABELS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const formatTimeWindowDays = (days) => {
+  if (!days || days.length === 7) return "每天";
+  return [1, 2, 3, 4, 5, 6, 0]
+    .filter((d) => days.includes(d))
+    .map((d) => DAY_LABELS[d])
+    .join("、");
+};
+
 // Start the scheduler
 const startScheduler = () => {
   // Clear any existing interval first
@@ -4252,30 +4328,50 @@ const startScheduler = () => {
             });
             return;
           }
+        } else if (task.runType === "interval" && task.intervalMinutes) {
+          // Interval: check if enough time has elapsed since last run
+          const lastExecLsKey = `lastTaskExecution:${userStoragePrefix.value}_${task.id}`;
+          const lastExecTs = parseInt(localStorage.getItem(lastExecLsKey) || "0", 10);
+          const intervalMs = task.intervalMinutes * 60 * 1000;
+          shouldRun = !lastExecTs || (now.getTime() - lastExecTs) >= intervalMs;
+          reason = `lastExec=${lastExecTs ? new Date(lastExecTs).toLocaleTimeString() : "never"}, interval=${task.intervalMinutes}min, shouldRun=${shouldRun}`;
         }
 
         if (shouldRun) {
-          // Check if the task was already executed in the last minute to avoid duplicate execution
-          const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
-          const lastExecutionKey = localStorage.getItem(
-            `lastTaskExecution_${task.id}`,
-          );
+            // For interval tasks, use timestamp-based dedup; for others use minute-based key
+            const lastExecLsKey = `lastTaskExecution:${userStoragePrefix.value}_${task.id}`;
+            let shouldExecute = false;
 
-          if (lastExecutionKey !== taskExecutionKey) {
-            // Update last execution time
-            localStorage.setItem(
-              `lastTaskExecution_${task.id}`,
-              taskExecutionKey,
-            );
+            if (task.runType === "interval") {
+              // Already checked above, just execute
+              shouldExecute = true;
+              localStorage.setItem(lastExecLsKey, String(now.getTime()));
+            } else {
+            // Check if the task was already executed in the last minute to avoid duplicate execution
+            const taskExecutionKey = `${task.id}_${now.getDate()}_${now.getHours()}_${now.getMinutes()}`;
+            const lastExecutionKey = localStorage.getItem(lastExecLsKey);
+            if (lastExecutionKey !== taskExecutionKey) {
+              shouldExecute = true;
+              // Update last execution time
+              localStorage.setItem(lastExecLsKey, taskExecutionKey);
+            }
+            }
 
-            // Execute the task
-            lastTaskExecution = Date.now();
-            executeScheduledTask(task);
-          } else {
-            // Only log once per minute to avoid spamming logs
-            // But since we check every 10s, this might log multiple times if we don't track logged state
-            // For now, we can skip logging "already executed" to keep logs clean
-          }
+            if (shouldExecute) {
+              // 检查时间窗口限制
+              if (!isWithinTimeWindow(now, task.timeWindow)) {
+                addLog({
+                  time: currentTime,
+                  message: `=== 任务 ${task.name} 不在时间窗口内，跳过本次执行 ===`,
+                  type: "warning",
+                });
+                return;
+              }
+
+              // Execute the task
+              lastTaskExecution = Date.now();
+              executeScheduledTask(task);
+            }
         }
       });
     } catch (error) {
@@ -4289,7 +4385,64 @@ const startScheduler = () => {
         type: "error",
       });
     }
-  }, 10000); // Check every 10 seconds
+  }, 30000); // Check every 30 seconds
+};
+
+// visibilitychange：标签页隐藏时暂停调度，显示时恢复
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    if (intervalId.value) {
+      clearInterval(intervalId.value);
+      intervalId.value = null;
+    }
+  } else {
+    if (!intervalId.value) {
+      startScheduler();
+    }
+  }
+};
+
+// Load per-account settings from server and merge into localStorage
+const loadAccountSettingsFromServer = async () => {
+  try {
+    const res = await authApi.getAccountSettings();
+    const serverSettings = res.data.accountSettings || {};
+    Object.entries(serverSettings).forEach(([tokenId, settings]) => {
+      const key = `daily-settings:${tokenId}`;
+      // Only overwrite if server has data (server is source of truth)
+      if (settings && typeof settings === 'object') {
+        localStorage.setItem(key, JSON.stringify(settings));
+      }
+    });
+  } catch (err) {
+    console.warn('[AccountSettings] Failed to load from server:', err);
+  }
+};
+
+// Load token groups from server (server is source of truth)
+const loadTokenGroupsFromServer = async () => {
+  try {
+    const res = await authApi.getTokenGroups();
+    const serverGroups = res.data.groups;
+    if (Array.isArray(serverGroups) && serverGroups.length > 0) {
+      tokenGroups.value = serverGroups;
+    }
+  } catch (err) {
+    console.warn('[TokenGroups] Failed to load from server:', err);
+  }
+};
+
+// Debounce helper
+let _groupSyncTimer = null;
+const syncTokenGroupsToServer = () => {
+  clearTimeout(_groupSyncTimer);
+  _groupSyncTimer = setTimeout(async () => {
+    try {
+      await authApi.saveTokenGroups(tokenGroups.value);
+    } catch (err) {
+      console.warn('[TokenGroups] Failed to sync to server:', err);
+    }
+  }, 800);
 };
 
 // Token刷新等待处理函数
@@ -4302,12 +4455,17 @@ const handleTokenRefreshWaiting = (data) => {
 };
 
 // Debug: Log initial state when component mounts
-onMounted(() => {
+onMounted(async () => {
+  // Load account settings and token groups from server first
+  await Promise.all([loadAccountSettingsFromServer(), loadTokenGroupsFromServer()]);
+  // Watch token groups and sync to backend on any change
+  watch(tokenGroups, syncTokenGroupsToServer, { deep: true });
   // Start the task scheduler after all functions are initialized
   scheduleTaskExecution();
   // Start countdown timer
   startCountdown();
   loadTaskTemplates();
+  document.addEventListener("visibilitychange", handleVisibilityChange);
   // 监听Token刷新等待事件
   $emit.on("token:refresh:waiting", handleTokenRefreshWaiting);
 });
@@ -4337,6 +4495,8 @@ onBeforeUnmount(() => {
     clearInterval(healthCheckInterval);
     healthCheckInterval = null;
   }
+
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 
 // Task scheduler - ensure it runs properly
@@ -4517,17 +4677,6 @@ const executeScheduledTask = async (task) => {
         return;
       }
 
-      if (
-        ["batchSmartSendCar", "batchClaimCars"].includes(taskName) &&
-        !isCarActivityOpen.value
-      ) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在发车开放时间)`,
-          type: "warning",
-        });
-        return;
-      }
 
       if (
         ["batchTopUpArena", "batcharenafight"].includes(taskName) &&
@@ -4593,6 +4742,12 @@ const executeScheduledTask = async (task) => {
 
     // Wait for all tasks to complete
     await Promise.all(taskPromises);
+
+    // Update lastRunAt on interval tasks so countdown recalculates correctly
+    if (task.runType === "interval") {
+      const idx = scheduledTasks.value.findIndex((t) => t.id === task.id);
+      if (idx !== -1) scheduledTasks.value[idx].lastRunAt = new Date().toISOString();
+    }
 
     addLog({
       time: new Date().toLocaleTimeString(),
@@ -4886,9 +5041,7 @@ const toggleDreamItem = (itemKey, checked) => {
 };
 
 const saveDreamBuyConfig = () => {
-  // Save settings
   batchSettings.dreamPurchaseList = [...dreamBuyList.value];
-  saveBatchSettings();
 
   showDreamBuyModal.value = false;
   message.success("梦境购买配置已保存");
@@ -4957,21 +5110,31 @@ const openSettings = (token) => {
   showSettingsModal.value = true;
 };
 
+const syncAccountSettingsToServer = async (tokenId, settings) => {
+  try {
+    await authApi.saveAccountSettings(tokenId, settings);
+  } catch (err) {
+    console.warn('[AccountSettings] Failed to sync to server:', err);
+  }
+};
+
 const saveSettings = () => {
   if (currentSettingsTokenId.value) {
+    const settingsSnapshot = { ...currentSettings };
     localStorage.setItem(
       `daily-settings:${currentSettingsTokenId.value}`,
-      JSON.stringify(currentSettings),
+      JSON.stringify(settingsSnapshot),
     );
+    syncAccountSettingsToServer(currentSettingsTokenId.value, settingsSnapshot);
     message.success(`已保存 ${currentSettingsTokenName.value} 的设置`);
     showSettingsModal.value = false;
   }
 };
 
 // Task Template Functions
-const openTaskTemplateModal = () => {
+const openTaskTemplateModal = async () => {
   // 加载模板列表
-  loadTaskTemplates();
+  await loadTaskTemplates();
   // 重置当前模板
   Object.assign(currentTemplate, {
     arenaFormation: 1,
@@ -4990,16 +5153,18 @@ const openTaskTemplateModal = () => {
   showTaskTemplateModal.value = true;
 };
 
-const loadTaskTemplates = () => {
-  const templates = localStorage.getItem("task-templates");
-  const parsed = templates ? JSON.parse(templates) : [];
-  taskTemplates.value = parsed;
-  return parsed;
+const loadTaskTemplates = async () => {
+  try {
+    const res = await authApi.getTemplates();
+    taskTemplates.value = res.data.templates;
+  } catch (err) {
+    console.error('[Templates] Load error:', err);
+  }
 };
 
-const openApplyTemplateModal = () => {
+const openApplyTemplateModal = async () => {
   // 加载模板列表
-  loadTaskTemplates();
+  await loadTaskTemplates();
   // 重置选择
   selectedTemplateId.value = null;
   selectedTokensForApply.value = [];
@@ -5021,8 +5186,7 @@ const applyTemplate = () => {
   }
 
   // 找到选中的模板
-  const templates = loadTaskTemplates();
-  const template = templates.find((t) => t.id === selectedTemplateId.value);
+  const template = taskTemplates.value.find((t) => t.id === selectedTemplateId.value);
   if (!template) {
     message.error("模板不存在");
     return;
@@ -5040,6 +5204,7 @@ const applyTemplate = () => {
       `daily-settings:${tokenId}`,
       JSON.stringify(accountSettings),
     );
+    syncAccountSettingsToServer(tokenId, accountSettings);
     successCount++;
   });
 
@@ -5048,9 +5213,9 @@ const applyTemplate = () => {
 };
 
 // Template Manager Functions
-const openTemplateManagerModal = () => {
+const openTemplateManagerModal = async () => {
   // 加载模板列表
-  loadTaskTemplates();
+  await loadTaskTemplates();
   showTemplateManagerModal.value = true;
 };
 
@@ -5062,59 +5227,39 @@ const openEditTemplateModal = (template) => {
   showTaskTemplateModal.value = true;
 };
 
-const updateTaskTemplate = () => {
+const updateTaskTemplate = async () => {
   if (!currentTemplateName.value.trim()) {
     message.error("请输入模板名称");
     return;
   }
 
-  // 找到并更新模板
-  const templates = loadTaskTemplates();
-  const templateIndex = templates.findIndex(
-    (t) => t.id === currentTemplateId.value,
-  );
-  if (templateIndex === -1) {
-    message.error("模板不存在");
-    return;
+  try {
+    const res = await authApi.updateTemplate(currentTemplateId.value, {
+      name: currentTemplateName.value.trim(),
+      settings: { ...currentTemplate },
+    });
+    const updated = res.data.template;
+    const idx = taskTemplates.value.findIndex((t) => t.id === updated.id);
+    if (idx !== -1) taskTemplates.value[idx] = updated;
+    message.success(`已更新模板 "${updated.name}"`);
+    showTaskTemplateModal.value = false;
+    resetTemplateForm();
+  } catch (err) {
+    message.error("更新模板失败");
+    console.error('[Templates] Update error:', err);
   }
-
-  // 更新模板
-  templates[templateIndex] = {
-    ...templates[templateIndex],
-    name: currentTemplateName.value.trim(),
-    settings: {
-      ...currentTemplate,
-    },
-    updatedAt: new Date().toISOString(),
-  };
-
-  // 保存模板到localStorage
-  localStorage.setItem("task-templates", JSON.stringify(templates));
-
-  // 更新模板列表
-  taskTemplates.value = templates;
-
-  message.success(`已更新模板 "${templates[templateIndex].name}"`);
-  showTaskTemplateModal.value = false;
-
-  // 重置编辑状态
-  resetTemplateForm();
 };
 
-const deleteTaskTemplate = (templateId) => {
-  // 确认删除
+const deleteTaskTemplate = async (templateId) => {
   if (confirm("确定要删除这个模板吗？")) {
-    // 找到并删除模板
-    const templates = loadTaskTemplates();
-    const filteredTemplates = templates.filter((t) => t.id !== templateId);
-
-    // 保存模板到localStorage
-    localStorage.setItem("task-templates", JSON.stringify(filteredTemplates));
-
-    // 更新模板列表
-    taskTemplates.value = filteredTemplates;
-
-    message.success("模板已删除");
+    try {
+      await authApi.deleteTemplate(templateId);
+      taskTemplates.value = taskTemplates.value.filter((t) => t.id !== templateId);
+      message.success("模板已删除");
+    } catch (err) {
+      message.error("删除模板失败");
+      console.error('[Templates] Delete error:', err);
+    }
   }
 };
 
@@ -5136,14 +5281,15 @@ const resetTemplateForm = () => {
   });
 };
 
-const openAccountTemplateModal = () => {
-  // 加载账号模板引用关系
+const openAccountTemplateModal = async () => {
+  // 先加载最新模板列表，再加载账号引用关系
+  await loadTaskTemplates();
   loadAccountTemplateReferences();
   showAccountTemplateModal.value = true;
 };
 
 const loadAccountTemplateReferences = () => {
-  const templates = loadTaskTemplates();
+  const templates = taskTemplates.value;
   const references = [];
 
   // 遍历所有账号，获取其模板引用
@@ -5196,40 +5342,30 @@ const openNewTemplateModal = () => {
 };
 
 // 修改saveTaskTemplate函数，支持新增和编辑
-const saveTaskTemplate = () => {
+const saveTaskTemplate = async () => {
   if (!currentTemplateName.value.trim()) {
     message.error("请输入模板名称");
     return;
   }
 
-  const templates = loadTaskTemplates();
-
   if (currentTemplateId.value) {
     // 更新现有模板
-    updateTaskTemplate();
+    await updateTaskTemplate();
   } else {
     // 创建新模板
-    const template = {
-      id: Date.now().toString(),
-      name: currentTemplateName.value.trim(),
-      settings: {
-        ...currentTemplate,
-      },
-      createdAt: new Date().toISOString(),
-    };
-
-    // 添加新模板
-    templates.push(template);
-    localStorage.setItem("task-templates", JSON.stringify(templates));
-
-    // 更新模板列表
-    taskTemplates.value = templates;
-
-    message.success(`已保存模板 "${template.name}"`);
-    showTaskTemplateModal.value = false;
-
-    // 重置表单
-    resetTemplateForm();
+    try {
+      const res = await authApi.createTemplate({
+        name: currentTemplateName.value.trim(),
+        settings: { ...currentTemplate },
+      });
+      taskTemplates.value.unshift(res.data.template);
+      message.success(`已保存模板 "${res.data.template.name}"`);
+      showTaskTemplateModal.value = false;
+      resetTemplateForm();
+    } catch (err) {
+      message.error("保存模板失败");
+      console.error('[Templates] Create error:', err);
+    }
   }
 };
 
@@ -5910,8 +6046,78 @@ const stopBatch = () => {
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-title {
+  margin: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.task-info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-light, #e9ecef);
+  flex: 1;
+  min-width: 0;
+}
+
+.task-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.task-count {
+  font-size: 14px;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.task-countdown {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1677ff;
+}
+
+.task-empty {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.task-mgmt-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.exec-action-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background-color: var(--bg-tertiary, #f8f9fa);
+  border-radius: 8px;
+  border: 1px solid var(--border-light, #e9ecef);
 }
 
 .token-item {
@@ -6157,13 +6363,27 @@ const stopBatch = () => {
 
   .page-header {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     align-items: stretch;
   }
 
-  .page-header .actions {
-    display: flex;
+  .header-left {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
+    width: 100%;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .task-info-card {
+    width: 100%;
+  }
+
+  .exec-action-card {
+    width: 100%;
   }
 
   .log-card {

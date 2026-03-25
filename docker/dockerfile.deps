@@ -1,0 +1,22 @@
+# 依赖预装基础镜像 - 只需构建一次，依赖不变时无需重建
+#
+# 构建命令:
+#   sh docker/install.sh deps
+#
+# 网络受限时通过代理安装 npm 包:
+#   sh docker/install.sh deps --proxy
+
+ARG HTTP_PROXY=""
+ARG HTTPS_PROXY=""
+
+FROM node:20-alpine
+
+RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+
+# 代理仅用于 pnpm install（apk/npm 网络请求），不影响 FROM 拉取
+RUN http_proxy=${HTTP_PROXY} https_proxy=${HTTPS_PROXY} \
+    pnpm install --frozen-lockfile

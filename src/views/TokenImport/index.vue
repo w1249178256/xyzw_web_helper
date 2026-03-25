@@ -65,7 +65,7 @@
           />
           <wx-qrcode-form
             @cancel="() => (showImportForm = false)"
-            @ok="() => (showImportForm = false)"
+            @ok="() => { showImportForm = false; router.push('/admin/batch-daily-tasks'); }"
             v-if="importMethod === 'wxQrcode'"
           />
           <bin-token-form

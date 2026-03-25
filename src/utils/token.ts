@@ -100,7 +100,7 @@ export const scheduleAuthUserRequest = <T>(
 export const transformToken = async (arrayBuffer: ArrayBuffer) => {
   return authUserRateLimiter.schedule(async () => {
     const res = await axios.post(
-      "https://xxz-xyzw.hortorgames.com/login/authuser",
+      "/api/xyzw/login/authuser",
       arrayBuffer,
       {
         params: {
@@ -131,7 +131,7 @@ export const transformToken = async (arrayBuffer: ArrayBuffer) => {
 export const getServerList = async (arrayBuffer: ArrayBuffer) => {
   // 如果是data URL格式，提取base64部分
   const res = await axios.post(
-    "https://xxz-xyzw.hortorgames.com/login/serverlist",
+    "/api/xyzw/login/serverlist",
     arrayBuffer,
     {
       params: {

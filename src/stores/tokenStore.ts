@@ -733,8 +733,23 @@ export const useTokenStore = defineStore("tokens", () => {
           throw new Error(`Token无效: ${parseResult.error}`);
         }
       }
-      // 6. 构建WebSocket URL
-      const baseWsUrl = `wss://xxz-xyzw.hortorgames.com/agent?p=${encodeURIComponent(actualToken)}&e=x&lang=chinese`;
+
+      // 如果 actualToken 是 JSON 格式（含 sessId/connId），每次连接刷新这两个值
+      try {
+        const parsed = JSON.parse(actualToken);
+        if (parsed && (parsed.sessId !== undefined || parsed.connId !== undefined)) {
+          const now = Date.now();
+          parsed.sessId = now * 100 + Math.floor(Math.random() * 100);
+          parsed.connId = now + Math.floor(Math.random() * 10);
+          actualToken = JSON.stringify(parsed);
+        }
+      } catch {
+        // 非 JSON 格式，直接使用原始 token
+      }
+
+      // 6. 构建WebSocket URL（通过 nginx ws-proxy 中转，绕过公司网络封锁）
+      const wsProtocol = location.protocol === "https:" ? "wss:" : "ws:";
+      const baseWsUrl = `${wsProtocol}//${location.host}/ws-proxy/agent?p=${encodeURIComponent(actualToken)}&e=x&lang=chinese`;
 
       const wsUrl = customWsUrl || baseWsUrl;
 
@@ -1444,6 +1459,18 @@ export const useTokenStore = defineStore("tokens", () => {
     });
 
     tokenLogger.info("Token Store 初始化完成，连接监控已启动");
+
+    // 清除旧的跨标签页连接状态，避免刷新后被误判为"其他标签页已连接"
+    gameTokens.value.forEach((t) => {
+      localStorage.removeItem(`ws_connection_${t.id}`);
+    });
+
+    // 自动重连上次选中的 token
+    if (selectedTokenId.value) {
+      setTimeout(() => {
+        selectToken(selectedTokenId.value, true);
+      }, 500);
+    }
   };
   const setBattleVersion = (version: number | null) => {
     gameData.value.battleVersion = version;

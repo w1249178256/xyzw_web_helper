@@ -66,7 +66,7 @@
               type="primary"
               size="large"
               block
-              :loading="authStore.isLoading"
+              :loading="authStore.isAuthLoading"
               class="login-button"
               @click="handleLogin"
             >
@@ -153,12 +153,12 @@
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useMessage } from "naive-ui";
-import { useAuthStore } from "@/stores/auth";
+import { useUserAuthStore } from "@/auth/store";
 import { PersonCircle, Cube, Ribbon, Settings } from "@vicons/ionicons5";
 
 const router = useRouter();
 const message = useMessage();
-const authStore = useAuthStore();
+const authStore = useUserAuthStore();
 const loginFormRef = ref(null);
 
 // 登录表单数据
@@ -226,21 +226,23 @@ const handleLogin = async () => {
   try {
     await loginFormRef.value.validate();
 
-    const result = await authStore.login({
-      username: loginForm.username,
-      password: loginForm.password,
-      rememberMe: loginForm.rememberMe,
-    });
+    const result = await authStore.login(
+      loginForm.username.trim(),
+      loginForm.password
+    );
 
-    if (result.success) {
+    if (result.ok) {
       message.success("登录成功");
 
-      // 跳转到dashboard或之前访问的页面
-      const redirect =
-        router.currentRoute.value.query.redirect || "/admin/dashboard";
-      router.push(redirect);
+      // 管理员跳转到用户管理，普通用户跳转到之前访问的页面或token管理
+      if (result.user?.is_admin) {
+        router.push("/admin/system-admin");
+      } else {
+        const redirect = router.currentRoute.value.query.redirect || "/tokens";
+        router.push(redirect);
+      }
     } else {
-      message.error(result.message);
+      message.error(result.error || "登录失败，请重试");
     }
   } catch (error) {
     // 表单验证失败
@@ -255,7 +257,7 @@ const handleSocialLogin = (provider) => {
 
 onMounted(() => {
   // 如果已经登录，直接跳转
-  if (authStore.isAuthenticated) {
+  if (authStore.isLoggedIn) {
     router.push("/admin/dashboard");
   }
 });

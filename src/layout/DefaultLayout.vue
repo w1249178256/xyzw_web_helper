@@ -203,8 +203,10 @@ import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { ref } from 'vue'
 import { isNowInLegionWarTime } from '@/utils/clubBattleUtils'
+import { useUserAuthStore } from '@/auth/store'
 
 const tokenStore = useTokenStore();
+const authStore = useUserAuthStore();
 const router = useRouter();
 const message = useMessage();
 
@@ -212,7 +214,7 @@ const isMobileMenuOpen = ref(false);
 
 const userMenuOptions = [
   {
-    label: "清除所有Token并退出",
+    label: "退出登录",
     key: "logout",
   },
 ];
@@ -222,8 +224,9 @@ const handleUserAction = async (key) => {
   switch (key) {
     case "logout":
       await tokenStore.clearAllTokens();
-      message.success("已清除所有Token");
-      router.push("/tokens");
+      await authStore.logout();
+      message.success("已退出登录");
+      router.push("/login");
       break;
   }
 };

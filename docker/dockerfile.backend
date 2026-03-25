@@ -1,0 +1,18 @@
+ARG HTTP_PROXY=""
+ARG HTTPS_PROXY=""
+
+# 复用前端依赖镜像（已含 node:20-alpine + pnpm），无需重新拉取基础镜像
+FROM xyzw-deps:latest
+
+WORKDIR /app
+
+COPY backend/package.json backend/.npmrc ./
+
+RUN http_proxy=${HTTP_PROXY} https_proxy=${HTTPS_PROXY} \
+    pnpm install
+
+COPY backend/ ./
+
+EXPOSE 3001
+ENV DB_PATH=/app/data/xyzw.db
+CMD ["node", "server.js"]
