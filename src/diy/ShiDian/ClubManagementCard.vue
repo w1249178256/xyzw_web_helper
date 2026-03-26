@@ -98,8 +98,9 @@
             @button-click="handleExportClubInfo"
           />
           <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
-          <CustomizedCard mode="button-number-input" name="一键领取" v-model:inputValue="autoAcceptGiftTokenIndex" placeholder="输入 Token 序号" @update:inputValue="handleAutoAcceptGiftTokenIndexInput" />
-          <CustomizedCard mode="button" :name="isAutoAcceptGiftRunning ? '领取中...' : '一键领取'" :disabled="isAutoAcceptGiftRunning || !autoAcceptGiftTokenIndex" @button-click="handleAutoAcceptGift" />
+          <CustomizedCard mode="button-number-input" name="一键领取" v-model:inputValue="autoAcceptGiftTokenIndex" placeholder="输入 Token 序号（默认 13）" @update:inputValue="handleAutoAcceptGiftTokenIndexInput" />
+          <CustomizedCard mode="button" :name="isAutoAcceptGiftRunning ? '领取中...' : '一键领取'" :disabled="isAutoAcceptGiftRunning" @button-click="handleAutoAcceptGift" />
+          <CustomizedCard mode="button" :name="isBatchLegacyHangupRunning ? '批量功法挂机中...' : '批量功法挂机'" :disabled="isBatchLegacyHangupRunning" @button-click="handleBatchLegacyHangup" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
         </CustomizedCard>
       </div>
@@ -108,7 +109,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['功法挂机', '收集功法', '批量赠送功法', '接受礼物', '一键领取', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
+        :filter-operations="['功法挂机', '收集功法', '批量赠送功法', '接受礼物', '一键领取', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法挂机', '批量功法图鉴', '加入俱乐部', '批量招募周']"
       />
     </template>
   </MyCard>
@@ -133,13 +134,14 @@ const exportClubInfoTokens = ref('')
 const legionId = ref('')
 const legacyTargetId = ref('111582820') // 默认赠送目标
 const legacyPassword = ref('946215') // 默认密码
-const autoAcceptGiftTokenIndex = ref('') // 一键领取的 Token 序号
+const autoAcceptGiftTokenIndex = ref('13') // 一键领取的 Token 序号，默认 13
 const isLegacyHangupRunning = ref(false)
 const isLegacyCollectRunning = ref(false)
 const isLegacyClaimGiftRunning = ref(false)
 const isAcceptGiftRunning = ref(false)
 const isAutoAcceptGiftRunning = ref(false)
 const isBatchAcceptGiftRunning = ref(false)
+const isBatchLegacyHangupRunning = ref(false)
 const isExportLegacyDetailsRunning = ref(false)
 const isExportClubInfoRunning = ref(false)
 const isLegacyBookRunning = ref(false)
@@ -284,13 +286,107 @@ const handleAutoAcceptGiftTokenIndexInput = (value) => {
 
 // 一键领取
 const handleAutoAcceptGift = async () => {
-  if (!autoAcceptGiftTokenIndex.value) {
-    message.warning('请输入 Token 序号')
-    return
-  }
+  const tokenIndex = autoAcceptGiftTokenIndex.value ? parseInt(autoAcceptGiftTokenIndex.value) : 13
   
-  // TODO: 实现一键领取功能
-  message.info('一键领取功能尚未实现')
+  try {
+    isAutoAcceptGiftRunning.value = true
+    message.info(`开始一键领取（序号${tokenIndex}）...`)
+    
+    const token = sortedTokens.value[tokenIndex - 1]
+    
+    if (!token) {
+      message.warning(`序号${tokenIndex}的 Token 不存在`)
+      return
+    }
+    
+    message.info(`[${tokenIndex}] ${token.name || token.id} 正在连接...`)
+    
+    // 连接 token
+    let retryCount = 0
+    const maxRetries = 5
+    let status = tokenStore.getWebSocketStatus(token.id)
+    
+    while (status !== 'connected' && retryCount < maxRetries) {
+      tokenStore.selectToken(token.id, true)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      status = tokenStore.getWebSocketStatus(token.id)
+      retryCount++
+      
+      if (status !== 'connected' && retryCount < maxRetries) {
+        message.info(`[${tokenIndex}] 连接尝试 ${retryCount}/${maxRetries}...`)
+      }
+    }
+    
+    if (status !== 'connected') {
+      message.warning(`[${tokenIndex}] ${token.name || token.id} 连接失败`)
+      return
+    }
+    
+    message.success(`[${tokenIndex}] ${token.name || token.id} 连接成功`)
+    
+    // 模拟点击接受礼物按钮（调用 legacy_acceptgift），执行 5 次，每次间隔 8 秒
+    message.info(`[${tokenIndex}] ${token.name || token.id} 开始执行接受礼物，共 5 次，每次间隔 8 秒...`)
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < 5; i++) {
+      try {
+        message.info(`[${tokenIndex}] ${token.name || token.id} - 第${i + 1}/5 次接受礼物...`)
+        
+        await tokenStore.sendLegacyAcceptGift(token.id, {})
+        
+        successCount++
+        message.success(`[${tokenIndex}] ${token.name || token.id} - 第${i + 1}次接受礼物成功`)
+        logOperation('shidian', '一键领取', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `第${i + 1}次接受礼物成功`
+        })
+      } catch (error) {
+        failCount++
+        console.error(`[${tokenIndex}] ${token.name || token.id} - 第${i + 1}次接受礼物失败:`, error)
+        message.error(`[${tokenIndex}] ${token.name || token.id} - 第${i + 1}次接受礼物失败：${error.message || error}`)
+        logOperation('shidian', '一键领取', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `第${i + 1}次接受礼物失败：${error.message || error}`
+        })
+      }
+      
+      // 每次执行间隔 8 秒（最后一次不需要等待）
+      if (i < 4) {
+        message.info(`[${tokenIndex}] ${token.name || token.id} - 等待 8 秒后执行下一次...`)
+        await new Promise(resolve => setTimeout(resolve, 8000))
+      }
+    }
+    
+    message.success(`[${tokenIndex}] ${token.name || token.id} - 一键领取完成，成功${successCount}次，失败${failCount}次`)
+    logOperation('shidian', '一键领取', {
+      cardType: '俱乐部管理',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `一键领取完成，成功${successCount}次，失败${failCount}次`
+    })
+    
+  } catch (error) {
+    console.error('一键领取失败:', error)
+    message.error(`一键领取失败：${error.message || error}`)
+    logOperation('shidian', '一键领取', {
+      cardType: '俱乐部管理',
+      tokenId: null,
+      tokenName: null,
+      status: 'error',
+      message: `一键领取失败：${error.message || error}`
+    })
+  } finally {
+    isAutoAcceptGiftRunning.value = false
+  }
 }
 
 // 加入俱乐部
