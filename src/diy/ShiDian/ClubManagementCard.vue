@@ -98,8 +98,14 @@
             @button-click="handleExportClubInfo"
           />
           <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
-          <CustomizedCard mode="button-number-input" name="一键领取" v-model:inputValue="autoAcceptGiftTokenIndex" placeholder="输入 Token 序号（默认 13）" @update:inputValue="handleAutoAcceptGiftTokenIndexInput" />
-          <CustomizedCard mode="button" :name="isAutoAcceptGiftRunning ? '领取中...' : '一键领取'" :disabled="isAutoAcceptGiftRunning" @button-click="handleAutoAcceptGift" />
+          <CustomizedCard 
+            mode="button-number-input" 
+            name="一键领取" 
+            v-model:inputValue="autoAcceptGiftTokenIndex" 
+            placeholder="输入 Token 序号（默认 13）" 
+            @update:inputValue="handleAutoAcceptGiftTokenIndexInput"
+            @button-click="handleAutoAcceptGift"
+          />
           <CustomizedCard mode="button" :name="isBatchLegacyHangupRunning ? '批量功法挂机中...' : '批量功法挂机'" :disabled="isBatchLegacyHangupRunning" @button-click="handleBatchLegacyHangup" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
         </CustomizedCard>

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -108,7 +108,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="怪异塔"
-        :filter-operations="[]"
+        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔']"
       />
     </template>
   </MyCard>
@@ -1330,6 +1330,17 @@ const handleBatchClimb = async () => {
       const tokenIndex = globalIndex + 1
       
       try {
+        // 添加开始日志
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${tokenIndex}、${token.name || token.id}、开始爬塔`
+        })
+        
         // 获取怪异塔信息（直接从响应获取）
         const towerInfoRes = await tokenStore.sendMessageWithPromise(
           token.id,
@@ -1342,7 +1353,23 @@ const handleBatchClimb = async () => {
         let currentEnergy = towerInfoRes?.evoTower?.energy || 0
         let currentTowerId = towerInfoRes?.evoTower?.towerId || 0
         
+        // 计算初始层数
+        const initChapter = Math.floor(currentTowerId / 10) + 1
+        const initFloor = (currentTowerId % 10) + 1
+        const initDisplayFloor = `${initChapter}-${initFloor}`
+        
         await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // 记录初始信息
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${tokenIndex}、${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
+        })
         
         // 执行爬塔逻辑（模拟点击开始爬塔按钮）
         let climbCount = 0
@@ -1365,7 +1392,7 @@ const handleBatchClimb = async () => {
             }
           })
           
-          return { climbCount: 0, currentFloor: '1-1', remainingEnergy: 0 }
+          return { climbCount: 0, currentFloor: initDisplayFloor, remainingEnergy: 0 }
         }
         
         for (let j = 0; j < maxClimb; j++) {
@@ -1403,7 +1430,7 @@ const handleBatchClimb = async () => {
           currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
           currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
 
-          // 检查是否刚通关10层
+          // 检查是否刚通关 10 层
           const floor = (currentTowerId % 10) + 1
           if (
             fightResult &&
@@ -1418,6 +1445,17 @@ const handleBatchClimb = async () => {
               {},
               5000
             )
+            
+            // 记录奖励领取日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '怪异塔',
+              operation: '批量爬塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${initChapter}-${floor}`
+            })
           }
 
           await new Promise((res) => setTimeout(res, 1000))
