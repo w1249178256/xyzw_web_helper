@@ -74,6 +74,7 @@ declare module 'vue' {
     TopClubListPageCard: typeof import('./src/components/cards/TopClubListPageCard.vue')['default']
     TopRankListPageCard: typeof import('./src/components/cards/TopRankListPageCard.vue')['default']
     TowerStatus: typeof import('./src/components/Tower/TowerStatus.vue')['default']
+    Unlimitedlineup: typeof import('./src/components/cards/Unlimitedlineup.vue')['default']
     WebSocketTester: typeof import('./src/components/Test/WebSocketTester.vue')['default']
     WeirdTowerStatus: typeof import('./src/components/Tower/WeirdTowerStatus.vue')['default']
   }
