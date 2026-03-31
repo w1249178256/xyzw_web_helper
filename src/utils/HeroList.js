@@ -241,9 +241,12 @@ const FishMap = {
   1116: { name: "公剑胆" },
   1117: { name: "母剑胆" },
   1118: { name: "璇玑" },
+  1119: { name: "公琴心" },
+  1120: { name: "母琴心" },
+  1121: { name: "回响" },
 };
 
-export { FishMap };
+export { FishMap, PearlMap, color };
 
 //洗练颜色
 const color = {
