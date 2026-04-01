@@ -392,7 +392,7 @@ export function registerDefaultCommands(reg) {
     .register("towers_fight")
 
     //发送游戏内消息
-    .register("system_sendchatmessage");
+    .register("system_sendchatmessage")
 
     // 物品相关（新增）
     .register("item_claimboxpointreward")
