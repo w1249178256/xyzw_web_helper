@@ -36,11 +36,21 @@
               size="small"
             >
               <n-checkbox value="1">表格导出</n-checkbox>
-              <n-checkbox value="2" :disabled="
-              loading1 || !battleRecords1">图片导出</n-checkbox>
+              <n-checkbox value="2" :disabled="loading1 || !battleRecords1"
+                >图片导出</n-checkbox
+              >
             </n-checkbox-group>
-            <div v-if="exportmethod.includes('1')" class="batch-size-input" style="display: flex; align-items: center; gap: 4px; margin-left: 8px;">
-              <span style="font-size: 12px;">每分钟查询:</span>
+            <div
+              v-if="exportmethod.includes('1')"
+              class="batch-size-input"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                margin-left: 8px;
+              "
+            >
+              <span style="font-size: 12px">每分钟查询:</span>
               <n-input-number
                 v-model:value="exportBatchSize"
                 size="small"
@@ -55,17 +65,17 @@
 
         <div class="function-right">
           <n-radio-group
-          v-model:value="selectedGroup"
-          name="group-radiogroup"
-          size="small"
-          class="radio-group"
-        >
-          <n-radio-button value="gold1">1-100</n-radio-button>
-          <n-radio-button value="gold2">101-200</n-radio-button>
-          <n-radio-button value="gold3">201-300</n-radio-button>
-          <n-radio-button value="gold4">301-400</n-radio-button>
-          <n-radio-button value="gold5">401-500</n-radio-button>
-        </n-radio-group>
+            v-model:value="selectedGroup"
+            name="group-radiogroup"
+            size="small"
+            class="radio-group"
+          >
+            <n-radio-button value="gold1">1-100</n-radio-button>
+            <n-radio-button value="gold2">101-200</n-radio-button>
+            <n-radio-button value="gold3">201-300</n-radio-button>
+            <n-radio-button value="gold4">301-400</n-radio-button>
+            <n-radio-button value="gold5">401-500</n-radio-button>
+          </n-radio-group>
           <n-button
             size="small"
             :disabled="loading1"
@@ -135,14 +145,8 @@
             <div class="table-cell rank">
               <div class="rank-container">
                 <span v-if="index === 0" class="rank-medal gold"></span>
-                <span
-                  v-else-if="index === 1"
-                  class="rank-medal silver"
-                ></span>
-                <span
-                  v-else-if="index === 2"
-                  class="rank-medal bronze"
-                ></span>
+                <span v-else-if="index === 1" class="rank-medal silver"></span>
+                <span v-else-if="index === 2" class="rank-medal bronze"></span>
                 <span v-else class="rank-number">{{ index + 1 }}</span>
               </div>
             </div>
@@ -1372,6 +1376,8 @@ const getAllianceClass = (alliance) => {
       return "alliance-xin-justice";
     case "龙盟":
       return "alliance-dragon";
+    case "曦盟":
+      return "alliance-xi";
     case "未知联盟":
       return "alliance-unknown";
     default:
@@ -1407,37 +1413,40 @@ const fetchBattleRecords1 = async () => {
   }
 
   loading1.value = true;
-    try {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "legionwar_getgoldmonthwarrank",
+  try {
+    const result = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "legionwar_getgoldmonthwarrank",
       {
         startRank: ProcessingstartRank(selectedGroup.value),
         endRank: ProcessingendRank(selectedGroup.value),
       },
-        10000,
-      );
+      10000,
+    );
 
-      if (!result?.legionList) {
-        battleRecords1.value = null;
-        message.warning("未查询到俱乐部数据");
-        return;
-      }
-
-      const sortedLegionList = await fetchLegionDetails(result.legionList, tokenId);
-
-      battleRecords1.value = {
-        ...result,
-        legionRankList: sortedLegionList,
-      };
-      message.success("俱乐部数据加载成功");
-    } catch (error) {
-      console.error("查询失败:", error);
-      message.error(`查询失败: ${error.message}`);
+    if (!result?.legionList) {
       battleRecords1.value = null;
-    } finally {
-      loading1.value = false;
+      message.warning("未查询到俱乐部数据");
+      return;
     }
+
+    const sortedLegionList = await fetchLegionDetails(
+      result.legionList,
+      tokenId,
+    );
+
+    battleRecords1.value = {
+      ...result,
+      legionRankList: sortedLegionList,
+    };
+    message.success("俱乐部数据加载成功");
+  } catch (error) {
+    console.error("查询失败:", error);
+    message.error(`查询失败: ${error.message}`);
+    battleRecords1.value = null;
+  } finally {
+    loading1.value = false;
+  }
 };
 
 // 提取单个俱乐部详情查询逻辑
@@ -1485,9 +1494,7 @@ const fetchSingleLegionDetail = async (club, tokenId) => {
     const top3Heroes = topHeroes.slice(0, 3);
 
     // 提取红淬数量数组
-    const redQuenchCounts = top3Heroes.map(
-      (hero) => hero.redQuench + "红",
-    );
+    const redQuenchCounts = top3Heroes.map((hero) => hero.redQuench + "红");
     // 提取圣物数量数组
     const HolyBeastNum = top3Heroes.map((hero) => hero.holyBeast);
 
@@ -1531,7 +1538,9 @@ const fetchSingleLegionDetail = async (club, tokenId) => {
 
 // 提取的俱乐部详情查询函数（批量处理）
 const fetchLegionDetails = async (legionList, tokenId) => {
-  const detailPromises = legionList.map((club) => fetchSingleLegionDetail(club, tokenId));
+  const detailPromises = legionList.map((club) =>
+    fetchSingleLegionDetail(club, tokenId),
+  );
   return await Promise.all(detailPromises);
 };
 
@@ -1561,16 +1570,18 @@ const handleExport1 = async () => {
   try {
     if (exportmethod.value.includes("1")) {
       // 如果选择表格导出，导出1-500名数据
-      const loadingBasicsMsg = message.loading("正在获取俱乐部列表...", { duration: 0 });
-      
+      const loadingBasicsMsg = message.loading("正在获取俱乐部列表...", {
+        duration: 0,
+      });
+
       const allLegionBasics = [];
       const groups = ["gold1", "gold2", "gold3", "gold4", "gold5"];
-      
+
       // 1. 获取所有 500 个俱乐部基础信息
       for (const group of groups) {
         const startRank = ProcessingstartRank(group);
         const endRank = ProcessingendRank(group);
-        
+
         const result = await tokenStore.sendMessageWithPromise(
           tokenId,
           "legionwar_getgoldmonthwarrank",
@@ -1580,12 +1591,12 @@ const handleExport1 = async () => {
           },
           10000,
         );
-        
+
         if (result?.legionList) {
-           allLegionBasics.push(...result.legionList);
+          allLegionBasics.push(...result.legionList);
         }
         // 基础列表获取很快，稍微延时一下即可
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
       if (allLegionBasics.length === 0) {
@@ -1593,7 +1604,7 @@ const handleExport1 = async () => {
         message.warning("没有可导出的数据");
         return;
       }
-      
+
       // 获取完基础列表后，销毁第一个loading
       loadingBasicsMsg.destroy();
 
@@ -1603,37 +1614,43 @@ const handleExport1 = async () => {
       const total = allLegionBasics.length;
       let processed = 0;
 
-      const prepareMsg = message.loading(`准备导出 ${total} 个俱乐部数据，预计耗时 ${Math.ceil(total / BATCH_SIZE)} 分钟...`, { duration: 0 });
+      const prepareMsg = message.loading(
+        `准备导出 ${total} 个俱乐部数据，预计耗时 ${Math.ceil(total / BATCH_SIZE)} 分钟...`,
+        { duration: 0 },
+      );
 
       // 创建一个持久的 loading message
-      const loadingMsg = message.loading(`正在导出... 进度 0/${total} (请勿关闭页面)`, { duration: 0 });
+      const loadingMsg = message.loading(
+        `正在导出... 进度 0/${total} (请勿关闭页面)`,
+        { duration: 0 },
+      );
 
       for (let i = 0; i < total; i += BATCH_SIZE) {
         const batchStartTime = Date.now();
         const batch = allLegionBasics.slice(i, i + BATCH_SIZE);
-        
+
         // 处理当前批次
         // 为了防止瞬间并发60个请求，我们在批次内部也稍微做一下平滑处理
         // 使用 map 并发请求，但通过 Promise.all 统一等待
         // 如果服务器对并发有严格限制，可以考虑在这里改为串行或限制并发数
         // 鉴于用户要求是“每分钟60个”，这里我们直接并发处理这60个，因为总量控制住了
         const batchPromises = batch.map(async (club) => {
-            const res = await fetchSingleLegionDetail(club, tokenId);
-            processed++;
-            // 实时更新进度
-            loadingMsg.content = `正在导出... 进度 ${processed}/${total} (请勿关闭页面)`;
-            return res;
+          const res = await fetchSingleLegionDetail(club, tokenId);
+          processed++;
+          // 实时更新进度
+          loadingMsg.content = `正在导出... 进度 ${processed}/${total} (请勿关闭页面)`;
+          return res;
         });
-        
+
         const batchResults = await Promise.all(batchPromises);
         allData.push(...batchResults);
-        
+
         // 如果还有剩余数据，需要等待，确保每分钟不超过60个
         if (processed < total) {
           const elapsed = Date.now() - batchStartTime;
           // 确保至少等待 60 秒（加一点缓冲 61秒）
           const waitTime = Math.max(0, 61000 - elapsed);
-          
+
           if (waitTime > 0) {
             // 显示倒计时提示
             let remainingSeconds = Math.ceil(waitTime / 1000);
@@ -1642,20 +1659,20 @@ const handleExport1 = async () => {
               if (remainingSeconds <= 0) {
                 clearInterval(timer);
               } else {
-                 loadingMsg.content = `正在导出... 进度 ${processed}/${total} (等待 ${remainingSeconds}秒 继续下一批)`;
+                loadingMsg.content = `正在导出... 进度 ${processed}/${total} (等待 ${remainingSeconds}秒 继续下一批)`;
               }
             }, 1000);
 
             // 等待
-            await new Promise(resolve => setTimeout(resolve, waitTime));
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
             clearInterval(timer);
           }
         }
       }
-      
+
       loadingMsg.destroy(); // 完成后销毁
       prepareMsg.destroy(); // 销毁准备导出的提示
-      
+
       formatWarrankRecordsForExport(
         allData,
         queryDate.value || formatTimestamp1(new Date()),
@@ -1711,7 +1728,9 @@ const exportToImage = async () => {
     });
 
     // 6. Canvas转图片链接并下载
-    const filename = inputDate1.value.replace("/", "年").replace("/", "月") + "日黄金积分俱乐部信息.png";
+    const filename =
+      inputDate1.value.replace("/", "年").replace("/", "月") +
+      "日黄金积分俱乐部信息.png";
     downloadCanvasAsImage(canvas, filename);
   } catch (err) {
     console.error("DOM转图片失败：", err);
@@ -1734,8 +1753,7 @@ defineExpose({
 });
 
 // Inline 模式：挂载后自动拉取
-onMounted(() => {
-});
+onMounted(() => {});
 </script>
 
 <style scoped lang="scss">
@@ -2716,6 +2734,12 @@ onMounted(() => {
       &.alliance-dragon {
         .alliance-tag {
           background: var(--error-color);
+        }
+      }
+
+      &.alliance-xi {
+        .alliance-tag {
+          background: #9c27b0;
         }
       }
 

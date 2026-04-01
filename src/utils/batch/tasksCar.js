@@ -215,8 +215,15 @@ export function createTasksCar(deps) {
           try {
             // 当启用金砖保底时，强制使用高票数的判断逻辑（严格模式），避免因票数不足而提前发车
             const effectiveTickets = batchSettings.useGoldRefreshFallback ? 999 : refreshTickets;
+            
+            const customConditions = {
+              gold: batchSettings.smartDepartureGoldThreshold,
+              recruit: batchSettings.smartDepartureRecruitThreshold,
+              jade: batchSettings.smartDepartureJadeThreshold,
+              ticket: batchSettings.smartDepartureTicketThreshold,
+            };
 
-            if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor)) {
+            if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
               await assignHelperIfNeeded(car);
               addLog({
                 time: new Date().toLocaleTimeString(),
@@ -249,7 +256,7 @@ export function createTasksCar(deps) {
               shouldRefresh = true;
               addLog({
                 time: new Date().toLocaleTimeString(),
-                message: `${token.name} 车辆[${gradeLabel(car.color)}]启用金砖刷新保底`,
+                message: `${token.name} 车辆[${gradeLabel(car.color)}]仍不满足条件且无刷新次数，将启用金砖刷新`,
                 type: "warning",
               });
             }
@@ -308,7 +315,7 @@ export function createTasksCar(deps) {
                 );
               } catch (_) {}
 
-              if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor)) {
+              if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
                 await assignHelperIfNeeded(car);
                 addLog({
                   time: new Date().toLocaleTimeString(),
@@ -331,8 +338,18 @@ export function createTasksCar(deps) {
               }
 
               const freeNow = Number(car.refreshCount ?? 0) === 0;
+              const useGoldFallback = batchSettings.useGoldRefreshFallback && !freeNow && refreshTickets < 6;
+
               if (refreshTickets >= 6) shouldRefresh = true;
               else if (freeNow) shouldRefresh = true;
+              else if (useGoldFallback) {
+                shouldRefresh = true;
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 刷新后车辆[${gradeLabel(car.color)}]仍不满足条件且无刷新次数，将启用金砖刷新`,
+                  type: "warning",
+                });
+              }
               else {
                 assignHelperIfNeeded(car);
                 addLog({
@@ -507,6 +524,25 @@ export function createTasksCar(deps) {
                   });
                   break;
                 }
+              }
+
+              // 尝试领取改装升级累计奖励
+              try {
+                const rewardRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "car_claimpartconsumereward",
+                  {},
+                  5000,
+                );
+                if (rewardRes && rewardRes.reward) {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 领取改装升级累计奖励成功`,
+                    type: "success",
+                  });
+                }
+              } catch (e) {
+                // 忽略错误
               }
             } catch (e) {
               addLog({

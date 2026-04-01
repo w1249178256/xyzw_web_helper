@@ -13,6 +13,15 @@
         </div>
       </div>
 
+      <!-- 限流等待提示 -->
+      <n-alert
+        v-if="rateLimitWaiting"
+        type="warning"
+        style="margin-bottom: 16px"
+      >
+        {{ rateLimitMessage }}
+      </n-alert>
+
       <!-- Token导入区域 -->
       <a-modal
         class="token-import-modal"
@@ -624,12 +633,14 @@ import {
   SyncCircle,
   TrashBin,
 } from "@vicons/ionicons5";
-import { NIcon, useDialog, useMessage } from "naive-ui";
-import { h, onMounted, reactive, ref, watch } from "vue";
+import { NIcon, NAlert, useDialog, useMessage } from "naive-ui";
+import { h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { transformToken } from "@/utils/token";
+import { transformToken, scheduleAuthUserRequest } from "@/utils/token";
+import { $emit } from "@/stores/events/index.ts";
 import useIndexedDB from "@/hooks/useIndexedDB";
-const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer } = useIndexedDB();
+const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } =
+  useIndexedDB();
 // 接收路由参数
 const props = defineProps({
   token: String,
@@ -644,6 +655,10 @@ const router = useRouter();
 const message = useMessage();
 const dialog = useDialog();
 const tokenStore = useTokenStore();
+
+// 限流等待状态
+const rateLimitWaiting = ref(false);
+const rateLimitMessage = ref("");
 
 // 响应式数据
 const showImportForm = ref(false);
@@ -682,7 +697,7 @@ const sortConfig = ref(
 
 // 排序后的游戏角色Token列表
 const sortedTokens = computed(() => {
-  if (sortConfig.value.field === 'manual') {
+  if (sortConfig.value.field === "manual") {
     return tokenStore.gameTokens;
   }
 
@@ -771,12 +786,12 @@ const handleDrop = (index, event) => {
 
   // 更新 store
   tokenStore.gameTokens = currentTokens;
-  
+
   // 切换到手动排序模式，防止自动排序打乱顺序
-  sortConfig.value.field = 'manual';
+  sortConfig.value.field = "manual";
   // 保存排序设置
   localStorage.setItem("tokenSortConfig", JSON.stringify(sortConfig.value));
-  
+
   dragIndex.value = null;
   message.success("Token 顺序已更新");
 };
@@ -818,42 +833,48 @@ const refreshToken = async (token) => {
 
   try {
     if (token.importMethod === "url") {
-      // 有源URL的token - 从URL重新获取
-      let response;
+      // 有源URL的token - 从URL重新获取（使用限流）
+      const data = await scheduleAuthUserRequest(async () => {
+        let response;
 
-      const isLocalUrl =
-        token.sourceUrl.startsWith(window.location.origin) ||
-        token.sourceUrl.startsWith("/") ||
-        token.sourceUrl.startsWith("http://localhost") ||
-        token.sourceUrl.startsWith("http://127.0.0.1");
+        const isLocalUrl =
+          token.sourceUrl.startsWith(window.location.origin) ||
+          token.sourceUrl.startsWith("/") ||
+          token.sourceUrl.startsWith("http://localhost") ||
+          token.sourceUrl.startsWith("http://127.0.0.1");
 
-      if (isLocalUrl) {
-        response = await fetch(token.sourceUrl);
-      } else {
-        try {
-          response = await fetch(token.sourceUrl, {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-            },
-            mode: "cors",
-          });
-        } catch (corsError) {
+        if (isLocalUrl) {
+          response = await fetch(token.sourceUrl);
+        } else {
+          try {
+            response = await fetch(token.sourceUrl, {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+              },
+              mode: "cors",
+            });
+          } catch (corsError) {
+            throw new Error(
+              `跨域请求被阻止。请确保目标服务器支持CORS。错误详情: ${corsError.message}`,
+            );
+          }
+        }
+
+        if (!response.ok) {
           throw new Error(
-            `跨域请求被阻止。请确保目标服务器支持CORS。错误详情: ${corsError.message}`,
+            `请求失败: ${response.status} ${response.statusText}`,
           );
         }
-      }
 
-      if (!response.ok) {
-        throw new Error(`请求失败: ${response.status} ${response.statusText}`);
-      }
+        const result = await response.json();
 
-      const data = await response.json();
+        if (!result.token) {
+          throw new Error("返回数据中未找到token字段");
+        }
 
-      if (!data.token) {
-        throw new Error("返回数据中未找到token字段");
-      }
+        return result;
+      });
 
       // 更新token信息
       tokenStore.updateToken(token.id, {
@@ -939,6 +960,8 @@ const refreshToken = async (token) => {
     message.error(error.message || "Token刷新失败");
   } finally {
     refreshingTokens.value.delete(token.id);
+    // 关闭限流等待提示
+    rateLimitWaiting.value = false;
   }
 };
 
@@ -1202,8 +1225,8 @@ const deleteToken = (token) => {
     content: `确定要删除Token "${token.name}" 吗？此操作无法恢复。`,
     positiveText: "确定删除",
     negativeText: "取消",
-    onPositiveClick: () => {
-      tokenStore.removeToken(token.id);
+    onPositiveClick: async () => {
+      await tokenStore.removeToken(token.id);
       message.success("Token已删除");
     },
   });
@@ -1257,22 +1280,20 @@ const refreshAllTokens = async () => {
             // 更新进度显示
             loadingMessage.content = `正在刷新Token (${i + 1}/${tokensToRefresh.length}): ${token.name}`;
 
-            // 调用单个刷新函数
+            // 调用单个刷新函数（限流器会自动处理等待）
             await refreshToken(token);
             successCount++;
           } catch (error) {
             console.error(`刷新Token "${token.name}" 失败:`, error);
             failCount++;
           }
-
-          // 添加短暂延迟避免请求过于频繁
-          if (i < tokensToRefresh.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
         }
 
         // 关闭进度提示
         loadingMessage.destroy();
+
+        // 关闭限流等待提示
+        rateLimitWaiting.value = false;
 
         // 显示结果
         if (failCount === 0) {
@@ -1364,8 +1385,8 @@ const importTokenFile = () => {
   input.click();
 };
 
-const cleanExpiredTokens = () => {
-  const count = tokenStore.cleanExpiredTokens();
+const cleanExpiredTokens = async () => {
+  const count = await tokenStore.cleanExpiredTokens();
   message.success(`已清理 ${count} 个过期Token`);
 };
 
@@ -1382,8 +1403,8 @@ const clearAllTokens = () => {
     content: "确定要清除所有Token吗？此操作无法恢复！",
     positiveText: "确定清除",
     negativeText: "取消",
-    onPositiveClick: () => {
-      tokenStore.clearAllTokens();
+    onPositiveClick: async () => {
+      await tokenStore.clearAllTokens();
       message.success("所有Token已清除");
     },
   });
@@ -1582,9 +1603,18 @@ const handleUrlParams = async () => {
 // 监听路由参数变化
 watch(() => [props.token, props.api], handleUrlParams, { immediate: false });
 
+// 限流等待事件处理
+const handleRateLimitWaiting = (data) => {
+  rateLimitWaiting.value = true;
+  rateLimitMessage.value = `Token刷新限流等待中，预计等待 ${data.waitSeconds} 秒（队列: ${data.queueSize}）`;
+};
+
 // 生命周期
 onMounted(async () => {
   tokenStore.initTokenStore();
+
+  // 监听限流等待事件
+  $emit.on("token:refresh:waiting", handleRateLimitWaiting);
 
   // 处理URL参数
   await handleUrlParams();
@@ -1593,6 +1623,11 @@ onMounted(async () => {
   if (!tokenStore.hasTokens && !props.token && !props.api) {
     showImportForm.value = true;
   }
+});
+
+onUnmounted(() => {
+  // 移除限流等待事件监听
+  $emit.off("token:refresh:waiting", handleRateLimitWaiting);
 });
 </script>
 

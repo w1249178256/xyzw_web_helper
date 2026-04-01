@@ -535,27 +535,48 @@ export class ProtoMsgLegion {
     this.rtt = 0;
   }
 
-  get sendMsg() { return this._sendMsg; }
-  get seq() { return this._raw.seq; }
-  get resp() { return this._raw.resp; }
-  get ack() { return this._raw.ack; }
-  get cmd() { return this._raw?.cmd && this._raw?.cmd.toLowerCase(); }
-  get code() { return ~~this._raw.code; }
-  get error() { return this._raw.error; }
-  get time() { return this._raw.time; }
-  get body() { return this._raw.body; }
-  get hint() { return this._raw.hint; }
+  get sendMsg() {
+    return this._sendMsg;
+  }
+  get seq() {
+    return this._raw.seq;
+  }
+  get resp() {
+    return this._raw.resp;
+  }
+  get ack() {
+    return this._raw.ack;
+  }
+  get cmd() {
+    return this._raw?.cmd && this._raw?.cmd.toLowerCase();
+  }
+  get code() {
+    return ~~this._raw.code;
+  }
+  get error() {
+    return this._raw.error;
+  }
+  get time() {
+    return this._raw.time;
+  }
+  get body() {
+    return this._raw.body;
+  }
+  get hint() {
+    return this._raw.hint;
+  }
 
   /** 惰性 decode body → rawData（bon.decode） */
   get rawData() {
-    if (this._rawData !== undefined || this.body === undefined) return this._rawData;
+    if (this._rawData !== undefined || this.body === undefined)
+      return this._rawData;
     this._rawData = bon.decode(this.body);
     return this._rawData;
   }
 
   /** 指定数据类型 */
   setDataType(t) {
-    if (t) this._t = { name: t.name ?? 'Anonymous', ctor: t };
+    if (t) this._t = { name: t.name ?? "Anonymous", ctor: t };
     return this;
   }
 
@@ -567,7 +588,8 @@ export class ProtoMsgLegion {
 
   /** 将 rawData 反序列化为业务对象 */
   getData(clazz) {
-    if (this._data !== undefined || this.rawData === undefined) return this._data;
+    if (this._data !== undefined || this.rawData === undefined)
+      return this._data;
 
     let t = this._t;
     if (clazz && t && clazz !== t.ctor) {
@@ -812,19 +834,19 @@ export function encode(obj, enc) {
 }
 
 /** 对外：parse（解密 → bon.decode → ProtoMsg） */
-export function parse(buf, enc,isLegion=false) {
-  if(!isLegion){
+export function parse(buf, enc, isLegion = false) {
+  if (!isLegion) {
     const u8 = new Uint8Array(buf);
     const plain = enc.decrypt(u8);
     const raw = bon.decode(plain);
     return new ProtoMsg(raw);
-  }else{
-    return parseLegion(buf,enc,true);
+  } else {
+    return parseLegion(buf, enc, true);
   }
 }
 
 /** 对外：parse（解密 → bon.decode → ProtoMsg） 返回的消息体是盐场版本的消息体*/
-function parseLegion(buf, enc,isLegion) {
+function parseLegion(buf, enc, isLegion) {
   const u8 = new Uint8Array(buf);
   const plain = enc.decrypt(u8);
   const raw = bon.decode(plain);
@@ -849,7 +871,7 @@ export const GameMessages = {
     cmd: "role_getroleinfo",
     body: encode(
       {
-        clientVersion: "2.10.3-f10a39eaa0c409f4-wx",
+        clientVersion: "2.21.2-fa918e1997301834-wx",
         inviteUid: 0,
         platform: "hortor",
         platformExt: "mix",

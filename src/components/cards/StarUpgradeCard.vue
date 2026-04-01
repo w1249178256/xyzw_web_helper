@@ -229,9 +229,9 @@ const runHeroUpgrade = async (mod) => {
         } catch (err) {
           addLog(`英雄ID:${heroId} 升星第${i}/10次失败，跳过剩余次数`, "error");
           skip = true;
-          break;
         }
         await sleep(mod.delay);
+        if (skip) break;
       }
       state.value.done++;
     }
@@ -287,9 +287,9 @@ const runBookUpgrade = async (mod) => {
             "error",
           );
           skip = true;
-          break;
         }
         await sleep(mod.delay);
+        if (skip) break;
       }
       state.value.done++;
     }
@@ -319,6 +319,7 @@ const runClaimRewards = async (mod) => {
     state.value.isRunning = true;
     for (let i = 1; i <= 10; i++) {
       if (state.value.stopRequested) break;
+      let success = true;
       try {
         const res = await tokenStore.sendMessageWithPromise(
           tokenId,
@@ -334,9 +335,10 @@ const runClaimRewards = async (mod) => {
       } catch (err) {
         addLog(`领取图鉴奖励第${i}/10次失败，跳过剩余次数`, "error");
         state.value.done++;
-        break;
+        success = false;
       }
       await sleep(mod.delay);
+      if (!success) break;
     }
     message.success(state.value.stopRequested ? "已停止" : "领取奖励完成");
   } finally {

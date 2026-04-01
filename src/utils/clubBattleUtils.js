@@ -66,37 +66,101 @@ export function getLastSaturday() {
 /**
  * 判断当前时间是否是盐场时间
  */
-export function isNowInLegionWarTime(){
+export function isNowInLegionWarTime() {
   const today = new Date();
   const dayOfWeek = today.getDay();
   const date = today.getDate();
   const hours = today.getHours();
   const minutes = today.getMinutes();
   //用分钟好计算
-  const minutesCount = hours * 60 +minutes;
+  const minutesCount = hours * 60 + minutes;
   //获取本月周日的数组
-  const getSundayOfMonths=(year,month)=>{
+  const getSundayOfMonths = (year, month) => {
     let sundayArr = [];
-    for (let d = 0; d <31; d++) {
-      let temp = new Date(year,month,d);
-      if(temp.getMonth()==month &&temp.getDay()==0){
-        sundayArr.push(d)
+    for (let d = 0; d < 31; d++) {
+      let temp = new Date(year, month, d);
+      if (temp.getMonth() == month && temp.getDay() == 0) {
+        sundayArr.push(d);
       }
     }
     return sundayArr;
-  }
+  };
 
   //当前时间是20.00~21.00,周日月赛则是20.00~21.30
   //前提是周六或第四周周日 1200=20*60   1260=21*60
-  if(dayOfWeek ==6&& minutesCount>=1195 &&minutesCount <=1260)
-  {
+  if (dayOfWeek == 6 && minutesCount >= 1195 && minutesCount <= 1260) {
     return true;
   }
-  const sundayArr = getSundayOfMonths(today.getFullYear(),today.getMonth());
+  const sundayArr = getSundayOfMonths(today.getFullYear(), today.getMonth());
   //取第四个周末的日期
-  if(dayOfWeek ==0&&sundayArr.length>=4 && date == sundayArr[3] &&minutesCount>=1195 &&minutesCount<=1290){
+  if (
+    dayOfWeek == 0 &&
+    sundayArr.length >= 4 &&
+    date == sundayArr[3] &&
+    minutesCount >= 1195 &&
+    minutesCount <= 1290
+  ) {
     return true;
   }
+  return false;
+}
+
+/**
+ * 判断当前是否允许使用盐场功能
+ * 规则：
+ * 1. 每月前四周周六
+ * 2. 每月第四周周日
+ * 3. 特殊修正：2026年3月1日
+ */
+export function isLegionWarAccessible() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth(); // 0-11
+  const date = today.getDate();
+  const dayOfWeek = today.getDay(); // 0-6, 0 is Sunday
+
+  const hours = today.getHours();
+  const minutes = today.getMinutes();
+  const minutesCount = hours * 60 + minutes;
+
+  // 辅助函数：检查时间是否在允许范围内
+  // 周六: 19:55 - 21:00 (1195 - 1260)
+  // 周日: 19:55 - 21:30 (1195 - 1290)
+  const isTimeAllowed = (isSunday) => {
+    const start = 1195; // 19:55
+    const end = isSunday ? 1290 : 1260; // 21:30 or 21:00
+    return minutesCount >= start && minutesCount <= end;
+  };
+  // 辅助函数：获取某个月的所有特定星期几的日期列表
+  const getDaysOfMonth = (y, m, targetDayOfWeek) => {
+    const days = [];
+    const d = new Date(y, m, 1);
+    while (d.getMonth() === m) {
+      if (d.getDay() === targetDayOfWeek) {
+        days.push(d.getDate());
+      }
+      d.setDate(d.getDate() + 1);
+    }
+    return days;
+  };
+
+  if (dayOfWeek === 6) {
+    // 周六
+    const saturdays = getDaysOfMonth(year, month, 6);
+    // 判断是否是前四个周六 (index 0, 1, 2, 3)
+    const index = saturdays.indexOf(date);
+    if (index >= 0 && index < 4) {
+      return isTimeAllowed(false);
+    }
+  } else if (dayOfWeek === 0) {
+    // 周日
+    const sundays = getDaysOfMonth(year, month, 0);
+    // 判断是否是第四个周日 (index 3)
+    if (sundays.length >= 4 && sundays[3] === date) {
+      return isTimeAllowed(true);
+    }
+  }
+
   return false;
 }
 
@@ -116,20 +180,20 @@ export function getFirstSaturdayOfMonth() {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-11
-  
+
   // Create date for 1st day of month
   const date = new Date(year, month, 1);
   const day = date.getDay(); // 0(Sun) - 6(Sat)
-  
+
   // Calculate days to add to reach first Saturday (6)
   const diff = 6 - day; // If day is 6 (Sat), diff is 0. If day is 0 (Sun), diff is 6.
-  
+
   date.setDate(date.getDate() + diff);
-  
+
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
-  
+
   return `${y}/${m}/${d}`;
 }
 
@@ -142,58 +206,75 @@ export function getRankQueryDate() {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-11
-  
+
   // Special case for Feb 2026
   if (year === 2026 && month === 1) {
     return "260301";
   }
-  
+
   // Calculate 4th Sunday
   // First, find the first Sunday
   const firstDay = new Date(year, month, 1);
   const dayOfWeek = firstDay.getDay();
-  let firstSundayDate = 1 + (7 - dayOfWeek) % 7;
-  
+  let firstSundayDate = 1 + ((7 - dayOfWeek) % 7);
+
   // 4th Sunday is 3 weeks after first Sunday
   const fourthSundayDate = firstSundayDate + 21;
-  
+
   const targetDate = new Date(year, month, fourthSundayDate);
-  
+
   const y = String(targetDate.getFullYear()).slice(2);
   const m = String(targetDate.getMonth() + 1).padStart(2, "0");
   const d = String(targetDate.getDate()).padStart(2, "0");
-  
+
   return `${y}${m}${d}`;
 }
 
 export function getWarTypeName(warType) {
   switch (warType) {
-    case 15: return "灰岩岛";
-    case 16: return "进阶周赛";
-    case 17: return "进阶月赛";
-    case 18: return "青铜周赛";
-    case 19: return "青铜月赛";
-    case 20: return "秘蓝周赛";
-    case 21: return "秘蓝月赛";
-    case 22: return "月宫周赛";
-    case 23: return "月宫月赛";
-    case 24: return "天宫周赛";
-    case 25: return "天宫月赛";
-    case 6: return "夺旗赛";
-    default: return "伟大航路";
+    case 15:
+      return "灰岩岛";
+    case 16:
+      return "进阶周赛";
+    case 17:
+      return "进阶月赛";
+    case 18:
+      return "青铜周赛";
+    case 19:
+      return "青铜月赛";
+    case 20:
+      return "秘蓝周赛";
+    case 21:
+      return "秘蓝月赛";
+    case 22:
+      return "月宫周赛";
+    case 23:
+      return "月宫月赛";
+    case 24:
+      return "天宫周赛";
+    case 25:
+      return "天宫月赛";
+    case 6:
+      return "夺旗赛";
+    default:
+      return "伟大航路";
   }
 }
 
 export function getRankParams(warType) {
   // Bronze: 18, 19 -> 1-1000
-  if (warType === 18 || warType === 19) return { startRank: 1, endRank: 1000, name: "青铜岛" };
+  if (warType === 18 || warType === 19)
+    return { startRank: 1, endRank: 1000, name: "青铜岛" };
   // Blue: 20, 21 -> 1-500
-  if (warType === 20 || warType === 21) return { startRank: 1, endRank: 500, name: "秘蓝岛" };
+  if (warType === 20 || warType === 21)
+    return { startRank: 1, endRank: 500, name: "秘蓝岛" };
   // Moon: 22, 23 -> 1-200
-  if (warType === 22 || warType === 23) return { startRank: 1, endRank: 200, name: "紫青月宫" };
+  if (warType === 22 || warType === 23)
+    return { startRank: 1, endRank: 200, name: "紫青月宫" };
   // Sun: 24, 25 -> 1-80
-  if (warType === 24 || warType === 25) return { startRank: 1, endRank: 80, name: "黄金天宫" };
-  
+  if (warType === 24 || warType === 25)
+    return { startRank: 1, endRank: 80, name: "黄金天宫" };
+
   return null;
 }
 

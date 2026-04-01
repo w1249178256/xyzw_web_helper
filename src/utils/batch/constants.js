@@ -41,6 +41,7 @@ export const availableTasks = [
   { label: "智能发车", value: "batchSmartSendCar" },
   { label: "一键收车", value: "batchClaimCars" },
   { label: "批量开箱", value: "batchOpenBox" },
+  { label: "按积分开箱", value: "batchOpenBoxByPoints" },
   { label: "领取宝箱积分", value: "batchClaimBoxPointReward" },
   { label: "批量钓鱼", value: "batchFish" },
   { label: "批量招募", value: "batchRecruit" },
@@ -58,10 +59,11 @@ export const availableTasks = [
   { label: "免费领取珍宝阁", value: "collection_claimfreereward" },
   { label: "批量领取功法残卷", value: "batchLegacyClaim" },
   { label: "批量赠送功法残卷", value: "batchLegacyGiftSendEnhanced" },
-  { label: "一键合成怪异塔道具", value: "batchMergeItems" },
-  { label: "一键怪异塔合成", value: "batchMergeWeirdItems" },
+  { label: "一键使用怪异塔道具", value: "batchUseItems" },
+  { label: "一键怪异塔合成", value: "batchMergeItems" },
   { label: "一键领取蟠桃园任务", value: "batchClaimPeachTasks" },
   { label: "一键扫荡灯神", value: "batchGenieSweep" },
+  { label: "一键购买梦境商品", value: "batchBuyDreamItems" },
 ];
 
 // 车辆研究消耗表
@@ -133,7 +135,6 @@ export const defaultBatchSettings = {
   defaultFishType: 1,
   receiverId: "",
   password: "",
-  hideScheduledTasksModule: false,
   useGoldRefreshFallback: false,
   tokenListColumns: 2,
   commandDelay: 500,
@@ -143,6 +144,12 @@ export const defaultBatchSettings = {
   connectionTimeout: 10000,
   reconnectDelay: 1000,
   maxLogEntries: 1000,
+  // 智能发车阈值设置
+  smartDepartureGoldThreshold: 0,
+  smartDepartureRecruitThreshold: 0,
+  smartDepartureJadeThreshold: 0,
+  smartDepartureTicketThreshold: 0,
+  smartDepartureMatchAll: false,
 };
 
 // 默认模板

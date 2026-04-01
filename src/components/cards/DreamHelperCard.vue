@@ -124,6 +124,11 @@ import { ref, computed, watch, onMounted, onUnmounted, watchEffect } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
 import MyCard from "../Common/MyCard.vue";
+import {
+  merchantConfig,
+  goldItemsConfig,
+  isDungeonOpen,
+} from "@/utils/dreamConstants";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -170,62 +175,6 @@ const heroData = {
   119: { name: "大乔", type: "吴国" },
   120: { name: "张角", type: "群雄" },
 };
-
-// 商人配置
-const merchantConfig = {
-  1: {
-    name: "初级商人",
-    items: [
-      "进阶石",
-      "精铁",
-      "木质宝箱",
-      "青铜宝箱",
-      "普通鱼竿",
-      "挑战票",
-      "咸神火把",
-    ],
-  },
-  2: {
-    name: "中级商人",
-    items: [
-      "梦魇晶石",
-      "进阶石",
-      "精铁",
-      "黄金宝箱",
-      "黄金鱼竿",
-      "招募令",
-      "橙将碎片",
-      "紫将碎片",
-    ],
-  },
-  3: {
-    name: "高级商人",
-    items: [
-      "梦魇晶石",
-      "铂金宝箱",
-      "黄金鱼竿",
-      "招募令",
-      "红将碎片",
-      "橙将碎片",
-      "红将碎片",
-      "普通鱼竿",
-    ],
-  },
-};
-
-// 金币购买的商品配置 [商人ID][商品索引]
-const goldItemsConfig = {
-  1: [5, 6], // 初级商人: 挑战票, 咸神火把
-  2: [6, 7], // 中级商人: 橙将碎片, 紫将碎片
-  3: [5, 6, 7], // 高级商人: 橙将碎片, 红将碎片, 普通鱼竿
-};
-
-// 检查梦境开放时间（周三/周四/周日/周一）
-function isDungeonOpen() {
-  const now = new Date();
-  const day = now.getDay(); // 0=周日, 1=周一, 2=周二, 3=周三, 4=周四, 5=周五, 6=周六
-  return day === 0 || day === 1 || day === 3 || day === 4; // 周日、周一、周三、周四
-}
 
 // 延迟函数
 function delay(seconds) {

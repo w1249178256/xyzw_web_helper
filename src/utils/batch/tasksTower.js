@@ -127,25 +127,85 @@ export function createTasksTower(deps) {
               type: "info",
             });
 
-            await new Promise((r) => setTimeout(r, 2000));
+            await new Promise((r) => setTimeout(r, 1000));
 
             // Refresh energy
-            tokenStore.sendMessage(tokenId, "tower_getinfo");
-            roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
-
-            const storeRoleInfo = tokenStore.gameData?.roleInfo;
-            energy =
-              storeRoleInfo?.role?.tower?.energy ??
-              roleInfo?.role?.tower?.energy ??
-              0;
+            // 默认每5次刷新一次，或体力不足时刷新
+            if (count % 5 === 0) {
+               try {
+                  roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+                  energy = roleInfo?.role?.tower?.energy || 0;
+               } catch (e) {
+                 // 忽略刷新失败
+               }
+            } else {
+               // 尝试从本地缓存获取最新的体力信息（如果其他地方更新了）
+               const storeRoleInfo = tokenStore.gameData?.roleInfo;
+               const storeEnergy = storeRoleInfo?.role?.tower?.energy;
+               
+               // 如果store中的体力大于当前预计剩余体力，说明可能有额外恢复/奖励，使用store的值
+               if (storeEnergy !== undefined && storeEnergy > (energy - 1)) {
+                   energy = storeEnergy;
+               } else {
+                   // 本地扣除体力
+                   energy--;
+               }
+            }
           } catch (err) {
             if (err.message && err.message.includes("200400")) {
               addLog({
                 time: new Date().toLocaleTimeString(),
-                message: `${token.name} 爬塔次数已用完 (200400)`,
-                type: "info",
+                message: `${token.name} 操作过快 (200400)，等待5秒后重试...`,
+                type: "warning",
               });
-              break;
+              await new Promise((r) => setTimeout(r, 5000));
+              continue;
+            }
+
+            // 处理"上座塔奖励未领取"错误 (1500040)
+            if (err.message && err.message.includes("1500040")) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 上座塔奖励未领取，尝试自动领取并等待...`,
+                type: "warning",
+              });
+              
+              // 尝试获取当前塔层数
+              try {
+                // 如果本地没有roleInfo，尝试获取一次
+                if (!roleInfo) {
+                   roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+                }
+                const towerId = roleInfo?.role?.tower?.id;
+                
+                if (towerId !== undefined) {
+                   const rewardFloor = Math.floor(towerId / 10);
+                   if (rewardFloor > 0) {
+                      addLog({
+                        time: new Date().toLocaleTimeString(),
+                        message: `${token.name} 尝试领取第 ${rewardFloor} 层奖励`,
+                        type: "info",
+                      });
+                      // 发送领取请求，不等待响应，因为可能通过事件处理了
+                      tokenStore.sendMessage(tokenId, "tower_claimreward", { rewardId: rewardFloor });
+                   }
+                }
+              } catch (e) {
+                 // 忽略获取信息失败
+              }
+
+              // 等待较长时间让领取生效
+              await new Promise((r) => setTimeout(r, 3000));
+              
+              // 刷新角色信息以更新状态
+              try {
+                 roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+                 energy = roleInfo?.role?.tower?.energy || 0;
+              } catch (e) {}
+
+              // 重置连续失败计数，因为这是一个可恢复的错误
+              consecutiveFailures = 0;
+              continue;
             }
 
             consecutiveFailures++;
