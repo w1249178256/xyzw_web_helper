@@ -41,7 +41,7 @@ const errorCodeMap = {
   12400000: "挂机奖励领取过于频繁",
   2300250: "俱乐部BOSS今日攻打次数已用完",
   400010: "物品数量不足",
-  400090: "武将等级不能大于主公等级"
+  400090: "武将等级不能大于主公等级",
   7900023: "已达到使用次数上限",
   7900022: "已经击杀所有 boss",
   12300040: "没有空格子了",
@@ -298,10 +298,8 @@ export function registerDefaultCommands(reg) {
     // 武将升级相关
     .register("hero_heroupgradelevel") //武将升级
     .register("hero_heroupgradeorder") //武将进阶
-<<<<<<< HEAD
     .register("hero_lordupgradelevel") //主公升级
     .register("hero_lordupgradeorder") //主公进阶
-=======
     .register("hero_rebirth") //武将重新birth
 
     // 升星相关
