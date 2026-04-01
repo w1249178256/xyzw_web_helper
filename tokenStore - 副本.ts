@@ -28,6 +28,7 @@ declare interface TokenData {
   remark?: string; // 备注信息
   importMethod?: "manual" | "bin" | "url" | "wxQrcode"; // 导入方式：manual（手动）、bin文件或url链接
   sourceUrl?: string; // 当importMethod为url时，存储url链接
+  originalStorageKey?: string; // 原始存储键（用于刷新token）
   avatar?: string; // 用户头像URL
   upgradedToPermanent?: boolean; // 是否升级为长期有效
   upgradedAt?: string; // 升级时间
@@ -221,6 +222,7 @@ export const useTokenStore = defineStore("tokens", () => {
       // URL获取相关信息
       sourceUrl: tokenData.sourceUrl || null, // Token来源URL（用于刷新）
       importMethod: tokenData.importMethod || "manual", // 导入方式：manual 或 url
+      originalStorageKey: tokenData.originalStorageKey || null, // 原始存储键（用于刷新token）
       avatar: tokenData.avatar || "", // 用户头像
     };
 
@@ -433,18 +435,120 @@ export const useTokenStore = defineStore("tokens", () => {
       if (message.error) {
         const errText = String(message.error).toLowerCase();
         gameLogger.warn(`消息处理跳过 [${tokenId}]:`, message.error);
-        if (errText.includes("token") && errText.includes("expired")) {
+        
+        // 检测 "check token error" 或 "token expired"
+        const isTokenError = errText.includes("check token error") || 
+                            (errText.includes("token") && errText.includes("expired"));
+        
+        if (isTokenError) {
           const conn = wsConnections.value[tokenId];
           if (conn) {
             conn.status = "error";
             conn.lastError = {
               timestamp: new Date().toISOString(),
-              error: "token expired",
+              error: message.error,
             };
           }
 
           const gameToken = gameTokens.value.find((t) => t.id === tokenId);
           if (gameToken) {
+<<<<<<< HEAD
+            if (gameToken.importMethod === "url" && gameToken.sourceUrl) {
+              // URL 形式 token 刷新
+              try {
+                const response = await fetch(gameToken.sourceUrl);
+                if (response.ok) {
+                  const data = await response.json();
+                  if (data.token) {
+                    // 直接使用返回的 token，无需 transformToken
+                    updateToken(tokenId, { ...gameToken, token: data.token });
+                    console.log("从 URL 获取 token 成功:", gameToken.name);
+                    refreshSuccess = true;
+                  }
+                }
+              } catch (error) {
+                console.error("从 URL 获取 token 失败:", error);
+              }
+            } else if (
+              gameToken.importMethod === "bin" ||
+              gameToken.importMethod === "wxQrcode"
+            ) {
+              // Bin 形式 token 刷新（兼容新旧两种 key 格式）
+              // 优先使用 originalStorageKey，如果有
+              // 然后使用新的 tokenId 作为 key
+              // 最后尝试旧的 name 作为 key
+              let userToken: ArrayBuffer | null = null;
+              let storageKey = null;
+              let usedOldKey = false;
+              
+              // 1. 优先使用 originalStorageKey
+              if (gameToken.originalStorageKey) {
+                userToken = await getArrayBuffer(
+                  gameToken.originalStorageKey,
+                );
+                storageKey = gameToken.originalStorageKey;
+              }
+              
+              // 2. 如果没有 originalStorageKey 或获取失败，使用 tokenId
+              if (!userToken) {
+                userToken = await getArrayBuffer(
+                  tokenId,
+                );
+                storageKey = tokenId;
+              }
+              
+              // 3. 如果还是失败，尝试使用 name 作为 key
+              if (!userToken) {
+                userToken = await getArrayBuffer(
+                  gameToken.name,
+                );
+                storageKey = gameToken.name;
+                usedOldKey = true;
+              }
+              
+              console.log("读取到的 ArrayBuffer:", storageKey, userToken);
+              if (userToken) {
+                const token = await transformToken(userToken);
+                updateToken(tokenId, { ...gameToken, token });
+                // 如果使用旧的 key 读取成功，则用新的 tokenId key 重新保存并删除旧数据
+                if (usedOldKey) {
+                  await storeArrayBuffer(tokenId, userToken);
+                  await deleteArrayBuffer(gameToken.name);
+                  console.log("已迁移 IndexedDB 数据:", gameToken.name, "->", tokenId);
+                }
+                console.log(gameToken);
+                refreshSuccess = true;
+              }
+            }
+          }
+          if (refreshSuccess) {
+            wsLogger.info(`Token 刷新成功，自动重新连接 [${tokenId}]`);
+            // 在 tokens、admin/game-features 或 fish-helper 页面自动重连
+            const currentPath = router.currentRoute.value.path;
+            const shouldAutoReconnect = 
+              currentPath === '/tokens' || 
+              currentPath === '/admin/game-features' ||
+              currentPath === '/admin/fish-helper';
+            
+            if (shouldAutoReconnect) {
+              // 先断开现有连接
+              closeWebSocketConnection(tokenId);
+              // 等待 500ms 后重新连接
+              setTimeout(() => {
+                createWebSocketConnection(
+                  tokenId,
+                  gameToken.token,
+                  gameToken.wsUrl,
+                );
+                wsLogger.info(`已自动重新连接 [${tokenId}]`);
+              }, 500);
+            } else {
+              wsLogger.info(`当前页面不自动重连：${currentPath}`);
+            }
+          } else {
+            wsLogger.error(`Token 已过期，需要重新导入 [${tokenId}]`);
+          }
+=======
             // 调用统一的Token刷新逻辑
             const refreshed = await attemptTokenRefresh(tokenId);
             if (!refreshed) {
@@ -453,6 +557,7 @@ export const useTokenStore = defineStore("tokens", () => {
               );
             }
           }
+>>>>>>> main
         }
         return;
       }
@@ -1074,7 +1179,7 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "presetteam_getinfo", params);
   };
 
-  //发送消息到世界
+  // 发送消息到世界
   const sendMessageToWorld = (tokenId: string, message: string) => {
     return sendMessageWithPromise(tokenId, "system_sendchatmessage", {
       channel: 1,
