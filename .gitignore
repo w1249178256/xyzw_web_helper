@@ -76,3 +76,6 @@ temp/
 *.exe
 node_modules/
 dist.zip
+*.bin
+bin/
+server/config.json

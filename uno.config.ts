@@ -1,10 +1,15 @@
-import { defineConfig, presetAttributify, presetIcons, presetWind } from "unocss";
+import {
+  defineConfig,
+  presetAttributify,
+  presetIcons,
+  presetWind,
+} from "unocss";
 
 export default defineConfig({
   shortcuts: [
     {
       // 按钮基础样式
-      "btn": "px-4 py-2 rounded inline-block",
+      btn: "px-4 py-2 rounded inline-block",
       "btn-primary": "btn bg-blue-500 text-white hover:bg-blue-700",
       "btn-secondary": "btn bg-gray-500 text-white hover:bg-gray-700",
       "btn-danger": "btn bg-red-500 text-white hover:bg-red-700",
@@ -14,7 +19,7 @@ export default defineConfig({
       "grid-basic": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
 
       // 卡片系列
-      "card": "bg-white rounded-lg shadow p-4",
+      card: "bg-white rounded-lg shadow p-4",
     },
     [/^i-ad:(.*)$/, (p) => `i-ant-design:${p[1]}`],
     [/^i-c:(.*)$/, (p) => `i-carbon:${p[1]}`],
@@ -35,12 +40,14 @@ export default defineConfig({
   },
   presets: [
     presetWind(),
-    presetAttributify({ /* preset options */ }),
+    presetAttributify({
+      /* preset options */
+    }),
     presetIcons({
       scale: 1.25,
-      autoInstall: true,
+      autoInstall: false,
       extraProperties: {
-        "display": "inline-block",
+        display: "inline-block",
         "vertical-align": "text-bottom",
       },
       processor(css, meta) {

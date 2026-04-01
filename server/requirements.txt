@@ -1,0 +1,4 @@
+flask
+flask-cors
+requests
+werkzeug

@@ -386,10 +386,169 @@ export function createTasksHangUp(deps) {
     message.success("批量俱乐部签到结束");
   };
 
+  /**
+   * 月赛助威
+   * @param {number} legionId - 俱乐部ID
+   * @param {number} guessCoin - 竞猜币数量
+   */
+  const batchWarGuessCheer = async (legionId, guessCoin) => {
+    if (selectedTokens.value.length === 0) {
+      message.warning("请先选择账号");
+      return;
+    }
+    if (!legionId) {
+      message.warning("请选择要助威的俱乐部");
+      return;
+    }
+    
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 开始助威: ${token.name} ===`,
+          type: "info",
+        });
+        await ensureConnection(tokenId);
+        
+        // 尝试领取拍手器
+        try {
+          const rewardRes = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "warguess_getguesscoinreward",
+            {},
+            3000 // 短超时，因为这不是关键步骤
+          );
+          if (rewardRes && rewardRes.reward) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `=== ${token.name} 领取拍手器成功 ===`,
+              type: "success",
+            });
+          }
+        } catch (e) {
+          // 忽略领取失败
+          // console.warn("领取拍手器失败", e);
+        }
+
+        // 获取助威数据以判断次数
+        const rankRes = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "warguess_getrank",
+          { bfId: '' },
+          5000,
+        );
+
+        let totalGuessNum = 0;
+        if (rankRes && rankRes.list) {
+          let list = [];
+          if (Array.isArray(rankRes.list)) {
+            list = rankRes.list;
+          } else {
+            list = Object.values(rankRes.list);
+          }
+          totalGuessNum = list.reduce((sum, item) => sum + (item.guessNum || 0), 0);
+        }
+
+        if (totalGuessNum === 20) {
+             addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `=== ${token.name} 助威次数已满 (${totalGuessNum}/20)，跳过 ===`,
+                type: "warning",
+              });
+             tokenStatus.value[tokenId] = "completed";
+             return;
+        }
+
+        let coinToUse = Number(guessCoin);
+        const remaining = 20 - totalGuessNum;
+        
+        if (coinToUse > remaining) {
+            addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `=== ${token.name} 剩余助威次数不足，调整为 ${remaining} 次 (原计划: ${coinToUse}) ===`,
+                type: "info",
+            });
+            coinToUse = remaining;
+        }
+
+        if (coinToUse <= 0) {
+             tokenStatus.value[tokenId] = "completed";
+             return;
+        }
+
+        const result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "warguess_startguess",
+          { guessCoin: coinToUse, legionId: legionId },
+          5000,
+        );
+
+        if (result && result.guessLegion) {
+             addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `=== ${token.name} 助威成功 (当前次数: ${result.guessLegion.guessNum}/20) ===`,
+                type: "success",
+              });
+             tokenStatus.value[tokenId] = "completed";
+        } else {
+             addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `=== ${token.name} 助威失败 ===`,
+                type: "error",
+              });
+             tokenStatus.value[tokenId] = "failed";
+        }
+      } catch (error) {
+        console.error(error);
+        
+        // Handle specific error: 400000 - Item does not exist (feature locked)
+        if (error.code === 400000 || (error.message && error.message.includes("400000"))) {
+          tokenStatus.value[tokenId] = "completed"; // Mark as completed (skipped)
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `=== ${token.name} 助威失败: 未解锁该功能===`,
+            type: "warning",
+          });
+        } else {
+          tokenStatus.value[tokenId] = "failed";
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 助威失败: ${error.message || "未知错误"}`,
+            type: "error",
+          });
+        }
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭`,
+          type: "info",
+        });
+      }
+    });
+
+    await Promise.all(taskPromises);
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("批量助威结束");
+  };
+
   return {
     claimHangUpRewards,
     batchAddHangUpTime,
     batchStudy,
     batchclubsign,
+    batchWarGuessCheer,
   };
 }

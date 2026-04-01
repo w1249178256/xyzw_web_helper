@@ -108,14 +108,8 @@
             <div class="table-cell rank">
               <div class="rank-container">
                 <span v-if="index === 0" class="rank-medal gold"></span>
-                <span
-                  v-else-if="index === 1"
-                  class="rank-medal silver"
-                ></span>
-                <span
-                  v-else-if="index === 2"
-                  class="rank-medal bronze"
-                ></span>
+                <span v-else-if="index === 1" class="rank-medal silver"></span>
+                <span v-else-if="index === 2" class="rank-medal bronze"></span>
                 <span v-else class="rank-number">{{ index + 1 }}</span>
               </div>
             </div>
@@ -1307,6 +1301,8 @@ const getAllianceClass = (alliance) => {
       return "alliance-xin-justice";
     case "龙盟":
       return "alliance-dragon";
+    case "曦盟":
+      return "alliance-xi";
     case "未知联盟":
       return "alliance-unknown";
     default:
@@ -1342,85 +1338,28 @@ const fetchBattleRecords1 = async () => {
   }
 
   loading1.value = true;
-    try {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "legion_getarearank",
-        {},
-        10000,
-      );
+  try {
+    const result = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "legion_getarearank",
+      {},
+      10000,
+    );
 
-      if (!result?.list) {
-        battleRecords1.value = null;
-        message.warning("未查询到俱乐部数据");
-        return;
-      }
-      const detailPromises = result.list.map(async (club) => {
-        try {
-          const detail = await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "legion_getinfobyid",
-            { legionId: club.id },
-            10000,
-          );
-          if (!detail) {
-            return {
-              ...club,
-              redQuench: 0,
-              power: 0,
-              announcement: "未知",
-              redno: 0,
-              redno1: "0红",
-              redno2: "0红",
-              redno3: "0红",
-              hb1: 0,
-              hb2: 0,
-              hb3: 0,
-              topHeroes: [],
-              level: 30,
-            };
-          }
-          const topHeroes = [];
-          const members = detail?.legionData?.members || {};
-
-          for (const [roleId, memberData] of Object.entries(members)) {
-            topHeroes.push({
-              id: roleId,
-              name: memberData.name || memberData.custom?.name || "未知",
-              headImg: memberData.headImg || memberData.custom?.headImg || "",
-              power: memberData?.power || 0,
-              redQuench: memberData.custom?.red_quench_cnt || 0,
-            });
-          }
-
-          // 按红淬数量降序排序，取前三
-          topHeroes.sort((a, b) => b.redQuench - a.redQuench);
-          const top3Heroes = topHeroes.slice(0, 3);
-
-          // 提取红淬数量数组
-          const redQuenchCounts = top3Heroes.map(
-            (hero) => hero.redQuench + "红",
-          );
-          // 提取圣物数量数组
-          const HolyBeastNum = top3Heroes.map((hero) => hero.holyBeast);
-
-          return {
-            ...club,
-            redQuench: detail?.legionData?.quenchNum || 0,
-            power: detail?.legionData?.power || 0,
-            announcement: detail?.legionData?.announcement || 0,
-            redno: redQuenchCounts || 0,
-            redno1: redQuenchCounts[0] || "0红",
-            redno2: redQuenchCounts[1] || "0红",
-            redno3: redQuenchCounts[2] || "0红",
-            hb1: HolyBeastNum[0] || 0,
-            hb2: HolyBeastNum[1] || 0,
-            hb3: HolyBeastNum[2] || 0,
-            topHeroes: top3Heroes,
-            level: 30,
-          };
-        } catch (error) {
-          console.error(`查询俱乐部${club.id}详情失败:`, error);
+    if (!result?.list) {
+      battleRecords1.value = null;
+      message.warning("未查询到俱乐部数据");
+      return;
+    }
+    const detailPromises = result.list.map(async (club) => {
+      try {
+        const detail = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "legion_getinfobyid",
+          { legionId: club.id },
+          10000,
+        );
+        if (!detail) {
           return {
             ...club,
             redQuench: 0,
@@ -1437,27 +1376,82 @@ const fetchBattleRecords1 = async () => {
             level: 30,
           };
         }
-      });
-      const processedClubs = await Promise.all(detailPromises);
+        const topHeroes = [];
+        const members = detail?.legionData?.members || {};
 
-      // 1. 为每个俱乐部添加联盟信息，直接按返回的list顺序显示
-      const sortedLegionList = processedClubs.map((club) => ({
-        ...club,
-        alliance: allianceincludes(club.announcement),
-      }));
+        for (const [roleId, memberData] of Object.entries(members)) {
+          topHeroes.push({
+            id: roleId,
+            name: memberData.name || memberData.custom?.name || "未知",
+            headImg: memberData.headImg || memberData.custom?.headImg || "",
+            power: memberData?.power || 0,
+            redQuench: memberData.custom?.red_quench_cnt || 0,
+          });
+        }
 
-      battleRecords1.value = {
-        ...result,
-        legionRankList: sortedLegionList,
-      };
-      message.success("俱乐部数据加载成功");
-    } catch (error) {
-      console.error("查询失败:", error);
-      message.error(`查询失败: ${error.message}`);
-      battleRecords1.value = null;
-    } finally {
-      loading1.value = false;
-    }
+        // 按红淬数量降序排序，取前三
+        topHeroes.sort((a, b) => b.redQuench - a.redQuench);
+        const top3Heroes = topHeroes.slice(0, 3);
+
+        // 提取红淬数量数组
+        const redQuenchCounts = top3Heroes.map((hero) => hero.redQuench + "红");
+        // 提取圣物数量数组
+        const HolyBeastNum = top3Heroes.map((hero) => hero.holyBeast);
+
+        return {
+          ...club,
+          redQuench: detail?.legionData?.quenchNum || 0,
+          power: detail?.legionData?.power || 0,
+          announcement: detail?.legionData?.announcement || 0,
+          redno: redQuenchCounts || 0,
+          redno1: redQuenchCounts[0] || "0红",
+          redno2: redQuenchCounts[1] || "0红",
+          redno3: redQuenchCounts[2] || "0红",
+          hb1: HolyBeastNum[0] || 0,
+          hb2: HolyBeastNum[1] || 0,
+          hb3: HolyBeastNum[2] || 0,
+          topHeroes: top3Heroes,
+          level: 30,
+        };
+      } catch (error) {
+        console.error(`查询俱乐部${club.id}详情失败:`, error);
+        return {
+          ...club,
+          redQuench: 0,
+          power: 0,
+          announcement: "未知",
+          redno: 0,
+          redno1: "0红",
+          redno2: "0红",
+          redno3: "0红",
+          hb1: 0,
+          hb2: 0,
+          hb3: 0,
+          topHeroes: [],
+          level: 30,
+        };
+      }
+    });
+    const processedClubs = await Promise.all(detailPromises);
+
+    // 1. 为每个俱乐部添加联盟信息，直接按返回的list顺序显示
+    const sortedLegionList = processedClubs.map((club) => ({
+      ...club,
+      alliance: allianceincludes(club.announcement),
+    }));
+
+    battleRecords1.value = {
+      ...result,
+      legionRankList: sortedLegionList,
+    };
+    message.success("俱乐部数据加载成功");
+  } catch (error) {
+    console.error("查询失败:", error);
+    message.error(`查询失败: ${error.message}`);
+    battleRecords1.value = null;
+  } finally {
+    loading1.value = false;
+  }
 };
 // 刷新战绩
 const handleRefresh1 = () => {
@@ -1530,7 +1524,9 @@ const exportToImage = async () => {
     });
 
     // 6. Canvas转图片链接并下载
-    const filename = inputDate1.value.replace("/", "年").replace("/", "月") + "日TOP五百服俱乐部信息.png";
+    const filename =
+      inputDate1.value.replace("/", "年").replace("/", "月") +
+      "日TOP五百服俱乐部信息.png";
     downloadCanvasAsImage(canvas, filename);
   } catch (err) {
     console.error("DOM转图片失败：", err);
@@ -2536,6 +2532,12 @@ onMounted(() => {
       &.alliance-dragon {
         .alliance-tag {
           background: var(--error-color);
+        }
+      }
+
+      &.alliance-xi {
+        .alliance-tag {
+          background: #9c27b0;
         }
       }
 

@@ -175,6 +175,14 @@
           </div>
           <div
             class="alliance-tab"
+            :class="{ active: activeAlliance === '曦盟' }"
+            @click="setActiveAlliance('曦盟')"
+          >
+            <span class="tab-text">曦盟</span>
+            <span class="tab-count">{{ getActiveAllianceCount("曦盟") }}</span>
+          </div>
+          <div
+            class="alliance-tab"
             :class="{ active: activeAlliance === '未知联盟' }"
             @click="setActiveAlliance('未知联盟')"
           >
@@ -903,6 +911,7 @@ const allianceOptions = [
   { label: "梦盟", value: "梦盟" },
   { label: "正义联盟", value: "正义联盟" },
   { label: "龙盟", value: "龙盟" },
+  { label: "曦盟", value: "曦盟" },
   { label: "未知联盟", value: "未知联盟" },
 ];
 
@@ -972,7 +981,8 @@ const handleRankBlur = (member) => {
 
   // 查找占用新排名的俱乐部
   const targetMemberId = Object.keys(manualRankings.value).find(
-    (id) => String(id) !== String(member.id) && manualRankings.value[id] === newRank
+    (id) =>
+      String(id) !== String(member.id) && manualRankings.value[id] === newRank,
   );
 
   if (targetMemberId) {
@@ -989,7 +999,7 @@ const handleRankBlur = (member) => {
 // 获取成员名称辅助函数
 const getMemberName = (id) => {
   const member = battleRecords1.value?.legionRankList.find(
-    (m) => String(m.id) === String(id)
+    (m) => String(m.id) === String(id),
   );
   return member ? member.name : "未知俱乐部";
 };
@@ -1662,6 +1672,8 @@ const getAllianceClass = (alliance) => {
       return "alliance-xin-justice";
     case "龙盟":
       return "alliance-dragon";
+    case "曦盟":
+      return "alliance-xi";
     case "未知联盟":
       return "alliance-unknown";
     default:
@@ -2192,7 +2204,7 @@ const exportToImage = async () => {
   }
 
   // 获取 table-container
-  const tableContainer = exportDom.value.querySelector('.table-container');
+  const tableContainer = exportDom.value.querySelector(".table-container");
   // 保存滚动位置
   const scrollTop = tableContainer ? tableContainer.scrollTop : 0;
 
@@ -2205,7 +2217,7 @@ const exportToImage = async () => {
       // 保存原始样式
       tableContainer.dataset.originalHeight = tableContainer.style.height;
       tableContainer.dataset.originalOverflow = tableContainer.style.overflow;
-      
+
       tableContainer.style.height = "auto";
       tableContainer.style.overflow = "visible";
     }
@@ -2227,33 +2239,35 @@ const exportToImage = async () => {
     });
 
     // 6. Canvas转图片链接并下载
-    const filename = queryDate.value.replace("/", "年").replace("/", "月") + "日盐场匹配信息.png";
+    const filename =
+      queryDate.value.replace("/", "年").replace("/", "月") +
+      "日盐场匹配信息.png";
     downloadCanvasAsImage(canvas, filename);
   } catch (err) {
     console.error("DOM转图片失败：", err);
     alert("导出图片失败，请重试");
   } finally {
     // 恢复原始样式
-    exportDom.value.style.removeProperty('height');
-    exportDom.value.style.removeProperty('overflow');
-    
+    exportDom.value.style.removeProperty("height");
+    exportDom.value.style.removeProperty("overflow");
+
     if (tableContainer) {
       if (tableContainer.dataset.originalHeight) {
         tableContainer.style.height = tableContainer.dataset.originalHeight;
       } else {
-        tableContainer.style.removeProperty('height');
+        tableContainer.style.removeProperty("height");
       }
-      
+
       if (tableContainer.dataset.originalOverflow) {
         tableContainer.style.overflow = tableContainer.dataset.originalOverflow;
       } else {
-        tableContainer.style.removeProperty('overflow');
+        tableContainer.style.removeProperty("overflow");
       }
-      
+
       // 清理 dataset
       delete tableContainer.dataset.originalHeight;
       delete tableContainer.dataset.originalOverflow;
-      
+
       // 恢复滚动位置
       tableContainer.scrollTop = scrollTop;
     }
@@ -3254,6 +3268,12 @@ onMounted(() => {
       &.alliance-dragon {
         .alliance-tag {
           background: var(--error-color);
+        }
+      }
+
+      &.alliance-xi {
+        .alliance-tag {
+          background: #9c27b0;
         }
       }
 

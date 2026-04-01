@@ -39,7 +39,7 @@ export class GameCommands {
     return {
       cmd: "role_getroleinfo",
       body: this.g_utils.bon.encode({
-        clientVersion: "2.10.3-f10a39eaa0c409f4-wx",
+        clientVersion: "2.21.2-fa918e1997301834-wx",
         inviteUid: 0,
         platform: "hortor",
         platformExt: "mix",
