@@ -1,0 +1,44 @@
+name: uild Web to APK (咸鱼之王助手) on
+ 上:
+   push :
+     branches : [ main ]
+   workflow_dispatch : # 允许手动触发
+ jOBS:
+   build :
+     runs-on : ubuntu-latest
+     steps :
+       # 1. 拉取代码
+       - name: Checkout code
+         uses : actions/checkout@v4
+       # 2. 安装Node.js环境
+       Set up Node.js name: 设立节点
+         uses : actions/setup-node@v4
+         with :
+           node-version : 20
+           cache : 'npm'
+       # 3. 安装依赖
+       - name: Install dependencies
+         run : npm install
+       # 4. 构建Web项目（生成dist文件夹）
+       - name: Build Vue project
+         run: npm run build
+       # 5. 用Capacitor把Web打包成APK
+       - name: Install Capacitor
+         run: |
+           npm install -g @capacitor/cli
+           npm install @capacitor/core @capacitor/android
+       # 6. 同步Web构建产物到Android项目
+       - name: Sync Capacitor
+         run: npx cap sync android
+       # 7. 打包APK
+       - name: Build APK
+         run: |
+           cd android
+           chmod +x ./gradlew
+           ./gradlew assembleRelease
+       # 8. 上传APK供下载
+       - name: Upload APK
+         uses: actions/upload-artifact@v4
+         with:
+           name: xyzw-apk
+           path: android/app/build/outputs/apk/release/*.apk
