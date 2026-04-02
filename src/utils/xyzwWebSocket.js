@@ -287,6 +287,8 @@ export function registerDefaultCommands(reg) {
     .register("artifact_unload")
     .register("lordweapon_changedefaultweapon")
     .register("pearl_replaceskill")
+    .register("pearl_exchangeskill")
+    .register("pearl_unloadskill")
 
     // 武将升级相关
     .register("hero_heroupgradelevel") //武将升级
@@ -1091,6 +1093,8 @@ export class XyzwWebSocketClient {
       legion_researchresp: "legion_research",
       legion_resetresearchresp: "legion_resetresearch",
       pearl_replaceskillresp: "pearl_replaceskill",
+      pearl_exchangeskillresp: "pearl_exchangeskill",
+      pearl_unloadskillresp: "pearl_unloadskill",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
       bosstower_getinforesp: "bosstower_getinfo",

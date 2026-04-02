@@ -161,17 +161,29 @@
         </div>
         <div v-else class="saved-lineups-modal-content">
           <div class="team-tabs">
-            <div
-              v-for="teamId in availableTeams"
-              :key="teamId"
-              class="team-tab"
-              :class="{ active: selectedTeamTab === teamId }"
-              @click="selectedTeamTab = teamId"
-            >
-              槽位{{ teamId }}
-              <span class="tab-count"
-                >({{ getLineupsByTeamId(teamId).length }})</span
+            <div class="team-tabs-left">
+              <div
+                v-for="teamId in availableTeams"
+                :key="teamId"
+                class="team-tab"
+                :class="{ active: selectedTeamTab === teamId }"
+                @click="selectedTeamTab = teamId"
               >
+                槽位{{ teamId }}
+                <span class="tab-count"
+                  >({{ getLineupsByTeamId(teamId).length }})</span
+                >
+              </div>
+            </div>
+            <div class="team-tabs-right">
+              <n-button size="tiny" @click="exportLineups"> 导出 </n-button>
+              <n-upload
+                :show-file-list="false"
+                :custom-request="importLineups"
+                accept=".json"
+              >
+                <n-button size="tiny">导入</n-button>
+              </n-upload>
             </div>
           </div>
           <div class="lineups-list">
@@ -540,6 +552,15 @@ const COMMAND_DELAY = 500;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const generateLineupId = () => {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 32; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 const state = ref({
   isRunning: false,
 });
@@ -608,8 +629,8 @@ const syncLegionResearch = async (tokenId, targetResearch) => {
         advanced: false,
         type: type,
       });
-      await delay(COMMAND_DELAY);
     } catch (err) {}
+    await delay(COMMAND_DELAY);
   }
 
   const sortedTypes = [...typesToReset].sort((a, b) => a - b);
@@ -631,8 +652,8 @@ const syncLegionResearch = async (tokenId, targetResearch) => {
                 researchId: techId,
               },
             );
-            await delay(COMMAND_DELAY);
           } catch (err) {}
+          await delay(COMMAND_DELAY);
         } else {
           for (let i = 0; i < targetLevel; i++) {
             try {
@@ -644,8 +665,8 @@ const syncLegionResearch = async (tokenId, targetResearch) => {
                   researchId: techId,
                 },
               );
-              await delay(COMMAND_DELAY);
             } catch (err) {}
+            await delay(COMMAND_DELAY);
           }
         }
       }
@@ -995,7 +1016,6 @@ const showHeroRefineModal = async (hero) => {
         "role_getroleinfo",
         {},
       );
-      await delay(COMMAND_DELAY);
       const role = roleInfo?.role || roleInfo;
       const heroes = role?.heroes || {};
       allHeroesData.value = heroes;
@@ -1008,10 +1028,10 @@ const showHeroRefineModal = async (hero) => {
       message.warning("未找到该武将的装备数据");
     }
   } catch (error) {
-    message.error(`获取装备信息失败: ${error.message}`);
   } finally {
     refineModalLoading.value = false;
   }
+  await delay(COMMAND_DELAY);
 };
 
 const openExchangeModal = (hero) => {
@@ -1396,6 +1416,7 @@ const saveCurrentLineup = async () => {
     });
 
     savedLineups.value.unshift({
+      id: generateLineupId(),
       name: lineupName,
       heroes: heroesData,
       teamId: currentTeamId.value,
@@ -1470,9 +1491,9 @@ const applyHeroLevel = async (tokenId, heroId, targetLevel, currentLevel) => {
       await tokenStore.sendMessageWithPromise(tokenId, "hero_rebirth", {
         heroId,
       });
-      await delay(COMMAND_DELAY);
       actualCurrentLevel = 1;
     } catch (err) {}
+    await delay(COMMAND_DELAY);
   }
 
   if (actualCurrentLevel >= targetLevel) {
@@ -1504,9 +1525,9 @@ const applyHeroLevel = async (tokenId, heroId, targetLevel, currentLevel) => {
           upgradeNum,
         },
       );
-      await delay(COMMAND_DELAY);
       actualCurrentLevel += upgradeNum;
     } catch (err) {}
+    await delay(COMMAND_DELAY);
 
     if (nextOrderLevel && actualCurrentLevel >= nextOrderLevel) {
       try {
@@ -1517,8 +1538,8 @@ const applyHeroLevel = async (tokenId, heroId, targetLevel, currentLevel) => {
             heroId,
           },
         );
-        await delay(COMMAND_DELAY);
       } catch (err) {}
+      await delay(COMMAND_DELAY);
     }
   }
 
@@ -1575,6 +1596,7 @@ const applyLineup = async (lineup) => {
       "presetteam_getinfo",
       {},
     );
+    await delay(COMMAND_DELAY);
     const heroes = roleInfo?.role?.heroes || roleInfo?.heroes || {};
     const pearlMapData = roleInfo?.role?.pearlMap || roleInfo?.pearlMap || {};
     const artifactBooksData =
@@ -1634,10 +1656,10 @@ const applyLineup = async (lineup) => {
                 slot: emptySlot,
               },
             );
-            await delay(COMMAND_DELAY);
           } catch (err) {
             continue;
           }
+          await delay(COMMAND_DELAY);
 
           try {
             await tokenStore.sendMessageWithPromise(
@@ -1648,8 +1670,8 @@ const applyLineup = async (lineup) => {
                 slot: emptySlot + 1,
               },
             );
-            await delay(COMMAND_DELAY);
           } catch (err) {}
+          await delay(COMMAND_DELAY);
         }
 
         try {
@@ -1657,13 +1679,14 @@ const applyLineup = async (lineup) => {
             heroId: currentHolderId,
             targetHeroId: targetHero.heroId,
           });
-          await delay(COMMAND_DELAY);
         } catch (err) {}
+        await delay(COMMAND_DELAY);
       }
     }
 
     await delay(COMMAND_DELAY);
     const data1 = await fetchLatestData();
+    await delay(COMMAND_DELAY);
     heroes = data1.heroes;
     for (const [id, hero] of Object.entries(heroes)) {
       if (hero.attachmentUid && hero.attachmentUid !== -1) {
@@ -1676,7 +1699,6 @@ const applyLineup = async (lineup) => {
 
     for (const hero of [...currentHeroes]) {
       if (!targetHeroIds.has(hero.heroId)) {
-        if (currentHeroes.length <= targetHeroes.length) break;
         try {
           await tokenStore.sendMessageWithPromise(
             tokenId,
@@ -1685,9 +1707,8 @@ const applyLineup = async (lineup) => {
               slot: hero.position,
             },
           );
-          await delay(COMMAND_DELAY);
-          currentHeroes = currentHeroes.filter((h) => h.heroId !== hero.heroId);
         } catch (err) {}
+        await delay(COMMAND_DELAY);
       }
     }
 
@@ -1696,57 +1717,11 @@ const applyLineup = async (lineup) => {
     await delay(COMMAND_DELAY);
     currentHeroes = getTeamHeroes(data2.teamInfo);
 
-    const needPositionFix = targetHeroes.some((targetHero) => {
+    for (const targetHero of targetHeroes) {
       const currentHero = currentHeroes.find(
         (h) => h.heroId === targetHero.heroId,
       );
-      return !currentHero || currentHero.position !== targetHero.position;
-    });
-
-    if (needPositionFix) {
-      const correctHeroes = currentHeroes.filter((h) => {
-        const target = targetHeroes.find((t) => t.heroId === h.heroId);
-        return target && target.position === h.position;
-      });
-
-      const heroesToRemove = currentHeroes.filter((h) => {
-        const target = targetHeroes.find((t) => t.heroId === h.heroId);
-        return !target || target.position !== h.position;
-      });
-
-      const keepHero =
-        correctHeroes.length > 0
-          ? correctHeroes[0]
-          : heroesToRemove.length > 0
-            ? heroesToRemove.pop()
-            : null;
-
-      for (const hero of heroesToRemove) {
-        try {
-          await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "hero_gobackbattle",
-            {
-              slot: hero.position,
-            },
-          );
-          await delay(COMMAND_DELAY);
-        } catch (err) {}
-      }
-
-      const heroesToDeploy = targetHeroes.filter((t) => {
-        if (
-          keepHero &&
-          t.heroId === keepHero.heroId &&
-          t.position === keepHero.position
-        ) {
-          return false;
-        }
-        const current = currentHeroes.find((h) => h.heroId === t.heroId);
-        return !current || current.position !== t.position;
-      });
-
-      for (const targetHero of heroesToDeploy) {
+      if (!currentHero) {
         try {
           await tokenStore.sendMessageWithPromise(
             tokenId,
@@ -1756,8 +1731,31 @@ const applyLineup = async (lineup) => {
               slot: targetHero.position,
             },
           );
+        } catch (err) {}
+        await delay(COMMAND_DELAY);
+      } else if (currentHero.position !== targetHero.position) {
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "hero_gobackbattle",
+            {
+              slot: currentHero.position,
+            },
+          );
+          await delay(COMMAND_DELAY);
+          try {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "hero_gointobattle",
+              {
+                heroId: targetHero.heroId,
+                slot: targetHero.position,
+              },
+            );
+          } catch (err) {}
           await delay(COMMAND_DELAY);
         } catch (err) {}
+        await delay(COMMAND_DELAY);
       }
     }
 
@@ -1833,8 +1831,8 @@ const applyLineup = async (lineup) => {
                 heroId: currentHolderId,
               },
             );
-            await delay(COMMAND_DELAY);
           } catch (err) {}
+          await delay(COMMAND_DELAY);
         }
 
         try {
@@ -1843,33 +1841,104 @@ const applyLineup = async (lineup) => {
             itemId: artifactId,
             pearlId: targetHero.pearlId,
           });
-          await delay(COMMAND_DELAY);
           fishApplied++;
         } catch (err) {}
-
-        if (targetHero.skillId) {
-          const currentPearlData = pearlMap[targetHero.pearlId];
-          if (
-            currentPearlData &&
-            currentPearlData.skillId !== targetHero.skillId
-          ) {
-            try {
-              await tokenStore.sendMessageWithPromise(
-                tokenId,
-                "pearl_replaceskill",
-                {
-                  pearlId: targetHero.pearlId,
-                  skillId: targetHero.skillId,
-                },
-              );
-              await delay(COMMAND_DELAY);
-            } catch (err) {}
-          }
-        }
+        await delay(COMMAND_DELAY);
       }
 
       if (fishApplied > 0) {
         message.success(`已应用 ${fishApplied} 个鱼灵配置`);
+      }
+
+      let skillApplied = 0;
+      const skillData = await fetchLatestData();
+      const latestPearlMap = skillData.pearlMap || {};
+
+      const heroesNeedSkillChange = targetHeroes.filter((targetHero) => {
+        if (!targetHero.pearlId) return false;
+        const currentPearlData = latestPearlMap[targetHero.pearlId];
+        const currentSkillId = currentPearlData?.skillId || null;
+        const targetSkillId = targetHero.skillId || null;
+        return currentSkillId !== targetSkillId;
+      });
+
+      const processedPearlIds = new Set();
+
+      for (const targetHero of heroesNeedSkillChange) {
+        if (processedPearlIds.has(targetHero.pearlId)) continue;
+
+        const currentPearlData = latestPearlMap[targetHero.pearlId];
+        const currentSkillId = currentPearlData?.skillId || null;
+        const targetSkillId = targetHero.skillId || null;
+
+        if (!targetSkillId && currentSkillId) {
+          try {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "pearl_unloadskill",
+              {
+                pearlId: targetHero.pearlId,
+              },
+            );
+            skillApplied++;
+            processedPearlIds.add(targetHero.pearlId);
+          } catch (err) {}
+          await delay(COMMAND_DELAY);
+          continue;
+        }
+
+        if (targetSkillId && currentSkillId) {
+          const exchangeTarget = heroesNeedSkillChange.find((h) => {
+            if (h.pearlId === targetHero.pearlId) return false;
+            if (!h.skillId) return false;
+            const hPearlData = latestPearlMap[h.pearlId];
+            const hCurrentSkillId = hPearlData?.skillId || null;
+            return (
+              hCurrentSkillId === targetSkillId && h.skillId === currentSkillId
+            );
+          });
+
+          if (
+            exchangeTarget &&
+            !processedPearlIds.has(exchangeTarget.pearlId)
+          ) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "pearl_exchangeskill",
+                {
+                  pearlId1: targetHero.pearlId,
+                  pearlId2: exchangeTarget.pearlId,
+                },
+              );
+              skillApplied += 2;
+              processedPearlIds.add(targetHero.pearlId);
+              processedPearlIds.add(exchangeTarget.pearlId);
+            } catch (err) {}
+            await delay(COMMAND_DELAY);
+            continue;
+          }
+        }
+
+        if (targetSkillId && !processedPearlIds.has(targetHero.pearlId)) {
+          try {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "pearl_replaceskill",
+              {
+                pearlId: targetHero.pearlId,
+                skillId: targetHero.skillId,
+              },
+            );
+            skillApplied++;
+            processedPearlIds.add(targetHero.pearlId);
+          } catch (err) {}
+          await delay(COMMAND_DELAY);
+        }
+      }
+
+      if (skillApplied > 0) {
+        message.success(`已切换 ${skillApplied} 个鱼珠技能`);
       }
     }
 
@@ -1913,11 +1982,11 @@ const applyLineup = async (lineup) => {
               weaponId: lineup.weaponId,
             },
           );
-          await delay(COMMAND_DELAY);
           message.success(
             `玩具已切换为: ${weapon[lineup.weaponId] || lineup.weaponId}`,
           );
         } catch (err) {}
+        await delay(COMMAND_DELAY);
       }
     }
 
@@ -1973,6 +2042,170 @@ const deleteLineup = (index) => {
       message.success("阵容已删除");
     },
   });
+};
+
+const exportLineups = async () => {
+  const token = tokenStore.selectedToken;
+  if (!token) {
+    message.warning("请先选择Token");
+    return;
+  }
+
+  const tokenId = token.id;
+  const status = tokenStore.getWebSocketStatus(tokenId);
+  if (status !== "connected") {
+    message.error("WebSocket未连接，无法导出");
+    return;
+  }
+
+  try {
+    const roleInfo = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "role_getroleinfo",
+      {},
+    );
+    const role = roleInfo?.role || roleInfo;
+    const roleId = role?.roleId || role?.id;
+
+    if (!roleId) {
+      message.error("无法获取角色ID");
+      return;
+    }
+
+    const exportData = {
+      roleId: roleId,
+      exportTime: Date.now(),
+      lineups: savedLineups.value,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `阵容配置_${roleId}_${new Date().toLocaleDateString().replace(/\//g, "-")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    message.success(`已导出 ${savedLineups.value.length} 个阵容`);
+  } catch (error) {
+    message.error(`导出失败: ${error.message}`);
+  }
+};
+
+const importLineups = async ({ file }) => {
+  const token = tokenStore.selectedToken;
+  if (!token) {
+    message.warning("请先选择Token");
+    return;
+  }
+
+  const tokenId = token.id;
+  const status = tokenStore.getWebSocketStatus(tokenId);
+  if (status !== "connected") {
+    message.error("WebSocket未连接，无法导入");
+    return;
+  }
+
+  try {
+    const roleInfo = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "role_getroleinfo",
+      {},
+    );
+    const role = roleInfo?.role || roleInfo;
+    const currentRoleId = role?.roleId || role?.id;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importData = JSON.parse(e.target.result);
+
+        if (!importData.roleId || !importData.lineups) {
+          message.error("无效的阵容文件格式");
+          return;
+        }
+
+        const processImport = (lineupsToImport) => {
+          const existingIds = new Set(savedLineups.value.map((l) => l.id));
+          const newLineups = [];
+          const duplicateLineups = [];
+
+          for (const lineup of lineupsToImport) {
+            if (lineup.id && existingIds.has(lineup.id)) {
+              duplicateLineups.push(lineup);
+            } else {
+              newLineups.push({
+                ...lineup,
+                id: lineup.id || generateLineupId(),
+                savedAt: Date.now(),
+                applying: false,
+              });
+            }
+          }
+
+          if (duplicateLineups.length > 0) {
+            dialog.warning({
+              title: "发现重复阵容",
+              content: `发现 ${duplicateLineups.length} 个已存在的阵容，是否覆盖？`,
+              positiveText: "覆盖",
+              negativeText: "跳过重复",
+              onPositiveClick: () => {
+                for (const dupLineup of duplicateLineups) {
+                  const index = savedLineups.value.findIndex(
+                    (l) => l.id === dupLineup.id,
+                  );
+                  if (index !== -1) {
+                    savedLineups.value[index] = {
+                      ...dupLineup,
+                      savedAt: Date.now(),
+                      applying: false,
+                    };
+                  }
+                }
+                savedLineups.value = [...savedLineups.value, ...newLineups];
+                saveLineupsToStorage();
+                message.success(
+                  `已导入 ${newLineups.length + duplicateLineups.length} 个阵容`,
+                );
+              },
+              onNegativeClick: () => {
+                savedLineups.value = [...savedLineups.value, ...newLineups];
+                saveLineupsToStorage();
+                message.success(
+                  `已导入 ${newLineups.length} 个阵容，跳过 ${duplicateLineups.length} 个重复`,
+                );
+              },
+            });
+          } else {
+            savedLineups.value = [...savedLineups.value, ...newLineups];
+            saveLineupsToStorage();
+            message.success(`已导入 ${newLineups.length} 个阵容`);
+          }
+        };
+
+        if (importData.roleId !== currentRoleId) {
+          dialog.warning({
+            title: "角色不匹配",
+            content: `该阵容文件来自其他角色，是否继续导入？`,
+            positiveText: "导入",
+            negativeText: "取消",
+            onPositiveClick: () => {
+              processImport(importData.lineups);
+            },
+          });
+        } else {
+          processImport(importData.lineups);
+        }
+      } catch (parseError) {
+        message.error("解析文件失败，请检查文件格式");
+      }
+    };
+    reader.readAsText(file.file);
+  } catch (error) {
+    message.error(`导入失败: ${error.message}`);
+  }
 };
 
 const switchTeam = async (teamId) => {
@@ -2667,6 +2900,18 @@ onMounted(() => {
   gap: var(--spacing-xs);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: var(--spacing-sm);
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-tabs-left {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.team-tabs-right {
+  display: flex;
+  gap: var(--spacing-xs);
 }
 
 .team-tab {
