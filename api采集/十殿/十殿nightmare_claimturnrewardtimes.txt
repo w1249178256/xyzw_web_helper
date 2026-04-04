@@ -1,0 +1,45 @@
+时间: 2026/1/26 20:02:34
+服务: NightMareService
+方法: claimTurnRewardTimes
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 44,
+    "ack": 0,
+    "time": 1769428907186,
+    "resp": 43,
+    "cmd": "nightmare_clickturntableresp",
+    "body": {
+      "role": {
+        "statistics": {
+          "nm:t:red:dot": 1769428907
+        }
+      },
+      "weekAward": {
+        "maxLevel": 0,
+        "levelReward": {},
+        "turntableReward": {},
+        "turntableCnt": 0,
+        "turntableLeftCnt": 5
+      },
+      "nightMare": {
+        "weekAward": {
+          "20251215": null,
+          "20251222": null,
+          "20260126": {
+            "maxLevel": 0,
+            "levelReward": {},
+            "turntableReward": {},
+            "turntableCnt": 0,
+            "turntableLeftCnt": 5
+          }
+        },
+        "turnRewardTime": 40
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}

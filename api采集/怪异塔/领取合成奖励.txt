@@ -1,0 +1,1148 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/1/27 20:58:35
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 22
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/27 20:58:26
+服务: MergeBoxService
+方法: claimMergeProgress
+参数: [{"actType":1,"taskId":251212206}]
+结果:
+{
+  "_raw": {
+    "seq": 364,
+    "ack": 271,
+    "time": 1769518660900,
+    "resp": 272,
+    "cmd": "mergebox_claimmergeprogressresp",
+    "body": {
+      "role": {
+        "items": {
+          "1013": {
+            "quantity": 643
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1013,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "taskClaimMap": {
+          "251212206": 1769518660
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518706950_ysmsdwexk
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/27 20:58:25
+服务: MergeBoxService
+方法: claimMergeProgress
+参数: [{"actType":1,"taskId":251212204}]
+结果:
+{
+  "_raw": {
+    "seq": 362,
+    "ack": 269,
+    "time": 1769518659126,
+    "resp": 270,
+    "cmd": "mergebox_claimmergeprogressresp",
+    "body": {
+      "role": {
+        "items": {
+          "1013": {
+            "quantity": 641
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1013,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "taskClaimMap": {
+          "251212204": 1769518659
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1769518705175_qrrymgxw0
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/27 20:58:22
+服务: MergeBoxService
+方法: claimMergeProgress
+参数: [{"actType":1,"taskId":251212202}]
+结果:
+{
+  "_raw": {
+    "seq": 360,
+    "ack": 267,
+    "time": 1769518656935,
+    "resp": 268,
+    "cmd": "mergebox_claimmergeprogressresp",
+    "body": {
+      "role": {
+        "items": {
+          "1012": {
+            "quantity": 648
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1012,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "taskClaimMap": {
+          "251212202": 1769518656
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518702984_4dagb2tsw
+
+记录 #4:
+----------------------------------------
+时间: 2026/1/27 20:58:20
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":6},"targetPos":{"gridX":5,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 358,
+    "ack": 265,
+    "time": 1769518654801,
+    "resp": 266,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 3,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "6": {
+            "6": null
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518700866_tocjnztds
+
+记录 #5:
+----------------------------------------
+时间: 2026/1/27 20:58:18
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":1,"gridY":4},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 357,
+    "ack": 0,
+    "time": 1769518652365,
+    "resp": 265,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": null
+          },
+          "6": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 6,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1769518698427_703a0lgg2
+
+记录 #6:
+----------------------------------------
+时间: 2026/1/27 20:58:16
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":5},"targetPos":{"gridX":1,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 356,
+    "ack": 263,
+    "time": 1769518650699,
+    "resp": 264,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "4": {
+              "gridItemId": 6
+            }
+          },
+          "6": {
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212205": 3
+        },
+        "groupItemRecord": {
+          "1": {
+            "6": 3
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        },
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518696764_16um0fttb
+
+记录 #7:
+----------------------------------------
+时间: 2026/1/27 20:58:15
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":6},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 355,
+    "ack": 262,
+    "time": 1769518649363,
+    "resp": 263,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "6": null
+          },
+          "6": {
+            "5": {
+              "gridItemId": 5
+            }
+          }
+        },
+        "taskMap": {
+          "251212204": 6
+        },
+        "groupItemRecord": {
+          "1": {
+            "5": 6
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518695427_v7ssw7p03
+
+记录 #8:
+----------------------------------------
+时间: 2026/1/27 20:58:14
+服务: EvoTowerService
+方法: getTowerMyRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 354,
+    "ack": 261,
+    "time": 1769518648404,
+    "resp": 262,
+    "cmd": "evotower_gettowermyrankresp",
+    "body": {
+      "myRank": {
+        "roleId": 111582820,
+        "serverId": 8949,
+        "name": "神州丶相符",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+        "power": 12369976039,
+        "score": 289,
+        "legionName": "空山新雨后✨"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518694465_b63qds6p1
+
+记录 #9:
+----------------------------------------
+时间: 2026/1/27 20:58:14
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":5},"targetPos":{"gridX":4,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 353,
+    "ack": 260,
+    "time": 1769518648164,
+    "resp": 261,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "6": {
+              "gridItemId": 4
+            }
+          },
+          "5": {
+            "5": null
+          }
+        },
+        "taskMap": {
+          "251212203": 12
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 12
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 5
+        },
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518694221_f85qudo1k
+
+记录 #10:
+----------------------------------------
+时间: 2026/1/27 20:58:12
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":5},"targetPos":{"gridX":4,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 351,
+    "ack": 258,
+    "time": 1769518646258,
+    "resp": 259,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "5": null
+          },
+          "4": {
+            "5": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 47
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 47
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 5
+        },
+        {
+          "gridX": 4,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518692318_cg2a996x6
+
+记录 #11:
+----------------------------------------
+时间: 2026/1/27 20:58:10
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":6},"targetPos":{"gridX":4,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 350,
+    "ack": 257,
+    "time": 1769518644636,
+    "resp": 258,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "5": {
+              "gridItemId": 1
+            },
+            "6": {
+              "gridItemId": 3
+            }
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518690696_4upjweqn3
+
+记录 #12:
+----------------------------------------
+时间: 2026/1/27 20:58:08
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 343,
+    "ack": 0,
+    "time": 1769518642082,
+    "resp": 254,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "6": {
+              "gridConfId": 0,
+              "gridItemId": 2,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 46
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 46
+          }
+        },
+        "costTotalCnt": 84
+      },
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518688145_ufsibrgu8
+
+记录 #13:
+----------------------------------------
+时间: 2026/1/27 20:58:01
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":5},"targetPos":{"gridX":4,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 340,
+    "ack": 251,
+    "time": 1769518635643,
+    "resp": 252,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "4": {
+              "gridItemId": 100012
+            },
+            "5": null
+          }
+        },
+        "groupItemRecord": {
+          "3": {
+            "100012": 2
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 5
+        },
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518681707_sxf3s7mdq
+
+记录 #14:
+----------------------------------------
+时间: 2026/1/27 20:58:00
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":7},"targetPos":{"gridX":4,"gridY":4}}]
+结果:
+{
+  "_raw": {
+    "seq": 339,
+    "ack": 0,
+    "time": 1769518634654,
+    "resp": 251,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "7": null
+          },
+          "4": {
+            "4": {
+              "gridItemId": 100011
+            }
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518680715_jcqnt26g4
+
+记录 #15:
+----------------------------------------
+时间: 2026/1/27 20:57:57
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":4,"gridY":6},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 338,
+    "ack": 249,
+    "time": 1769518631697,
+    "resp": 250,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "6": null
+          },
+          "6": {
+            "5": {
+              "gridItemId": 4
+            }
+          }
+        },
+        "taskMap": {
+          "251212203": 11
+        },
+        "groupItemRecord": {
+          "1": {
+            "4": 11
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518677763_7j6lhweto
+
+记录 #16:
+----------------------------------------
+时间: 2026/1/27 20:57:56
+服务: MergeBoxService
+方法: moveItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":8},"targetPos":{"gridX":5,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 337,
+    "ack": 248,
+    "time": 1769518630822,
+    "resp": 249,
+    "cmd": "mergebox_moveitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "5": {
+              "gridConfId": 0,
+              "gridItemId": 2,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "8": null
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518676885_197x0wq97
+
+记录 #17:
+----------------------------------------
+时间: 2026/1/27 20:57:55
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":7},"targetPos":{"gridX":7,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 336,
+    "ack": 247,
+    "time": 1769518629195,
+    "resp": 248,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "6": {
+              "gridItemId": 100002
+            },
+            "7": null
+          }
+        },
+        "groupItemRecord": {
+          "2": {
+            "100002": 5
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 7
+        },
+        {
+          "gridX": 7,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518675262_l45bc63vs
+
+记录 #18:
+----------------------------------------
+时间: 2026/1/27 20:57:54
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":6,"gridY":7},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 335,
+    "ack": 246,
+    "time": 1769518628172,
+    "resp": 247,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "6": {
+            "5": {
+              "gridItemId": 3
+            },
+            "7": null
+          }
+        },
+        "taskMap": {
+          "251212202": 23
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 23
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 6,
+          "gridY": 7
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518674237_lkg5314bu
+
+记录 #19:
+----------------------------------------
+时间: 2026/1/27 20:57:52
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":3,"gridY":6},"targetPos":{"gridX":4,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 333,
+    "ack": 244,
+    "time": 1769518626382,
+    "resp": 245,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "3": {
+            "6": null
+          },
+          "4": {
+            "6": {
+              "gridItemId": 3
+            }
+          }
+        },
+        "taskMap": {
+          "251212202": 21
+        },
+        "groupItemRecord": {
+          "1": {
+            "3": 21
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 3,
+          "gridY": 6
+        },
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769518672447_z9xwj0nc8
+
+记录 #20:
+----------------------------------------
+时间: 2026/1/27 20:57:50
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":7,"gridY":6},"targetPos":{"gridX":5,"gridY":7}}]
+结果:
+{
+  "_raw": {
+    "seq": 331,
+    "ack": 242,
+    "time": 1769518624041,
+    "resp": 243,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "7": {
+              "gridItemId": 2
+            }
+          },
+          "7": {
+            "6": null
+          }
+        },
+        "taskMap": {
+          "251212201": 44
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 44
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        },
+        {
+          "gridX": 5,
+          "gridY": 7
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518670104_agmu06brn
+
+记录 #21:
+----------------------------------------
+时间: 2026/1/27 20:57:48
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":6},"targetPos":{"gridX":6,"gridY":6}}]
+结果:
+{
+  "_raw": {
+    "seq": 330,
+    "ack": 0,
+    "time": 1769518622440,
+    "resp": 242,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "6": null
+          },
+          "6": {
+            "6": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 43
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 43
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 6
+        },
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 6
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518668505_bg5dxn1gv
+
+记录 #22:
+----------------------------------------
+时间: 2026/1/27 20:57:47
+服务: MergeBoxService
+方法: mergeItem
+参数: [{"actType":1,"sourcePos":{"gridX":5,"gridY":5},"targetPos":{"gridX":6,"gridY":5}}]
+结果:
+{
+  "_raw": {
+    "seq": 329,
+    "ack": 0,
+    "time": 1769518621136,
+    "resp": 241,
+    "cmd": "mergebox_mergeitemresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "5": null
+          },
+          "6": {
+            "5": {
+              "gridItemId": 2
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 42
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 42
+          }
+        }
+      },
+      "delPosList": [
+        {
+          "gridX": 5,
+          "gridY": 5
+        },
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ],
+      "newPosList": [
+        {
+          "gridX": 6,
+          "gridY": 5
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518667201_jott9b44n
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -1,0 +1,32 @@
+
+时间: 2026/1/27 20:54:07
+服务: MergeBoxService
+方法: claimCostProgress
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 156,
+    "ack": 0,
+    "time": 1769518401893,
+    "resp": 114,
+    "cmd": "mergebox_claimcostprogressresp",
+    "body": {
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 13,
+          "ext": 0
+        }
+      ],
+      "mergeBox": {
+        "costClaimCnt": 40
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 44
+}
+

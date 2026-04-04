@@ -1,0 +1,49 @@
+时间: 2026/1/23 20:03:18
+服务: BossTowerService
+方法: claimReward
+参数: [{"idx":2}]
+结果:
+{
+  "_raw": {
+    "seq": 144,
+    "ack": 128,
+    "time": 1769169752432,
+    "resp": 129,
+    "cmd": "bosstower_claimrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "1001": {
+            "quantity": 692
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1001,
+          "value": 3,
+          "ext": 0
+        }
+      ],
+      "bossTower": {
+        "towerId": 10,
+        "boxTotalHp": 0,
+        "levelInfoMap": {
+          "9": {
+            "claimedIdxList": [
+              7,
+              5,
+              9,
+              3,
+              2
+            ]
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}

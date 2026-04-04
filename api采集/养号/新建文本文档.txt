@@ -1,0 +1,21 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 2,
+    "quenchId": 0,
+    "quenches": {
+      "1": {
+        "attrId": 9,
+        "attrNum": 15,
+        "colorId": 6,
+        "isLocked": false
+      }
+    },
+    "seed": 0,
+    "skipOrange": false
+  },
+  "cmd": "equipment_quench",
+  "seq": 5,
+  "time": 1772979422186
+}

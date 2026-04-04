@@ -1,0 +1,1839 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/1/26 12:07:39
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 6
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/26 12:07:12
+服务: ActivityService
+方法: get
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 58,
+    "ack": 54,
+    "time": 1769400385116,
+    "resp": 55,
+    "cmd": "activity_getresp",
+    "body": {
+      "activity": {
+        "firstCharge": {
+          "packId": 1003
+        },
+        "activityShop": {
+          "1": {
+            "activityId": 1,
+            "record": {
+              "5": {
+                "merchandiseId": 5,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "6": {
+                "merchandiseId": 6,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8": {
+                "merchandiseId": 8,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "64": {
+                "merchandiseId": 64,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "65": {
+                "merchandiseId": 65,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "66": {
+                "merchandiseId": 66,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "67": {
+                "merchandiseId": 67,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "68": {
+                "merchandiseId": 68,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "69": {
+                "merchandiseId": 69,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "101": {
+                "merchandiseId": 101,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "8": {
+            "activityId": 8,
+            "record": {
+              "8101": {
+                "merchandiseId": 8101,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8102": {
+                "merchandiseId": 8102,
+                "buyQuantity": 2,
+                "lastBuyTime": 0
+              },
+              "8103": {
+                "merchandiseId": 8103,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8104": {
+                "merchandiseId": 8104,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8105": {
+                "merchandiseId": 8105,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8106": {
+                "merchandiseId": 8106,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8107": {
+                "merchandiseId": 8107,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8108": {
+                "merchandiseId": 8108,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8109": {
+                "merchandiseId": 8109,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8110": {
+                "merchandiseId": 8110,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8111": {
+                "merchandiseId": 8111,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8112": {
+                "merchandiseId": 8112,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8201": {
+                "merchandiseId": 8201,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8202": {
+                "merchandiseId": 8202,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8203": {
+                "merchandiseId": 8203,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8204": {
+                "merchandiseId": 8204,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8205": {
+                "merchandiseId": 8205,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8206": {
+                "merchandiseId": 8206,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8207": {
+                "merchandiseId": 8207,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8208": {
+                "merchandiseId": 8208,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8209": {
+                "merchandiseId": 8209,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8210": {
+                "merchandiseId": 8210,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8211": {
+                "merchandiseId": 8211,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8212": {
+                "merchandiseId": 8212,
+                "buyQuantity": 2,
+                "lastBuyTime": 0
+              },
+              "8213": {
+                "merchandiseId": 8213,
+                "buyQuantity": 5,
+                "lastBuyTime": 0
+              },
+              "8214": {
+                "merchandiseId": 8214,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8215": {
+                "merchandiseId": 8215,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8216": {
+                "merchandiseId": 8216,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8217": {
+                "merchandiseId": 8217,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8218": {
+                "merchandiseId": 8218,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8219": {
+                "merchandiseId": 8219,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8220": {
+                "merchandiseId": 8220,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8301": {
+                "merchandiseId": 8301,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8302": {
+                "merchandiseId": 8302,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8303": {
+                "merchandiseId": 8303,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8304": {
+                "merchandiseId": 8304,
+                "buyQuantity": 3,
+                "lastBuyTime": 0
+              },
+              "8305": {
+                "merchandiseId": 8305,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8999": {
+                "merchandiseId": 8999,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "10": {
+            "activityId": 10,
+            "record": {}
+          },
+          "11": {
+            "activityId": 11,
+            "record": {}
+          },
+          "12": {
+            "activityId": 12,
+            "record": {}
+          },
+          "13": {
+            "activityId": 13,
+            "record": {
+              "1301": {
+                "merchandiseId": 1301,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1302": {
+                "merchandiseId": 1302,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1303": {
+                "merchandiseId": 1303,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1304": {
+                "merchandiseId": 1304,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1305": {
+                "merchandiseId": 1305,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1306": {
+                "merchandiseId": 1306,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1307": {
+                "merchandiseId": 1307,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1308": {
+                "merchandiseId": 1308,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1309": {
+                "merchandiseId": 1309,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1310": {
+                "merchandiseId": 1310,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1311": {
+                "merchandiseId": 1311,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1312": {
+                "merchandiseId": 1312,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1313": {
+                "merchandiseId": 1313,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1314": {
+                "merchandiseId": 1314,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1315": {
+                "merchandiseId": 1315,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1316": {
+                "merchandiseId": 1316,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1317": {
+                "merchandiseId": 1317,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1318": {
+                "merchandiseId": 1318,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1319": {
+                "merchandiseId": 1319,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1320": {
+                "merchandiseId": 1320,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1321": {
+                "merchandiseId": 1321,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1322": {
+                "merchandiseId": 1322,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1323": {
+                "merchandiseId": 1323,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1324": {
+                "merchandiseId": 1324,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1325": {
+                "merchandiseId": 1325,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1326": {
+                "merchandiseId": 1326,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1327": {
+                "merchandiseId": 1327,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1328": {
+                "merchandiseId": 1328,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1329": {
+                "merchandiseId": 1329,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1330": {
+                "merchandiseId": 1330,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1331": {
+                "merchandiseId": 1331,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1332": {
+                "merchandiseId": 1332,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1333": {
+                "merchandiseId": 1333,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1334": {
+                "merchandiseId": 1334,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1335": {
+                "merchandiseId": 1335,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1336": {
+                "merchandiseId": 1336,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1337": {
+                "merchandiseId": 1337,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1338": {
+                "merchandiseId": 1338,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1339": {
+                "merchandiseId": 1339,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1340": {
+                "merchandiseId": 1340,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1341": {
+                "merchandiseId": 1341,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1342": {
+                "merchandiseId": 1342,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1343": {
+                "merchandiseId": 1343,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1344": {
+                "merchandiseId": 1344,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1345": {
+                "merchandiseId": 1345,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1346": {
+                "merchandiseId": 1346,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1347": {
+                "merchandiseId": 1347,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1348": {
+                "merchandiseId": 1348,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1349": {
+                "merchandiseId": 1349,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1350": {
+                "merchandiseId": 1350,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1351": {
+                "merchandiseId": 1351,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1352": {
+                "merchandiseId": 1352,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1353": {
+                "merchandiseId": 1353,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1354": {
+                "merchandiseId": 1354,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1355": {
+                "merchandiseId": 1355,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1356": {
+                "merchandiseId": 1356,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1357": {
+                "merchandiseId": 1357,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1358": {
+                "merchandiseId": 1358,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1359": {
+                "merchandiseId": 1359,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1360": {
+                "merchandiseId": 1360,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1361": {
+                "merchandiseId": 1361,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1362": {
+                "merchandiseId": 1362,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1363": {
+                "merchandiseId": 1363,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1364": {
+                "merchandiseId": 1364,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1365": {
+                "merchandiseId": 1365,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1366": {
+                "merchandiseId": 1366,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1367": {
+                "merchandiseId": 1367,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1368": {
+                "merchandiseId": 1368,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1369": {
+                "merchandiseId": 1369,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1370": {
+                "merchandiseId": 1370,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1371": {
+                "merchandiseId": 1371,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1372": {
+                "merchandiseId": 1372,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1373": {
+                "merchandiseId": 1373,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1374": {
+                "merchandiseId": 1374,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1375": {
+                "merchandiseId": 1375,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1376": {
+                "merchandiseId": 1376,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1377": {
+                "merchandiseId": 1377,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1378": {
+                "merchandiseId": 1378,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1379": {
+                "merchandiseId": 1379,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1380": {
+                "merchandiseId": 1380,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1381": {
+                "merchandiseId": 1381,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1382": {
+                "merchandiseId": 1382,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1383": {
+                "merchandiseId": 1383,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1384": {
+                "merchandiseId": 1384,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1385": {
+                "merchandiseId": 1385,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1386": {
+                "merchandiseId": 1386,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1387": {
+                "merchandiseId": 1387,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1388": {
+                "merchandiseId": 1388,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1389": {
+                "merchandiseId": 1389,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1390": {
+                "merchandiseId": 1390,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "15": {
+            "activityId": 15,
+            "record": {
+              "1501": {
+                "merchandiseId": 1501,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1502": {
+                "merchandiseId": 1502,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1503": {
+                "merchandiseId": 1503,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1504": {
+                "merchandiseId": 1504,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1505": {
+                "merchandiseId": 1505,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1506": {
+                "merchandiseId": 1506,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1507": {
+                "merchandiseId": 1507,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1508": {
+                "merchandiseId": 1508,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1509": {
+                "merchandiseId": 1509,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1510": {
+                "merchandiseId": 1510,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1511": {
+                "merchandiseId": 1511,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1512": {
+                "merchandiseId": 1512,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1513": {
+                "merchandiseId": 1513,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1514": {
+                "merchandiseId": 1514,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1515": {
+                "merchandiseId": 1515,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1516": {
+                "merchandiseId": 1516,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1517": {
+                "merchandiseId": 1517,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1518": {
+                "merchandiseId": 1518,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1519": {
+                "merchandiseId": 1519,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1520": {
+                "merchandiseId": 1520,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1521": {
+                "merchandiseId": 1521,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1522": {
+                "merchandiseId": 1522,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1523": {
+                "merchandiseId": 1523,
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1524": {
+                "merchandiseId": 1524,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1525": {
+                "merchandiseId": 1525,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1526": {
+                "merchandiseId": 1526,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1527": {
+                "merchandiseId": 1527,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1528": {
+                "merchandiseId": 1528,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1529": {
+                "merchandiseId": 1529,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1530": {
+                "merchandiseId": 1530,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1531": {
+                "merchandiseId": 1531,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1532": {
+                "merchandiseId": 1532,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1533": {
+                "merchandiseId": 1533,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1534": {
+                "merchandiseId": 1534,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "16": {
+            "activityId": 16,
+            "record": {}
+          },
+          "17": {
+            "activityId": 17,
+            "record": {}
+          },
+          "18": {
+            "activityId": 18,
+            "record": {
+              "1801": {
+                "merchandiseId": 1801,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1802": {
+                "merchandiseId": 1802,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1803": {
+                "merchandiseId": 1803,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1804": {
+                "merchandiseId": 1804,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1805": {
+                "merchandiseId": 1805,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "19": {
+            "activityId": 19,
+            "record": {}
+          }
+        },
+        "pushGoods": {},
+        "dynamicPushGoods": {},
+        "activity": [
+          {
+            "id": 11,
+            "type": 12,
+            "name": "金砖达标",
+            "icon": "activities/icon/xshd_btn_dabiaojinzhuan",
+            "res": "activities/banner/xshd_img_jinzhuandabiao",
+            "module": 0,
+            "data": {
+              "rounds": 1,
+              "rewards": [
+                {
+                  "num": 1000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 5000,
+                  "rewardList": [
+                    {
+                      "value": 50,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007
+                    },
+                    {
+                      "value": 2000,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1016
+                    }
+                  ]
+                },
+                {
+                  "num": 10000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 20
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 5,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 15000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 100,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 5,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 20000,
+                  "rewardList": [
+                    {
+                      "itemId": 3201,
+                      "value": 30,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 1,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 150,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 1,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 35000
+                },
+                {
+                  "num": 50000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 50,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    }
+                  ]
+                },
+                {
+                  "num": 75000,
+                  "rewardList": [
+                    {
+                      "itemId": 3007,
+                      "value": 300,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    }
+                  ]
+                },
+                {
+                  "num": 100000,
+                  "rewardList": [
+                    {
+                      "value": 60,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201
+                    },
+                    {
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-06-06T01:59:43.841Z",
+            "createTime": "2025-05-29T22:08:23.661Z",
+            "nameId": "100000944",
+            "resID": "100000944",
+            "resText": "金砖达标"
+          },
+          {
+            "id": 9,
+            "type": 4,
+            "name": "江湖黑市",
+            "icon": "activities/icon/jchd_btn_shijingheishi",
+            "res": "activities/banner/xshd_img_jhhsbanner",
+            "module": -1,
+            "data": {
+              "buyType": 3,
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "黑市福利",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市见面礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 600,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1006,
+                      "value": 1000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市惊喜礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 1200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2500,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 6000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 5000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2003,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "顶级鱼竿包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 30,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "白玉黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级灵贝包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 25000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000711",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "养成补给包",
+                  "description": "",
+                  "limit": 4,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1016,
+                      "value": 2000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1026,
+                      "value": 3000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000945",
+                  "descriptionId": ""
+                }
+              ]
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:14:56.880Z",
+            "createTime": "2022-04-25T12:40:39.906Z",
+            "nameId": "100000041",
+            "resID": "100000041",
+            "resText": "江湖黑市"
+          },
+          {
+            "id": 5,
+            "type": 4,
+            "name": "金砖商店",
+            "icon": "activities/icon/xshd_btn_inzhuanshangdian",
+            "res": "activities/banner/xshd_img_jzdbbanner",
+            "module": -1,
+            "data": {
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "金砖回馈",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 200,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000948",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 3000,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 660,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000949",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 6800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000950",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2820,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000951",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级金砖礼包",
+                  "description": "",
+                  "limit": 5,
+                  "price": 32800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 7220,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000952",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级金砖礼包",
+                  "description": "",
+                  "limit": 10,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 14260,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000953",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 1
+            },
+            "openTime": "2026-01-23T04:00:00.000Z",
+            "endTime": "2026-01-29T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:21:06.021Z",
+            "createTime": "2021-12-24T03:30:09.806Z",
+            "nameId": "100000946",
+            "resID": "100000947",
+            "resText": "金砖闪耀 价值永恒|金砖大礼包"
+          }
+        ],
+        "myTotalInfo": {
+          "11": {
+            "num": 400,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          }
+        },
+        "myMonthInfo": {
+          "2": {
+            "num": 325,
+            "rounds": 1,
+            "complete": {
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1
+            },
+            "openTime": 1767196800
+          },
+          "3": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1767196800
+          }
+        },
+        "myArenaInfo": {
+          "num": 127,
+          "rounds": 1,
+          "complete": {
+            "0": 1,
+            "1": 1
+          },
+          "openTime": 1767196800
+        },
+        "myStoreInfo": {
+          "5": {
+            "complete": {
+              "0": 1
+            }
+          },
+          "9": {
+            "complete": {
+              "0": 1
+            }
+          }
+        },
+        "yearInfo": {},
+        "fiveInfo": {},
+        "commonActivityInfo": {},
+        "warOrderActivityInfo": {
+          "1": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1": 1,
+              "2": 1,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "10": 1,
+              "11": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          },
+          "1003": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1001": 1,
+              "1002": 1,
+              "1003": 1,
+              "1004": 1,
+              "1005": 1,
+              "1006": 1,
+              "1007": 1,
+              "1008": 1,
+              "1009": 1,
+              "1010": 1,
+              "1011": 1,
+              "1012": 1,
+              "1013": 1,
+              "1014": 1,
+              "1015": 1,
+              "1016": 1,
+              "1017": 1,
+              "1018": 1,
+              "1019": 1,
+              "1020": 1,
+              "1021": 1,
+              "1022": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 4,
+            "phaseEndTime": 0
+          },
+          "1004": {
+            "purchased": true,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1111": 2,
+              "1112": 2,
+              "1113": 2,
+              "1114": 2,
+              "1115": 2,
+              "1116": 2,
+              "1117": 2,
+              "1118": 2,
+              "1119": 2,
+              "1120": 2,
+              "1121": 2,
+              "1122": 2,
+              "1123": 2,
+              "1124": 2,
+              "1125": 2,
+              "1126": 2,
+              "1127": 2,
+              "1128": 2,
+              "1129": 2
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 1,
+            "phaseEndTime": 0
+          }
+        },
+        "totalChargeDay": 12,
+        "actBingoInfo": {},
+        "dropReward": {},
+        "actCMInfo": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 57
+}
+异步: 是
+调用ID: call_1769400432903_za4rxdbji
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/26 12:07:12
+服务: HallService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 57,
+    "ack": 0,
+    "time": 1769400385076,
+    "resp": 54,
+    "cmd": "hall_getinforesp",
+    "body": {
+      "bottle": {
+        "roleId": 111582820,
+        "bottleType": 1,
+        "occupyId": -1,
+        "occupyLordWeaponId": 9,
+        "occupyPower": 10922795383,
+        "occupyTotalTime": 12600,
+        "occupyEndTime": 1759724095,
+        "nextRefreshTime": -1,
+        "isFirst": false,
+        "battleTeam": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769400432893_8fscnqjwm
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/26 12:06:57
+服务: LegacyService
+方法: getGifts
+参数: [{"typ":0}]
+结果:
+{
+  "_raw": {
+    "seq": 56,
+    "ack": 52,
+    "time": 1769400369630,
+    "resp": 53,
+    "cmd": "legacy_getgiftsresp",
+    "body": {
+      "p": 1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1769400417448_6e5qcbxak
+
+记录 #4:
+----------------------------------------
+时间: 2026/1/26 12:06:57
+服务: LegacyService
+方法: claimGift
+参数: [{"id":""}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1769400369592,
+    "resp": 52,
+    "cmd": "legacy_claimgiftresp",
+    "body": {
+      "role": {
+        "items": {
+          "37007": {
+            "quantity": 9758
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 37007,
+          "value": 837,
+          "ext": 0
+        }
+      ],
+      "roleLegacy": {
+        "receivedItemCnt": 403535
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 53
+}
+异步: 是
+调用ID: call_1769400417382_0699hlqgb
+
+记录 #5:
+----------------------------------------
+时间: 2026/1/26 12:06:48
+服务: LegacyService
+方法: getGifts
+参数: [{"typ":0}]
+结果:
+{
+  "_raw": {
+    "seq": 54,
+    "ack": 0,
+    "time": 1769400360611,
+    "resp": 51,
+    "cmd": "legacy_getgiftsresp",
+    "body": {
+      "gifts": [
+        {
+          "id": "111573885-111582820-1769400360552-19",
+          "scheduleId": 1,
+          "legacyList": null,
+          "itemCnt": 837,
+          "sender": 111573885,
+          "targetInfo": {
+            "roleId": 111573885,
+            "serverId": 8949,
+            "name": "锦衣｜等风来",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJuxPx3AibSEuMbKiaUod2hGrzcEgnowR2uBrqYI1Z4wT3gCTyNuRhFIKQ9rayV2yF7zic5X3MvFKuMwYvEUJ8nStONfs9HHac3AGn6n0k0Vs33Q/132",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "power": 11894924820,
+            "legionId": 0,
+            "legionName": ""
+          },
+          "createTime": 1769400360552,
+          "expTime": 1769573160552,
+          "state": 0,
+          "fromRet": false
+        }
+      ],
+      "p": 1,
+      "total": 1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1769400408428_w1lox6sph
+
+记录 #6:
+----------------------------------------
+时间: 2026/1/26 12:06:39
+服务: LegacyService
+方法: getGifts
+参数: [{"typ":0}]
+结果:
+{
+  "_raw": {
+    "seq": 52,
+    "ack": 0,
+    "time": 1769400351594,
+    "resp": 50,
+    "cmd": "legacy_getgiftsresp",
+    "body": {
+      "p": 1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769400399413_a4vrd6a6h
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -1,0 +1,1491 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/1/27 20:53:11
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 23
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/27 20:53:08
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 146,
+    "ack": 104,
+    "time": 1769518341936,
+    "resp": 105,
+    "code": 12300040,
+    "error": "没有空格子了"
+  },
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518388015_49rpxjap8
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/27 20:53:06
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 135,
+    "ack": 0,
+    "time": 1769518340906,
+    "resp": 99,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "1": {
+            "9": {
+              "gridConfId": 0,
+              "gridItemId": 2,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 33
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 4
+        },
+        "groupItemRecord": {
+          "1": {
+            "2": 4
+          }
+        },
+        "costTotalCnt": 35
+      },
+      "newPosList": [
+        {
+          "gridX": 1,
+          "gridY": 9
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 40
+}
+异步: 是
+调用ID: call_1769518386984_muilir52j
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/27 20:52:53
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 129,
+    "ack": 0,
+    "time": 1769518327554,
+    "resp": 96,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "9": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 30
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 29
+          }
+        },
+        "costTotalCnt": 32
+      },
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 9
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 39
+}
+异步: 是
+调用ID: call_1769518373630_n08b1r2mx
+
+记录 #4:
+----------------------------------------
+时间: 2026/1/27 20:52:52
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 117,
+    "ack": 0,
+    "time": 1769518326480,
+    "resp": 90,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 24
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 24
+          }
+        },
+        "costTotalCnt": 26
+      },
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1769518372558_j16l5pzh1
+
+记录 #5:
+----------------------------------------
+时间: 2026/1/27 20:52:51
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 105,
+    "ack": 0,
+    "time": 1769518325338,
+    "resp": 84,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "3": {
+              "openCnt": 18
+            },
+            "8": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 18
+          }
+        },
+        "costTotalCnt": 20
+      },
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 8
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 39
+}
+异步: 是
+调用ID: call_1769518371415_pt0bzg1t6
+
+记录 #6:
+----------------------------------------
+时间: 2026/1/27 20:52:50
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 93,
+    "ack": 0,
+    "time": 1769518324295,
+    "resp": 78,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "5": {
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 12
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 12
+          }
+        },
+        "costTotalCnt": 14
+      },
+      "newPosList": [
+        {
+          "gridX": 5,
+          "gridY": 7
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1769518370367_fsw0gylya
+
+记录 #7:
+----------------------------------------
+时间: 2026/1/27 20:52:49
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 79,
+    "ack": 0,
+    "time": 1769518323123,
+    "resp": 71,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "3": {
+              "openCnt": 5
+            },
+            "6": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 6
+          }
+        },
+        "costTotalCnt": 7
+      },
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 6
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1769518369200_dsvkp4wgo
+
+记录 #8:
+----------------------------------------
+时间: 2026/1/27 20:52:48
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 71,
+    "ack": 0,
+    "time": 1769518322115,
+    "resp": 67,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "7": {
+            "3": {
+              "openCnt": 1
+            },
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 3
+          }
+        },
+        "costTotalCnt": 3
+      },
+      "newPosList": [
+        {
+          "gridX": 7,
+          "gridY": 4
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 39
+}
+异步: 是
+调用ID: call_1769518368192_50fv0no81
+
+记录 #9:
+----------------------------------------
+时间: 2026/1/27 20:52:39
+服务: MergeBoxService
+方法: getInfo
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 69,
+    "ack": 0,
+    "time": 1769518313426,
+    "resp": 66,
+    "cmd": "mergeboxinforesp",
+    "body": {
+      "mergeBox": {
+        "actType": 1,
+        "actId": 251212,
+        "gridMap": {
+          "1": {
+            "1": {
+              "gridConfId": 251212101,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212108,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212115,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "2": {
+            "1": {
+              "gridConfId": 251212102,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212109,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212116,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "3": {
+            "1": {
+              "gridConfId": 251212103,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212110,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212117,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "4": {
+            "1": {
+              "gridConfId": 251212104,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212111,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212118,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "5": {
+            "1": {
+              "gridConfId": 251212105,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212112,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212119,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "6": {
+            "1": {
+              "gridConfId": 251212106,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212113,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212120,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "7": {
+            "1": {
+              "gridConfId": 251212107,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212114,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212121,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": false
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 0,
+          "251212202": 0,
+          "251212203": 0,
+          "251212204": 0,
+          "251212205": 0,
+          "251212206": 0,
+          "251212207": 0,
+          "251212208": 0,
+          "251212209": 0,
+          "251212210": 0,
+          "251212211": 0
+        },
+        "taskClaimMap": {},
+        "groupItemRecord": {
+          "1": {
+            "1": 2
+          }
+        },
+        "shareReward": {},
+        "costTotalCnt": 2,
+        "costClaimCnt": 0,
+        "freeEnergy": 6,
+        "freeEnergyRTime": 1769507878
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518359500_m9lrq4a1d
+
+记录 #10:
+----------------------------------------
+时间: 2026/1/27 20:52:14
+服务: EvoTowerService
+方法: getTowerMyRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 68,
+    "ack": 0,
+    "time": 1769518288394,
+    "resp": 65,
+    "cmd": "evotower_gettowermyrankresp",
+    "body": {
+      "myRank": {
+        "roleId": 111582820,
+        "serverId": 8949,
+        "name": "神州丶相符",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+        "power": 12369976039,
+        "score": 289,
+        "legionName": "空山新雨后✨"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518334471_mo502fhg7
+
+记录 #11:
+----------------------------------------
+时间: 2026/1/27 20:52:09
+服务: EvoTowerService
+方法: claimLegionTask
+参数: [{"taskId":6}]
+结果:
+{
+  "_raw": {
+    "seq": 67,
+    "ack": 63,
+    "time": 1769518283588,
+    "resp": 64,
+    "cmd": "evotower_claimtaskresp",
+    "body": {
+      "role": {
+        "diamond": 352686,
+        "freeDiamond": 332016,
+        "items": {
+          "1014": {
+            "quantity": 182854
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 5,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1014,
+          "value": 800,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 800,
+          "ext": 0
+        }
+      ],
+      "evoTower": {
+        "legionTaskClaimMap": {
+          "6": 1769518283
+        },
+        "lotteryLeftCnt": 57
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 61
+}
+异步: 是
+调用ID: call_1769518329650_pryprnnwx
+
+记录 #12:
+----------------------------------------
+时间: 2026/1/27 20:52:08
+服务: EvoTowerService
+方法: claimLegionTask
+参数: [{"taskId":5}]
+结果:
+{
+  "_raw": {
+    "seq": 66,
+    "ack": 0,
+    "time": 1769518282286,
+    "resp": 63,
+    "cmd": "evotower_claimtaskresp",
+    "body": {
+      "role": {
+        "diamond": 351886,
+        "freeDiamond": 331216,
+        "items": {
+          "1014": {
+            "quantity": 182054
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 4,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1014,
+          "value": 700,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 700,
+          "ext": 0
+        }
+      ],
+      "evoTower": {
+        "legionTaskClaimMap": {
+          "5": 1769518282
+        },
+        "lotteryLeftCnt": 52
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 45
+}
+异步: 是
+调用ID: call_1769518328346_rnr4kod2u
+
+记录 #13:
+----------------------------------------
+时间: 2026/1/27 20:52:06
+服务: EvoTowerService
+方法: claimLegionTask
+参数: [{"taskId":4}]
+结果:
+{
+  "_raw": {
+    "seq": 65,
+    "ack": 61,
+    "time": 1769518280833,
+    "resp": 62,
+    "cmd": "evotower_claimtaskresp",
+    "body": {
+      "role": {
+        "diamond": 351186,
+        "freeDiamond": 330516,
+        "items": {
+          "1014": {
+            "quantity": 181354
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 55,
+          "itemId": 37001,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1014,
+          "value": 600,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 600,
+          "ext": 0
+        }
+      ],
+      "evoTower": {
+        "legionTaskClaimMap": {
+          "4": 1769518280
+        },
+        "lotteryLeftCnt": 48
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769518326901_b6xaxv898
+
+记录 #14:
+----------------------------------------
+时间: 2026/1/27 20:52:04
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 64,
+    "ack": 0,
+    "time": 1769518278009,
+    "resp": 61,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571254": 319,
+        "111572720": 149,
+        "111576243": 399,
+        "111579733": 399,
+        "111580628": 249,
+        "111582820": 289,
+        "112010943": 289,
+        "112012189": 399,
+        "112232064": 319,
+        "115082791": 169,
+        "115782542": 156,
+        "163528587": 349,
+        "186155126": 289,
+        "219597132": 59,
+        "436379721": 119,
+        "440165515": 129,
+        "440406840": 149,
+        "453028474": 149,
+        "455067558": 169,
+        "518348052": 289,
+        "586281307": 19,
+        "586288104": 69,
+        "586291010": 149,
+        "590289605": 149,
+        "597010243": 219
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 51
+}
+异步: 是
+调用ID: call_1769518324084_zxz886l5i
+
+记录 #15:
+----------------------------------------
+时间: 2026/1/27 20:51:56
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":4,"gridY":5},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 61,
+    "ack": 0,
+    "time": 1769518270137,
+    "resp": 59,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "4": {
+            "4": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            },
+            "5": {
+              "openCnt": 1
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 1
+          }
+        },
+        "costTotalCnt": 1
+      },
+      "newPosList": [
+        {
+          "gridX": 4,
+          "gridY": 4
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1769518316216_egh6yn2lv
+
+记录 #16:
+----------------------------------------
+时间: 2026/1/27 20:51:48
+服务: MergeBoxService
+方法: getInfo
+参数: [{"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 59,
+    "ack": 0,
+    "time": 1769518262893,
+    "resp": 58,
+    "cmd": "mergeboxinforesp",
+    "body": {
+      "mergeBox": {
+        "actType": 1,
+        "actId": 251212,
+        "gridMap": {
+          "1": {
+            "1": {
+              "gridConfId": 251212101,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212108,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212115,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "2": {
+            "1": {
+              "gridConfId": 251212102,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212109,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212116,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "3": {
+            "1": {
+              "gridConfId": 251212103,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212110,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212117,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "4": {
+            "1": {
+              "gridConfId": 251212104,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212111,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212118,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "5": {
+              "gridConfId": 251212132,
+              "gridItemId": 10001,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "5": {
+            "1": {
+              "gridConfId": 251212105,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212112,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212119,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "6": {
+            "1": {
+              "gridConfId": 251212106,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212113,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212120,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          },
+          "7": {
+            "1": {
+              "gridConfId": 251212107,
+              "gridItemId": 7,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "2": {
+              "gridConfId": 251212114,
+              "gridItemId": 4,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            },
+            "3": {
+              "gridConfId": 251212121,
+              "gridItemId": 1,
+              "gridType": 1,
+              "openCnt": 0,
+              "isLock": true
+            }
+          }
+        },
+        "taskMap": {
+          "251212201": 0,
+          "251212202": 0,
+          "251212203": 0,
+          "251212204": 0,
+          "251212205": 0,
+          "251212206": 0,
+          "251212207": 0,
+          "251212208": 0,
+          "251212209": 0,
+          "251212210": 0,
+          "251212211": 0
+        },
+        "taskClaimMap": {},
+        "groupItemRecord": {},
+        "shareReward": {},
+        "costTotalCnt": 0,
+        "costClaimCnt": 0,
+        "freeEnergy": 6,
+        "freeEnergyRTime": 1769507878
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1769518308971_3fdqcpf3x
+
+记录 #17:
+----------------------------------------
+时间: 2026/1/27 20:50:52
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 58,
+    "ack": 0,
+    "time": 1769518206323,
+    "resp": 57,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3
+        },
+        {
+          "discountId": 2,
+          "expireTime": 1677645743,
+          "discountState": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 1700750827,
+          "discountState": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 22
+}
+异步: 是
+调用ID: call_1769518252408_g8oybaect
+
+记录 #18:
+----------------------------------------
+时间: 2026/1/27 20:50:42
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 56,
+    "ack": 54,
+    "time": 1769518196471,
+    "resp": 55,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571254": 319,
+        "111572720": 149,
+        "111576243": 399,
+        "111579733": 399,
+        "111580628": 249,
+        "111582820": 289,
+        "112010943": 289,
+        "112012189": 399,
+        "112232064": 319,
+        "115082791": 169,
+        "115782542": 150,
+        "163528587": 349,
+        "186155126": 289,
+        "219597132": 59,
+        "436379721": 119,
+        "440165515": 129,
+        "440406840": 149,
+        "453028474": 149,
+        "455067558": 169,
+        "518348052": 289,
+        "586281307": 19,
+        "586288104": 69,
+        "586291010": 149,
+        "590289605": 149,
+        "597010243": 219
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1769518242553_wihgrgpxc
+
+记录 #19:
+----------------------------------------
+时间: 2026/1/27 20:50:42
+服务: EvoTowerService
+方法: claimLegionPrivilege
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1769518196443,
+    "resp": 54,
+    "cmd": "evotower_claimlegionprivilegeresp",
+    "body": {
+      "legionPrivilege": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      },
+      "evoTower": {
+        "legionPrivilege": {
+          "3": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1769518242529_rj01ymvjb
+
+记录 #20:
+----------------------------------------
+时间: 2026/1/27 20:50:29
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 54,
+    "ack": 52,
+    "time": 1769518183906,
+    "resp": 53,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571254": 319,
+        "111572720": 149,
+        "111576243": 399,
+        "111579733": 399,
+        "111580628": 249,
+        "111582820": 289,
+        "112010943": 289,
+        "112012189": 399,
+        "112232064": 319,
+        "115082791": 169,
+        "115782542": 149,
+        "163528587": 349,
+        "186155126": 289,
+        "219597132": 59,
+        "436379721": 119,
+        "440165515": 129,
+        "440406840": 149,
+        "453028474": 149,
+        "455067558": 169,
+        "518348052": 289,
+        "586281307": 19,
+        "586288104": 69,
+        "586291010": 149,
+        "590289605": 149,
+        "597010243": 219
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518229988_ng4rpkpvq
+
+记录 #21:
+----------------------------------------
+时间: 2026/1/27 20:50:29
+服务: EvoTowerService
+方法: claimLegionPrivilege
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 53,
+    "ack": 0,
+    "time": 1769518183874,
+    "resp": 52,
+    "cmd": "evotower_claimlegionprivilegeresp",
+    "body": {
+      "legionPrivilege": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      },
+      "evoTower": {
+        "legionPrivilege": {
+          "2": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1769518229959_0qvh80t5x
+
+记录 #22:
+----------------------------------------
+时间: 2026/1/27 20:50:20
+服务: EvoTowerService
+方法: claimLegionPrivilege
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 52,
+    "ack": 50,
+    "time": 1769518173981,
+    "resp": 51,
+    "cmd": "evotower_claimlegionprivilegeresp",
+    "body": {
+      "legionPrivilege": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      },
+      "evoTower": {
+        "legionPrivilege": {
+          "1": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 22
+}
+异步: 是
+调用ID: call_1769518220067_d41dlff9o
+
+记录 #23:
+----------------------------------------
+时间: 2026/1/27 20:50:19
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 51,
+    "ack": 0,
+    "time": 1769518172953,
+    "resp": 50,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571254": 319,
+        "111572720": 149,
+        "111576243": 399,
+        "111579733": 399,
+        "111580628": 249,
+        "111582820": 289,
+        "112010943": 289,
+        "112012189": 399,
+        "112232064": 319,
+        "115082791": 169,
+        "115782542": 149,
+        "163528587": 349,
+        "186155126": 289,
+        "219597132": 59,
+        "436379721": 119,
+        "440165515": 129,
+        "440406840": 149,
+        "453028474": 149,
+        "455067558": 169,
+        "518348052": 289,
+        "586281307": 19,
+        "586288104": 69,
+        "586291010": 149,
+        "590289605": 149,
+        "597010243": 219
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1769518219020_0tdpv422j
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

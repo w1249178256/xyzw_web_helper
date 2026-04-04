@@ -309,6 +309,59 @@ export function createTasksStore(deps) {
   };
 
   /**
+   * 黑市一键采购（单个Token）
+   */
+  const store_purchaseForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始黑市采购`,
+        type: "info",
+      });
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 发送黑市采购请求...`,
+        type: "info",
+      });
+      const result = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "store_purchase",
+        {},
+        5000,
+      );
+
+      await new Promise((r) => setTimeout(r, delayConfig.action));
+
+      if (result.error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 黑市采购失败: ${result.error}`,
+          type: "error",
+        });
+        throw new Error(result.error);
+      } else {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 黑市采购成功`,
+          type: "success",
+        });
+      }
+
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 黑市采购过程出错: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 黑市一键采购
    */
   const store_purchase = async () => {
@@ -395,6 +448,7 @@ export function createTasksStore(deps) {
     legion_storebuygoods,
     legionStoreBuySkinCoins,
     store_purchase,
+    store_purchaseForToken,
     collection_claimfreereward,
   };
 }

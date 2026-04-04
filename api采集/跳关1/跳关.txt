@@ -1,0 +1,2704 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/3/10 21:16:47
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 14
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/3/10 21:16:43
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 87,
+    "ack": 64,
+    "time": 1773148604682,
+    "resp": 65,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 1413,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "12": {
+              "id": 9405,
+              "type": 1,
+              "index": 12,
+              "level": 112,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9405,
+              "type": 1,
+              "index": 14,
+              "level": 112,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11043,
+              "type": 1,
+              "index": 26,
+              "level": 112,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "IsActLevel": 0,
+          "levelId": 112,
+          "autoSpeed": 125
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1773148603823_sz2f4b8yb
+
+记录 #2:
+----------------------------------------
+时间: 2026/3/10 21:16:43
+服务: FightService
+方法: endLevel
+参数: [{"levelId":111,"battleTime":1516,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[145,5,26],[148,5,35],[194,5,32],[177,5,40],[220,5,26],[148,5,66],[319,5,19]],"outputCode":"850b77036c3b30b5f6deb0caf475a12f","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 86,
+    "ack": 0,
+    "time": 1773148604634,
+    "resp": 64,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 7693,
+        "levelId": 112,
+        "items": {
+          "2001": {
+            "quantity": 40
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 111
+          }
+        },
+        "levelReward": {
+          "111": 1773148604
+        },
+        "statistics": {
+          "task:complete:21": 111
+        },
+        "statisticsTime": {
+          "multi:fail:level": 1773148604,
+          "multi:fail:cnt": 1773148604
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 440,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2001,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1773148603759_psb1rdo65
+
+记录 #3:
+----------------------------------------
+时间: 2026/3/10 21:16:37
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 83,
+    "ack": 0,
+    "time": 1773148598139,
+    "resp": 63,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 7485,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "12": {
+              "id": 9405,
+              "type": 1,
+              "index": 12,
+              "level": 111,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9405,
+              "type": 1,
+              "index": 14,
+              "level": 111,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11009,
+              "type": 1,
+              "index": 26,
+              "level": 111,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "levelId": 111,
+          "autoSpeed": 125,
+          "IsActLevel": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1773148597282_n7firpm42
+
+记录 #4:
+----------------------------------------
+时间: 2026/3/10 21:16:37
+服务: FightService
+方法: endLevel
+参数: [{"levelId":110,"battleTime":2151,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[143,5,32],[181,5,35],[194,5,43],[232,5,82],[404,5,76],[378,5,96],[452,5,19]],"outputCode":"eac29d898f77d073c336c89b52527059","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 81,
+    "ack": 0,
+    "time": 1773148598092,
+    "resp": 62,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 7253,
+        "levelId": 111,
+        "items": {
+          "1024": {
+            "itemId": 1024,
+            "quantity": 1,
+            "ext": null
+          },
+          "2002": {
+            "quantity": 23
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 110
+          }
+        },
+        "levelReward": {
+          "110": 1773148598
+        },
+        "statistics": {
+          "task:complete:21": 110
+        },
+        "statisticsTime": {
+          "multi:fail:level": 1773148598,
+          "multi:fail:cnt": 1773148598
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 430,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1024,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1773148597219_9df2tfa98
+
+记录 #5:
+----------------------------------------
+时间: 2026/3/10 21:16:28
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 79,
+    "ack": 0,
+    "time": 1773148588897,
+    "resp": 61,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 5752,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "10": {
+              "id": 9402,
+              "type": 1,
+              "index": 10,
+              "level": 110,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 9402,
+              "type": 1,
+              "index": 11,
+              "level": 110,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 9402,
+              "type": 1,
+              "index": 12,
+              "level": 110,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9402,
+              "type": 1,
+              "index": 14,
+              "level": 110,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11001,
+              "type": 1,
+              "index": 26,
+              "level": 110,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "levelId": 110,
+          "autoSpeed": 125,
+          "IsActLevel": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1773148588040_4jxlxa2sz
+
+记录 #6:
+----------------------------------------
+时间: 2026/3/10 21:16:27
+服务: FightService
+方法: endLevel
+参数: [{"levelId":109,"battleTime":1897,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[120,5,32],[180,5,32],[180,5,43],[232,5,39],[214,5,40],[219,5,109],[562,5,19]],"outputCode":"0cddcf91843580f93076d011465d3356","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 77,
+    "ack": 0,
+    "time": 1773148588851,
+    "resp": 60,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 6823,
+        "levelId": 110,
+        "items": {
+          "2001": {
+            "quantity": 39
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 109
+          }
+        },
+        "levelReward": {
+          "109": 1773148588
+        },
+        "statistics": {
+          "task:complete:21": 109
+        },
+        "statisticsTime": {
+          "multi:fail:cnt": 1773148588,
+          "multi:fail:level": 1773148588
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 430,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2001,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 41
+}
+异步: 是
+调用ID: call_1773148587977_cshwdthr1
+
+记录 #7:
+----------------------------------------
+时间: 2026/3/10 21:16:19
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 75,
+    "ack": 0,
+    "time": 1773148580691,
+    "resp": 59,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 3364,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "10": {
+              "id": 9403,
+              "type": 1,
+              "index": 10,
+              "level": 109,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 9403,
+              "type": 1,
+              "index": 11,
+              "level": 109,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 9405,
+              "type": 1,
+              "index": 12,
+              "level": 109,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9405,
+              "type": 1,
+              "index": 14,
+              "level": 109,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11034,
+              "type": 1,
+              "index": 26,
+              "level": 109,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "autoSpeed": 125,
+          "IsActLevel": 0,
+          "levelId": 109
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1773148579830_hqp3jxiog
+
+记录 #8:
+----------------------------------------
+时间: 2026/3/10 21:16:19
+服务: FightService
+方法: endLevel
+参数: [{"levelId":108,"battleTime":1885,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[119,5,32],[177,5,35],[194,5,43],[233,5,40],[217,5,40],[218,5,112],[536,5,19]],"outputCode":"0b2c08a40bc08e28d0023412cdd70356","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 73,
+    "ack": 0,
+    "time": 1773148580641,
+    "resp": 58,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 6393,
+        "levelId": 109,
+        "items": {
+          "2001": {
+            "quantity": 38
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 108
+          }
+        },
+        "levelReward": {
+          "108": 1773148580
+        },
+        "statistics": {
+          "task:complete:21": 108
+        },
+        "statisticsTime": {
+          "multi:fail:cnt": 1773148580,
+          "multi:fail:level": 1773148580
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 430,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2001,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 40
+}
+异步: 是
+调用ID: call_1773148579769_q83g4k89z
+
+记录 #9:
+----------------------------------------
+时间: 2026/3/10 21:15:32
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 71,
+    "ack": 0,
+    "time": 1773148533407,
+    "resp": 57,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 328,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "10": {
+              "id": 9403,
+              "type": 1,
+              "index": 10,
+              "level": 108,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 9403,
+              "type": 1,
+              "index": 11,
+              "level": 108,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 9401,
+              "type": 1,
+              "index": 12,
+              "level": 108,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9401,
+              "type": 1,
+              "index": 14,
+              "level": 108,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11023,
+              "type": 1,
+              "index": 26,
+              "level": 108,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "IsActLevel": 0,
+          "levelId": 108,
+          "autoSpeed": 125
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1773148532550_lqnfzg6mc
+
+记录 #10:
+----------------------------------------
+时间: 2026/3/10 21:15:32
+服务: FightService
+方法: endLevel
+参数: [{"levelId":107,"battleTime":1394,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[118,5,25],[146,5,32],[177,5,35],[194,5,38],[208,5,25],[146,5,39],[213,5,19]],"outputCode":"f10977c32cd801379f41a084a51add05","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 69,
+    "ack": 0,
+    "time": 1773148533361,
+    "resp": 56,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 5963,
+        "levelId": 108,
+        "items": {
+          "2001": {
+            "quantity": 37
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 107
+          }
+        },
+        "levelReward": {
+          "107": 1773148533
+        },
+        "statistics": {
+          "task:complete:21": 107
+        },
+        "statisticsTime": {
+          "multi:fail:cnt": 1773148533,
+          "multi:fail:level": 1773148533
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 420,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2001,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1773148532488_der7lmjnd
+
+记录 #11:
+----------------------------------------
+时间: 2026/3/10 21:15:29
+服务: ActivityService
+方法: get
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 67,
+    "ack": 54,
+    "time": 1773148530676,
+    "resp": 55,
+    "cmd": "activity_getresp",
+    "body": {
+      "activity": {
+        "firstCharge": {
+          "packId": 1001
+        },
+        "activityShop": {
+          "1": {
+            "activityId": 1,
+            "record": {
+              "5": {
+                "merchandiseId": 5,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "6": {
+                "merchandiseId": 6,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8": {
+                "merchandiseId": 8,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "64": {
+                "merchandiseId": 64,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "65": {
+                "merchandiseId": 65,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "66": {
+                "merchandiseId": 66,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "67": {
+                "merchandiseId": 67,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "68": {
+                "merchandiseId": 68,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "69": {
+                "merchandiseId": 69,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "101": {
+                "merchandiseId": 101,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "10": {
+            "activityId": 10,
+            "record": {}
+          },
+          "11": {
+            "activityId": 11,
+            "record": {}
+          },
+          "12": {
+            "activityId": 12,
+            "record": {}
+          },
+          "13": {
+            "activityId": 13,
+            "record": {
+              "1301": {
+                "merchandiseId": 1301,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1302": {
+                "merchandiseId": 1302,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1303": {
+                "merchandiseId": 1303,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1304": {
+                "merchandiseId": 1304,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1305": {
+                "merchandiseId": 1305,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1306": {
+                "merchandiseId": 1306,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1307": {
+                "merchandiseId": 1307,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1308": {
+                "merchandiseId": 1308,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1309": {
+                "merchandiseId": 1309,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1310": {
+                "merchandiseId": 1310,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1311": {
+                "merchandiseId": 1311,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1312": {
+                "merchandiseId": 1312,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1313": {
+                "merchandiseId": 1313,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1314": {
+                "merchandiseId": 1314,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1315": {
+                "merchandiseId": 1315,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1316": {
+                "merchandiseId": 1316,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1317": {
+                "merchandiseId": 1317,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1318": {
+                "merchandiseId": 1318,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1319": {
+                "merchandiseId": 1319,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1320": {
+                "merchandiseId": 1320,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1321": {
+                "merchandiseId": 1321,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1322": {
+                "merchandiseId": 1322,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1323": {
+                "merchandiseId": 1323,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1324": {
+                "merchandiseId": 1324,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1325": {
+                "merchandiseId": 1325,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1326": {
+                "merchandiseId": 1326,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1327": {
+                "merchandiseId": 1327,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1328": {
+                "merchandiseId": 1328,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1329": {
+                "merchandiseId": 1329,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1330": {
+                "merchandiseId": 1330,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1331": {
+                "merchandiseId": 1331,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1332": {
+                "merchandiseId": 1332,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1333": {
+                "merchandiseId": 1333,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1334": {
+                "merchandiseId": 1334,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1335": {
+                "merchandiseId": 1335,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1336": {
+                "merchandiseId": 1336,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1337": {
+                "merchandiseId": 1337,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1338": {
+                "merchandiseId": 1338,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1339": {
+                "merchandiseId": 1339,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1340": {
+                "merchandiseId": 1340,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1341": {
+                "merchandiseId": 1341,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1342": {
+                "merchandiseId": 1342,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1343": {
+                "merchandiseId": 1343,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1344": {
+                "merchandiseId": 1344,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1345": {
+                "merchandiseId": 1345,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1346": {
+                "merchandiseId": 1346,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1347": {
+                "merchandiseId": 1347,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1348": {
+                "merchandiseId": 1348,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1349": {
+                "merchandiseId": 1349,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1350": {
+                "merchandiseId": 1350,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1351": {
+                "merchandiseId": 1351,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1352": {
+                "merchandiseId": 1352,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1353": {
+                "merchandiseId": 1353,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1354": {
+                "merchandiseId": 1354,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1355": {
+                "merchandiseId": 1355,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1356": {
+                "merchandiseId": 1356,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1357": {
+                "merchandiseId": 1357,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1358": {
+                "merchandiseId": 1358,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1359": {
+                "merchandiseId": 1359,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1360": {
+                "merchandiseId": 1360,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1361": {
+                "merchandiseId": 1361,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1362": {
+                "merchandiseId": 1362,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1363": {
+                "merchandiseId": 1363,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1364": {
+                "merchandiseId": 1364,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1365": {
+                "merchandiseId": 1365,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1366": {
+                "merchandiseId": 1366,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1367": {
+                "merchandiseId": 1367,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1368": {
+                "merchandiseId": 1368,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1369": {
+                "merchandiseId": 1369,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1370": {
+                "merchandiseId": 1370,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1371": {
+                "merchandiseId": 1371,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1372": {
+                "merchandiseId": 1372,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1373": {
+                "merchandiseId": 1373,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1374": {
+                "merchandiseId": 1374,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1375": {
+                "merchandiseId": 1375,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1376": {
+                "merchandiseId": 1376,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1377": {
+                "merchandiseId": 1377,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1378": {
+                "merchandiseId": 1378,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1379": {
+                "merchandiseId": 1379,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1380": {
+                "merchandiseId": 1380,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1381": {
+                "merchandiseId": 1381,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1382": {
+                "merchandiseId": 1382,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1383": {
+                "merchandiseId": 1383,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1384": {
+                "merchandiseId": 1384,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1385": {
+                "merchandiseId": 1385,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1386": {
+                "merchandiseId": 1386,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1387": {
+                "merchandiseId": 1387,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1388": {
+                "merchandiseId": 1388,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1389": {
+                "merchandiseId": 1389,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1390": {
+                "merchandiseId": 1390,
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "16": {
+            "activityId": 16,
+            "record": {}
+          },
+          "17": {
+            "activityId": 17,
+            "record": {}
+          },
+          "19": {
+            "activityId": 19,
+            "record": {}
+          }
+        },
+        "pushGoods": {},
+        "dynamicPushGoods": {},
+        "activity": [
+          {
+            "id": -1,
+            "type": 1,
+            "name": "招募达标",
+            "icon": "activities/icon/xshd_btn_zhaomudabiao",
+            "res": "activities/banner/xshd_img_zyhgbanner",
+            "module": 0,
+            "data": {
+              "rounds": 40,
+              "rewards": [
+                {
+                  "num": 50,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10
+                    }
+                  ]
+                },
+                {
+                  "num": 100,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 20
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 200,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2003,
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3
+                    }
+                  ]
+                },
+                {
+                  "num": 300,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "value": 80,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 80
+                    },
+                    {
+                      "itemId": 2005,
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 8,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 400
+                }
+              ]
+            },
+            "openTime": "2026-03-06T16:00:00.000Z",
+            "endTime": "2026-03-16T16:00:00.000Z",
+            "updateTime": "2022-12-02T03:56:01.746Z",
+            "createTime": "2021-12-11T02:40:26.195Z",
+            "nameId": "100000060",
+            "resID": "100000066",
+            "resText": "招募达标奖励"
+          },
+          {
+            "id": -2,
+            "type": 2,
+            "name": "宝箱达标",
+            "icon": "activities/icon/xshd_btn_baoxiangdabiao",
+            "res": "activities/banner/xshd_img_zyhgbanner",
+            "module": 0,
+            "data": {
+              "rounds": 40,
+              "rewards": [
+                {
+                  "num": 1000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 3007,
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 20,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1000
+                    }
+                  ],
+                  "num": 2000
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 4000
+                },
+                {
+                  "num": 6000,
+                  "rewardList": [
+                    {
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 2002
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 80
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 80
+                    },
+                    {
+                      "itemId": 1013,
+                      "value": 8,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2500,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 8000
+                }
+              ]
+            },
+            "openTime": "2026-03-06T16:00:00.000Z",
+            "endTime": "2026-03-16T16:00:00.000Z",
+            "updateTime": "2025-05-29T21:41:35.541Z",
+            "createTime": "2021-12-17T03:01:44.275Z",
+            "nameId": "100000081",
+            "resID": "100000083",
+            "resText": "宝箱达标奖励"
+          },
+          {
+            "id": 9,
+            "type": 4,
+            "name": "江湖黑市",
+            "icon": "activities/icon/jchd_btn_shijingheishi",
+            "res": "activities/banner/xshd_img_jhhsbanner",
+            "module": -1,
+            "data": {
+              "goodsList": [
+                {
+                  "title": "黑市福利",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市见面礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 600,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1006,
+                      "value": 1000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市惊喜礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 1200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2500,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 6000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 5000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2003,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "顶级鱼竿包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 30,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "白玉黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级灵贝包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 25000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000711",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "养成补给包",
+                  "description": "",
+                  "limit": 4,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1016,
+                      "value": 2000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1026,
+                      "value": 3000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000945",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 3,
+              "itemId": 0
+            },
+            "openTime": "2026-03-06T04:00:00.000Z",
+            "endTime": "2026-03-12T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:14:56.880Z",
+            "createTime": "2022-04-25T12:40:39.906Z",
+            "nameId": "100000041",
+            "resID": "100000041",
+            "resText": "江湖黑市"
+          },
+          {
+            "id": 5,
+            "type": 4,
+            "name": "金砖商店",
+            "icon": "activities/icon/xshd_btn_inzhuanshangdian",
+            "res": "activities/banner/xshd_img_jzdbbanner",
+            "module": -1,
+            "data": {
+              "goodsList": [
+                {
+                  "title": "金砖回馈",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 200,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000948",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 3000,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 660,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000949",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 6800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000950",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2820,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000951",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级金砖礼包",
+                  "description": "",
+                  "limit": 5,
+                  "price": 32800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 7220,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000952",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级金砖礼包",
+                  "description": "",
+                  "limit": 10,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 14260,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000953",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 1,
+              "itemId": 0
+            },
+            "openTime": "2026-03-06T04:00:00.000Z",
+            "endTime": "2026-03-12T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:21:06.021Z",
+            "createTime": "2021-12-24T03:30:09.806Z",
+            "nameId": "100000946",
+            "resID": "100000947",
+            "resText": "金砖闪耀 价值永恒|金砖大礼包"
+          }
+        ],
+        "myTotalInfo": {
+          "-2": {
+            "num": 550,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          },
+          "-1": {
+            "num": 41,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          }
+        },
+        "myMonthInfo": {
+          "2": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1772294400
+          },
+          "3": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1772294400
+          }
+        },
+        "myArenaInfo": {
+          "rounds": 1,
+          "openTime": 1772294400
+        },
+        "myStoreInfo": {
+          "5": {
+            "complete": {
+              "0": 1
+            }
+          },
+          "9": {
+            "complete": {
+              "0": 1,
+              "2": 1
+            }
+          }
+        },
+        "yearInfo": {},
+        "fiveInfo": {},
+        "commonActivityInfo": {},
+        "warOrderActivityInfo": {
+          "1001": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "801": 1,
+              "802": 1,
+              "803": 1,
+              "804": 1,
+              "805": 1,
+              "806": 1,
+              "807": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          },
+          "1003": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {},
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 6,
+            "phaseEndTime": 0
+          }
+        },
+        "actBingoInfo": {},
+        "dropReward": {},
+        "actCMInfo": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1773148529814_2kq8uhhbf
+
+记录 #12:
+----------------------------------------
+时间: 2026/3/10 21:15:29
+服务: HallService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 66,
+    "ack": 0,
+    "time": 1773148530652,
+    "resp": 54,
+    "cmd": "hall_getinforesp",
+    "body": {
+      "bottle": {
+        "roleId": 720414847,
+        "bottleType": 2,
+        "occupyId": -1,
+        "occupyLordWeaponId": 0,
+        "occupyPower": 0,
+        "occupyTotalTime": 0,
+        "occupyEndTime": 1772873731,
+        "nextRefreshTime": -1,
+        "isFirst": false,
+        "battleTeam": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1773148529801_yjvrs0p7g
+
+记录 #13:
+----------------------------------------
+时间: 2026/3/10 21:14:57
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 65,
+    "ack": 0,
+    "time": 1773148498446,
+    "resp": 53,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 607,
+        "version": 240490,
+        "leftTeam": {
+          "roleId": 720414847,
+          "power": 71520,
+          "tapAttack": 681,
+          "attributeBonus": {
+            "5": 0.01
+          },
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 350,
+              "attack": 20886,
+              "defense": 16580,
+              "curHp": 181109,
+              "hp": 181109,
+              "curEnergy": -1,
+              "speed": 224,
+              "color": 3,
+              "star": 1,
+              "order": 3,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 201,
+              "attribute": {
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                202,
+                203
+              ],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "12": {
+              "id": 9402,
+              "type": 1,
+              "index": 12,
+              "level": 107,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9402,
+              "type": 1,
+              "index": 14,
+              "level": 107,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 11042,
+              "type": 1,
+              "index": 26,
+              "level": 107,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "levelId": 107,
+          "autoSpeed": 125,
+          "IsActLevel": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1773148497595_0sc1sejz0
+
+记录 #14:
+----------------------------------------
+时间: 2026/3/10 21:14:57
+服务: FightService
+方法: endLevel
+参数: [{"levelId":106,"battleTime":1682,"tapTimes":[[],[],[],[],[],[],[]],"autoTapTimes":[[119,5,26],[148,5,35],[194,5,32],[181,5,40],[220,5,26],[148,5,92],[481,5,19]],"outputCode":"4ba847fb2a3713f42450efc12e933c08","log":""}]
+结果:
+{
+  "_raw": {
+    "seq": 63,
+    "ack": 0,
+    "time": 1773148498404,
+    "resp": 52,
+    "cmd": "fight_endlevelresp",
+    "body": {
+      "role": {
+        "gold": 5543,
+        "levelId": 107,
+        "items": {
+          "2001": {
+            "quantity": 36
+          }
+        },
+        "achievement": {
+          "2": {
+            "completeValue": 106
+          }
+        },
+        "levelReward": {
+          "106": 1773148498
+        },
+        "statistics": {
+          "task:complete:21": 106
+        },
+        "statisticsTime": {
+          "multi:fail:level": 1773148498,
+          "multi:fail:cnt": 1773148498
+        },
+        "medallion": null
+      },
+      "reward": [
+        {
+          "type": 1,
+          "itemId": 0,
+          "value": 420,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2001,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "levelWeaponSkillIds": []
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1773148497536_hbj2o2bn9
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

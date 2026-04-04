@@ -35,6 +35,147 @@ export function createTasksArena(deps) {
   } = deps;
 
   /**
+   * 一键竞技场战斗3次（单个Token）
+   */
+  const batcharenafightForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始竞技场战斗`,
+        type: "info",
+      });
+
+      // 检查咸神门票 (ID: 1007)
+      let role = tokenStore.gameData?.roleInfo?.role;
+      if (!role) {
+        try {
+          const roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+          role = roleInfo?.role;
+        } catch {}
+      }
+      const ticketCount = role?.items?.[1007]?.quantity || 0;
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 当前咸神门票: ${ticketCount}`,
+        type: "info",
+      });
+
+      if (ticketCount <= 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 咸神门票不足，无法进行竞技场战斗`,
+          type: "warning",
+        });
+        return;
+      }
+
+      const teamInfo = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "presetteam_getinfo",
+        {},
+        5000,
+      );
+      if (!teamInfo || !teamInfo.presetTeamInfo) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `阵容信息异常: ${JSON.stringify(teamInfo)}`,
+          type: "warning",
+        });
+      }
+
+      // 加载该Token的独立配置
+      const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
+      const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
+      let Isswitching = false;
+      if (currentFormation === tokenSettings.arenaFormation) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
+          type: "info",
+        });
+      } else {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "presetteam_saveteam",
+          { teamId: tokenSettings.arenaFormation },
+          5000,
+        );
+        Isswitching = true;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `成功切换到阵容${tokenSettings.arenaFormation}`,
+          type: "info",
+        });
+      }
+      
+      const fights = Math.min(3, ticketCount);
+      if (fights < 3) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 咸神门票仅剩 ${ticketCount} 张，将执行 ${fights} 次战斗`,
+          type: "warning",
+        });
+      }
+
+      for (let i = 0; i < fights; i++) {
+        if (shouldStop.value) break;
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始第 ${i + 1} 次竞技场战斗`,
+          type: "info",
+        });
+
+        const res = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "arena_challenge",
+          { 
+            defId: tokenSettings.arenaPlayerId,
+            defName: tokenSettings.arenaPlayerName,
+          },
+          10000,
+        );
+
+        if (res?.result === 0) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 第 ${i + 1} 次竞技场战斗胜利`,
+            type: "success",
+          });
+        } else {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 第 ${i + 1} 次竞技场战斗失败: ${res.hint || "未知错误"}`,
+            type: "error",
+          });
+        }
+
+        if (i < fights - 1) {
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 竞技场战斗完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 竞技场战斗失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 一键竞技场战斗3次
    */
   const batcharenafight = async () => {
@@ -914,5 +1055,6 @@ export function createTasksArena(deps) {
     batcharenafight,
     batchTopUpFish,
     batchTopUpArena,
+    batcharenafightForToken,
   };
 }

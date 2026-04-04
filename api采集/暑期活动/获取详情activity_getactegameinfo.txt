@@ -1,0 +1,220 @@
+时间: 2026/1/31 14:47:11
+服务: ActivityService
+方法: getActEGameInfo
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "seq": 92,
+    "ack": 0,
+    "time": 1769841981354,
+    "resp": 90,
+    "cmd": "activity_getactegameinforesp",
+    "body": {
+      "actEGame": {
+        "actId": 2601302,
+        "mapId": 510,
+        "gridInfo": [
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 10,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 2,
+              "flag": 0
+            },
+            {
+              "gridType": -2,
+              "awardIndex": 0,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 4,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 13,
+              "flag": 0
+            },
+            {
+              "gridType": -1,
+              "awardIndex": 0,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 7,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 20,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 0,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 6,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 11,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 12,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 16,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 8,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 3,
+              "flag": 0
+            },
+            {
+              "gridType": -3,
+              "awardIndex": 17,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ],
+          [
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            },
+            {
+              "gridType": 0,
+              "awardIndex": -1,
+              "flag": 0
+            }
+          ]
+        ],
+        "curX": 1,
+        "curY": 1,
+        "stageId": 26013021,
+        "stageNum": 12
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37

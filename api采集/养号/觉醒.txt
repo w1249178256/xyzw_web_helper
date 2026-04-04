@@ -1,0 +1,10 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "index": -1
+  },
+  "cmd": "hero_skillawake",
+  "seq": 3,
+  "time": 1772864296880
+}

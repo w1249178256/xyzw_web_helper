@@ -15,6 +15,36 @@
 
         <div class="nav-menu">
           <router-link
+            to="/admin/shidian"
+            class="nav-item"
+            active-class="active"
+          >
+            <n-icon>
+              <LockClosedSharp />
+            </n-icon>
+            <span>十殿</span>
+          </router-link>
+          <router-link
+            to="/admin/fish-helper"
+            class="nav-item"
+            active-class="active"
+          >
+            <n-icon>
+              <Fish />
+            </n-icon>
+            <span>一键金鱼</span>
+          </router-link>
+          <router-link
+            to="/admin/resource-manager"
+            class="nav-item"
+            active-class="active"
+          >
+            <n-icon>
+              <Cube />
+            </n-icon>
+            <span>资源管理</span>
+          </router-link>
+          <router-link
             to="/admin/dashboard"
             class="nav-item"
             active-class="active"
@@ -96,6 +126,36 @@
       style="width: 260px"
     >
       <div class="drawer-menu">
+        <router-link
+          to="/admin/shidian"
+          class="drawer-item"
+          @click="isMobileMenuOpen = false"
+        >
+          <n-icon>
+            <LockClosedSharp />
+          </n-icon>
+          <span>十殿</span>
+        </router-link>
+        <router-link
+          to="/admin/fish-helper"
+          class="drawer-item"
+          @click="isMobileMenuOpen = false"
+        >
+          <n-icon>
+            <Fish />
+          </n-icon>
+          <span>一键金鱼</span>
+        </router-link>
+        <router-link
+          to="/admin/resource-manager"
+          class="drawer-item"
+          @click="isMobileMenuOpen = false"
+        >
+          <n-icon>
+            <Cube />
+          </n-icon>
+          <span>资源管理</span>
+        </router-link>
         <router-link
           to="/admin/dashboard"
           class="drawer-item"
@@ -197,6 +257,7 @@ import {
   LockClosedSharp,LockOpen,
   Menu,
   Layers,
+  Fish,
 } from "@vicons/ionicons5";
 
 import { useRouter } from 'vue-router'

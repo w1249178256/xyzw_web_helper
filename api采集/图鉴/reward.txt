@@ -1,0 +1,56 @@
+时间: 2026/2/1 10:05:52
+服务: BookService
+方法: claimPointReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 40,
+    "ack": 0,
+    "time": 1769911553279,
+    "resp": 40,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "diamond": 243797,
+        "freeDiamond": 243797,
+        "book": {
+          "bookLastReward": 42
+        },
+        "items": {
+          "1001": {
+            "quantity": 2599
+          },
+          "1003": {
+            "quantity": 609724
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 7800,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 60000,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1001,
+          "value": 240,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1769911552761_iujnrlgjm

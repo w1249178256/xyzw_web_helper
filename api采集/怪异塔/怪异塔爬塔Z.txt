@@ -1,0 +1,1032 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/2/19 23:36:10
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 10
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/2/19 23:36:05
+服务: EvoTowerService
+方法: claimReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 67,
+    "ack": 64,
+    "time": 1771515366908,
+    "resp": 65,
+    "cmd": "evotower_claimrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "2003": {
+            "quantity": 197
+          },
+          "37002": {
+            "quantity": 520
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 5,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 37002,
+          "value": 40,
+          "ext": 0
+        }
+      ],
+      "evoTower": {
+        "rewardTowerId": 13
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 43
+}
+异步: 是
+调用ID: call_1771515365419_r15miheu5
+
+记录 #2:
+----------------------------------------
+时间: 2026/2/19 23:36:05
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 66,
+    "ack": 0,
+    "time": 1771515366571,
+    "resp": 64,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3
+        },
+        {
+          "discountId": 2,
+          "expireTime": 1761699796,
+          "discountState": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 1701407866,
+          "discountState": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1771515365099_wuixpvlhs
+
+记录 #3:
+----------------------------------------
+时间: 2026/2/19 23:36:02
+服务: EvoTowerService
+方法: getShareInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 65,
+    "ack": 62,
+    "time": 1771515364310,
+    "resp": 63,
+    "cmd": "evotower_getshareinforesp",
+    "body": {
+      "shareTask": {
+        "helpRoleIdMap": {},
+        "inviteRoleIdMap": {},
+        "shareTaskMap": {
+          "1": {
+            "typ": 1,
+            "progress": 0,
+            "claimedProgress": 0
+          },
+          "2": {
+            "typ": 2,
+            "progress": 0,
+            "claimedProgress": 0
+          },
+          "3": {
+            "typ": 3,
+            "progress": 0,
+            "claimedProgress": 0
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1771515362837_tw49uaxn7
+
+记录 #4:
+----------------------------------------
+时间: 2026/2/19 23:36:02
+服务: EvoTowerService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 64,
+    "ack": 61,
+    "time": 1771515364281,
+    "resp": 62,
+    "cmd": "evotowerinforesp",
+    "body": {
+      "evoTower": {
+        "serverId": 8976,
+        "towerId": 130,
+        "rewardTowerId": 12,
+        "energy": 19,
+        "energyRecoveryTime": 1771515360,
+        "bindLegionId": 2781636,
+        "towerScore": 130,
+        "plugInTowerId": 0,
+        "legionPrivilege": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "storeMap": {},
+        "taskMap": {
+          "260214": {
+            "1": 3,
+            "2": 6,
+            "3": 10,
+            "4": 0,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          },
+          "260219": {
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 0,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          }
+        },
+        "taskClaimMap": {
+          "260214": {
+            "1": 1771050380,
+            "2": 1771050381,
+            "3": 1771050382
+          }
+        },
+        "legionTaskMap": {
+          "4": 19,
+          "5": 19,
+          "6": 14,
+          "7": 13,
+          "8": 1
+        },
+        "legionTaskClaimMap": {
+          "4": 1771059736,
+          "5": 1771059737,
+          "6": 1771059738,
+          "7": 1771059739
+        },
+        "lotteryLeftCnt": 27,
+        "lotterySkipCnt": 0,
+        "packRecord": {},
+        "orderPassReward": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 35
+}
+异步: 是
+调用ID: call_1771515362801_gnjmkinqo
+
+记录 #5:
+----------------------------------------
+时间: 2026/2/19 23:35:59
+服务: EvoTowerService
+方法: getTowerMyRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 63,
+    "ack": 60,
+    "time": 1771515360963,
+    "resp": 61,
+    "cmd": "evotower_gettowermyrankresp",
+    "body": {
+      "myRank": {
+        "roleId": 363165230,
+        "serverId": 8949,
+        "name": "锦衣·羽生",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/iaxgvyIjNFomaMibFl2E9QeUuT9icmcQrpwianJIwKZZ45NTVyjIDv0v9B02I01pjib2X1dE6fIJhd5B1V9Lj0TSCFg/132",
+        "power": 9180056237,
+        "score": 130,
+        "legionName": "观悦丶锦衣"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1771515359480_881zfq5co
+
+记录 #6:
+----------------------------------------
+时间: 2026/2/19 23:35:59
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 62,
+    "ack": 59,
+    "time": 1771515360958,
+    "resp": 60,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571123": 169,
+        "111572145": 149,
+        "111573885": 399,
+        "111574137": 349,
+        "111579431": 399,
+        "111579805": 399,
+        "111579959": 149,
+        "111581800": 399,
+        "111582252": 399,
+        "111582562": 349,
+        "111583668": 399,
+        "112007511": 439,
+        "112012701": 319,
+        "112018979": 319,
+        "175153809": 349,
+        "219582429": 399,
+        "363165230": 130,
+        "458909152": 0,
+        "480043876": 119,
+        "677095932": 289
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 34
+}
+异步: 是
+调用ID: call_1771515359479_1lucntx6q
+
+记录 #7:
+----------------------------------------
+时间: 2026/2/19 23:35:59
+服务: EvoTowerService
+方法: fight
+参数: [{"battleNum":1,"winNum":1,"isSkip":false}]
+结果:
+{
+  "_raw": {
+    "seq": 61,
+    "ack": 0,
+    "time": 1771515360918,
+    "resp": 59,
+    "cmd": "evotower_fightresp",
+    "body": {
+      "role": {
+        "items": {
+          "37005": {
+            "quantity": 369
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 37005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 54,
+          "itemId": 41,
+          "value": 10,
+          "ext": 0
+        }
+      ],
+      "evoTower": {
+        "towerId": 130,
+        "energy": 19,
+        "energyRecoveryTime": 1771515360,
+        "towerScore": 130,
+        "taskMap": {
+          "260219": {
+            "1": 1,
+            "2": 1,
+            "3": 1,
+            "4": 0,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          }
+        }
+      },
+      "winList": [
+        true
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 168
+}
+异步: 是
+调用ID: call_1771515359306_kqdr1eiz4
+
+记录 #8:
+----------------------------------------
+时间: 2026/2/19 23:35:58
+服务: EvoTowerService
+方法: readyFight
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 60,
+    "ack": 58,
+    "time": 1771515359868,
+    "resp": 58,
+    "cmd": "evotower_readyfightresp",
+    "body": {
+      "randomNumList": [
+        5992
+      ],
+      "battleData": {
+        "id": 1771515359867,
+        "mode": 35,
+        "randomSeed": 5992,
+        "version": 240487,
+        "leftTeam": {
+          "roleId": 363165230,
+          "power": 9180056237,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 118,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 583708512,
+              "defense": 153849700,
+              "curHp": 6490942674,
+              "hp": 6490942674,
+              "curEnergy": -1,
+              "speed": 14975,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11806,
+              "skinName": "",
+              "activeSkill": 1185,
+              "attribute": {
+                "5": 0.3,
+                "7": 0.3,
+                "51": 1.69,
+                "52": 0.1925,
+                "53": 0.4,
+                "56": 0.711,
+                "57": 0.934,
+                "58": 0.02,
+                "59": 0.78,
+                "61": 0.58,
+                "66": 0.008,
+                "68": 0.04,
+                "70": 1.012,
+                "101": 0,
+                "102": 0,
+                "226": 0.11,
+                "229": 0.22
+              },
+              "skill": [
+                1186,
+                1187,
+                1188,
+                1033015,
+                111350
+              ],
+              "recordFlag": false
+            },
+            "1": {
+              "id": 102,
+              "type": 0,
+              "index": 1,
+              "level": 6000,
+              "attack": 335128294,
+              "defense": 151528026,
+              "curHp": 6247175950,
+              "hp": 6247175950,
+              "curEnergy": -1,
+              "speed": 14522,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10201,
+              "skinName": "",
+              "activeSkill": 1025,
+              "attribute": {
+                "5": 0.3,
+                "7": 0.3,
+                "51": 0.026,
+                "52": 0.35,
+                "53": 0.152,
+                "54": 0.5,
+                "56": 0.3825,
+                "57": 0.4,
+                "58": 0.012,
+                "59": 0.4,
+                "61": 0.4,
+                "62": 0.07,
+                "66": 0.02,
+                "69": 0.008,
+                "70": 0.68,
+                "101": 0,
+                "102": 0,
+                "226": 0.04
+              },
+              "skill": [
+                1026,
+                1027,
+                1028,
+                111550
+              ],
+              "recordFlag": false
+            },
+            "2": {
+              "id": 106,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 472512929,
+              "defense": 150503599,
+              "curHp": 6342458721,
+              "hp": 6342458721,
+              "curEnergy": -1,
+              "speed": 13987,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 8000005,
+              "attribute": {
+                "5": 0.3,
+                "7": 0.3,
+                "51": 1.172,
+                "52": 0.28,
+                "53": 0.15,
+                "54": 0.2,
+                "56": 0.4215,
+                "57": 0.45,
+                "58": 0.194,
+                "59": 0.4,
+                "60": 0.008,
+                "61": 0.4,
+                "63": 0.25,
+                "65": 0.06,
+                "66": 0.004,
+                "68": 0.02,
+                "70": 0.048,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                8000006,
+                8000007,
+                8000008,
+                11105
+              ],
+              "recordFlag": false
+            },
+            "3": {
+              "id": 116,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 404992669,
+              "defense": 148293014,
+              "curHp": 5076412821,
+              "hp": 5076412821,
+              "curEnergy": -1,
+              "speed": 14448,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11601,
+              "skinName": "",
+              "activeSkill": 1165,
+              "attribute": {
+                "5": 0.3,
+                "7": 0.3,
+                "52": 0.4865,
+                "53": 0.15,
+                "54": 0.23,
+                "56": 0.5605,
+                "57": 0.61,
+                "58": 0.036,
+                "59": 1,
+                "60": 0.004,
+                "61": 0.4,
+                "64": 0.188,
+                "66": 0.016,
+                "68": 0.04,
+                "70": 0.08,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1166,
+                1167,
+                1168
+              ],
+              "recordFlag": false
+            },
+            "4": {
+              "id": 107,
+              "type": 0,
+              "index": 4,
+              "level": 6000,
+              "attack": 912887044,
+              "defense": 150573049,
+              "curHp": 3925004903,
+              "hp": 3925004903,
+              "curEnergy": -1,
+              "speed": 15018,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10707,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {
+                "5": 0.3,
+                "7": 0.3,
+                "52": 0.063,
+                "53": 0.406,
+                "54": 0.15,
+                "56": 0.0075,
+                "57": 0.4,
+                "59": 0.4,
+                "60": 0.04,
+                "61": 0.718,
+                "63": 0.008,
+                "65": 0.032,
+                "68": 0.08,
+                "70": 0.036,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                206,
+                207,
+                208,
+                1033014
+              ],
+              "recordFlag": true
+            }
+          },
+          "name": "锦衣·羽生",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/iaxgvyIjNFomaMibFl2E9QeUuT9icmcQrpwianJIwKZZ45NTVyjIDv0v9B02I01pjib2X1dE6fIJhd5B1V9Lj0TSCFg/132",
+          "weaponId": 3,
+          "weaponActiveLevelId": 450,
+          "lordSkinId": 1,
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "10": {
+              "id": 30440000,
+              "type": 1,
+              "index": 10,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 206,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 30700000,
+              "type": 1,
+              "index": 11,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 313,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 30380000,
+              "type": 1,
+              "index": 12,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 223,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "13": {
+              "id": 30130002,
+              "type": 1,
+              "index": 13,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 11304,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 30210002,
+              "type": 1,
+              "index": 14,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 2007,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "towerId": 130
+        }
+      },
+      "rightTeamList": [
+        {
+          "roleId": 0,
+          "power": 0,
+          "legionName": "",
+          "tapAttack": 0,
+          "lordAttackTime": null,
+          "lordAutoAttackTime": null,
+          "attributeBonus": null,
+          "team": {
+            "10": {
+              "id": 30440000,
+              "type": 1,
+              "index": 10,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 206,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 30700000,
+              "type": 1,
+              "index": 11,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 313,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 30380000,
+              "type": 1,
+              "index": 12,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 223,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "13": {
+              "id": 30130002,
+              "type": 1,
+              "index": 13,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 11304,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 30210002,
+              "type": 1,
+              "index": 14,
+              "level": 30000130,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 2007,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          },
+          "teamInfo": null,
+          "options": null,
+          "name": "",
+          "headImg": "",
+          "weaponId": 0,
+          "weaponActiveLevelId": 0,
+          "lordSkinId": 0,
+          "lordSkill": null,
+          "avatarFrame": null,
+          "customCard": null,
+          "levelWeaponSkillId": null,
+          "legacyColor": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1771515358391_hcjvrnecj
+
+记录 #9:
+----------------------------------------
+时间: 2026/2/19 23:35:55
+服务: EvoTowerService
+方法: getLegionJoinMembers
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 59,
+    "ack": 56,
+    "time": 1771515357457,
+    "resp": 57,
+    "cmd": "evotower_getlegionjoinmembersresp",
+    "body": {
+      "memberScores": {
+        "111571123": 169,
+        "111572145": 149,
+        "111573885": 399,
+        "111574137": 349,
+        "111579431": 399,
+        "111579805": 399,
+        "111579959": 149,
+        "111581800": 399,
+        "111582252": 399,
+        "111582562": 349,
+        "111583668": 399,
+        "112007511": 439,
+        "112012701": 319,
+        "112018979": 319,
+        "175153809": 349,
+        "219582429": 399,
+        "363165230": 129,
+        "458909152": 0,
+        "480043876": 119,
+        "677095932": 289
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 40
+}
+异步: 是
+调用ID: call_1771515355976_jrnmh93t9
+
+记录 #10:
+----------------------------------------
+时间: 2026/2/19 23:35:55
+服务: EvoTowerService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 58,
+    "ack": 0,
+    "time": 1771515356893,
+    "resp": 56,
+    "cmd": "evotowerinforesp",
+    "body": {
+      "evoTower": {
+        "serverId": 8976,
+        "towerId": 129,
+        "rewardTowerId": 12,
+        "energy": 10,
+        "energyRecoveryTime": 1771080242,
+        "bindLegionId": 2781636,
+        "towerScore": 129,
+        "plugInTowerId": 0,
+        "legionPrivilege": {
+          "1": 1,
+          "2": 1,
+          "3": 1
+        },
+        "storeMap": {},
+        "taskMap": {
+          "260214": {
+            "1": 3,
+            "2": 6,
+            "3": 10,
+            "4": 0,
+            "5": 0,
+            "6": 0,
+            "7": 0,
+            "8": 0,
+            "9": 0
+          }
+        },
+        "taskClaimMap": {
+          "260214": {
+            "1": 1771050380,
+            "2": 1771050381,
+            "3": 1771050382
+          }
+        },
+        "legionTaskMap": {
+          "4": 19,
+          "5": 19,
+          "6": 14,
+          "7": 13,
+          "8": 1
+        },
+        "legionTaskClaimMap": {
+          "4": 1771059736,
+          "5": 1771059737,
+          "6": 1771059738,
+          "7": 1771059739
+        },
+        "lotteryLeftCnt": 27,
+        "lotterySkipCnt": 0,
+        "packRecord": {},
+        "orderPassReward": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 41
+}
+异步: 是
+调用ID: call_1771515355409_e42twxwbu
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================
