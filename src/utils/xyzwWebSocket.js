@@ -1090,8 +1090,6 @@ export class XyzwWebSocketClient {
       league_getgroupopponentresp: "league_getgroupopponent",
       legion_signupresp: "legion_signup",
       legion_payloadsignupresp: "legion_payloadsignup",
-      legion_researchresp: "legion_research",
-      legion_resetresearchresp: "legion_resetresearch",
       pearl_replaceskillresp: "pearl_replaceskill",
       pearl_exchangeskillresp: "pearl_exchangeskill",
       pearl_unloadskillresp: "pearl_unloadskill",
@@ -1103,7 +1101,6 @@ export class XyzwWebSocketClient {
       discount_getdiscountinforesp: "discount_getdiscountinfo",
       // 升星相关响应映射
       hero_heroupgradestarresp: "hero_heroupgradestar",
-      hero_rebirthresp: "hero_rebirth",
       hero_heroupgradelevelresp: "hero_heroupgradelevel",
       hero_heroupgradeorderresp: "hero_heroupgradeorder",
       book_upgraderesp: "book_upgrade",
@@ -1138,6 +1135,8 @@ export class XyzwWebSocketClient {
       task_claimweekrewardresp: "task_claimweekreward",
 
       // 同步响应映射（优先级低）
+
+      legion_researchresp: ["legion_research", "legion_resetresearch"],
       syncresp: [
         "system_mysharecallback",
         "task_claimdailypoint",
@@ -1157,6 +1156,7 @@ export class XyzwWebSocketClient {
         "dungeon_selecthero",
         "artifact_exchange",
         "hero_exchange",
+        "hero_rebirth",
       ],
     };
 
