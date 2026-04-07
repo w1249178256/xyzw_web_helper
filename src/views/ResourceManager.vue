@@ -1,6 +1,40 @@
 <template>
   <div class="batch-daily-tasks">
     <div class="main-layout">
+      <!-- Token 导入区域 -->
+      <n-modal v-model:show="showImportForm" width="40rem" :default-visible="!tokenStore.hasTokens">
+        <template #header>
+          <h2>
+            <n-icon>
+              <Add />
+            </n-icon>
+            添加游戏 Token
+          </h2>
+        </template>
+        <div class="card-header">
+          <!-- 导入方式选择 -->
+          <n-radio-group v-model:value="importMethod" class="import-method-tabs" size="small">
+            <n-radio-button value="manual">
+              手动输入
+            </n-radio-button>
+            <n-radio-button value="url">
+              URL 获取
+            </n-radio-button>
+            <n-radio-button value="bin">
+              BIN 获取
+            </n-radio-button>
+          </n-radio-group>
+        </div>
+        <div class="card-body">
+          <ManualTokenForm @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
+            v-if="importMethod === 'manual'" />
+          <UrlTokenForm @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
+            v-if="importMethod === 'url'" />
+          <BinTokenForm @cancel="() => showImportForm = false" @ok="() => showImportForm = false"
+            v-if="importMethod === 'bin'" />
+        </div>
+      </n-modal>
+
       <!-- Left Column -->
       <div class="left-column">
         <!-- Header -->
@@ -2195,6 +2229,68 @@
         </div>
       </div>
     </n-modal>
+
+    <!-- 功能卡片区域 -->
+    <div class="feature-cards-container" v-if="tokenStore.hasTokens">
+      <!-- 无限资源卡片 -->
+      <Unlimitedline 
+        :selected-token-id="selectedTokenId"
+      />
+
+      <!-- 怪异塔卡片 -->
+      <WeirdTowerCard 
+        :selected-token-id="selectedTokenId"
+      />
+    </div>
+
+    <!-- Token 选择区域 -->
+    <div class="tokens-section" v-if="tokenStore.hasTokens">
+      <div class="section-header">
+        <h2>选择 Token</h2>
+        <div class="header-actions">
+          <n-button @click="showImportForm = true" type="primary" size="small">
+            <template #icon>
+              <n-icon><Add /></n-icon>
+            </template>
+            添加 Token
+          </n-button>
+          <n-button @click="refreshAllTokens" size="small">
+            <template #icon>
+              <n-icon><Refresh /></n-icon>
+            </template>
+            刷新所有
+          </n-button>
+        </div>
+      </div>
+
+      <div class="tokens-grid">
+        <a-card v-for="(token, index) in sortedTokens" :key="token.id" :class="{
+          'token-card': true,
+          active: selectedTokenId === token.id
+        }" @click="selectToken(token)">
+          <template #title>
+            <a-space class="token-name">
+              <span class="token-index">{{ index + 1 }}.</span>
+              <span class="token-name-text" @click.stop="selectToken(token)">{{ token.name || '未命名' }}</span>
+              <a-tag color="red" v-if="token.server">{{ token.server }}</a-tag>
+              <a-badge v-if="getTokenStyle(token.id)" :status="getTokenStyle(token.id)" :text="getConnectionStatusText(token.id)" />
+              <span v-else class="connection-status">{{ getConnectionStatusText(token.id) }}</span>
+            </a-space>
+          </template>
+          <template #extra>
+            <n-dropdown :options="getTokenActions(token)" @select="(key) => handleTokenAction(key, token)">
+              <n-button text>
+                <template #icon>
+                  <n-icon>
+                    <EllipsisHorizontal />
+                  </n-icon>
+                </template>
+              </n-button>
+            </n-dropdown>
+          </template>
+        </a-card>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -2208,12 +2304,20 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
+  h,
 } from "vue";
 import { useTokenStore, gameTokens, tokenGroups } from "@/stores/tokenStore";
 import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
 import { preloadQuestions } from "@/utils/studyQuestionsFromJSON.js";
 import { useMessage } from "naive-ui";
-import { Settings } from "@vicons/ionicons5";
+import { Settings, Add, Refresh, TrashBin, EllipsisHorizontal, Create } from "@vicons/ionicons5";
+import ManualTokenForm from '@/views/TokenImport/manual.vue'
+import UrlTokenForm from '@/views/TokenImport/url.vue'
+import BinTokenForm from '@/views/TokenImport/bin.vue'
+
+// 导入子卡片组件
+import Unlimitedline from '@/diy/ResourceManagement/Unlimitedline.vue'
+import WeirdTowerCard from '@/diy/ResourceManagement/WeirdTowerCard.vue'
 
 // Import batch task modules
 import {
@@ -2273,7 +2377,14 @@ import {
 const tokenStore = useTokenStore();
 const message = useMessage();
 
-// 排序配置（从localStorage读取，与TokenImport共享）
+// Token 管理相关变量
+const showImportForm = ref(!tokenStore.hasTokens)
+const importMethod = ref('manual')
+const selectedTokenId = ref(null)
+const connectingTokens = ref(new Set())
+const refreshingTokens = ref(new Set())
+
+// 排序配置（从 localStorage 读取，与 TokenImport 共享）
 const savedSortConfig = localStorage.getItem("tokenSortConfig");
 const sortConfig = ref(
   savedSortConfig
@@ -2302,7 +2413,145 @@ const towerEnergy = computed(() => {
   return weirdTowerData.value?.energy || 0;
 });
 
-// 排序后的游戏角色Token列表
+// Token 管理相关方法
+// 选择 Token（采用 token 管理代码，自动连接游戏）
+const selectToken = (token, forceReconnect = false) => {
+  const isAlreadySelected = selectedTokenId.value === token.id
+  const connectionStatus = tokenStore.getWebSocketStatus(token.id)
+
+  // 如果已经选中且已连接，不执行任何操作
+  if (
+    isAlreadySelected &&
+    connectionStatus === 'connected' &&
+    !forceReconnect
+  ) {
+    message.info(`${token.name} 已选中且已连接`)
+    return
+  }
+
+  // 如果已经选中但正在连接，也不执行操作
+  if (
+    isAlreadySelected &&
+    connectionStatus === 'connecting' &&
+    !forceReconnect
+  ) {
+    message.info(`${token.name} 正在连接中...`)
+    return
+  }
+
+  // 选择 token（带智能连接判断）
+  selectedTokenId.value = token.id
+  const result = tokenStore.selectToken(token.id, forceReconnect)
+
+  if (result) {
+    if (forceReconnect) {
+      message.success(`强制重连：${token.name}`)
+    } else if (isAlreadySelected) {
+      message.success(`重新连接：${token.name}`)
+    } else {
+      message.success(`已选择：${token.name}`)
+    }
+  } else {
+    message.warning(`选择 Token 失败：${token.name}`)
+  }
+}
+
+// 获取 Token 样式
+const getTokenStyle = (tokenId) => {
+  const connection = tokenStore.wsConnections[tokenId]
+  if (connection?.status === 'connected') return 'success'
+  if (connection?.status === 'connecting') return 'processing'
+  return null
+}
+
+// 获取连接状态文本
+const getConnectionStatusText = (tokenId) => {
+  const connection = tokenStore.wsConnections[tokenId]
+  if (!connection) return '未连接'
+  if (connection.status === 'connected') return '已连接'
+  if (connection.status === 'connecting') return '连接中'
+  if (connection.status === 'disconnected') return '已断开'
+  return '未知'
+}
+
+// 获取 Token 操作菜单
+const getTokenActions = (token) => {
+  const actions = []
+  
+  actions.push({
+    label: '重新连接',
+    key: 'reconnect',
+    icon: () => h(Refresh, { size: 18 })
+  })
+  
+  actions.push({
+    label: '编辑名称',
+    key: 'edit',
+    icon: () => h(Create, { size: 18 })
+  })
+  
+  actions.push({
+    label: '删除',
+    key: 'delete',
+    icon: () => h(TrashBin, { size: 18 }),
+    props: {
+      style: { color: 'red' }
+    }
+  })
+  
+  return actions
+}
+
+// 处理 Token 操作
+const handleTokenAction = (key, token) => {
+  switch (key) {
+    case 'reconnect':
+      selectToken(token, true)
+      break
+    case 'edit':
+      editTokenName(token)
+      break
+    case 'delete':
+      deleteToken(token)
+      break
+  }
+}
+
+// 编辑 Token 名称
+const editTokenName = (token) => {
+  const newName = prompt('请输入新的角色名称:', token.name)
+  if (newName && newName.trim()) {
+    tokenStore.updateToken(token.id, { name: newName.trim() })
+    message.success('名称已更新')
+  }
+}
+
+// 删除 Token
+const deleteToken = (token) => {
+  if (confirm(`确定要删除角色"${token.name}"吗？此操作不可恢复。`)) {
+    tokenStore.removeToken(token.id)
+    if (selectedTokenId.value === token.id) {
+      selectedTokenId.value = null
+    }
+    message.success('Token 已删除')
+  }
+}
+
+// 刷新所有 Token
+const refreshAllTokens = () => {
+  tokenStore.gameTokens.forEach(token => {
+    refreshingTokens.value.add(token.id)
+  })
+  
+  setTimeout(() => {
+    tokenStore.gameTokens.forEach(token => {
+      refreshingTokens.value.delete(token.id)
+    })
+    message.success('刷新完成')
+  }, 1000)
+}
+
+// 排序后的游戏角色 Token 列表
 const sortedTokens = computed(() => {
   return [...tokenStore.gameTokens].sort((tokenA, tokenB) => {
     let valueA, valueB;
@@ -5206,6 +5455,89 @@ const stopBatch = () => {
 .token-item {
   display: flex;
   align-items: center;
+}
+
+/* Token 管理样式 */
+.tokens-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.token-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.token-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.token-card.active {
+  border-color: #1890ff;
+  background-color: #e6f7ff;
+}
+
+.token-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.token-name-text {
+  font-weight: 500;
+  color: #333;
+}
+
+.token-index {
+  color: #999;
+  font-size: 14px;
+}
+
+.connection-status {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 功能卡片容器 */
+.feature-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .log-card {

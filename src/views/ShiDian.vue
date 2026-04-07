@@ -132,9 +132,6 @@
           :selected-token-id="selectedTokenId"
         />
 
-        <!-- 宝库助威卡片 -->
-        <BossTowerCard />
-
         <!-- 十殿信息卡片 -->
         <ShiDianInfoCard 
           ref="shidianInfoCardRef"
@@ -248,7 +245,6 @@ import ShiDianInfoCard from '@/diy/ShiDian/ShiDianInfoCard.vue'
 import LampGodInfoCard from '@/diy/ShiDian/LampGodInfoCard.vue'
 import HeroInfoCard from '@/diy/ShiDian/HeroInfoCard.vue'
 import ClubManagementCard from '@/diy/ShiDian/ClubManagementCard.vue'
-import BossTowerCard from '@/diy/ShiDian/BossTowerCard.vue'
 import SummerActivityCard from '@/diy/ShiDian/SummerActivityCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import { savePageTokenCards, loadPageTokenCards } from '@/utils/pageTokenStorage'

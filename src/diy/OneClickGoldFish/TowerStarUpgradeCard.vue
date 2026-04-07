@@ -1317,7 +1317,28 @@ const handleBatchTower = async () => {
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始爬塔...`)
         
         // 执行爬塔操作
-        await startTowerClimbForToken(token)
+        const climbResult = await startTowerClimbForToken(token)
+        
+        // 如果返回 false，说明 WebSocket 未连接，停止批量爬塔
+        if (climbResult === false) {
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '批量爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`
+          })
+          failedTokens.push({
+            index: tokenIndex,
+            name: token.name || token.id,
+            reason: 'WebSocket 未连接'
+          })
+          // 停止整个批量爬塔
+          break
+        }
         
         message.success(`序号 ${tokenIndex} ${token.name || token.id} 爬塔完成`)
         logStore.addLog({
@@ -1330,6 +1351,9 @@ const handleBatchTower = async () => {
           message: `${tokenIndex}、${token.name || token.id}、爬塔完成`
         })
         
+        // 清空该 Token 的爬塔过程日志，只保留最终完成日志
+        logStore.clearLogsByToken(token.id, '开始爬塔')
+        
         // 在每个 token 之间添加 500ms 间隔
         if (i < sortedTargetTokens.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 500))
@@ -1337,10 +1361,10 @@ const handleBatchTower = async () => {
       } catch (error) {
         const errorMsg = error.message || ''
         
-        // WebSocket 连接失败，跳过当前 token，继续下一个
-        if (error.isWebSocketError || errorMsg.includes('WebSocket') || errorMsg.includes('连接') || errorMsg.includes('socket')) {
+        // WebSocket 连接失败，停止批量爬塔
+        if (error.isWebSocketError || errorMsg.includes('WebSocket') || errorMsg.includes('未连接')) {
           console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败:`, error)
-          message.warning(`序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败，跳过继续下一个`)
+          message.warning(`序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '爬塔升星',
@@ -1348,18 +1372,18 @@ const handleBatchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 连接失败，跳过继续下一个`
+            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`
           })
           failedTokens.push({
             index: tokenIndex,
             name: token.name || token.id,
-            reason: 'WebSocket 连接失败'
+            reason: 'WebSocket 未连接'
           })
-          
-          // 跳过当前 token，继续下一个
-          continue
+          // 停止整个批量爬塔
+          break
         }
         
+        // 其他错误，记录后继续
         console.error(`Token 序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败:`, error)
         message.error(`序号 ${tokenIndex} ${token.name || token.id}: 批量爬塔失败`)
         logStore.addLog({
@@ -1383,16 +1407,33 @@ const handleBatchTower = async () => {
     const successCount = sortedTargetTokens.length - failedTokens.length
     const failCount = failedTokens.length
     
-    message.success(`批量爬塔操作完成，成功: ${successCount}个，失败: ${failCount}个`)
+    // 筛选出 WebSocket 未连接的 token
+    const websocketFailedTokens = failedTokens.filter(t => 
+      t.reason && (t.reason.includes('WebSocket') || t.reason.includes('未连接'))
+    )
+    
+    message.success(`批量爬塔操作完成，成功：${successCount}个，失败：${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
       operation: '批量爬塔',
       status: 'success',
-      message: `批量爬塔操作完成，成功: ${successCount}个，失败: ${failCount}个`
+      message: `批量爬塔操作完成，成功：${successCount}个，失败：${failCount}个`
     })
     
-    // 如果有失败的token，生成txt文档
+    // 如果有 WebSocket 未连接的 token，单独列出
+    if (websocketFailedTokens.length > 0) {
+      message.warning(`WebSocket 未连接的 Token 共 ${websocketFailedTokens.length} 个，请手动补充爬塔`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '爬塔升星',
+        operation: '批量爬塔',
+        status: 'warning',
+        message: `WebSocket 未连接的 Token 列表（共${websocketFailedTokens.length}个，请手动补充爬塔）：${websocketFailedTokens.map(t => `[序号${t.index}] ${t.name}`).join('、')}`
+      })
+    }
+    
+    // 如果有失败的 token，生成 txt 文档
     if (failedTokens.length > 0) {
       const timestamp = new Date().toLocaleString('zh-CN', {
         year: 'numeric',
@@ -1406,12 +1447,19 @@ const handleBatchTower = async () => {
       const content = [
         `批量爬塔失败报告 - ${timestamp}`,
         `================================`,
-        `总Token数: ${sortedTargetTokens.length}`,
-        `成功: ${successCount}个`,
-        `失败: ${failCount}个`,
+        `总 Token 数：${sortedTargetTokens.length}`,
+        `成功：${successCount}个`,
+        `失败：${failCount}个`,
         ``,
         `失败列表:`,
         ...failedTokens.map(t => `  [序号${t.index}] ${t.name} - ${t.reason}`),
+        ``,
+        `================================`,
+        ``,
+        `WebSocket 未连接的 Token（需手动补充爬塔）:`,
+        ...(websocketFailedTokens.length > 0 
+          ? websocketFailedTokens.map(t => `  [序号${t.index}] ${t.name}`)
+          : ['  无']),
         ``,
         `================================`
       ].join('\n')
@@ -1458,9 +1506,9 @@ const startTowerClimbForToken = async (token) => {
     // 检查 WebSocket 连接状态
     const status = tokenStore.getWebSocketStatus(token.id)
     if (status !== 'connected') {
-      const error = new Error('WebSocket 未连接')
-      error.isWebSocketError = true  // 标记为 WebSocket 错误
-      throw error
+      console.warn(`[爬塔] Token: ${token.name || token.id} WebSocket 未连接，跳过`)
+      message.warning(`序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，跳过`)
+      return false
     }
     
     // 步骤 1：使用 role_getroleinfo 获取当前层数和鱼干数
@@ -1571,6 +1619,9 @@ const startTowerClimbForToken = async (token) => {
         await tokenStore.sendMessageWithPromise(token.id, 'fight_starttower', {}, 10000)
         climbCount++
         
+        // 计算当前层数
+        const currentClimbFloor = currentFloor + climbCount
+        
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1578,9 +1629,9 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功`
+          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功，当前层数：${currentClimbFloor}层`
         })
-        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功`)
+        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${currentClimbFloor}层`)
         
         // 每次爬塔后等待 1000ms，避免操作过快
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1711,6 +1762,21 @@ const startTowerClimbForToken = async (token) => {
           })
           message.warning(`${token.name || token.id} 错误提示能量不足，停止爬塔`)
           break
+        } else if (error.isWebSocketError || errorMsg.includes('WebSocket') || errorMsg.includes('未连接')) {
+          // WebSocket 未连接 → break 停止，不再重试
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、WebSocket 未连接，停止爬塔，不再重试`
+          })
+          message.warning(`${token.name || token.id} WebSocket 未连接，停止爬塔`)
+          // 抛出错误，让上层捕获并停止批量爬塔
+          error.isWebSocketError = true
+          throw error
         } else {
           // 其他错误 → 等待后继续执行
           logStore.addLog({
@@ -1729,7 +1795,10 @@ const startTowerClimbForToken = async (token) => {
       }
     }
     
-    message.success(`${token.name || token.id} 爬塔完成，共执行${climbCount}次`)
+    // 计算最终层数
+    const finalFloor = currentFloor + climbCount
+    
+    message.success(`${token.name || token.id} 爬塔完成，共执行${climbCount}次，当前层数：${finalFloor}层`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',
@@ -1737,11 +1806,18 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共执行${climbCount}次`
+      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共执行${climbCount}次，当前层数：${finalFloor}层`
     })
     
   } catch (error) {
     console.error('爬塔失败:', error)
+    
+    // 标记 WebSocket 错误
+    const errorMsg = error.message || ''
+    if (error.isWebSocketError || errorMsg.includes('WebSocket') || errorMsg.includes('未连接') || errorMsg.includes('连接')) {
+      error.isWebSocketError = true
+    }
+    
     logStore.addLog({
       page: 'fish-helper',
       cardType: '爬塔升星',

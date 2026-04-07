@@ -174,13 +174,6 @@
           />
           <CustomizedCard 
             mode="button"
-            :name="isBatchRecruitWeekRunning ? '批量招募周中...' : '批量招募周'"
-            @button-click="handleBatchRecruitWeek"
-            :disabled="isBatchRecruitWeekRunning"
-            :loading="isBatchRecruitWeekRunning"
-          />
-          <CustomizedCard 
-            mode="button"
             :name="isBatchSettingStoryTeam ? '批量设置推图阵容中...' : '批量设置推图阵容'"
             @button-click="handleBatchSetStoryTeam"
             :disabled="isBatchSettingStoryTeam"
@@ -343,7 +336,6 @@ const isBoxWeekRunning = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
 const isBatchBoxWeekRunning = ref(false)
-const isBatchRecruitWeekRunning = ref(false)
 
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
@@ -805,6 +797,11 @@ const handleBatchUpgradeEquipment = async () => {
       message: `批量升级装备完成，成功 ${successCount} 个，失败 ${failureCount} 个`
     })
 
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '升级装备')
+    })
+
   } catch (error) {
     console.error('批量升级装备失败:', error)
     message.error(`批量升级装备失败: ${error.message || '未知错误'}`)
@@ -840,47 +837,75 @@ const handleBatchAwakeSkill = async () => {
     const results = await connectionPool.batchOperate(
       targetTokens,
       async (token, globalIndex) => {
-        try {
-          const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始觉醒...`)
+        const tokenIndex = getTokenIndex(token)
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始觉醒...`)
 
-          // 执行hero_skillawake命令觉醒
-          const response = await tokenStore.sendHeroSkillAwake(token.id, {
-            heroId: 107,
-            index: -1
-          })
+        // 对 index -1, 0, 1, 2 各执行一次觉醒
+        const indices = [-1, 0, 1, 2]
+        let successCount = 0
+        let failCount = 0
 
-          if (response && (response.code === 0 || response.code === undefined)) {
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 觉醒成功`)
+        for (let i = 0; i < indices.length; i++) {
+          const index = indices[i]
+          
+          try {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 执行觉醒 (index: ${index})...`)
+            
+            const response = await tokenStore.sendHeroSkillAwake(token.id, {
+              heroId: 107,
+              index: index
+            })
+
+            if (response && (response.code === 0 || response.code === undefined)) {
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 觉醒成功 (index: ${index})`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '觉醒',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、觉醒成功 (index: ${index})`
+              })
+              successCount++
+            } else {
+              const errorMsg = response?.msg || response?.message || '未知错误'
+              throw new Error(errorMsg)
+            }
+          } catch (error) {
+            console.error(`[序号${tokenIndex}] ${token.name || token.id} - 觉醒失败 (index: ${index}):`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 觉醒失败 (index: ${index}): ${error.message}，继续执行下一个`)
             logStore.addLog({
               page: 'fish-helper',
               cardType: '养号',
               operation: '觉醒',
               tokenId: token.id,
               tokenName: token.name,
-              status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、觉醒成功`
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、觉醒失败 (index: ${index}): ${error.message}，继续执行`
             })
-            return { success: true, tokenId: token.id }
-          } else {
-            const errorMsg = response?.msg || response?.message || '未知错误'
-            throw new Error(errorMsg)
+            failCount++
+            // 失败也继续执行下一个 index
           }
-        } catch (error) {
-          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 觉醒失败:`, error)
-          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 觉醒失败: ${error.message}`)
-          const tokenIndex = getTokenIndex(token)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '觉醒',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、觉醒失败: ${error.message}`
-          })
-          return { success: false, tokenId: token.id, error: error.message }
+
+          // 每次执行后等待 500ms
+          if (i < indices.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
         }
+
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} - 觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '觉醒',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`
+        })
+        
+        return { success: true, tokenId: token.id, successCount, failCount }
       },
       {
         batchSize: 5,
@@ -888,17 +913,22 @@ const handleBatchAwakeSkill = async () => {
       }
     )
 
-    // 统计结果
-    const successCount = results.filter(r => r.success).length
-    const failureCount = results.filter(r => !r.success).length
+    // 统计总结果
+    const totalSuccess = results.reduce((sum, r) => sum + (r.successCount || 0), 0)
+    const totalFail = results.reduce((sum, r) => sum + (r.failCount || 0), 0)
 
-    message.success(`批量觉醒完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    message.success(`批量觉醒完成：共执行 ${totalSuccess + totalFail} 次，成功 ${totalSuccess} 次，失败 ${totalFail} 次`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '觉醒',
       status: 'success',
-      message: `批量觉醒完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `批量觉醒完成，共执行 ${totalSuccess + totalFail} 次，成功 ${totalSuccess} 次，失败 ${totalFail} 次`
+    })
+
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '觉醒')
     })
 
   } catch (error) {
@@ -1363,6 +1393,11 @@ const handleBatchQuench = async () => {
       })
     })
 
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '洗练减伤')
+    })
+
   } catch (error) {
     console.error('批量洗练减伤失败:', error)
     message.error(`批量洗练减伤失败: ${error.message || '未知错误'}`)
@@ -1512,6 +1547,11 @@ const handleBatchUpgradeHangup = async () => {
       operation: '升级挂机',
       status: 'success',
       message: `批量升级挂机完成，成功 ${successCount} 个，失败 ${failureCount} 个，共使用${totalUsed}个道具`
+    })
+
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '升级挂机')
     })
 
   } catch (error) {
@@ -3712,6 +3752,11 @@ const handleBatchSetStoryTeam = async () => {
       status: 'success',
       message: `批量设置推图阵容完成：成功${successCount}个，失败${failCount}个`
     })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量设置推图阵容')
+    })
   } catch (error) {
     console.error('批量设置推图阵容失败:', error)
     message.error(`批量设置推图阵容失败: ${error.message || '未知错误'}`)
@@ -4262,6 +4307,11 @@ const handleBatchSetTowerTeam = async () => {
       status: 'success',
       message: `批量设置爬塔阵容完成：成功${successCount}个，失败${failCount}个`
     })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量设置爬塔阵容')
+    })
   } catch (error) {
     console.error('批量设置爬塔阵容失败:', error)
     message.error(`批量设置爬塔阵容失败: ${error.message || '未知错误'}`)
@@ -4798,13 +4848,18 @@ const handleBatchUpgrade900 = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     
-    message.success(`批量升级900级完成：成功${successCount}个，失败${failCount}个`)
+    message.success(`批量升级 900 级完成：成功${successCount}个，失败${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '批量升级900级',
+      operation: '批量升级 900 级',
       status: 'success',
-      message: `批量升级900级完成：成功${successCount}个，失败${failCount}个`
+      message: `批量升级 900 级完成：成功${successCount}个，失败${failCount}个`
+    })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量升级 900 级')
     })
   } catch (error) {
     console.error('批量升级900级失败:', error)
@@ -6344,6 +6399,11 @@ const handleBatchActivateToys = async () => {
       status: 'success',
       message: `批量激活玩具完成：成功${successCount}个，失败${failCount}个`
     })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量激活玩具')
+    })
   } catch (error) {
     console.error('批量激活玩具失败:', error)
     message.error(`批量激活玩具失败: ${error.message || '未知错误'}`)
@@ -7012,6 +7072,11 @@ const handleBatchUpgradeLord = async () => {
       operation: '批量升级主公武将',
       status: 'success',
       message: `批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
+    })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.token.tokenId || r.token.id, '批量升级主公武将')
     })
   } catch (error) {
     console.error('批量升级主公武将失败:', error)

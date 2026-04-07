@@ -76,6 +76,15 @@ export const useOperationLogStore = defineStore('operationLog', () => {
     }
   }
 
+  // 清空指定 Token 的日志
+  const clearLogsByToken = (tokenId: string, operation?: string) => {
+    if (!operation) {
+      logs.value = logs.value.filter(log => log.tokenId !== tokenId)
+    } else {
+      logs.value = logs.value.filter(log => !(log.tokenId === tokenId && log.operation === operation))
+    }
+  }
+
   // 清空所有日志
   const clearAllLogs = () => {
     logs.value = []

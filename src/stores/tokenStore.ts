@@ -964,12 +964,16 @@ export const useTokenStore = defineStore("tokens", () => {
   ) => {
     const connection = wsConnections.value[tokenId];
     if (!connection || connection.status !== "connected") {
-      return Promise.reject(new Error(`WebSocket未连接 [${tokenId}]`));
+      const error = new Error(`WebSocket 未连接 [${tokenId}]`);
+      error.isWebSocketError = true;  // 标记为 WebSocket 错误
+      return Promise.reject(error);
     }
 
     const client = connection.client;
     if (!client) {
-      return Promise.reject(new Error(`WebSocket客户端不存在 [${tokenId}]`));
+      const error = new Error(`WebSocket 客户端不存在 [${tokenId}]`);
+      error.isWebSocketError = true;  // 标记为 WebSocket 错误
+      return Promise.reject(error);
     }
 
     // 为战斗相关命令自动注入 battleVersion

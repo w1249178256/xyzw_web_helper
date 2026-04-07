@@ -68,11 +68,6 @@
         <TowerStarUpgradeCard 
           :selected-token-id="selectedTokenId"
         />
-
-        <!-- 怪异塔卡片 -->
-        <WeirdTowerCard 
-          :selected-token-id="selectedTokenId"
-        />
       </div>
 
       <!-- Token选择区域 -->
@@ -143,7 +138,6 @@ import AccountMaintenanceCard from '@/diy/OneClickGoldFish/AccountMaintenanceCar
 import ResourceManagementCard from '@/diy/OneClickGoldFish/ResourceManagementCard.vue'
 import TowerStarUpgradeCard from '@/diy/OneClickGoldFish/TowerStarUpgradeCard.vue'
 import FishResourceCard from '@/diy/OneClickGoldFish/FishResourceCard.vue'
-import WeirdTowerCard from '@/diy/OneClickGoldFish/WeirdTowerCard.vue'
 
 const router = useRouter()
 const tokenStore = useTokenStore()

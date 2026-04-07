@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -1195,6 +1195,37 @@ const handleBatchRecruitWeek = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
+          
+          // 首先获取吕布星级
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取吕布星级...`)
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
+            throw new Error('获取角色信息失败')
+          }
+          
+          // 获取吕布星级
+          let luBuStar = 0
+          if (roleInfo.role.heroes['107']) {
+            luBuStar = roleInfo.role.heroes['107'].star || 0
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 吕布星级：${luBuStar}`)
+          
+          // 如果吕布 30 星，跳过
+          if (luBuStar >= 30) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 吕布已 30 星，跳过招募周`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、吕布已 30 星，跳过`
+            })
+            return { success: true, tokenId: token.id, skipped: true, reason: '吕布已 30 星' }
+          }
+          
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取活动详情...`)
           
           // 1. 使用 activity_get 获取已用招募令数量 X
@@ -1446,14 +1477,15 @@ const handleBatchRecruitWeek = async () => {
     
     // 统计结果
     const totalTokens = results.length
-    const successCount = results.filter(r => r.success).length
-    const failureCount = totalTokens - successCount
+    const successCount = results.filter(r => r.success && !r.skipped).length
+    const skippedCount = results.filter(r => r.skipped).length
+    const failureCount = results.filter(r => !r.success).length
     const totalCompletedRounds = results.reduce((sum, r) => sum + (r.completedRounds || 0), 0)
     const totalClaimSuccessRounds = results.reduce((sum, r) => sum + (r.claimSuccessRounds || 0), 0)
     const totalRecruits = results.reduce((sum, r) => sum + (r.totalRecruits || 0), 0)
     const totalMailClaims = results.reduce((sum, r) => sum + (r.mailClaimCount || 0), 0)
     
-    let summaryMessage = `批量招募周完成，共处理${totalTokens}个 Token，成功${successCount}个，失败${failureCount}个`
+    let summaryMessage = `批量招募周完成，共处理${totalTokens}个 Token，成功${successCount}个，跳过${skippedCount}个，失败${failureCount}个`
     if (totalCompletedRounds > 0) {
       summaryMessage += `，共完成${totalCompletedRounds}轮`
     }
