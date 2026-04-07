@@ -24,9 +24,9 @@ export class ConnectionPoolManager {
         this.config = {
             maxConnections: options.maxConnections || 20,           // 最大并发连接数
             connectionTimeout: options.connectionTimeout || 10000,  // 连接超时时间 (ms)
-            reconnectDelay: options.reconnectDelay || 1000,        // 初始重连延迟 (ms)
-            maxReconnectDelay: options.maxReconnectDelay || 30000, // 最大重连延迟 (ms)
-            maxRetries: options.maxRetries || 2,                   // 最大重试次数
+            reconnectDelay: options.reconnectDelay || 500,         // 初始重连延迟 (ms)
+            maxReconnectDelay: options.maxReconnectDelay || 5000,  // 最大重连延迟 (ms)
+            maxRetries: options.maxRetries || 3,                   // 最大重试次数
         };
 
         // 简化的连接槽位控制 - 使用计数器机制（类似批量日常页面）
@@ -83,7 +83,8 @@ export class ConnectionPoolManager {
                 const reconnectInfo = this.getReconnectInfo(tokenId);
                 console.log(`[ConnectionPool] 重连信息：${tokenId} - 尝试次数：${reconnectInfo.retries}, 延迟：${reconnectInfo.delay}ms`);
                 
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                // 使用配置的重连延迟
+                await new Promise((resolve) => setTimeout(resolve, reconnectInfo.delay));
 
                 console.log(`[ConnectionPool] 正在重连: ${tokenId}`);
 

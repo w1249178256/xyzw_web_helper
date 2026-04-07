@@ -1616,11 +1616,40 @@ const startTowerClimbForToken = async (token) => {
       
       try {
         // 执行爬塔命令
-        await tokenStore.sendMessageWithPromise(token.id, 'fight_starttower', {}, 10000)
+        const towerResponse = await tokenStore.sendMessageWithPromise(token.id, 'fight_starttower', {}, 10000)
         climbCount++
         
-        // 计算当前层数
-        const currentClimbFloor = currentFloor + climbCount
+        // 从响应中获取实际层数
+        let actualFloor = ''
+        if (towerResponse?.battleData?.options?.towerId) {
+          const towerId = towerResponse.battleData.options.towerId
+          // towerId 格式：数字，例如 101 表示 10 章 1 层，780 表示 78 章 10 层
+          // 解析规则：最后一位是章内层数，前面的是章节号
+          // 但如果最后一位是 0，则表示第 10 层（章节号不变）
+          // 显示格式：章节 - 层数
+          if (typeof towerId === 'number') {
+            const towerIdStr = towerId.toString()
+            const lastDigit = parseInt(towerIdStr.slice(-1))
+            const chapter = parseInt(towerIdStr.slice(0, -1))
+            
+            if (lastDigit === 0) {
+              // 最后一位是 0，表示第 10 层
+              actualFloor = `${chapter}-10`
+            } else {
+              // 正常情况
+              actualFloor = `${chapter}-${lastDigit}`
+            }
+          } else if (typeof towerId === 'string' && towerId.includes('-')) {
+            // 兼容字符串格式 "78-10"
+            actualFloor = towerId
+          } else {
+            // 其他格式，使用计算值
+            actualFloor = `${currentFloor + climbCount}`
+          }
+        } else {
+          // 如果没有 towerId，使用计算值作为备用
+          actualFloor = `${currentFloor + climbCount}`
+        }
         
         logStore.addLog({
           page: 'fish-helper',
@@ -1629,9 +1658,9 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功，当前层数：${currentClimbFloor}层`
+          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功，当前层数：${actualFloor}层`
         })
-        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${currentClimbFloor}层`)
+        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${actualFloor}层`)
         
         // 每次爬塔后等待 1000ms，避免操作过快
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1795,8 +1824,8 @@ const startTowerClimbForToken = async (token) => {
       }
     }
     
-    // 计算最终层数
-    const finalFloor = currentFloor + climbCount
+    // 最终层数（使用最后一次爬塔的实际层数）
+    const finalFloor = actualFloor || `${currentFloor + climbCount}`
     
     message.success(`${token.name || token.id} 爬塔完成，共执行${climbCount}次，当前层数：${finalFloor}层`)
     logStore.addLog({
