@@ -42,7 +42,7 @@ const my_routes = [
         name: 'ShiDian',
         component: () => import('@/views/ShiDian.vue'),
         meta: {
-          title: '十殿',
+          title: '⚔️',
           requiresToken: true
         }
       },
@@ -51,7 +51,7 @@ const my_routes = [
         name: 'FishHelper',
         component: () => import('@/views/FishHelper.vue'),
         meta: {
-          title: '一键金鱼',
+          title: '🐋',
           requiresToken: true
         }
       },
@@ -60,7 +60,7 @@ const my_routes = [
         name: 'ResourceManager',
         component: () => import('@/views/ResourceManager.vue'),
         meta: {
-          title: '资源管理',
+          title: '✨️',
           requiresToken: true
         }
       },
@@ -185,7 +185,7 @@ router.beforeEach((to, from, next) => {
   const tokenStore = useTokenStore()
 
   // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - XYZW 游戏管理系统` : 'XYZW 游戏管理系统'
+  document.title = to.meta.title ? `${to.meta.title} - 🚀` : '🚀'
   if(to.name==="LegionWar"&&!isNowInLegionWarTime()){
   // if(to.name==="LegionWar"&&isNowInLegionWarTime()){
     next('/admin/dashboard');

@@ -159,6 +159,7 @@ export const useOperationLogStore = defineStore('operationLog', () => {
     getLogsByPage,
     getLogsByPageAndCardType,
     clearLogsByPage,
+    clearLogsByToken,
     clearAllLogs,
     exportLogs
   }

@@ -23,7 +23,7 @@ export class ConnectionPoolManager {
         // 配置参数 - 与批量日常页面一致
         this.config = {
             maxConnections: options.maxConnections || 20,           // 最大并发连接数
-            connectionTimeout: options.connectionTimeout || 10000,  // 连接超时时间 (ms)
+            connectionTimeout: options.connectionTimeout || 3000,   // 连接超时时间 (ms) - 3 秒
             reconnectDelay: options.reconnectDelay || 500,         // 初始重连延迟 (ms)
             maxReconnectDelay: options.maxReconnectDelay || 5000,  // 最大重连延迟 (ms)
             maxRetries: options.maxRetries || 3,                   // 最大重试次数
@@ -115,6 +115,38 @@ export class ConnectionPoolManager {
                 this.releaseConnectionSlot();
                 return false;
             }
+        } else {
+            // 连接状态显示为 connected，但需要验证是否真的可用
+            // 等待连接槽位时持续监测连接状态
+            const slotWaitStart = Date.now();
+            await this.waitForConnectionSlot();
+            
+            // 检查等待槽位期间连接是否已断开
+            const currentStatus = this.tokenStore.getWebSocketStatus(tokenId);
+            if (currentStatus !== "connected") {
+                console.log(`[ConnectionPool] 等待槽位期间连接断开：${tokenId}，重新尝试连接`);
+                // 递归调用，重新连接
+                return await this.ensureConnection(tokenId, maxRetries);
+            }
+            
+            // 如果等待槽位时间超过 1 秒，发送心跳验证连接
+            const waitTime = Date.now() - slotWaitStart;
+            if (waitTime > 1000) {
+                console.log(`[ConnectionPool] 等待槽位时间较长 (${waitTime}ms)，发送心跳验证连接`);
+                try {
+                    this.tokenStore.sendHeartbeat(tokenId);
+                    // 等待短暂时间确认心跳响应
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const afterHeartbeatStatus = this.tokenStore.getWebSocketStatus(tokenId);
+                    if (afterHeartbeatStatus !== "connected") {
+                        console.log(`[ConnectionPool] 心跳验证失败，连接已断开：${tokenId}`);
+                        return await this.ensureConnection(tokenId, maxRetries);
+                    }
+                } catch (error) {
+                    console.log(`[ConnectionPool] 心跳发送失败，连接可能已断开：${tokenId}`);
+                    return await this.ensureConnection(tokenId, maxRetries);
+                }
+            }
         }
 
         // 连接成功，初始化游戏数据（关键步骤，如战斗版本和会话）
@@ -184,11 +216,19 @@ export class ConnectionPoolManager {
     }
 
     /**
-     * 等待连接槽位（类似批量日常页面的逻辑）
+     * 等待连接槽位（优化版本：添加超时和优先级）
      */
-    async waitForConnectionSlot() {
+    async waitForConnectionSlot(timeout = 3000) {
+        const startTime = Date.now();
+        
         while (this.connectionSlots.active >= this.maxActive) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            // 检查是否超时
+            if (Date.now() - startTime > timeout) {
+                console.warn('[ConnectionPool] 等待连接槽位超时，强制获取槽位');
+                break;
+            }
+            // 缩短等待间隔，从 1 秒改为 100ms
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
         this.connectionSlots.active++;
     }
@@ -313,7 +353,8 @@ export class ConnectionPoolManager {
         while (Date.now() - start < timeout) {
             const status = this.tokenStore.getWebSocketStatus(tokenId);
             if (status === "connected") return true;
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            // 缩短检查间隔，从 1 秒改为 100ms，更快响应连接状态变化
+            await new Promise((resolve) => setTimeout(resolve, 100));
         }
         return false;
     }

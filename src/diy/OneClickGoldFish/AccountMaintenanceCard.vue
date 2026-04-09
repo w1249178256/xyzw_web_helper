@@ -214,6 +214,13 @@
             :disabled="isBatchUpgradingLord"
             :loading="isBatchUpgradingLord"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchActivatingToyTeam ? '批量激活玩具阵容中...' : '批量激活玩具阵容'"
+            @button-click="handleBatchActivateToyTeam"
+            :disabled="isBatchActivatingToyTeam"
+            :loading="isBatchActivatingToyTeam"
+          />
         </CustomizedCard>
       </div>
       
@@ -367,6 +374,7 @@ const isBatchSettingTowerTeam = ref(false)
 const isBatchUpgrading900 = ref(false)
 const isExportingTeam = ref(false)
 const isBatchUpgradingLord = ref(false)
+const isBatchActivatingToyTeam = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
@@ -6416,6 +6424,238 @@ const handleBatchActivateToys = async () => {
     })
   } finally {
     isBatchActivatingToys.value = false
+  }
+}
+
+// 批量激活玩具阵容
+// 流程说明：
+// 1. 按 token 昵称排序，获取目标 tokens
+// 2. 对每个 token 执行以下操作：
+//    a. 使用 hero_exchange 命令切换阵容 1-4 的武将
+//    b. 阵容配置：陆绩、于禁、张昭、邢道荣
+// 3. 统计结果并显示
+const handleBatchActivateToyTeam = async () => {
+  // 按 token 昵称排序的 token 列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的 Token')
+    return
+  }
+  
+  // 解析执行范围
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的 Token')
+    return
+  }
+  
+  // 获取每个 token 在 sortedTokens 中的序号
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量激活玩具阵容（${rangeText}），共${targetTokens.length}个 Token，按序号顺序执行...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量激活玩具阵容',
+    status: 'info',
+    message: `开始批量激活玩具阵容，${rangeText}，共${targetTokens.length}个 Token`
+  })
+  
+  try {
+    isBatchActivatingToyTeam.value = true
+    
+    // 玩具阵容配置：阵容 1-4 对应的武将（位置 1-4，不换 0 号的吕布）
+    const toyTeamConfig = [
+      { team: 1, heroId: 309, heroName: '陆绩' },    // 陆绩 ID: 309
+      { team: 2, heroId: 303, heroName: '于禁' },    // 于禁 ID: 303
+      { team: 3, heroId: 308, heroName: '张昭' },    // 张昭 ID: 308
+      { team: 4, heroId: 312, heroName: '邢道荣' }   // 邢道荣 ID: 312
+    ]
+    
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在激活玩具阵容...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量激活玩具阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 开始激活玩具阵容`
+          })
+          
+          // 1. 使用 fight_startlevel 获取当前阵容
+          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 2. 解析阵容数据（兼容多种响应格式）
+          let battleTeam = null
+          if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
+            battleTeam = fightResult.body.battleData.leftTeam.team
+          } else if (fightResult && fightResult._raw && fightResult._raw.body && fightResult._raw.body.battleData && fightResult._raw.body.battleData.leftTeam && fightResult._raw.body.battleData.leftTeam.team) {
+            battleTeam = fightResult._raw.body.battleData.leftTeam.team
+          } else if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
+            battleTeam = fightResult.battleData.leftTeam.team
+          }
+          
+          // 获取阵容 1-4 的武将 ID（位置 1-4，不换 0 号的吕布）
+          let currentTeamHeroes = []
+          for (let i = 1; i <= 4; i++) {
+            const hero = battleTeam?.[String(i)] || battleTeam?.[i]
+            if (hero && hero.id) {
+              currentTeamHeroes.push(hero.id)
+            } else {
+              currentTeamHeroes.push(0)  // 如果位置为空，使用 0 作为占位符
+            }
+          }
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量激活玩具阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 当前阵容武将：${JSON.stringify(currentTeamHeroes)}`
+          })
+          
+          // 2. 对每个阵容执行 hero_exchange 命令
+          for (const config of toyTeamConfig) {
+            // 获取当前阵容的原武将 ID
+            const currentHeroId = currentTeamHeroes[config.team - 1] || config.heroId
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量激活玩具阵容',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `[序号${tokenIndex}] ${token.name || token.id} 切换阵容${config.team}：${currentHeroId} → ${config.heroName}(ID:${config.heroId})`
+            })
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_exchange',
+              {
+                heroId: currentHeroId,        // 原武将 ID
+                targetHeroId: config.heroId   // 目标武将 ID
+              },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量激活玩具阵容',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `[序号${tokenIndex}] ${token.name || token.id} 阵容${config.team}切换为${config.heroName}成功`
+            })
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量激活玩具阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活完成`
+          })
+          return { success: true, token: token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量激活玩具阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活失败：${error.message || '未知错误'}`
+          })
+          return { success: false, token: token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            if (progress.status === 'warning') {
+              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量激活玩具阵容完成：成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量激活玩具阵容',
+      status: 'success',
+      message: `批量激活玩具阵容完成：成功${successCount}个，失败${failCount}个`
+    })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量激活玩具阵容')
+    })
+  } catch (error) {
+    console.error('批量激活玩具阵容失败:', error)
+    message.error(`批量激活玩具阵容失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量激活玩具阵容',
+      status: 'error',
+      message: `批量激活玩具阵容失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchActivatingToyTeam.value = false
   }
 }
 
