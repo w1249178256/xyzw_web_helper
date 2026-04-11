@@ -2089,6 +2089,21 @@ export class GameCommands {
     }
   }
 
+  /**
+   * 玩具获取
+   */
+  lordweapon_get(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        ...params
+      }),
+      cmd: "lordweapon_get",
+      seq,
+      time: Date.now()
+    }
+  }
+
 
   /**
    * 玩具主动升级

@@ -221,6 +221,13 @@
             :disabled="isBatchActivatingToyTeam"
             :loading="isBatchActivatingToyTeam"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchUpgradingToyTeamStar ? '批量玩具阵容升星中...' : '批量玩具阵容升星'"
+            @button-click="handleBatchUpgradeToyTeamStar"
+            :disabled="isBatchUpgradingToyTeamStar"
+            :loading="isBatchUpgradingToyTeamStar"
+          />
         </CustomizedCard>
       </div>
       
@@ -375,6 +382,7 @@ const isBatchUpgrading900 = ref(false)
 const isExportingTeam = ref(false)
 const isBatchUpgradingLord = ref(false)
 const isBatchActivatingToyTeam = ref(false)
+const isBatchUpgradingToyTeamStar = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
@@ -6328,7 +6336,7 @@ const handleBatchActivateToys = async () => {
           }
           
           if (activateSuccess) {
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} 武器激活完成`)
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} 武器激活完成，开始执行玩具升级`)
             logStore.addLog({
               page: 'fish-helper',
               cardType: '养号',
@@ -6336,7 +6344,232 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 武器激活完成`
+              message: `[序号${tokenIndex}] ${token.name || token.id} 武器激活完成，开始执行玩具升级`
+            })
+            
+            // 执行 lordweapon_get 命令，获取玩具信息
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 执行 lordweapon_get 获取玩具信息`)
+            try {
+              const lordWeaponInfo = await tokenStore.sendLordWeaponGet(token.id, {})
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量激活玩具',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行成功`
+              })
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行成功`)
+            } catch (error) {
+              console.warn(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败:`, error.message)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量激活玩具',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败：${error.message || '未知错误'}`
+              })
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败，继续执行升级`)
+            }
+            
+            // 执行玩具主动升级，最多 60 次
+            const weaponId = 3
+            let activeUpgradeCount = 0
+            let activeUpgradeSuccess = true
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具主动升级 (weaponId:${weaponId})，最多 60 次`)
+            
+            for (let i = 0; i < 60; i++) {
+              try {
+                await tokenStore.sendLordWeaponUpgradeActiveSkillLevel(token.id, {
+                  weaponId: weaponId
+                })
+                
+                activeUpgradeCount++
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次成功`)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次成功`
+                })
+                
+                // 每次执行间隔 300ms
+                if (i < 59) {
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                }
+              } catch (error) {
+                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败:`, error.message)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
+                })
+                
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败，停止主动升级`)
+                activeUpgradeSuccess = false
+                break
+              }
+            }
+            
+            if (activeUpgradeSuccess) {
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级完成，共执行${activeUpgradeCount}次`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量激活玩具',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级完成，共执行${activeUpgradeCount}次`
+              })
+            }
+            
+            // 执行玩具被动升级 skillId 9，最多 60 次
+            let passiveSkill9UpgradeCount = 0
+            let passiveSkill9UpgradeSuccess = true
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具被动升级 (weaponId:${weaponId}, skillId:9)，最多 60 次`)
+            
+            for (let i = 0; i < 60; i++) {
+              try {
+                await tokenStore.sendLordWeaponUpgradePassiveSkillLevel(token.id, {
+                  weaponId: weaponId,
+                  skillId: 9
+                })
+                
+                passiveSkill9UpgradeCount++
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次成功`)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次成功`
+                })
+                
+                // 每次执行间隔 300ms
+                if (i < 59) {
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                }
+              } catch (error) {
+                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败:`, error.message)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:9 升级`
+                })
+                
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败，停止 skillId:9 升级`)
+                passiveSkill9UpgradeSuccess = false
+                break
+              }
+            }
+            
+            if (passiveSkill9UpgradeSuccess) {
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量激活玩具',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`
+              })
+            }
+            
+            // 执行玩具被动升级 skillId 10，最多 60 次
+            let passiveSkill10UpgradeCount = 0
+            let passiveSkill10UpgradeSuccess = true
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具被动升级 (weaponId:${weaponId}, skillId:10)，最多 60 次`)
+            
+            for (let i = 0; i < 60; i++) {
+              try {
+                await tokenStore.sendLordWeaponUpgradePassiveSkillLevel(token.id, {
+                  weaponId: weaponId,
+                  skillId: 10
+                })
+                
+                passiveSkill10UpgradeCount++
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次成功`)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次成功`
+                })
+                
+                // 每次执行间隔 300ms
+                if (i < 59) {
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                }
+              } catch (error) {
+                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败:`, error.message)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量激活玩具',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:10 升级`
+                })
+                
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败，停止 skillId:10 升级`)
+                passiveSkill10UpgradeSuccess = false
+                break
+              }
+            }
+            
+            if (passiveSkill10UpgradeSuccess) {
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量激活玩具',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`
+              })
+            }
+            
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} 玩具激活和升级全部完成`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量激活玩具',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `[序号${tokenIndex}] ${token.name || token.id} 玩具激活和升级全部完成`
             })
             return { success: true, token: token }
           } else {
@@ -6656,6 +6889,214 @@ const handleBatchActivateToyTeam = async () => {
     })
   } finally {
     isBatchActivatingToyTeam.value = false
+  }
+}
+
+// 批量玩具阵容升星
+const handleBatchUpgradeToyTeamStar = async () => {
+  // 按 token 昵称排序的 token 列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的 Token')
+    return
+  }
+  
+  // 解析执行范围
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的 Token')
+    return
+  }
+  
+  // 获取每个 token 在 sortedTokens 中的序号
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量玩具阵容升星（${rangeText}），共${targetTokens.length}个 Token，按序号顺序执行...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量玩具阵容升星',
+    status: 'info',
+    message: `开始批量玩具阵容升星，${rangeText}，共${targetTokens.length}个 Token`
+  })
+  
+  try {
+    isBatchUpgradingToyTeamStar.value = true
+    
+    // 玩具阵容武将配置：四个紫将（与批量激活玩具阵容一致）
+    const toyTeamHeroes = [
+      { heroId: 309, heroName: '陆绩' },    // 陆绩 ID: 309
+      { heroId: 303, heroName: '于禁' },    // 于禁 ID: 303
+      { heroId: 308, heroName: '张昭' },    // 张昭 ID: 308
+      { heroId: 312, heroName: '邢道荣' }   // 邢道荣 ID: 312
+    ]
+    
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始玩具阵容升星...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量玩具阵容升星',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 开始玩具阵容升星`
+          })
+          
+          // 对每个紫将执行武将升星操作，每个英雄最多执行 10 次
+          for (const hero of toyTeamHeroes) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始为${hero.heroName}(ID:${hero.heroId})执行升星，最多 10 次`)
+            
+            let successCount = 0
+            let errorCount = 0
+            
+            // 每个英雄最多执行 10 次升星
+            for (let i = 0; i < 10; i++) {
+              try {
+                await tokenStore.sendHeroUpgradeStar(token.id, {
+                  heroId: hero.heroId
+                })
+                
+                successCount++
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 第${i + 1}次升星成功`)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量玩具阵容升星',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 第${i + 1}次升星成功`
+                })
+                
+                // 每次执行间隔 300ms
+                if (i < 9) {
+                  await new Promise(resolve => setTimeout(resolve, 300))
+                }
+              } catch (error) {
+                errorCount++
+                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 第${i + 1}次升星失败:`, error.message)
+                
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '养号',
+                  operation: '批量玩具阵容升星',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'warning',
+                  message: `[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 第${i + 1}次升星失败：${error.message || '未知错误'}`
+                })
+                
+                // 执行错误，继续执行下一个武将
+                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 第${i + 1}次升星失败，继续执行下一个武将`)
+                break
+              }
+            }
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${hero.heroName} 升星完成：成功${successCount}次，失败${errorCount}次`)
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容升星完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量玩具阵容升星',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容升星完成`
+          })
+          return { success: true, token: token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容升星失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 玩具阵容升星失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量玩具阵容升星',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容升星失败：${error.message || '未知错误'}`
+          })
+          return { success: false, token: token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            if (progress.status === 'warning') {
+              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量玩具阵容升星完成：成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量玩具阵容升星',
+      status: 'success',
+      message: `批量玩具阵容升星完成：成功${successCount}个，失败${failCount}个`
+    })
+    
+    // 清空过程日志，只保留结果日志
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '批量玩具阵容升星')
+    })
+  } catch (error) {
+    console.error('批量玩具阵容升星失败:', error)
+    message.error(`批量玩具阵容升星失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量玩具阵容升星',
+      status: 'error',
+      message: `批量玩具阵容升星失败：${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchUpgradingToyTeamStar.value = false
   }
 }
 

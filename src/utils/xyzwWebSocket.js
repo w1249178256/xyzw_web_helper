@@ -471,6 +471,7 @@ export function registerDefaultCommands(reg) {
     .register("lordweapon_upgradeactiveskilllevel")
     .register("lordweapon_upgradepassiveskilllevel")
     .register("lordweapon_unlock")
+    .register("lordweapon_get")
     .register("trump_upgrade")
     .register("hero_heroupgradestar")
     .register("hero_heroupgradelevel")
@@ -1229,6 +1230,7 @@ export class XyzwWebSocketClient {
       legacy_getinforesp: "legacy_getinfo",
       // 主公武器相关响应映射
       lordweapon_unlockresp: "lordweapon_unlock",
+      lordweapon_getresp: "lordweapon_get",
       // 车辆相关响应映射
       car_getrolecarresp: "car_getrolecar",
       car_refreshresp: "car_refresh",
