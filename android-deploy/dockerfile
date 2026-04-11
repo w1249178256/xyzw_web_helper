@@ -1,0 +1,12 @@
+FROM nginx:xyzw
+
+VOLUME /app/web
+COPY ./dist /app/web
+
+VOLUME /etc/nginx/conf.d
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+WORKDIR /app
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
