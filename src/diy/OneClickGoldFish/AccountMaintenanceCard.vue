@@ -188,7 +188,14 @@
           />
           <CustomizedCard 
             mode="button"
-            :name="isBatchUpgrading900 ? '批量升级900级中...' : '批量升级900级'"
+            :name="isBatchUnloadingHeroes ? '批量下阵武将中...' : '批量下阵武将'"
+            @button-click="handleBatchUnloadHeroes"
+            :disabled="isBatchUnloadingHeroes"
+            :loading="isBatchUnloadingHeroes"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchUpgrading900 ? '批量升级 900 级中...' : '批量升级 900 级'"
             @button-click="handleBatchUpgrade900"
             :disabled="isBatchUpgrading900"
             :loading="isBatchUpgrading900"
@@ -378,6 +385,7 @@ const usedBoxScore = ref('0')
 // 新功能状态
 const isBatchSettingStoryTeam = ref(false)
 const isBatchSettingTowerTeam = ref(false)
+const isBatchUnloadingHeroes = ref(false)
 const isBatchUpgrading900 = ref(false)
 const isExportingTeam = ref(false)
 const isBatchUpgradingLord = ref(false)
@@ -4370,6 +4378,143 @@ const calculateUpgradeNum = (currentLevel) => {
 }
 
 // 批量升级900级
+// 批量下阵武将（1-4 号位）
+const handleBatchUnloadHeroes = async () => {
+  // 按 token 昵称排序的 token 列表
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的 Token')
+    return
+  }
+  
+  // 解析执行范围
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的 Token')
+    return
+  }
+  
+  // 获取每个 token 在 sortedTokens 中的序号
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量下阵武将（${rangeText}），共${targetTokens.length}个 Token，下阵位置：1-4 号位`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量下阵武将',
+    status: 'info',
+    message: `开始批量下阵武将，${rangeText}，共${targetTokens.length}个 Token`
+  })
+  
+  try {
+    isBatchUnloadingHeroes.value = true
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在下阵武将...`)
+          
+          // 下阵 1-4 号位（slot: 1-4）
+          const unloadSlots = [
+            { slot: 1, positionName: '1 号位' },
+            { slot: 2, positionName: '2 号位' },
+            { slot: 3, positionName: '3 号位' },
+            { slot: 4, positionName: '4 号位' }
+          ]
+          
+          for (const { slot, positionName } of unloadSlots) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'hero_gobackbattle',
+                {
+                  slot: slot
+                },
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 300))
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量下阵武将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `下阵${positionName}成功`
+              })
+            } catch (error) {
+              // 如果该位置没有武将，会返回错误，忽略继续执行
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '养号',
+                operation: '批量下阵武将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `${positionName}没有武将或下阵失败：${error.message}`
+              })
+            }
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 下阵完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量下阵武将',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: '下阵武将完成'
+          })
+          
+        } catch (error) {
+          console.error(`[序号${getTokenIndex(token)}] ${token.name || token.id} 下阵失败:`, error)
+          throw error
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.status === 'fulfilled').length
+    const failCount = results.filter(r => r.status === 'rejected').length
+    
+    message.success(`批量下阵完成！成功：${successCount}，失败：${failCount}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量下阵武将',
+      status: 'success',
+      message: `批量下阵完成，成功：${successCount}，失败：${failCount}`
+    })
+    
+  } catch (error) {
+    console.error('批量下阵武将失败:', error)
+    message.error('批量下阵武将失败')
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量下阵武将',
+      status: 'error',
+      message: `批量下阵失败：${error.message}`
+    })
+  } finally {
+    isBatchUnloadingHeroes.value = false
+  }
+}
+
+
 const handleBatchUpgrade900 = async () => {
   // 按token昵称排序的token列表
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {

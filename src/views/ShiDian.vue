@@ -46,59 +46,10 @@
       <div class="feature-cards-container" v-if="tokenStore.hasTokens">
         
         <!-- 十殿 TeamID 卡片 -->
-        <MyCard status-class="active">
-          <template #icon>
-            <n-icon size="24">
-              <People />
-            </n-icon>
-          </template>
-          <template #title>
-            <h3>十殿 TeamID</h3>
-          </template>
-          <template #default>
-            <CustomizedCard mode="container">
-              <div style="grid-column: 1 / -1; font-size: 12px; color: #666; padding: 4px 0; margin-bottom: 4px;">
-                💡 提示：点击按钮可清空对应 TeamID
-              </div>
-              <CustomizedCard 
-                v-for="i in 5" 
-                :key="i"
-                mode="button-with-input"
-                :name="`十殿${['一', '二', '三', '四', '五'][i-1]}`"
-                :input-value="teamIds[i-1]"
-                @update:input-value="(value) => handleTeamIdChange(i-1, value)"
-                :placeholder="`输入十殿${['一', '二', '三', '四', '五'][i-1]}的 TeamID`"
-                button-text="清除"
-                :disabled="!teamIds[i-1]"
-                @button-click="() => clearSingleTeamId(i-1)"
-              />
-              <CustomizedCard 
-                mode="button-placeholder"
-                button-text="全部清除"
-                :disabled="!teamIds?.some(id => id)"
-                @button-click="clearAllTeamIds"
-              />
-              <CustomizedCard 
-                mode="button-placeholder"
-                button-text="自动加入十殿"
-                :disabled="!teamIds?.some(id => id) || isAutoJoinRunning"
-                @button-click="autoJoinShiDian"
-              />
-              <CustomizedCard 
-                mode="button-placeholder"
-                button-text="停止"
-                :disabled="!isAutoJoinRunning"
-                @button-click="stopAutoJoinShiDian"
-              />
-              <CustomizedCard 
-                mode="button-placeholder"
-                button-text="清空十殿标签"
-                :disabled="!tokenStore.hasTokens"
-                @button-click="clearAllNightmareLabels"
-              />
-            </CustomizedCard>
-          </template>
-        </MyCard>
+        <ShiDianTeamIdCard 
+          :selected-token-id="selectedTokenId"
+          @update-pillow-count="handleUpdatePillowCount"
+        />
 
         <!-- 俱乐部管理卡片 -->
         <ClubManagementCard
@@ -242,6 +193,7 @@ import BinTokenForm from '@/views/TokenImport/bin.vue'
 
 // 导入模块化卡片组件
 import ShiDianInfoCard from '@/diy/ShiDian/ShiDianInfoCard.vue'
+import ShiDianTeamIdCard from '@/diy/ShiDian/ShiDianTeamIdCard.vue'
 import LampGodInfoCard from '@/diy/ShiDian/LampGodInfoCard.vue'
 import HeroInfoCard from '@/diy/ShiDian/HeroInfoCard.vue'
 import ClubManagementCard from '@/diy/ShiDian/ClubManagementCard.vue'
@@ -1537,7 +1489,7 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
     const { ConnectionPoolManager } = await import('@/utils/connectionPoolManager.js')
     const connectionPool = new ConnectionPoolManager(tokenStore, {
       maxConnections: 20,
-      connectionTimeout: 30000,
+      connectionTimeout: 3000,
       idleTimeout: 60000,
       queueTimeout: 120000,
       reconnectDelay: 1000,

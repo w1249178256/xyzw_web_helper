@@ -25,6 +25,16 @@
             <span>十殿</span>
           </router-link>
           <router-link
+            to="/admin/common-tasks"
+            class="nav-item"
+            active-class="active"
+          >
+            <n-icon>
+              <Flash />
+            </n-icon>
+            <span>常用任务</span>
+          </router-link>
+          <router-link
             to="/admin/fish-helper"
             class="nav-item"
             active-class="active"
@@ -42,7 +52,7 @@
             <n-icon>
               <Cube />
             </n-icon>
-            <span>资源管理</span>
+            <span>Token 分组</span>
           </router-link>
           <router-link
             to="/admin/dashboard"
@@ -137,6 +147,16 @@
           <span>十殿</span>
         </router-link>
         <router-link
+          to="/admin/common-tasks"
+          class="drawer-item"
+          @click="isMobileMenuOpen = false"
+        >
+          <n-icon>
+            <Flash />
+          </n-icon>
+          <span>常用任务</span>
+        </router-link>
+        <router-link
           to="/admin/fish-helper"
           class="drawer-item"
           @click="isMobileMenuOpen = false"
@@ -154,7 +174,7 @@
           <n-icon>
             <Cube />
           </n-icon>
-          <span>资源管理</span>
+          <span>Token 分组</span>
         </router-link>
         <router-link
           to="/admin/dashboard"
@@ -258,6 +278,7 @@ import {
   Menu,
   Layers,
   Fish,
+  Flash,
 } from "@vicons/ionicons5";
 
 import { useRouter } from 'vue-router'

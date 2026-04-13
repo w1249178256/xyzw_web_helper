@@ -9,6 +9,7 @@
  */
 
 import { useIndexedDB } from '@/hooks/useIndexedDB';
+import { transformToken } from '@/utils/token';
 
 export class ConnectionPoolManager {
     constructor(tokenStore, options = {}) {
@@ -172,38 +173,63 @@ export class ConnectionPoolManager {
         } catch (e) {
             console.warn(`[ConnectionPool] 初始化数据失败：${tokenId}`, e.message);
             
-            // 检查是否是 "check token error"
-            if (e.message && e.message.includes('check token error')) {
-                console.warn(`[ConnectionPool] 检测到 Token 失效：${tokenId}，尝试自动刷新...`);
+            // 检查是否是 "check token error" 或其他 token 相关错误
+            if (e.message && (e.message.includes('check token error') || e.message.includes('token'))) {
+                console.warn(`[ConnectionPool] 检测到 Token 失效：${tokenId}，立即刷新并重连...`);
                 
-                // 尝试刷新 Token
+                // 立即刷新 Token（从 IndexedDB 读取）
                 const refreshed = await this.refreshToken(tokenId);
                 
                 if (refreshed) {
-                    console.log(`[ConnectionPool] Token 刷新成功，重新初始化：${tokenId}`);
+                    console.log(`[ConnectionPool] Token 刷新成功，断开旧连接并重新连接：${tokenId}`);
                     
-                    // 刷新成功后，重新尝试初始化
-                    try {
-                        await this.tokenStore.sendMessageWithPromise(
-                            tokenId,
-                            "role_getroleinfo",
-                            {},
-                            5000,
-                        );
-
-                        const res = await this.tokenStore.sendMessageWithPromise(
-                            tokenId,
-                            "fight_startlevel",
-                            {},
-                            5000,
-                        );
-                        if (res?.battleData?.version) {
-                            this.tokenStore.setBattleVersion(res.battleData.version);
-                        }
+                    // 断开旧连接
+                    this.tokenStore.closeWebSocketConnection(tokenId);
+                    
+                    // 重置重连状态，确保立即重连
+                    this.resetReconnectInfo(tokenId);
+                    
+                    // 获取最新的 token
+                    const latestToken = this.tokenStore.gameTokens.find(t => t.id === tokenId);
+                    
+                    // 重新创建连接
+                    this.tokenStore.createWebSocketConnection(
+                        tokenId,
+                        latestToken.token,
+                        latestToken.wsUrl,
+                    );
+                    
+                    // 等待新连接建立
+                    const connected = await this.waitForConnection(tokenId, 5000);
+                    
+                    if (connected) {
+                        console.log(`[ConnectionPool] 重连成功，重新初始化：${tokenId}`);
                         
-                        console.log(`[ConnectionPool] Token 刷新后初始化成功：${tokenId}`);
-                    } catch (retryError) {
-                        console.error(`[ConnectionPool] Token 刷新后初始化仍失败：${tokenId}`, retryError.message);
+                        // 重新尝试初始化
+                        try {
+                            await this.tokenStore.sendMessageWithPromise(
+                                tokenId,
+                                "role_getroleinfo",
+                                {},
+                                5000,
+                            );
+
+                            const res = await this.tokenStore.sendMessageWithPromise(
+                                tokenId,
+                                "fight_startlevel",
+                                {},
+                                5000,
+                            );
+                            if (res?.battleData?.version) {
+                                this.tokenStore.setBattleVersion(res.battleData.version);
+                            }
+                            
+                            console.log(`[ConnectionPool] Token 刷新后初始化成功：${tokenId}`);
+                        } catch (retryError) {
+                            console.error(`[ConnectionPool] Token 刷新后初始化仍失败：${tokenId}`, retryError.message);
+                        }
+                    } else {
+                        console.error(`[ConnectionPool] 重连失败：${tokenId}`);
                     }
                 } else {
                     console.error(`[ConnectionPool] Token 刷新失败，需要手动重新导入：${tokenId}`);
@@ -638,7 +664,7 @@ export class ConnectionPoolManager {
 
                 if (userToken) {
                     // 转换 Token
-                    const newToken = await this.transformToken(userToken);
+                    const newToken = await transformToken(userToken);
                     
                     this.tokenStore.updateToken(tokenId, {
                         token: newToken,
@@ -667,29 +693,6 @@ export class ConnectionPoolManager {
         } catch (error) {
             console.error(`[ConnectionPool] 刷新 Token 失败：${tokenId}`, error.message);
             return false;
-        }
-    }
-
-    /**
-     * 转换 Token（从 ArrayBuffer 解码）
-     * 复制自 TokenImport/index.vue 中的 transformToken 函数
-     */
-    async transformToken(arrayBuffer) {
-        try {
-            const decoder = new TextDecoder('utf-8');
-            const jsonStr = decoder.decode(arrayBuffer);
-            const data = JSON.parse(jsonStr);
-            
-            if (data.token) {
-                return data.token;
-            } else if (data.sessId) {
-                return data.sessId;
-            } else {
-                throw new Error('Token 数据格式无效');
-            }
-        } catch (error) {
-            console.error('[ConnectionPool] Token 转换失败:', error);
-            throw error;
         }
     }
 

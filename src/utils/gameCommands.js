@@ -1729,6 +1729,24 @@ export class GameCommands {
     }
   }
 
+/**
+   * 咸将下阵
+   */
+  hero_gobackbattle(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId: params.heroId,
+        slot: params.slot,
+        ...params
+      }),
+      cmd: "hero_gobackbattle",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
   /**
    * 设置阵容
    */

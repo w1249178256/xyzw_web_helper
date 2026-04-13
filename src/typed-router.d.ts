@@ -20,6 +20,7 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/BatchDailyTasks': RouteRecordInfo<'/BatchDailyTasks', '/BatchDailyTasks', Record<never, never>, Record<never, never>>,
     '/Changelog': RouteRecordInfo<'/Changelog', '/Changelog', Record<never, never>, Record<never, never>>,
+    '/CommonTasks': RouteRecordInfo<'/CommonTasks', '/CommonTasks', Record<never, never>, Record<never, never>>,
     '/DailyTasks': RouteRecordInfo<'/DailyTasks', '/DailyTasks', Record<never, never>, Record<never, never>>,
     '/Dashboard': RouteRecordInfo<'/Dashboard', '/Dashboard', Record<never, never>, Record<never, never>>,
     '/FishHelper': RouteRecordInfo<'/FishHelper', '/FishHelper', Record<never, never>, Record<never, never>>,

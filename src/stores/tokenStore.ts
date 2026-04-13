@@ -10,8 +10,6 @@ import useIndexedDB from "@/hooks/useIndexedDB";
 import { generateRandomSeed } from "@/utils/randomSeed";
 import {
   transformToken,
-  setAuthUserRateLimiterCallback,
-  scheduleAuthUserRequest,
 } from "@/utils/token";
 import { emitPlus, $emit } from "./events/index.js";
 import router from "@/router";
@@ -340,32 +338,30 @@ export const useTokenStore = defineStore("tokens", () => {
     const gameToken = gameTokens.value.find((t) => t.id === tokenId);
     if (!gameToken) return false;
 
-    wsLogger.info(`尝试自动刷新Token [${tokenId}]`);
+    wsLogger.info(`尝试自动刷新 Token [${tokenId}]`);
     let refreshSuccess = false;
 
     try {
       if (gameToken.importMethod === "url" && gameToken.sourceUrl) {
-        // URL形式token刷新
-        const token = await scheduleAuthUserRequest(async () => {
-          const response = await fetch(gameToken.sourceUrl!);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.token) {
-              return data.token;
-            }
+        // URL 形式 token 刷新
+        const response = await fetch(gameToken.sourceUrl!);
+        let token: string | null = null;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.token) {
+            token = data.token;
           }
-          return null;
-        });
+        }
         if (token) {
           updateToken(tokenId, { ...gameToken, token });
-          wsLogger.info(`从URL获取token成功: ${gameToken.name}`);
+          wsLogger.info(`从 URL 获取 token 成功：${gameToken.name}`);
           refreshSuccess = true;
         }
       } else if (
         gameToken.importMethod === "bin" ||
         gameToken.importMethod === "wxQrcode"
       ) {
-        // Bin形式token刷新
+        // Bin 形式 token 刷新
         let userToken: ArrayBuffer | null = await getArrayBuffer(tokenId);
         let usedOldKey = false;
 
@@ -396,25 +392,40 @@ export const useTokenStore = defineStore("tokens", () => {
     }
 
     if (refreshSuccess) {
-      wsLogger.info(`Token刷新成功 [${tokenId}]`);
+      wsLogger.info(`Token 刷新成功 [${tokenId}]`);
 
       const currentPath = router.currentRoute.value.path;
+      // 如果是强制重连或在特定页面，或者是因为 token 错误触发的刷新，立即重连
       const shouldReconnect =
         forceReconnect ||
         currentPath === "/tokens" ||
         currentPath === "/admin/game-features";
 
       if (shouldReconnect) {
-        wsLogger.info(`触发自动重连 [${tokenId}]`);
+        wsLogger.info(`触发强制重连 [${tokenId}]`);
         // 重置重连状态以允许立即重连
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].reconnectAttempts = 0;
         }
         selectToken(tokenId, true);
+      } else {
+        // Token 刷新成功，检查当前连接状态
+        const conn = wsConnections.value[tokenId];
+        if (conn && conn.status === "connected") {
+          // 连接仍然有效，保持连接
+          wsLogger.info(`Token 已刷新，保持现有连接 [${tokenId}]`);
+        } else {
+          // 连接已断开，需要重连
+          wsLogger.info(`Token 已刷新但连接已断开，触发重连 [${tokenId}]`);
+          if (wsConnections.value[tokenId]) {
+            wsConnections.value[tokenId].reconnectAttempts = 0;
+          }
+          selectToken(tokenId, true);
+        }
       }
       return true;
     } else {
-      wsLogger.error(`Token刷新失败，请手动重新导入 [${tokenId}]`);
+      wsLogger.error(`Token 刷新失败，请手动重新导入 [${tokenId}]`);
       return false;
     }
   };
@@ -433,19 +444,21 @@ export const useTokenStore = defineStore("tokens", () => {
       if (message.error) {
         const errText = String(message.error).toLowerCase();
         gameLogger.warn(`消息处理跳过 [${tokenId}]:`, message.error);
-        if (errText.includes("token") && errText.includes("expired")) {
+        
+        // 检查 token 相关错误（包括 "check token error" 和 "token expired"）
+        if (errText.includes("token")) {
           const conn = wsConnections.value[tokenId];
           if (conn) {
             conn.status = "error";
             conn.lastError = {
               timestamp: new Date().toISOString(),
-              error: "token expired",
+              error: message.error,
             };
           }
 
           const gameToken = gameTokens.value.find((t) => t.id === tokenId);
           if (gameToken) {
-            // 调用统一的Token刷新逻辑
+            // 调用统一的 Token 刷新逻辑
             const refreshed = await attemptTokenRefresh(tokenId);
             if (!refreshed) {
               wsLogger.error(
@@ -795,12 +808,33 @@ export const useTokenStore = defineStore("tokens", () => {
           conn.status = "disconnected";
           conn.randomSeedSynced = false;
 
-          // 如果连接异常断开(1006)且从未连接成功(握手失败)，尝试刷新Token
-          // connectedAt 为 null 表示 socket.onopen 还没触发就断开了，通常意味着握手失败（如403 Forbidden）
+          // 如果连接异常断开 (1006) 且从未连接成功 (握手失败)，尝试刷新 Token
+          // connectedAt 为 null 表示 socket.onopen 还没触发就断开了，通常意味着握手失败（如 403 Forbidden）
           if (event.code === 1006 && !conn.connectedAt) {
-            wsLogger.warn(`检测到握手失败(1006)，尝试刷新Token [${tokenId}]`);
+            wsLogger.warn(`检测到握手失败 (1006)，尝试刷新 Token [${tokenId}]`);
             // 强制刷新并重连
             await attemptTokenRefresh(tokenId, true);
+          }
+          // 如果已经连接过但收到 token 错误后断开，检查是否刚刚刷新过
+          else if (event.code === 1006 && conn.connectedAt) {
+            // 检查最后一条错误消息是否是 token 相关
+            if (conn.lastError?.error && String(conn.lastError.error).toLowerCase().includes('token')) {
+              const lastAttempt = tokenRefreshAttempts.value[tokenId] || 0;
+              const now = Date.now();
+              
+              // 如果 10 秒内已经刷新过，直接重连，不再刷新
+              if (now - lastAttempt < 10000) {
+                wsLogger.warn(`检测到 Token 错误后断开连接，但刚刚已刷新，直接重连 [${tokenId}]`);
+                // 重置重连状态并触发重连
+                if (wsConnections.value[tokenId]) {
+                  wsConnections.value[tokenId].reconnectAttempts = 0;
+                }
+                selectToken(tokenId, true);
+              } else {
+                wsLogger.warn(`检测到 Token 错误后断开连接，尝试刷新 Token [${tokenId}]`);
+                await attemptTokenRefresh(tokenId, true);
+              }
+            }
           }
         }
         updateCrossTabConnectionState(tokenId, "disconnected");
@@ -1929,17 +1963,6 @@ export const useTokenStore = defineStore("tokens", () => {
 
     // 设置跨标签页监听
     setupCrossTabListener();
-
-    // 设置限流等待回调
-    setAuthUserRateLimiterCallback((waitTimeMs: number, queueSize: number) => {
-      const waitSeconds = Math.ceil(waitTimeMs / 1000);
-      $emit.emit("token:refresh:waiting", {
-        waitTimeMs,
-        waitSeconds,
-        queueSize,
-        timestamp: Date.now(),
-      });
-    });
 
     tokenLogger.info("Token Store 初始化完成，连接监控已启动");
   };

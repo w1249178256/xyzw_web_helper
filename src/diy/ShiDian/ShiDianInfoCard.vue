@@ -87,16 +87,6 @@
           @button-click="selectedTokenId ? joinNightmareRoom(tokenStore.gameTokens.find(t => t.id === selectedTokenId)) : null"
         />
         <CustomizedCard 
-          mode="button-with-input"
-          name="十殿 8"
-          button-text="十殿 8"
-          :disabled="!selectedTokenId8 || connectingTokens.has(selectedTokenId8)"
-          :inputValue="teamIdForDian8"
-          @update:inputValue="(value) => teamIdForDian8 = value"
-          placeholder="输入队伍号"
-          @button-click="executeNightmare8()"
-        />
-        <CustomizedCard 
           mode="button-placeholder"
           button-text="开始十殿"
           :disabled="!selectedTokenId || !displayTeamId"
@@ -210,7 +200,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="十殿信息"
-        :filter-operations="['刷新信息', '领取奖励', '批量领取', '十殿恢复', '重置枕头', '解散十殿', '批量十殿', '创建房间', '加入房间', '开始十殿', '出战人员', '踢出房间', '转让房主', '导出资源', '十殿 8']"
+        :filter-operations="['刷新信息', '领取奖励', '批量领取', '十殿恢复', '重置枕头', '解散十殿', '批量十殿', '创建房间', '加入房间', '开始十殿', '出战人员', '踢出房间', '转让房主', '导出资源']"
       />
     </template>
   </MyCard>
@@ -259,11 +249,6 @@ const displayRoomId = ref(0)
 const displayTeamId = ref(0)
 const displayNightmareLevel = ref(0)
 
-// 十殿 8 相关变量
-const selectedTokenId8 = ref(null)
-const teamIdForDian8 = ref('')
-const isExecutingNightmare8 = ref(false)
-
 // 存储各个 token 的 roleId
 const tokenRoleIds = ref({})
 
@@ -282,7 +267,7 @@ onMounted(() => {
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 5,
-  connectionTimeout: 30000,
+  connectionTimeout: 3000,
   idleTimeout: 60000,
   queueTimeout: 120000,
   reconnectDelay: 1000,
@@ -4225,112 +4210,6 @@ const executeDian7Fight = async () => {
   }
 }
 
-// 十殿 8 执行函数
-const executeNightmare8 = async () => {
-  if (!teamIdForDian8.value) {
-    message.warning('请输入队伍号')
-    return
-  }
-
-  isExecutingNightmare8.value = true
-  
-  try {
-    message.info('开始执行十殿 8...')
-    
-    // 第一步：查找 1 个名称带 8#7 的 token
-    const gameTokens = toRaw(tokenStore.gameTokens)
-    const dian87Token = gameTokens.find(t => {
-      const name = t.name || ''
-      return name.includes('8#7')
-    })
-    
-    if (!dian87Token) {
-      message.warning('未找到名称带 8#7 的 Token')
-      return
-    }
-    
-    message.info(`找到 Token: ${dian87Token.name || dian87Token.id}`)
-    
-    // 连接游戏
-    await connectTokenByClick(dian87Token, 5)
-    
-    // 获取十殿枕头数量
-    const pillowCount87 = await getPillowCountForToken(dian87Token)
-    message.info(`${dian87Token.name} 十殿枕头数量：${pillowCount87}`)
-    
-    // 如果枕头数量等于 5，点击加入十殿
-    if (pillowCount87 === 5) {
-      message.info(`${dian87Token.name} 枕头数量为 5，执行加入十殿...`)
-      await joinNightmareRoom(dian87Token, parseInt(teamIdForDian8.value))
-      message.success(`${dian87Token.name} 加入十殿成功`)
-    } else {
-      message.warning(`${dian87Token.name} 枕头数量不为 5，当前数量：${pillowCount87}`)
-      return
-    }
-    
-    // 等待 1 秒
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // 第二步：查找 3 个名称带 8# 的 token
-    const dian8Tokens = gameTokens.filter(t => {
-      const name = t.name || ''
-      return name.includes('8#') && !name.includes('8#7')
-    }).slice(0, 3)
-    
-    if (dian8Tokens.length === 0) {
-      message.warning('未找到名称带 8# 的 Token（排除 8#7）')
-      return
-    }
-    
-    message.info(`找到 ${dian8Tokens.length} 个 Token，准备依次加入十殿...`)
-    
-    // 依次处理每个 token
-    for (let i = 0; i < dian8Tokens.length; i++) {
-      const token = dian8Tokens[i]
-      message.info(`正在处理第 ${i + 1} 个 Token: ${token.name || token.id}`)
-      
-      // 连接游戏
-      await connectTokenByClick(token, 5)
-      
-      // 获取十殿枕头数量
-      const pillowCount = await getPillowCountForToken(token)
-      message.info(`${token.name} 十殿枕头数量：${pillowCount}`)
-      
-      // 如果枕头数量等于 5，点击加入十殿
-      if (pillowCount === 5) {
-        message.info(`${token.name} 枕头数量为 5，执行加入十殿...`)
-        await joinNightmareRoom(token, parseInt(teamIdForDian8.value))
-        message.success(`${token.name} 加入十殿成功`)
-      } else {
-        message.warning(`${token.name} 枕头数量不为 5，当前数量：${pillowCount}，跳过`)
-      }
-      
-      // 等待 1 秒（除了最后一个）
-      if (i < dian8Tokens.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-    }
-    
-    message.success('十殿 8 执行完成！')
-    
-    // 记录日志
-    const tokenIndex = getTokenIndex(dian87Token)
-    logOperation('shidian', '十殿 8', {
-      cardType: '十殿信息',
-      tokenId: dian87Token.id,
-      tokenName: dian87Token.name,
-      status: 'success',
-      message: `${tokenIndex}、${dian87Token.name || dian87Token.id}、十殿 8 执行完成，队伍号：${teamIdForDian8.value}`
-    })
-    
-  } catch (error) {
-    console.error('十殿 8 执行失败:', error)
-    message.error(`十殿 8 执行失败：${error.message || '未知错误'}`)
-  } finally {
-    isExecutingNightmare8.value = false
-  }
-}
-
 // 组件卸载前清理连接池
 onBeforeUnmount(async () => {
   try {
@@ -4352,8 +4231,7 @@ defineExpose({
   executeFighter,
   executeKick,
   executeTransfer,
-  executeRestore,
-  executeNightmare8
+  executeRestore
 })
 </script>
 

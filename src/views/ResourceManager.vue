@@ -49,7 +49,7 @@
           "
         >
           <div style="display: flex; align-items: center; gap: 16px">
-            <h2>资源管理</h2>
+            <h2>Token 分组</h2>
             <div
               style="
                 display: flex;

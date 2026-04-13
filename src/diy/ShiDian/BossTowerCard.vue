@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="boss-tower" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -192,7 +192,7 @@ const message = useMessage();
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 5,
-  connectionTimeout: 30000,
+  connectionTimeout: 3000,
   reconnectDelay: 1000,
   maxRetries: 3
 });

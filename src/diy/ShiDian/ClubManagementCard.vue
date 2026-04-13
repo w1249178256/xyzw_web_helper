@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -183,7 +183,7 @@ const sortedTokens = computed(() => {
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 5,
-  connectionTimeout: 30000,
+  connectionTimeout: 3000,
   idleTimeout: 60000,
   queueTimeout: 120000,
   reconnectDelay: 1000,

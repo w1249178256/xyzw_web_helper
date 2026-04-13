@@ -60,7 +60,16 @@ const my_routes = [
         name: 'ResourceManager',
         component: () => import('@/views/ResourceManager.vue'),
         meta: {
-          title: '✨️',
+          title: 'Token 分组',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'common-tasks',
+        name: 'CommonTasks',
+        component: () => import('@/views/CommonTasks.vue'),
+        meta: {
+          title: '常用任务',
           requiresToken: true
         }
       },
