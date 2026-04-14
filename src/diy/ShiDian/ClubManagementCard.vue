@@ -73,7 +73,7 @@
           />
           <CustomizedCard 
             mode="button" 
-            :name="isRunning ? '批量加入中...' : '批量加入俱乐部'" 
+            name="批量获取俱乐部信息" 
             :disabled="isRunning"
             @button-click="batchFetchClubInfo"
           />
@@ -81,7 +81,7 @@
             mode="button-number-input" 
             name="加入俱乐部" 
             v-model:inputValue="legionId" 
-            placeholder="输入俱乐部ID" 
+            placeholder="输入俱乐部 ID" 
             @update:inputValue="handleLegionIdInput" 
             @button-click="joinLegion" 
             :disabled="!legionId"
@@ -98,6 +98,12 @@
             @button-click="handleExportClubInfo"
           />
           <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
+          <CustomizedCard 
+            mode="button" 
+            :name="isAcceptGiftRunning ? '批量加入中...' : '批量加入俱乐部'" 
+            :disabled="isAcceptGiftRunning"
+            @button-click="joinLegion"
+          />
           <CustomizedCard 
             mode="button-number-input" 
             name="一键领取" 
@@ -395,9 +401,141 @@ const handleAutoAcceptGift = async () => {
   }
 }
 
-// 加入俱乐部
-const joinLegion = () => {
-  emit('join-legion', legionTokens.value, legionId.value)
+// 批量加入俱乐部（使用连接池，支持执行范围）
+const joinLegion = async () => {
+  if (!legionId.value) {
+    message.warning('请输入俱乐部 ID')
+    return
+  }
+  
+  try {
+    isAcceptGiftRunning.value = true
+    
+    // 解析执行范围
+    const tokenIndices = connectionPool.parseTokenRange(legionTokens.value)
+    
+    // 获取目标 Token 列表（根据执行范围过滤）
+    const targetTokens = connectionPool.getTargetTokens(sortedTokens.value, tokenIndices)
+    
+    if (targetTokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到 Token`)
+      return
+    }
+    
+    const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+    message.info(`开始批量加入俱乐部（${rangeText}），共${targetTokens.length}个 Token...`)
+    console.log(`[批量加入俱乐部] 执行范围：${legionTokens.value || '全部'}，目标 Token 数量：${targetTokens.length}`)
+    console.log(`[批量加入俱乐部] 目标 Token:`, targetTokens.map(t => `${t.id}(${t.name || ''})`))
+    
+    // 使用连接池的批量操作功能
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          console.log(`[批量加入俱乐部] [${globalIndex + 1}/${targetTokens.length}] 开始处理 ${token.name || token.id}`)
+          
+          // 使用 sendMessageWithPromise 获取响应
+          const response = await tokenStore.sendMessageWithPromise(
+            token.id, 
+            'legion_applyjoin', 
+            { legionId: parseInt(legionId.value) },
+            5000
+          )
+          
+          let successMsg = ''
+          let resultStatus = 'success'
+          
+          // 检查响应结果
+          if (response && response.code !== undefined) {
+            if (response.code === 0) {
+              successMsg = `${token.name || token.id} 成功申请加入俱乐部 ${legionId.value}`
+              message.success(successMsg)
+            } else if (response.msg && response.msg.includes('已经加入')) {
+              successMsg = `${token.name || token.id} 已经加入俱乐部`
+              message.info(successMsg)
+              resultStatus = 'info'
+            } else if (response.msg && response.msg.includes('未找到俱乐部')) {
+              successMsg = `${token.name || token.id} 加入失败：未找到俱乐部 ${legionId.value}`
+              message.error(successMsg)
+              resultStatus = 'error'
+            } else {
+              successMsg = `${token.name || token.id} 加入俱乐部失败：${response.msg || '未知错误'}`
+              message.error(successMsg)
+              resultStatus = 'error'
+            }
+          } else {
+            successMsg = `${token.name || token.id} 已申请加入俱乐部 ${legionId.value}`
+            message.success(successMsg)
+          }
+          
+          // 记录操作日志
+          const tokenIndex = getTokenIndex(token)
+          logOperation('shidian', '加入俱乐部', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: resultStatus,
+            message: `${tokenIndex}、${token.name || token.id}、${successMsg.replace(`${token.name || token.id} `, '')}`
+          })
+          
+          return { 
+            success: resultStatus !== 'error', 
+            status: resultStatus,
+            message: successMsg
+          }
+        } catch (error) {
+          const errorMsg = `${token.name || token.id}: 加入失败 - ${error.message || '未知错误'}`
+          console.error(`[批量加入俱乐部] [${globalIndex + 1}]`, errorMsg)
+          message.error(errorMsg)
+          
+          // 记录操作日志
+          const tokenIndex = getTokenIndex(token)
+          logOperation('shidian', '加入俱乐部', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name || token.id}、加入俱乐部失败：${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: error.message }
+        }
+      },
+      {
+        batchSize: 1,
+        delayBetween: 1000,
+        keepConnections: false,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            console.log(`[批量加入俱乐部] 正在处理第 ${progress.batchIndex} 批（共 ${progress.totalBatches} 批）`)
+          } else if (progress.type === 'token-start') {
+            console.log(`[批量加入俱乐部] [${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            console.log(`[批量加入俱乐部] [${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              console.warn(`[批量加入俱乐部] [${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              console.error(`[批量加入俱乐部] [${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    // 汇总统计结果
+    const successCount = results.filter(r => r.success).length
+    const errorCount = results.filter(r => !r.success).length
+    
+    message.success(`批量加入俱乐部完成，成功${successCount}个，失败${errorCount}个`)
+    console.log(`[批量加入俱乐部] 完成 - 成功：${successCount}, 失败：${errorCount}`)
+  } catch (error) {
+    console.error('[批量加入俱乐部] 失败:', error)
+    message.error('批量加入俱乐部失败：' + (error.message || '未知错误'))
+  } finally {
+    isAcceptGiftRunning.value = false
+  }
 }
 
 // 解析Token范围（如果为空则返回null，表示执行全部）
