@@ -1,5 +1,5 @@
 /**
- * WebSocket连接管理器
+ * WebSocket 连接管理器
  */
 
 // 全局连接队列控制 - 限制并发连接数
@@ -8,7 +8,7 @@ export const connectionQueue = { active: 0 };
 /**
  * 创建连接管理器
  * @param {object} options - 配置选项
- * @param {object} options.tokenStore - Token存储
+ * @param {object} options.tokenStore - Token 存储
  * @param {object} options.batchSettings - 批量设置
  * @param {function} options.addLog - 日志添加函数
  * @returns {object} - 连接管理器对象
@@ -51,7 +51,7 @@ export function createConnectionManager({ tokenStore, batchSettings, addLog }) {
   /**
    * 确保连接建立
    * @param {string} tokenId - Token ID
-   * @param {object} tokens - Tokens列表
+   * @param {object} tokens - Tokens 列表
    * @param {number} maxRetries - 最大重试次数
    */
   const ensureConnection = async (tokenId, tokens, maxRetries = 2) => {
@@ -69,7 +69,7 @@ export function createConnectionManager({ tokenStore, batchSettings, addLog }) {
 
       addLog({
         time: new Date().toLocaleTimeString(),
-        message: `正在连接... (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+        message: `正在连接... (队列：${connectionQueue.active}/${batchSettings.maxActive})`,
         type: "info",
       });
 
@@ -115,9 +115,9 @@ export function createConnectionManager({ tokenStore, batchSettings, addLog }) {
 
     // 连接成功，槽位保持占用，直到任务完成后手动释放
 
-    // Initialize Game Data (Critical for Battle Version and Session)
+    // 连接成功，初始化游戏数据（关键步骤，如战斗版本和会话）
     try {
-      // Fetch Role Info first (Standard flow)
+      // 首先获取角色信息（标准流程）
       await tokenStore.sendMessageWithPromise(
         tokenId,
         "role_getroleinfo",
@@ -125,7 +125,7 @@ export function createConnectionManager({ tokenStore, batchSettings, addLog }) {
         5000
       );
 
-      // Fetch Battle Version
+      // 获取战斗版本
       const res = await tokenStore.sendMessageWithPromise(
         tokenId,
         "fight_startlevel",
@@ -136,27 +136,87 @@ export function createConnectionManager({ tokenStore, batchSettings, addLog }) {
         tokenStore.setBattleVersion(res.battleData.version);
       }
     } catch (e) {
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `初始化数据失败: ${e.message}`,
-        type: "warning",
-      });
+      console.warn(`[ConnectionPool] 初始化数据失败：${tokenId}`, e.message);
+
+      // 检查是否是 "check token error" 或其他 token 相关错误
+      if (e.message && (e.message.includes('check token error') || e.message.includes('token'))) {
+        console.warn(`[ConnectionPool] 检测到 Token 失效：${tokenId}，立即刷新并重连...`);
+
+        // 立即刷新 Token（从 IndexedDB 读取）
+        const refreshed = await tokenStore.refreshTokenFromIndexedDB(tokenId);
+
+        if (refreshed) {
+          console.log(`[ConnectionPool] Token 刷新成功，断开旧连接并重新连接：${tokenId}`);
+
+          // 断开旧连接
+          tokenStore.closeWebSocketConnection(tokenId);
+
+          // 重置重连状态，确保立即重连
+          tokenStore.resetReconnectInfo(tokenId);
+
+          // 获取最新的 token
+          const latestToken = tokenStore.gameTokens.find(t => t.id === tokenId);
+
+          // 重新创建连接
+          tokenStore.createWebSocketConnection(
+            tokenId,
+            latestToken.token,
+            latestToken.wsUrl
+          );
+
+          // 等待新连接建立
+          const connected = await waitForConnection(tokenId, 5000);
+
+          if (connected) {
+            console.log(`[ConnectionPool] 重连成功，重新初始化：${tokenId}`);
+
+            // 重新尝试初始化
+            try {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "role_getroleinfo",
+                {},
+                5000
+              );
+
+              const res = await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "fight_startlevel",
+                {},
+                5000
+              );
+              if (res?.battleData?.version) {
+                tokenStore.setBattleVersion(res.battleData.version);
+              }
+
+              console.log(`[ConnectionPool] Token 刷新后初始化成功：${tokenId}`);
+            } catch (retryError) {
+              console.error(`[ConnectionPool] Token 刷新后初始化仍失败：${tokenId}`, retryError.message);
+            }
+          } else {
+            console.error(`[ConnectionPool] 重连失败：${tokenId}`);
+          }
+        } else {
+          console.error(`[ConnectionPool] Token 刷新失败，需要手动重新导入：${tokenId}`);
+        }
+      }
     }
 
+    // 连接成功，槽位保持占用，直到任务完成后手动释放
     return true;
   };
 
   /**
    * 关闭连接并释放槽位
    * @param {string} tokenId - Token ID
-   * @param {string} tokenName - Token名称
+   * @param {string} tokenName - Token 名称
    */
   const closeConnection = (tokenId, tokenName) => {
     tokenStore.closeWebSocketConnection(tokenId);
     releaseConnectionSlot();
     addLog({
       time: new Date().toLocaleTimeString(),
-      message: `${tokenName} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+      message: `${tokenName} 连接已关闭  (队列：${connectionQueue.active}/${batchSettings.maxActive})`,
       type: "info",
     });
   };
@@ -206,7 +266,7 @@ export const getActivityStatus = () => {
     ismengjingActivityOpen: day === 0 || day === 1 || day === 3 || day === 4,
     // 宝库活动开放 (非周一、周二)
     isbaokuActivityOpen: day !== 1 && day !== 2,
-    // 竞技场活动开放 (6点到22点)
+    // 竞技场活动开放 (6 点到 22 点)
     isarenaActivityOpen: hour >= 6 && hour < 22,
     // 当前活动周
     currentActivityWeek,
@@ -251,9 +311,9 @@ export const calculateMonthProgress = () => {
 };
 
 /**
- * 竞技场目标ID选择
+ * 竞技场目标 ID 选择
  * @param {object} targets - 目标列表
- * @returns {number|null} - 目标ID
+ * @returns {number|null} - 目标 ID
  */
 export const pickArenaTargetId = (targets) => {
   const candidate =
