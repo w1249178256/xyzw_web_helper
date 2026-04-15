@@ -437,6 +437,7 @@ export function registerDefaultCommands(reg) {
     .register("evotower_claimlegionprivilege")
     .register("mergebox_mergeitem")
     .register("mergebox_openbox")
+    .register("legacy_beginhangup")
 
     // 塔相关（新增）
     .register("towers_getinfo")

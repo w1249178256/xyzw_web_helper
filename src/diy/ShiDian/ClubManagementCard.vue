@@ -98,6 +98,7 @@
             @button-click="joinLegion"
           />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
+          <CustomizedCard mode="button" :name="isBatchLegacyBeginHangupRunning ? '批量开启功法挂机中...' : '批量开启功法挂机'" :disabled="isBatchLegacyBeginHangupRunning" @button-click="handleBatchLegacyBeginHangup" />
         </CustomizedCard>
       </div>
       
@@ -105,7 +106,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
+        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机']"
       />
     </template>
   </MyCard>
@@ -138,6 +139,7 @@ const isAcceptGiftRunning = ref(false)
 const isAutoAcceptGiftRunning = ref(false)
 const isBatchAcceptGiftRunning = ref(false)
 const isBatchLegacyHangupRunning = ref(false)
+const isBatchLegacyBeginHangupRunning = ref(false)
 const isExportLegacyDetailsRunning = ref(false)
 const isExportClubInfoRunning = ref(false)
 const isLegacyBookRunning = ref(false)
@@ -2808,6 +2810,132 @@ const handleBatchRecruitWeek = async () => {
     })
   } finally {
     isBatchRecruitWeekRunning.value = false
+  }
+}
+
+// 批量开启功法挂机
+const handleBatchLegacyBeginHangup = async () => {
+  try {
+    isBatchLegacyBeginHangupRunning.value = true
+    message.info('开始批量开启功法挂机...')
+    logOperation('shidian', '批量开启功法挂机', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: '开始批量开启功法挂机...'
+    })
+
+    // 解析执行范围
+    const tokenIndices = connectionPool.parseTokenRange(legionTokens.value)
+    
+    // 获取目标 Token 列表（根据执行范围过滤）
+    const tokens = connectionPool.getTargetTokens(sortedTokens.value, tokenIndices)
+
+    if (tokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到 Token`)
+      logOperation('shidian', '批量开启功法挂机', {
+        cardType: '俱乐部管理',
+        status: 'warning',
+        message: `执行范围${rangeText}内没有找到 Token`
+      })
+      return
+    }
+    
+    const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+    message.info(`开始批量开启功法挂机，共 ${tokens.length} 个 Token（${rangeText}）`)
+    logOperation('shidian', '批量开启功法挂机', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: `开始批量开启功法挂机，共 ${tokens.length} 个 Token（${rangeText}）`
+    })
+    
+    // 使用连接池的批量操作功能
+    const results = await connectionPool.batchOperate(
+      tokens,
+      async (token, globalIndex) => {
+        try {
+          message.info(`[${globalIndex + 1}/${tokens.length}] ${token.name || token.id} 正在开启功法挂机...`)
+          
+          // 等待 1 秒后执行
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
+          await tokenStore.sendLegacyBeginHangup(token.id, {})
+          
+          message.success(`[${globalIndex + 1}] ${token.name || token.id} 开启功法挂机成功`)
+          logOperation('shidian', '批量开启功法挂机', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `开启功法挂机成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 开启功法挂机失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 开启功法挂机失败：${error.message || error}`)
+          logOperation('shidian', '批量开启功法挂机', {
+            cardType: '俱乐部管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `开启功法挂机失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    const failedTokens = results.filter(r => !r.success).map(r => r.token.name)
+    
+    if (failCount > 0) {
+      const failedTokensStr = failedTokens.join('、')
+      message.success(`批量开启功法挂机完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`)
+      logOperation('shidian', '批量开启功法挂机', {
+        cardType: '俱乐部管理',
+        status: 'success',
+        message: `批量开启功法挂机完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
+      })
+    } else {
+      message.success(`批量开启功法挂机完成：成功${successCount}个，失败${failCount}个`)
+      logOperation('shidian', '批量开启功法挂机', {
+        cardType: '俱乐部管理',
+        status: 'success',
+        message: `批量开启功法挂机完成：成功${successCount}个，失败${failCount}个`
+      })
+    }
+  } catch (error) {
+    console.error('批量开启功法挂机失败:', error)
+    message.error(`批量开启功法挂机失败：${error.message || error}`)
+    logOperation('shidian', '批量开启功法挂机', {
+      cardType: '俱乐部管理',
+      status: 'error',
+      message: `批量开启功法挂机失败：${error.message || error}`
+    })
+  } finally {
+    isBatchLegacyBeginHangupRunning.value = false
   }
 }
 </script>

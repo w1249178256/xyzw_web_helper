@@ -766,6 +766,21 @@ export class GameCommands {
   }
 
   /**
+   * 开启功法挂机
+   */
+ legacy_beginhangup(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        ...params
+      }),
+      cmd: "legacy_beginhangup",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
    * 领取功法挂机
    */
   legacy_claimhangup(ack = 0, seq = 0, params = {}) {

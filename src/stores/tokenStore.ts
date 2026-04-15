@@ -1442,6 +1442,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "activity_startactegame", params);
   };
 
+  // 发送开始功法挂机
+  const sendLegacyBeginHangup = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_beginhangup", params);
+  };
+
   // 发送活动通用购买商品
   const sendActivityCommonBuyGoods = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "activity_commonbuygoods", params);
@@ -2180,6 +2185,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendActivityActeGameStageClaim,
     sendActivityStarteGame,
     sendActivityStartActeGame,
+    sendLegacyBeginHangup,
     sendActivityCommonBuyGoods,
     sendActivityMaydaylottery,
     sendAutumnUseItem,
