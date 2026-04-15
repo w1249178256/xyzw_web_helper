@@ -1978,6 +1978,23 @@ export class GameCommands {
   }
 
   /**
+   * 暑期活动使用新道具
+   */
+  activity_startactegame(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        actId:params.actId,
+          ...params
+      }),
+      cmd: "activity_startactegame",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 暑期活动领取道具
    */
   activity_actegamestageclaim(ack = 0, seq = 0, params = {}) {

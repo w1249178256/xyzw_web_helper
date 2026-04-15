@@ -41,7 +41,7 @@
         />
         <CustomizedCard
           mode="name-switch"
-          name="使用免费"
+          name="领取免费"
           :switch-value="useFree"
           @update:switch-value="useFree = $event"
         />
@@ -183,9 +183,9 @@
         />
         <CustomizedCard
           mode="button-placeholder"
-          button-text="批量活动"
+          button-text="批量使用道具"
           :disabled="isRunning"
-          @button-click="batchActivity()"
+          @button-click="batchUseItem()"
         />
         <CustomizedCard
           mode="button-placeholder"
@@ -265,9 +265,62 @@ const isRunning = ref(false);
 const freeGoodsId = ref("");
 const useFree = ref(false);
 const activityId = ref("");
-const itemId = ref("5264"); // 默认道具id
+const itemId = ref("5264"); // 默认道具 id
 const executionRange = ref(""); // 执行范围
-const bossSelect = ref(1); // BOSS选择，默认为1
+const bossSelect = ref(1); // BOSS 选择，默认为 1
+
+// 辅助函数：获取前一个周五的日期
+const getPreviousFriday = () => {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=周日，1=周一，2=周二，3=周三，4=周四，5=周五，6=周六
+  
+  // 计算前一个周五的日期
+  let daysToSubtract = 0;
+  
+  if (dayOfWeek === 5) {
+    // 今天是周五，返回今天
+    daysToSubtract = 0;
+  } else if (dayOfWeek < 5) {
+    // 今天是周日到周四，返回上一个周五（上周的周五）
+    daysToSubtract = dayOfWeek + 2; // 周日 (0) 需要减 2 天，周一 (1) 需要减 3 天，以此类推
+  } else {
+    // 今天是周六 (6)，返回昨天（周五）
+    daysToSubtract = 1;
+  }
+  
+  const previousFriday = new Date(now);
+  previousFriday.setDate(now.getDate() - daysToSubtract);
+  
+  // 格式化为 YYYYMMDD
+  const year = previousFriday.getFullYear();
+  const month = String(previousFriday.getMonth() + 1).padStart(2, '0');
+  const day = String(previousFriday.getDate()).padStart(2, '0');
+  
+  return `${year}${month}${day}`;
+};
+
+// 根据前一个周五的日期设置活动 ID 和免费商品 ID
+const setActivityIdsByDate = () => {
+  const fridayDate = getPreviousFriday();
+  
+  // 活动 ID = 年份后两位（YY）+ 月份（MM）+ 日期（DD）+ 2
+  // 例如：2026 年 4 月 10 日 -> 26 + 04 + 10 + 2 = 2604102
+  const year = fridayDate.substring(2, 4);  // 获取年份后两位
+  const month = fridayDate.substring(4, 6); // 获取月份（保留前导零）
+  const day = fridayDate.substring(6, 8);   // 获取日期（保留前导零）
+  activityId.value = `${year}${month}${day}2`;
+  
+  // 免费商品 ID = 年份后两位（YY）+ 月份（MM）+ 日期（DD）+ 31
+  // 例如：2026 年 4 月 10 日 -> 26 + 04 + 10 + 31 = 26041031
+  freeGoodsId.value = `${year}${month}${day}31`;
+  
+  console.log(`前一个周五日期：${fridayDate}`);
+  console.log(`自动设置活动 ID: ${activityId.value}`);
+  console.log(`自动设置免费商品 ID: ${freeGoodsId.value}`);
+};
+
+// 组件挂载时设置活动 ID 和免费商品 ID
+setActivityIdsByDate();
 
 // 辅助函数：获取token的序号（基于名称排序后的顺序）
 const getTokenIndex = (token) => {
@@ -1505,6 +1558,269 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
   }
 
   return true;
+};
+
+// 批量使用道具
+const batchUseItem = async () => {
+  if (!activityId.value) {
+    message.warning("请先输入活动 id");
+    return;
+  }
+
+  if (isRunning.value) {
+    message.warning("操作正在进行中，请稍后再试");
+    return;
+  }
+
+  // 按 token 昵称排序的 token 列表（与页面显示顺序一致）
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase();
+    const nameB = (b.name || '未命名').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  
+  if (sortedTokensList.length === 0) {
+    message.warning("没有可用的 Token");
+    return;
+  }
+  
+  // 解析执行范围（如果为空则执行全部）
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value);
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices);
+  
+  if (targetTokens.length === 0) {
+    message.warning("执行范围内没有有效的 Token");
+    return;
+  }
+  
+  // 获取每个 token 在 sortedTokens 中的序号（用于显示）
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id);
+    return index + 1;
+  };
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部";
+  message.info(`开始批量使用道具（${rangeText}），共${targetTokens.length}个 Token，按序号顺序执行...`);
+  logOperation('shidian', '批量使用道具', {
+    cardType: '暑期活动',
+    status: 'info',
+    message: `开始批量使用道具，${rangeText}，共${targetTokens.length}个 Token`
+  });
+
+  isRunning.value = true;
+  try {
+    // 使用连接池执行批量操作
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行使用道具...`);
+          
+          let useItemSuccess = true;
+          let claimGiftSuccess = true;
+          
+          // 如果"领取免费"开关打开，执行 activity_commonbuygoods
+          if (useFree.value) {
+            try {
+              console.log(`Token ${token.name} 正在领取免费商品...`);
+              await logCommand(
+                'shidian',
+                '批量使用道具 - 领取免费',
+                token.id,
+                token.name || token.id,
+                'activity_commonbuygoods',
+                { goodsId: Number(freeGoodsId.value) },
+                tokenStore.sendActivityCommonBuyGoods(token.id, { goodsId: Number(freeGoodsId.value) }),
+                true,
+                '暑期活动'
+              );
+              console.log(`Token ${token.name} 领取免费成功`);
+            } catch (buyError) {
+              console.error(`Token ${token.name} 领取免费失败:`, buyError);
+            }
+          }
+          
+          // 连续执行使用道具和领取赠送，直到两个命令都失败
+          let useItemSuccessCount = 0;
+          let claimGiftSuccessCount = 0;
+          let iteration = 0;
+          let consecutiveFailures = 0; // 连续失败次数（使用道具 + 领取赠送都算）
+          
+          while (true) {
+            iteration++;
+            let currentIterationSuccess = false; // 标记本轮是否有成功
+            
+            // 执行使用道具命令
+            try {
+              console.log(`Token ${token.name} 第 ${iteration} 次使用道具`);
+              await logCommand(
+                'shidian',
+                `批量使用道具 - 使用道具-${iteration}`,
+                token.id,
+                token.name || token.id,
+                'activity_startactegame',
+                { actId: Number(activityId.value) },
+                tokenStore.sendActivityStartActeGame(token.id, { actId: Number(activityId.value) }),
+                true,
+                '暑期活动'
+              );
+              console.log(`Token ${token.name} 第 ${iteration} 次使用道具成功`);
+              useItemSuccessCount++;
+              consecutiveFailures = 0; // 重置连续失败计数
+              currentIterationSuccess = true;
+              logOperation('shidian', '批量使用道具', {
+                cardType: '暑期活动',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `${tokenIndex}、${token.name || token.id}、第${iteration}次使用道具成功`
+              });
+            } catch (error) {
+              console.error(`Token ${token.name} 第 ${iteration} 次使用道具失败:`, error);
+              consecutiveFailures++;
+              
+              // 使用道具失败后，连续执行领取赠送道具直到失败
+              let consecutiveClaimAttempts = 0;
+              while (true) {
+                consecutiveClaimAttempts++;
+                try {
+                  console.log(`Token ${token.name} 第 ${iteration} 次第 ${consecutiveClaimAttempts} 次领取赠送道具`);
+                  await logCommand(
+                    'shidian',
+                    `批量使用道具 - 领取赠送-${iteration}-${consecutiveClaimAttempts}`,
+                    token.id,
+                    token.name || token.id,
+                    'activity_actegamestageclaim',
+                    { actId: Number(activityId.value) },
+                    tokenStore.sendActivityActeGameStageClaim(token.id, { actId: Number(activityId.value) }),
+                    true,
+                    '暑期活动'
+                  );
+                  console.log(`Token ${token.name} 第 ${iteration} 次第 ${consecutiveClaimAttempts} 次领取赠送道具成功`);
+                  claimGiftSuccessCount++;
+                  consecutiveFailures = 0; // 重置连续失败计数
+                  currentIterationSuccess = true;
+                  logOperation('shidian', '批量使用道具', {
+                    cardType: '暑期活动',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `${tokenIndex}、${token.name || token.id}、第${iteration}次第${consecutiveClaimAttempts}次领取赠送道具成功`
+                  });
+                } catch (claimError) {
+                  console.error(`Token ${token.name} 第 ${iteration} 次第 ${consecutiveClaimAttempts} 次领取赠送道具失败:`, claimError);
+                  consecutiveFailures++;
+                  break; // 领取赠送失败，跳出内层循环
+                }
+                
+                // 每次操作间延迟 500ms
+                await new Promise((resolve) => setTimeout(resolve, 500));
+              }
+            }
+            
+            // 检查是否连续失败（两个命令都失败）
+            if (consecutiveFailures >= 2) {
+              logOperation('shidian', '批量使用道具', {
+                cardType: '暑期活动',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `${tokenIndex}、${token.name || token.id}、第${iteration}次使用道具和领取赠送道具都失败，停止执行`
+              });
+              
+              // 记录成功次数
+              logOperation('shidian', '批量使用道具', {
+                cardType: '暑期活动',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `${tokenIndex}、${token.name || token.id}、使用道具成功${useItemSuccessCount}次，领取赠送成功${claimGiftSuccessCount}次`
+              });
+              
+              return { 
+                success: false, 
+                token: token, 
+                error: `第${iteration}次使用道具和领取赠送道具都失败`,
+                useItemSuccessCount,
+                claimGiftSuccessCount
+              };
+            }
+            
+            // 每次操作间延迟 500ms
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
+        } catch (error) {
+          console.error(`Token ${token.name} 批量使用道具失败:`, error);
+          logOperation('shidian', '批量使用道具', {
+            cardType: '暑期活动',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name || token.id}、批量使用道具失败：${error.message || error}`
+          });
+          return { success: false, token: token, error: error.message || error };
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`);
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`);
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`);
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            if (progress.status === 'warning') {
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
+            } else {
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
+            }
+          }
+        }
+      }
+    );
+
+    // 统计结果
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+    const failedTokens = results.filter(r => !r.success).map(r => r.token.name);
+
+    if (failCount > 0) {
+      const failedTokensStr = failedTokens.join('、');
+      message.success(`批量使用道具完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`);
+      logOperation('shidian', '批量使用道具', {
+        cardType: '暑期活动',
+        status: 'success',
+        message: `批量使用道具完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
+      });
+    } else {
+      message.success(`批量使用道具完成：成功${successCount}个，失败${failCount}个`);
+      logOperation('shidian', '批量使用道具', {
+        cardType: '暑期活动',
+        status: 'success',
+        message: `批量使用道具完成：成功${successCount}个，失败${failCount}个`
+      });
+    }
+  } catch (error) {
+    console.error("批量使用道具失败:", error);
+    message.error(`批量使用道具失败：${error.message || error}`);
+    logOperation('shidian', '批量使用道具', {
+      cardType: '暑期活动',
+      status: 'error',
+      message: `批量使用道具失败：${error.message || error}`
+    });
+  } finally {
+    isRunning.value = false;
+  }
 };
 
 const batchActivity = async () => {

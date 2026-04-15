@@ -427,6 +427,7 @@ export function registerDefaultCommands(reg) {
     .register("activity_getactegameinfo")
     .register("activity_actegamestageclaim")
     .register("activity_startegame")
+    .register("activity_startactegame")
     .register("activity_commonbuygoods")
     .register("activity_maydaylottery")
     .register("activity_claimweekactreward")
