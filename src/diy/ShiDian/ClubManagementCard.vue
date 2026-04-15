@@ -52,17 +52,10 @@
 
         <!-- 俱乐部功能显示 - 使用一个CustomizedCard容器容纳主要操作按钮 -->
         <CustomizedCard mode="container">
-          <!-- 功法挂机功能区域 - 直接放在容器中，自动两个一行 -->
-          <CustomizedCard mode="button-number-input" name="赠送目标" v-model:inputValue="legacyTargetId" placeholder="输入赠送目标ID" @update:inputValue="handleLegacyTargetIdInput" :disabled="isLegacyCollectRunning" />
-          <CustomizedCard mode="button-number-input" name="密码" v-model:inputValue="legacyPassword" placeholder="输入密码" @update:inputValue="handleLegacyPasswordInput" :disabled="isLegacyCollectRunning" />
-          <CustomizedCard mode="button" name="功法挂机" :disabled="!selectedTokenId" @button-click="handleLegacyHangup" />
-          <!-- 收集功法功能区域 -->
-          <CustomizedCard mode="button" name="收集功法" :disabled="!selectedTokenId || isLegacyCollectRunning" @button-click="handleLegacyCollect" />
-          <CustomizedCard mode="button" :name="isAcceptGiftRunning ? '接受礼物中...' : '接受礼物'" :disabled="isAcceptGiftRunning || !selectedTokenId" @button-click="handleAcceptGift" />
-          <CustomizedCard mode="button" :name="isExportLegacyDetailsRunning ? '导出中...' : '导出功法详情'" :disabled="isExportLegacyDetailsRunning || !selectedTokenId" @button-click="handleExportLegacyDetails" />
           <!-- 功法图鉴功能区域 -->
           <CustomizedCard mode="button" name="刷新图鉴信息" :disabled="!selectedTokenId || isRefreshLegacyInfoRunning" @button-click="handleRefreshLegacyInfo" />
           <CustomizedCard mode="button" name="激活功法图鉴" :disabled="!selectedTokenId || isLegacyBookRunning" @button-click="handleLegacyBook" />
+          <CustomizedCard mode="button" :name="isExportLegacyDetailsRunning ? '导出中...' : '导出功法详情'" :disabled="isExportLegacyDetailsRunning || !selectedTokenId" @button-click="handleExportLegacyDetails" />
           
           <!-- 俱乐部基本功能按钮 -->
           <CustomizedCard 
@@ -104,15 +97,6 @@
             :disabled="isAcceptGiftRunning"
             @button-click="joinLegion"
           />
-          <CustomizedCard 
-            mode="button-number-input" 
-            name="一键领取" 
-            v-model:inputValue="autoAcceptGiftTokenIndex" 
-            placeholder="输入 Token 序号（默认 13）" 
-            @update:inputValue="handleAutoAcceptGiftTokenIndexInput"
-            @button-click="handleAutoAcceptGift"
-          />
-          <CustomizedCard mode="button" :name="isBatchLegacyHangupRunning ? '批量功法挂机中...' : '批量功法挂机'" :disabled="isBatchLegacyHangupRunning" @button-click="handleBatchLegacyHangup" />
           <CustomizedCard mode="button" :name="isBatchLegacyBookRunning ? '批量功法图鉴中...' : '批量功法图鉴'" :disabled="isBatchLegacyBookRunning" @button-click="handleBatchLegacyBook" />
         </CustomizedCard>
       </div>
@@ -121,7 +105,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['功法挂机', '收集功法', '批量赠送功法', '接受礼物', '一键领取', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法挂机', '批量功法图鉴', '加入俱乐部', '批量招募周']"
+        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周']"
       />
     </template>
   </MyCard>

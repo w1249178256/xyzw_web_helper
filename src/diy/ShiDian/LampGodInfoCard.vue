@@ -79,14 +79,6 @@
         <CustomizedCard mode="name-switch" name="群雄" :switch-value="lampGodSelection.qunxiong" @update:switch-value="(val) => handleLampGodSwitch('qunxiong', val)" />
         <CustomizedCard mode="name-switch" name="爬塔" :switch-value="lampGodSelection.tower" @update:switch-value="(val) => handleLampGodSwitch('tower', val)" />
         <CustomizedCard mode="name-switch" name="深海" :switch-value="lampGodSelection.deepsea" @update:switch-value="(val) => handleLampGodSwitch('deepsea', val)" />
-        <CustomizedCard mode="button" name="刷新阵容" :disabled="!selectedTokenId" @button-click="refreshTeamInfo" />
-        <CustomizedCard mode="button" name="刷新灯神" :disabled="!selectedTokenId" @button-click="refreshLampGodInfo" />
-        <CustomizedCard mode="button" name="切换阵1" :disabled="!selectedTokenId" @button-click="switchToTeam1" />
-        <CustomizedCard mode="button" name="切换阵容" :disabled="!selectedTokenId" @button-click="switchTeam" />
-        <CustomizedCard mode="button" name="更换科技" :disabled="!selectedTokenId" @button-click="changeTech" />
-        <CustomizedCard mode="button" name="单个灯神战斗" :disabled="!selectedTokenId" @button-click="lampGodFight" />
-        <CustomizedCard mode="button" name="灯神按钮" :disabled="!selectedTokenId" @button-click="lampGodAction" />
-        <CustomizedCard mode="button" name="扫荡" :disabled="!selectedTokenId" @button-click="sweepAction" />
       </CustomizedCard>
       
       <!-- 新增容器：执行范围及批量操作 -->

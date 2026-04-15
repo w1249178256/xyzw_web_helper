@@ -68,16 +68,7 @@
       
       <!-- 阵容操作按钮 - 另起一行 -->
       <CustomizedCard mode="container">
-        <!-- 阵容信息显示 -->
-        <CustomizedCard mode="button" name="刷新阵容" :disabled="!selectedTokenId" @button-click="refreshTeamInfo" />
-        <CustomizedCard mode="button" name="武将升级" :disabled="!selectedTokenId" @button-click="heroUpgrade" />
-        
-        <CustomizedCard mode="button" name="切换阵1" :disabled="!selectedTokenId" @button-click="switchToTeam1" />
-        <CustomizedCard mode="button" name="切换阵2" :disabled="!selectedTokenId" @button-click="switchToTeam2" />
-        
-        <CustomizedCard mode="button" name="切换爬塔" :disabled="!selectedTokenId || isSwitchTowerRunning" @button-click="switchTower" />
-        <CustomizedCard mode="button" name="切换推图" :disabled="!selectedTokenId || isSwitchStoryRunning" @button-click="switchStory" />
-        
+        <!-- 批量操作按钮 -->
         <CustomizedCard mode="button" name="批量升级一" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchUpgradeOne" />
         <CustomizedCard mode="button" name="批量升级二" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchUpgradeTwo" />
         <CustomizedCard mode="button" :name="isBatchSwitchTowerRunning ? '批量切换爬塔中...' : '批量切换爬塔'" :disabled="isBatchSwitchTowerRunning" @button-click="batchSwitchTower" />

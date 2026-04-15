@@ -78,34 +78,10 @@
           @button-click="getRemainingItems()"
         />
 
-        <!-- 第四行：切换阵2按钮，设置队伍按钮，开始按钮，战斗按钮 -->
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="切换阵2"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="switchToTeam2()"
-        />
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="设置队伍"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="setTeam()"
-        />
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="开始"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="startTower()"
-        />
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="战斗"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="fightTower()"
-        />
+        <!-- 第四行：BOSS 选择，活动详情 -->
         <CustomizedCard
           mode="name-select"
-          name="BOSS选择"
+          name="BOSS 选择"
           :select-value="bossSelect"
           :select-options="bossOptions"
           @update:select-value="bossSelect = $event"
@@ -118,51 +94,13 @@
           @button-click="getActivityCount()"
         />
 
-        <!-- 第五行：一键战斗按钮 -->
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="一键战斗"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="oneKeyBattle()"
-        />
-
-        <!-- 第六行：使用道具按钮，领取道具奖励按钮 -->
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="使用道具"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning || !activityId"
-          @button-click="useItem()"
-        />
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="领取道具奖励"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning || !activityId"
-          @button-click="claimItemReward()"
-        />
-
-        <!-- 第六行：一键活动按钮 -->
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="一键活动"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="oneKeyActivity()"
-        />
-
-        <!-- 第七行：福币数量按钮 -->
+        <!-- 第五行：福币数量按钮 -->
         <CustomizedCard
           mode="button-count"
           :name="`福币数量`"
           :count="fuCoinCount"
           :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
           @button-click="getFuCoinCount()"
-        />
-
-        <!-- 第八行：使用福币按钮 -->
-        <CustomizedCard
-          mode="button-placeholder"
-          button-text="使用福币"
-          :disabled="!selectedTokenId || connectingTokens.has(selectedTokenId) || isRunning"
-          @button-click="useFuCoin()"
         />
       </CustomizedCard>
       

@@ -638,7 +638,28 @@ const handleExecuteScheduledTasks = async () => {
           
           if (scheduledTasks.value.legion_boss) {
             try {
-              // 一键俱乐部 BOSS
+              // 一键俱乐部 BOSS：先切换到阵容 1，再执行俱乐部 BOSS
+              // 切换阵 1
+              try {
+                await tokenStore.sendPresetteamSaveTeam(
+                  token.id,
+                  { teamId: 1 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                console.log(`[${tokenIndex}] ${token.name || token.id} - 切换阵容 1 成功`)
+              } catch (switchError) {
+                // 检查错误消息是否包含"200020"，如果是，则仍然认为成功
+                const switchErrorMessage = switchError.message || switchError.toString()
+                if (switchErrorMessage.includes('200020')) {
+                  console.warn(`[${tokenIndex}] ${token.name || token.id} - 切换阵容 1 遇到服务器错误 200020，但继续执行`)
+                } else {
+                  console.error(`[${tokenIndex}] ${token.name || token.id} - 切换阵容 1 失败：${switchError.message}`)
+                  throw switchError
+                }
+              }
+              
+              // 执行俱乐部 BOSS
               await tokenStore.sendMessageWithPromise(
                 token.id,
                 'fight_startlegionboss',
