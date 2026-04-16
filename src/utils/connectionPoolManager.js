@@ -538,6 +538,10 @@ export class ConnectionPoolManager {
                         });
                     }
 
+                    // 等待游戏数据初始化完成（关键步骤！）
+                    // 确保 role_getroleinfo 和 fight_startlevel 已执行完成
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
                     // 执行操作
                     const result = await operationFn(token, globalIndex);
                     

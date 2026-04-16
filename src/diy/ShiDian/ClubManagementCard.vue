@@ -2859,6 +2859,12 @@ const handleBatchLegacyBeginHangup = async () => {
           // 等待 1 秒后执行
           await new Promise(resolve => setTimeout(resolve, 1000))
           
+          // 先发送 legacy_getinfo 获取功法信息
+          console.log(`[${globalIndex + 1}] ${token.name || token.id} 正在获取功法信息...`);
+          await tokenStore.sendLegacyGetInfo(token.id, {});
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // 发送 legacy_beginhangup 开始挂机
           await tokenStore.sendLegacyBeginHangup(token.id, {})
           
           message.success(`[${globalIndex + 1}] ${token.name || token.id} 开启功法挂机成功`)
