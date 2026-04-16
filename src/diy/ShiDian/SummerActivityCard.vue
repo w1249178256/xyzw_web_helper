@@ -1295,27 +1295,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             
             // 检查是否是 7900019 错误码（爬塔没有开启）
             if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
-              console.log(`BOSS ${bossNumber} - 爬塔没有开启 (7900019)，尝试执行 towers_start...`);
-              try {
-                // 执行 towers_start 开启爬塔
-                await logCommand(
-                  'shidian',
-                  `一键战斗 - 重新开启塔-${bossNumber}`,
-                  tokenId,
-                  tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-                  'towers_start',
-                  { towerType: bossNumber },
-                  tokenStore.sendTowersStart(tokenId, { towerType: bossNumber }),
-                  true,
-                  '暑期活动'
-                );
-                console.log(`BOSS ${bossNumber} - 爬塔已重新开启，继续执行战斗`);
-                await new Promise((resolve) => setTimeout(resolve, 500));
-                // 继续执行战斗，不 break
-                continue;
-              } catch (restartError) {
-                console.log(`BOSS ${bossNumber} - 重新开启爬塔失败:`, restartError);
-              }
+              console.log(`BOSS ${bossNumber} - 爬塔没有开启 (7900019)，需要重新执行 towers_start`);
+              // 爬塔未开启，跳出战斗循环，让外层逻辑重新执行 towers_start（会计入 startClickCount）
+              break;
             }
             
             // 其他错误，跳出战斗循环，进入下一个开始按钮循环
@@ -1574,6 +1556,8 @@ const batchUseItem = async () => {
                 '暑期活动'
               );
               console.log(`Token ${token.name} 领取免费成功`);
+              // 命令间延迟 500ms
+              await new Promise((resolve) => setTimeout(resolve, 500));
             } catch (buyError) {
               console.error(`Token ${token.name} 领取免费失败:`, buyError);
             }
@@ -1702,7 +1686,7 @@ const batchUseItem = async () => {
       },
       {
         batchSize: 20,
-        delayBetween: 300,
+        delayBetween: 500,
         onProgress: (progress) => {
           if (progress.type === 'batch-start') {
             message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`);
@@ -1850,10 +1834,10 @@ const batchActivity = async () => {
       },
       {
         batchSize: 20,
-        delayBetween: 300,
+        delayBetween: 500,
         onProgress: (progress) => {
           if (progress.type === 'batch-start') {
-            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`);
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`);
           } else if (progress.type === 'token-start') {
             const token = sortedTokensList.find(t => t.id === progress.tokenId);
             const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
@@ -2907,7 +2891,7 @@ const batchBattle = async () => {
       },
       {
         batchSize: 20,
-        delayBetween: 300,
+        delayBetween: 500,
         onProgress: (progress) => {
           if (progress.type === 'batch-start') {
             message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`);
@@ -3239,7 +3223,7 @@ const batchUseFuCoin = async () => {
       },
       {
         batchSize: 20,
-        delayBetween: 300,
+        delayBetween: 500,
         onProgress: (progress) => {
           if (progress.type === 'batch-start') {
             message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`);
