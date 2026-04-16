@@ -1260,6 +1260,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           }
           // 开始按钮点击失败，但继续执行
           console.log(`BOSS ${bossNumber} 开始按钮点击失败，但继续执行:`, startError);
+          // 错误后等待 500ms
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
         // 连续执行战斗按钮点击，直到提示错误
@@ -1297,11 +1299,15 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
               console.log(`BOSS ${bossNumber} - 爬塔没有开启 (7900019)，需要重新执行 towers_start`);
               // 爬塔未开启，跳出战斗循环，让外层逻辑重新执行 towers_start（会计入 startClickCount）
+              // 跳出前等待 500ms
+              await new Promise((resolve) => setTimeout(resolve, 500));
               break;
             }
             
             // 其他错误，跳出战斗循环，进入下一个开始按钮循环
             console.log(`BOSS ${bossNumber} - 战斗失败，跳转到执行开始按钮`);
+            // 战斗失败后等待 500ms
+            await new Promise((resolve) => setTimeout(resolve, 500));
             break;
           }
         }
@@ -1401,6 +1407,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         }
         // 开始按钮点击失败，但继续执行
         console.log("开始按钮点击失败，但继续执行");
+        // 错误后等待 500ms
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
       // 无论开始按钮是否成功，都连续点击战斗按钮最多10次
@@ -1456,11 +1464,15 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               continue;
             } catch (restartError) {
               console.log(`重新开启爬塔失败:`, restartError);
+              // 重新开启失败后等待 500ms
+              await new Promise((resolve) => setTimeout(resolve, 500));
             }
           }
           
           // 其他错误，跳出战斗循环，进入下一个开始按钮循环
           console.log(`战斗失败，跳转到执行开始按钮`);
+          // 战斗失败后等待 500ms
+          await new Promise((resolve) => setTimeout(resolve, 500));
           break;
         }
       }
