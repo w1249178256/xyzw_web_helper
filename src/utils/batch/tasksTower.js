@@ -127,7 +127,7 @@ export function createTasksTower(deps) {
               type: "info",
             });
 
-            await new Promise((r) => setTimeout(r, 1000));
+            await new Promise((r) => setTimeout(r, 2000));
 
             // Refresh energy
             // 默认每5次刷新一次，或体力不足时刷新
