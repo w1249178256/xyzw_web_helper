@@ -56,9 +56,9 @@ const my_routes = [
         }
       },
       {
-        path: 'resource-manager',
-        name: 'ResourceManager',
-        component: () => import('@/views/ResourceManager.vue'),
+        path: 'token-group',
+        name: 'TokenGroup',
+        component: () => import('@/views/TokenGroup.vue'),
         meta: {
           title: 'Token 分组',
           requiresToken: true

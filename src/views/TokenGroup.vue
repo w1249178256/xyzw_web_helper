@@ -405,6 +405,27 @@
                 </n-button>
                 <n-button
                   size="small"
+                  @click="batchLegionBoss"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键俱乐部BOSS
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchFreeGift"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键每日免费礼包
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchDailyBoss"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键每日咸王
+                </n-button>
+                <n-button
+                  size="small"
                   @click="batchclubsign"
                   :disabled="isRunning || selectedTokens.length === 0"
                 >
@@ -6050,6 +6071,136 @@ const stopBatch = () => {
     message: "正在停止...",
     type: "warning",
   });
+};
+
+// 获取今日咸王BOSS ID（根据星期几返回不同的BOSS ID）
+const getTodayBossId = () => {
+  const DAY_BOSS_MAP = [9904, 9905, 9901, 9902, 9903, 9904, 9905]; // 周日~周六
+  const dayOfWeek = new Date().getDay();
+  return DAY_BOSS_MAP[dayOfWeek];
+};
+
+// 一键俱乐部BOSS
+const batchLegionBoss = async () => {
+  const tokens = selectedTokens.value;
+  if (tokens.length === 0) {
+    message.warning("请先选择要执行的Token");
+    return;
+  }
+
+  message.info(`开始对 ${tokens.length} 个角色执行俱乐部BOSS操作...`);
+
+  for (const token of tokens) {
+    try {
+      // 切换到阵容1
+      try {
+        await tokenStore.sendPresetteamSaveTeam(
+          token.id,
+          { teamId: 1 },
+          5000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (switchError) {
+        const switchErrorMsg = switchError.message || switchError.toString();
+        if (!switchErrorMsg.includes('200020')) {
+          throw switchError;
+        }
+      }
+
+      // 执行俱乐部BOSS
+      await tokenStore.sendMessageWithPromise(
+        token.id,
+        'fight_startlegionboss',
+        {},
+        5000
+      );
+      await new Promise(resolve => setTimeout(resolve, 500));
+      message.success(`${token.name} 俱乐部BOSS成功`);
+    } catch (error) {
+      message.error(`${token.name} 俱乐部BOSS失败: ${error.message}`);
+    }
+  }
+
+  message.success(`俱乐部BOSS执行完成`);
+};
+
+// 一键每日免费礼包
+const batchFreeGift = async () => {
+  const tokens = selectedTokens.value;
+  if (tokens.length === 0) {
+    message.warning("请先选择要执行的Token");
+    return;
+  }
+
+  message.info(`开始对 ${tokens.length} 个角色执行每日免费礼包操作...`);
+
+  for (const token of tokens) {
+    try {
+      // 签到
+      try {
+        await tokenStore.sendMessageWithPromise(
+          token.id,
+          'system_signinreward',
+          {},
+          5000
+        );
+        message.info(`${token.name} 每日签到成功`);
+      } catch (signinError) {
+        message.warning(`${token.name} 签到跳过: ${signinError.message}`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 领取折扣奖励
+      try {
+        await tokenStore.sendMessageWithPromise(
+          token.id,
+          'discount_claimreward',
+          { discountId: 1 },
+          5000
+        );
+        message.info(`${token.name} 免费礼包领取成功`);
+      } catch (discountError) {
+        message.warning(`${token.name} 免费礼包领取失败: ${discountError.message}`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      message.error(`${token.name} 每日免费礼包执行异常: ${error.message}`);
+    }
+  }
+
+  message.success(`每日免费礼包执行完成`);
+};
+
+// 一键每日咸王
+const batchDailyBoss = async () => {
+  const tokens = selectedTokens.value;
+  if (tokens.length === 0) {
+    message.warning("请先选择要执行的Token");
+    return;
+  }
+
+  const todayBossId = getTodayBossId();
+  message.info(`开始对 ${tokens.length} 个角色执行每日咸王操作（今日BOSS ID: ${todayBossId}）...`);
+
+  for (const token of tokens) {
+    try {
+      // 挑战3次咸王
+      for (let i = 0; i < 3; i++) {
+        await tokenStore.sendMessageWithPromise(
+          token.id,
+          'fight_startboss',
+          { bossId: todayBossId },
+          12000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      message.success(`${token.name} 咸王挑战完成`);
+    } catch (error) {
+      message.error(`${token.name} 咸王挑战失败: ${error.message}`);
+    }
+  }
+
+  message.success(`每日咸王执行完成`);
 };
 </script>
 

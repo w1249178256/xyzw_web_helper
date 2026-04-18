@@ -177,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
 import { logOperation } from "@/utils/operationLogger";
@@ -188,6 +188,12 @@ import OperationLogCard from "@/diy/ShiDian/OperationLogCard.vue";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -308,8 +314,8 @@ const executeCommandWithLog = async (type, tokenId, tokenName, cmd, params, time
   const command = { cmd, params };
   try {
     addLog(type, tokenName, `执行命令: ${cmd}`, true, command);
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const response = await tokenStore.sendMessageWithPromise(tokenId, cmd, params, timeout);
     // 更新日志，添加响应结果
     addLog(type, tokenName, `执行命令: ${cmd} 成功`, true, command, response);
@@ -397,18 +403,18 @@ const extractRewardListFromBossTower = (bossTower) => {
 const updateTokenResourceData = async (tokenId) => {
   try {
     // 等待一下确保数据已更新
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
 
     // 获取最新的角色信息和十殿信息
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     await tokenStore.sendGetRoleInfo(tokenId)
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     await tokenStore.sendNightmareGetRoleInfo(tokenId, { roleId: tokenId })
 
     // 等待数据更新
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
 
     console.log(`Token ${tokenId} 资源数据已更新`)
   } catch (error) {
@@ -580,10 +586,10 @@ const getTeam = async () => {
 
     // 如果仍然没有，尝试获取角色信息
     if (!roleId || !roleName) {
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      // 执行命令前等待
+      await waitCommandDelay()
       await tokenStore.sendGetRoleInfo(helpedTokenId.value);
-      await new Promise(resolve => setTimeout(resolve, 500)); // 等待数据更新
+      await waitCommandDelay(); // 等待数据更新
       
       // 再次尝试获取
       if (helpedToken.gameData?.roleInfo?.role) {
@@ -612,8 +618,8 @@ const getTeam = async () => {
     }
 
     // 获取宝库信息
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const response = await tokenStore.sendBossTowerGetInfo(helpedTokenId.value);
 
     // 更新宝库层数和队伍序号
@@ -663,8 +669,7 @@ const searchTeam = async () => {
       const teamId = String(teamIndex.value);
       console.log("搜索队伍参数:", { teamId, teamIndex: teamIndex.value });
       
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       // 使用 tokenStore 的 sendBossTowerSearchTeam 方法
       const response = await tokenStore.sendBossTowerSearchTeam(
         helperTokenId.value,
@@ -718,8 +723,8 @@ const buyBoom = async () => {
     for (let i = 0; i < goodsIds.length; i++) {
       console.log(`购买第${i + 1}个商品（goodsId: ${goodsIds[i]}）...`);
       try {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400))
+        // 执行命令前等待
+        await waitCommandDelay()
         const response = await tokenStore.sendMessageWithPromise(
           helpedTokenId.value,
           "charge_createorder",
@@ -729,7 +734,7 @@ const buyBoom = async () => {
         successCount++;
         console.log(`第${i + 1}次购买成功:`, response);
         // 成功后的延迟时间稍长一些
-        await new Promise((r) => setTimeout(r, 1000));
+        await waitCommandDelay();
       } catch (singleError) {
         const errorMsg = singleError?.message || String(singleError);
         console.warn(`第${i + 1}次购买失败:`, singleError);
@@ -741,7 +746,7 @@ const buyBoom = async () => {
         
         // 单个失败不中断整个流程，继续执行
         // 失败后的延迟时间稍长一些，避免请求过快
-        await new Promise((r) => setTimeout(r, 1000));
+        await waitCommandDelay();
       }
     }
 
@@ -812,10 +817,10 @@ const createTeam = async () => {
       
       // 如果仍然没有，尝试获取角色信息
       if (!leaderId) {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400))
+        // 执行命令前等待
+        await waitCommandDelay()
         await tokenStore.sendGetRoleInfo(helpedTokenId.value);
-        await new Promise(resolve => setTimeout(resolve, 500)); // 等待数据更新
+        await waitCommandDelay(); // 等待数据更新
         
         // 再次尝试获取
         if (helpedToken.gameData?.roleInfo?.role?.roleId) {
@@ -858,7 +863,7 @@ const createTeam = async () => {
     console.log("检查当前队伍状态...");
     try {
       // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay();
       const teamInfo = await tokenStore.sendMessageWithPromise(
         helperTokenId.value,
         "matchteam_getroleteaminfo",
@@ -878,7 +883,7 @@ const createTeam = async () => {
 
     // 使用宝库创建队伍命令，传入被助Token的roleId和队伍序号
     // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await waitCommandDelay();
     const response = await tokenStore.sendMessageWithPromise(
       helperTokenId.value,
       "matchteam_create_baoku",
@@ -1064,11 +1069,11 @@ const claimRewardInternal = async (tokenIdParam, skipRunningCheck = false) => {
           );
           successCount++;
           console.log(`第${i + 1}次领取成功:`, response);
-          await new Promise((r) => setTimeout(r, 300)); // 每次间隔300ms
+          await waitCommandDelay(); // 每次间隔300ms
         } catch (singleError) {
           console.warn(`第${i + 1}次领取失败:`, singleError);
           // 单个失败不中断整个流程，继续执行
-          await new Promise((r) => setTimeout(r, 300));
+          await waitCommandDelay();
         }
       }
     } else {
@@ -1093,11 +1098,11 @@ const claimRewardInternal = async (tokenIdParam, skipRunningCheck = false) => {
           );
           successCount++;
           console.log(`第${i + 1}次领取成功:`, response);
-          await new Promise((r) => setTimeout(r, 300)); // 每次间隔300ms
+          await waitCommandDelay(); // 每次间隔300ms
         } catch (singleError) {
           console.warn(`第${i + 1}次领取失败:`, singleError);
           // 单个失败不中断整个流程，继续执行
-          await new Promise((r) => setTimeout(r, 300));
+          await waitCommandDelay();
         }
       }
     }
@@ -1158,12 +1163,12 @@ const setTeam = async () => {
     try {
       await tokenStore.sendPresetteamSaveTeam(helperTokenId.value, { teamId: 1 });
       // 等待一下确保切换完成
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await waitCommandDelay();
       console.log("切换阵容1成功");
     } catch (switchError) {
       console.warn("切换阵容1失败，继续执行后续操作:", switchError);
       // 切换失败时也等待一下，可能当前已经是阵容1
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await waitCommandDelay();
     }
 
     // 2. 获取当前阵容信息
@@ -1313,11 +1318,11 @@ const useKey = async () => {
         }
 
         // 等待一下再继续下一次尝试
-        await new Promise((r) => setTimeout(r, 500));
+        await waitCommandDelay();
       } catch (boxError) {
         console.warn(`第${attemptCount}次执行bosstower_startbox失败:`, boxError);
         // 失败后也等待一下再继续
-        await new Promise((r) => setTimeout(r, 500));
+        await waitCommandDelay();
       }
     }
 
@@ -1378,10 +1383,10 @@ const useKey = async () => {
         );
         claimSuccessCount++;
         console.log(`第${i + 1}次奖励领取成功:`, claimResponse);
-        await new Promise((r) => setTimeout(r, 300)); // 每次间隔300ms
+        await waitCommandDelay(); // 每次间隔300ms
       } catch (claimError) {
         console.warn(`第${i + 1}次奖励领取失败:`, claimError);
-        await new Promise((r) => setTimeout(r, 300));
+        await waitCommandDelay();
       }
     }
 
@@ -1469,11 +1474,11 @@ const useBoomInternal = async (tokenIdParam, skipRunningCheck = false) => {
           }
         }
         
-        await new Promise((r) => setTimeout(r, 500)); // 每次间隔500ms
+        await waitCommandDelay(); // 每次间隔500ms
       } catch (singleError) {
         console.warn(`第${i + 1}次使用boom失败:`, singleError);
         // 单个失败不中断整个流程，继续执行
-        await new Promise((r) => setTimeout(r, 500));
+        await waitCommandDelay();
       }
     }
 
@@ -1557,7 +1562,7 @@ const oneKey5Internal = async (helpedTokenIdParam) => {
   const originalHelpedTokenId = helpedTokenId.value;
   helpedTokenId.value = helpedTokenIdParam;
   await connectHelpedToken();
-  await new Promise((r) => setTimeout(r, 2000)); // 等待连接
+  await waitCommandDelay(); // 等待连接
   
   const connectionStatus = tokenStore.getWebSocketStatus(helpedTokenIdParam);
   if (connectionStatus !== 'connected') {
@@ -1568,7 +1573,7 @@ const oneKey5Internal = async (helpedTokenIdParam) => {
 
   // 2. 模拟点击获取队伍
   await getTeam();
-  await new Promise((r) => setTimeout(r, 500));
+  await waitCommandDelay();
 
   // 3. 获取宝库层数
   const bosstowerinfo = await tokenStore.sendMessageWithPromise(
@@ -1596,13 +1601,13 @@ const oneKey5Internal = async (helpedTokenIdParam) => {
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
     }
     addLog("一键5", tokenName, "第1层：Boss战斗2次完成");
 
     // 模拟点击使用钥匙按钮
     await useKey();
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
 
     // Boss战斗 2次
     for (let i = 0; i < 2; i++) {
@@ -1612,7 +1617,7 @@ const oneKey5Internal = async (helpedTokenIdParam) => {
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
     }
     addLog("一键5", tokenName, "使用钥匙后：Boss战斗2次完成");
   }
@@ -1670,13 +1675,13 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     helperTokenId.value = helperTokenIdParam;
     
     await connectHelperToken();
-    await new Promise((r) => setTimeout(r, 2000));
+    await waitCommandDelay();
     
     await searchTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     
     await createTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     
     helperTokenId.value = originalHelperTokenId;
   };
@@ -1688,10 +1693,10 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     helperTokenId.value = helperTokenIdParam;
     
     await connectHelperToken();
-    await new Promise((r) => setTimeout(r, 2000));
+    await waitCommandDelay();
     
     await setTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     
     helperTokenId.value = originalHelperTokenId;
   };
@@ -1706,11 +1711,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     const connectionStatus = tokenStore.getWebSocketStatus(helperTokenIdParam);
     if (connectionStatus !== 'connected') {
       await connectHelperToken();
-      await new Promise((r) => setTimeout(r, 2000));
+      await waitCommandDelay();
     }
     
     await setTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     
     helperTokenId.value = originalHelperTokenId;
   };
@@ -1719,7 +1724,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
   const originalHelpedTokenId = helpedTokenId.value;
   helpedTokenId.value = helpedTokenIdParam;
   await connectHelpedToken();
-  await new Promise((r) => setTimeout(r, 2000)); // 等待连接
+  await waitCommandDelay(); // 等待连接
   
   const connectionStatus = tokenStore.getWebSocketStatus(helpedTokenIdParam);
   if (connectionStatus !== 'connected') {
@@ -1730,7 +1735,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
 
   // 2. 模拟点击获取队伍
   await getTeam();
-  await new Promise((r) => setTimeout(r, 500));
+  await waitCommandDelay();
 
   // 3. 获取宝库层数
   const bosstowerinfo = await executeCommandWithLog(
@@ -1763,9 +1768,9 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     addLog("一键14", tokenName, `初始层数为6层，先执行第6层流程`);
     // 先执行第6层流程
     await connectHelpedToken();
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await getTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await executeCommandWithLog(
       "一键14",
       helpedTokenIdParam,
@@ -1774,11 +1779,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
       {},
       5000
     );
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await useBoomInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await claimRewardInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     addLog("一键14", tokenName, "第6层：使用boom和领取奖励完成");
     // 然后执行助威连接、搜索队伍、创造队伍
     await executeHelperSetup();
@@ -1788,9 +1793,9 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     addLog("一键14", tokenName, `初始层数为9层，先执行第9层流程`);
     // 先执行第9层流程
     await connectHelpedToken();
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await getTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await executeCommandWithLog(
       "一键14",
       helpedTokenIdParam,
@@ -1799,11 +1804,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
       {},
       5000
     );
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await useBoomInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await claimRewardInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     addLog("一键14", tokenName, "第9层：使用boom和领取奖励完成");
     // 然后执行助威连接、搜索队伍、创造队伍
     await executeHelperSetup();
@@ -1813,9 +1818,9 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     addLog("一键14", tokenName, `初始层数为12层，先执行第12层流程`);
     // 先执行第12层流程
     await connectHelpedToken();
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await getTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await executeCommandWithLog(
       "一键14",
       helpedTokenIdParam,
@@ -1824,11 +1829,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
       {},
       5000
     );
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     await useBoomInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await claimRewardInternal(helpedTokenIdParam, true);
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     addLog("一键14", tokenName, "第12层：使用boom和领取奖励完成");
     // 然后执行助威连接、搜索队伍、创造队伍
     await executeHelperSetup();
@@ -1862,7 +1867,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第1层：Boss战斗1次完成");
     } else if (currentTowerId === 2) {
       // 第2层流程
@@ -1874,17 +1879,17 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第2层：Boss战斗1次完成");
     } else if (currentTowerId === 3) {
       // 第3层流程：使用钥匙（3层）
       await useKey();
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第3层：使用钥匙完成");
       
       // 执行完使用钥匙后，模拟点击领取奖励
       await claimRewardInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第3层：领取奖励完成");
     } else if (currentTowerId === 4) {
       // 第4层流程：Boss战斗1次（4层）
@@ -1896,7 +1901,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第4层：Boss战斗1次完成");
     } else if (currentTowerId === 5) {
       // 第5层流程（已在前面执行了助威连接、搜索队伍、创造队伍）
@@ -1906,11 +1911,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     } else if (currentTowerId === 6) {
       // 第6层流程
       await connectHelpedToken();
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 先获取宝库信息，确保游戏状态正确
       await getTeam();
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "执行命令: bosstower_getinfo", true, { cmd: "bosstower_getinfo", params: {} });
       await tokenStore.sendMessageWithPromise(
         helpedTokenIdParam,
@@ -1918,15 +1923,15 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       
       // 模拟点击使用boom（6层）
       await useBoomInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 执行完使用boom后，模拟点击领取奖励
       await claimRewardInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第6层：领取奖励完成");
       
       // 执行流程后，执行助威连接、搜索队伍、创造队伍（只在第一次执行）
@@ -1950,11 +1955,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     } else if (currentTowerId === 9) {
       // 第9层流程
       await connectHelpedToken();
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 先获取宝库信息，确保游戏状态正确
       await getTeam();
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "执行命令: bosstower_getinfo", true, { cmd: "bosstower_getinfo", params: {} });
       await tokenStore.sendMessageWithPromise(
         helpedTokenIdParam,
@@ -1962,15 +1967,15 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       
       // 模拟点击使用boom（9层）
       await useBoomInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 执行完使用boom后，模拟点击领取奖励
       await claimRewardInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第9层：领取奖励完成");
       
       // 执行流程后，执行助威连接、搜索队伍、创造队伍（只在第一次执行）
@@ -1994,11 +1999,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     } else if (currentTowerId === 12) {
       // 第12层流程
       await connectHelpedToken();
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 先获取宝库信息，确保游戏状态正确
       await getTeam();
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "执行命令: bosstower_getinfo", true, { cmd: "bosstower_getinfo", params: {} });
       await tokenStore.sendMessageWithPromise(
         helpedTokenIdParam,
@@ -2006,15 +2011,15 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         {},
         5000
       );
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       
       // 模拟点击使用boom（12层）
       await useBoomInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 1000));
+      await waitCommandDelay();
       
       // 执行完使用boom后，模拟点击领取奖励
       await claimRewardInternal(helpedTokenIdParam, true);
-      await new Promise((r) => setTimeout(r, 500));
+      await waitCommandDelay();
       addLog("一键14", tokenName, "第12层：领取奖励完成");
       
       // 执行流程后，执行助威连接、搜索队伍、创造队伍（只在第一次执行）
@@ -2039,9 +2044,9 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
 
     // 执行完当前层后，重新获取宝库层数
     await connectHelpedToken();
-    await new Promise((r) => setTimeout(r, 1000));
+    await waitCommandDelay();
     await getTeam();
-    await new Promise((r) => setTimeout(r, 500));
+    await waitCommandDelay();
     
     let nextBosstowerinfo = await executeCommandWithLog(
       "一键14",
@@ -2084,7 +2089,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
         } else if (currentTowerId === 2) {
           addLog("一键14", tokenName, `执行命令: bosstower_startboss (重试第${retryCount}次)`, true, { cmd: "bosstower_startboss", params: {} });
           await tokenStore.sendMessageWithPromise(
@@ -2093,12 +2098,12 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
         } else if (currentTowerId === 3) {
           await useKey();
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           await claimRewardInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
         } else if (currentTowerId === 4) {
           addLog("一键14", tokenName, `执行命令: bosstower_startboss (重试第${retryCount}次)`, true, { cmd: "bosstower_startboss", params: {} });
           await tokenStore.sendMessageWithPromise(
@@ -2107,15 +2112,15 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
         } else if (currentTowerId === 5) {
           await executeHelperSetTeam();
         } else if (currentTowerId === 6) {
           await connectHelpedToken();
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           // 先获取宝库信息，确保游戏状态正确
           await getTeam();
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           await executeCommandWithLog(
             "一键14",
             helpedTokenIdParam,
@@ -2124,11 +2129,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           await useBoomInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           await claimRewardInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           // 只在第一次执行时执行助威连接、搜索队伍、创造队伍
           if (!hasExecutedHelperSetupFor6_9_12) {
             await executeHelperSetup();
@@ -2140,10 +2145,10 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
           await executeSetTeamOnly();
         } else if (currentTowerId === 9) {
           await connectHelpedToken();
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           // 先获取宝库信息，确保游戏状态正确
           await getTeam();
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           await executeCommandWithLog(
             "一键14",
             helpedTokenIdParam,
@@ -2152,11 +2157,11 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           await useBoomInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           await claimRewardInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           // 只在第一次执行时执行助威连接、搜索队伍、创造队伍
           if (!hasExecutedHelperSetupFor6_9_12) {
             await executeHelperSetup();
@@ -2168,10 +2173,10 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
           await executeSetTeamOnly();
         } else if (currentTowerId === 12) {
           await connectHelpedToken();
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           // 先获取宝库信息，确保游戏状态正确
           await getTeam();
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           await executeCommandWithLog(
             "一键14",
             helpedTokenIdParam,
@@ -2180,18 +2185,18 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
             {},
             5000
           );
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           
           // 模拟点击使用boom（12层）
           addLog("一键14", tokenName, `重试第${retryCount}次：开始使用boom（12层）`);
           await useBoomInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 1000));
+          await waitCommandDelay();
           addLog("一键14", tokenName, `重试第${retryCount}次：使用boom完成`);
           
           // 执行完使用boom后，模拟点击领取奖励
           addLog("一键14", tokenName, `重试第${retryCount}次：开始领取奖励`);
           await claimRewardInternal(helpedTokenIdParam, true);
-          await new Promise((r) => setTimeout(r, 500));
+          await waitCommandDelay();
           addLog("一键14", tokenName, `重试第${retryCount}次：领取奖励完成`);
           
           // 只在第一次执行时执行助威连接、搜索队伍、创造队伍
@@ -2207,9 +2212,9 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         
         // 重新获取宝库层数
         await connectHelpedToken();
-        await new Promise((r) => setTimeout(r, 1000));
+        await waitCommandDelay();
         await getTeam();
-        await new Promise((r) => setTimeout(r, 500));
+        await waitCommandDelay();
         
         nextBosstowerinfo = await executeCommandWithLog(
           "一键14",
@@ -2236,7 +2241,7 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
         
         // 如果还没达到最大重试次数，继续重试
         if (retryCount < maxRetries) {
-          await new Promise((r) => setTimeout(r, 1000)); // 重试前延迟
+          await waitCommandDelay(); // 重试前延迟
         }
       }
       
@@ -2254,14 +2259,14 @@ const oneKey14Internal = async (helpedTokenIdParam, helperTokenIdParam = null) =
     
     // 更新当前层数，继续下一层
     currentTowerId = nextTowerId;
-    await new Promise((r) => setTimeout(r, 1000)); // 层间延迟
+    await waitCommandDelay(); // 层间延迟
   }
 
   // 最后：模拟点击被助连接游戏，模拟点击获取队伍，获取最终宝库层数
   await connectHelpedToken();
-  await new Promise((r) => setTimeout(r, 1000));
+  await waitCommandDelay();
   await getTeam();
-  await new Promise((r) => setTimeout(r, 500));
+  await waitCommandDelay();
   
   const finalBosstowerinfo = await executeCommandWithLog(
     "一键14",

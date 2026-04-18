@@ -678,7 +678,7 @@ const getNightmareRoleInfo = async (token) => {
       console.log('十殿层数:', level, '转盘次数:', turntableCnt)
       
       // 等待一下让数据更新生效
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await waitCommandDelay()
     } else {
       message.warning('未获取到十殿信息')
     }
@@ -715,7 +715,7 @@ const claimNightmareRewardsForCard = async (token) => {
       tokenStore.selectToken(token.id)
       let count = 0
       while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
         count++
       }
       if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -1116,7 +1116,7 @@ const connectTokenByClick = async (token, maxRetries = 5) => {
         continue
       }
       
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       
       if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
         return true
@@ -1576,7 +1576,7 @@ const batchNightmare = async () => {
             dian2Token, 
             '加入房间'
           )
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await waitCommandDelay()
           
           // 检查准备状态
           const teamInfo = await executeCommandWithRetry(
@@ -1595,7 +1595,7 @@ const batchNightmare = async () => {
           message.success(`${dian2Token.name} 加入房间成功`)
         } catch (error) {
           message.warning(`${dian2Token.name} 加入房间失败，尝试再次加入...`)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await waitCommandDelay()
         }
       }
 
@@ -1640,7 +1640,7 @@ const batchNightmare = async () => {
                   token, 
                   '加入房间'
                 )
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await waitCommandDelay()
                 
                 // 检查准备状态
                 const teamInfo = await executeCommandWithRetry(
@@ -1663,7 +1663,7 @@ const batchNightmare = async () => {
                 break
               } catch (error) {
                 message.warning(`${token.name} 加入房间失败，尝试再次加入...`)
-                await new Promise(resolve => setTimeout(resolve, 500))
+                await waitCommandDelay()
               }
             }
             
@@ -2894,7 +2894,7 @@ const joinNightmareRoom = async (token, teamIdParam = null) => {
       tokenStore.selectToken(token.id)
       let count = 0
       while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await waitCommandDelay()
         count++
       }
       if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -2920,7 +2920,7 @@ const joinNightmareRoom = async (token, teamIdParam = null) => {
     }
     
     // 等待一下
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
 
     // 第二步：执行matchteam_join操作（加入房间）
     message.info(`正在加入房间，使用TeamID: ${teamIdToUse}...`)
@@ -2930,7 +2930,7 @@ const joinNightmareRoom = async (token, teamIdParam = null) => {
     message.success('成功加入房间')
     
     // 等待一下再执行准备操作
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
     
     // 第三步：执行matchteam_memberprepare操作（准备十殿）
     message.info('正在准备十殿...')
@@ -3268,7 +3268,7 @@ const exportResources = async () => {
           // 等待连接，最多10秒
           let retryCount = 0
           while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 10) {
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await waitCommandDelay()
             retryCount++
           }
           
@@ -3292,7 +3292,7 @@ const exportResources = async () => {
         }
 
         // 执行getroleinfo获取资源
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
         const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
         
         // 直接使用返回的roleInfo获取资源，不依赖token.gameData
@@ -3321,7 +3321,7 @@ const exportResources = async () => {
         let maxNightmareLevel = '-'  
         try {
           // 执行nightmare_getroleinfo获取killAward
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await waitCommandDelay()
           const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) || token.id })
           
           if (nightmareInfo && nightmareInfo.killAward) {
@@ -3405,7 +3405,7 @@ const exportResources = async () => {
 
       // 每个token之间间隔一下
       if (i < tokenIds.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
       }
     }
 
@@ -3648,7 +3648,7 @@ const executeDian1Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3677,8 +3677,8 @@ const executeDian1Fight = async () => {
   // 开始战斗（殿7）
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 }
 
 // 殿2战斗流程
@@ -3705,7 +3705,7 @@ const executeDian2Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3732,8 +3732,8 @@ const executeDian2Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 
   // 殿2出战
   // 查找殿2Token
@@ -3746,8 +3746,8 @@ const executeDian2Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3770,8 +3770,8 @@ const executeDian2Fight = async () => {
     await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
     await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
     
-    // 等待22秒
-    await new Promise(resolve => setTimeout(resolve, 22000))
+    // 等待战斗完成
+    await waitCommandDelay()
   }
 }
 
@@ -3799,7 +3799,7 @@ const executeDian3Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3826,8 +3826,8 @@ const executeDian3Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 }
 
 // 殿4战斗流程
@@ -3851,7 +3851,7 @@ const executeDian4Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3878,8 +3878,8 @@ const executeDian4Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 }
 
 // 殿5战斗流程
@@ -3907,7 +3907,7 @@ const executeDian5Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -3934,8 +3934,8 @@ const executeDian5Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -3958,8 +3958,8 @@ const executeDian5Fight = async () => {
     await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
     await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
     
-    // 等待22秒
-    await new Promise(resolve => setTimeout(resolve, 22000))
+    // 等待战斗完成
+    await waitCommandDelay()
 
     // 再次检查层数
     const updatedNightmareInfo2 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
@@ -3977,8 +3977,8 @@ const executeDian5Fight = async () => {
       await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian7Token.id) })
       await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
       
-      // 等待22秒
-      await new Promise(resolve => setTimeout(resolve, 22000))
+      // 等待战斗完成
+      await waitCommandDelay()
 
       // 再次检查层数
       const updatedNightmareInfo3 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
@@ -4022,7 +4022,7 @@ const executeDian6Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -4084,8 +4084,8 @@ const executeDian6Fight = async () => {
   await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian2Token.id) })
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian2Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -4108,8 +4108,8 @@ const executeDian6Fight = async () => {
     await tokenStore.sendNightmareSetFighter(token.id, { roomId, roleId: parseInt(dian5Token.id) })
     await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian5Token.id) })
     
-    // 等待22秒
-    await new Promise(resolve => setTimeout(resolve, 22000))
+    // 等待战斗完成
+    await waitCommandDelay()
 
     // 再次检查层数
     const updatedNightmareInfo2 = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
@@ -4146,7 +4146,7 @@ const executeDian7Fight = async () => {
     tokenStore.selectToken(token.id)
     let count = 0
     while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       count++
     }
     if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
@@ -4194,8 +4194,8 @@ const executeDian7Fight = async () => {
   // 开始战斗（殿7）
   await tokenStore.sendNightmareFight(token.id, { roomId, roleId: parseInt(dian7Token.id) })
   
-  // 等待22秒
-  await new Promise(resolve => setTimeout(resolve, 22000))
+  // 等待战斗完成
+  await waitCommandDelay()
 
   // 检查层数
   const roleInfo = await tokenStore.sendGetRoleInfo(token.id)

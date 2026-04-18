@@ -116,7 +116,7 @@
 <script setup>
 // @unocss-include
 // uno-css-ignore-file
-import { defineProps, ref, computed, watch } from 'vue'
+import { defineProps, ref, computed, watch, inject } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import { logOperation } from '@/utils/operationLogger'
@@ -129,6 +129,12 @@ import ConnectionPoolManager from '@/utils/connectionPoolManager'
 
 const tokenStore = useTokenStore()
 const message = useMessage()
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -392,8 +398,8 @@ const refreshTeamInfo = async () => {
     message.info('正在刷新阵容信息...')
     
     // 1. 使用fight_startlevel获取当前阵容
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     console.log('fight_startlevel 原始响应:', fightResult)
     
@@ -416,21 +422,21 @@ const refreshTeamInfo = async () => {
       status: 'info',
       message: `${tokenIndex}、${token.name || token.id}、执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
     })
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
     
     // 2. 使用presetteam_getinfo获取useTeamId
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const teamInfoRes = await tokenStore.sendPresetteamGetInfo(token.id, {})
     console.log('presetteam_getinfo 原始响应:', teamInfoRes)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
     
     // 3. 使用role_getroleinfo获取角色科技信息
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const roleInfoRes = await tokenStore.sendGetRoleInfo(token.id, {})
     console.log('role_getroleinfo 原始响应:', roleInfoRes)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
     
     const extractedTeamInfo = {}
     
@@ -583,8 +589,8 @@ const switchToTeam1 = async () => {
     message.info('正在切换到阵容1...')
     
     const saveTeamParams = { teamId: 1 }
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     await tokenStore.sendPresetteamSaveTeam(token.id, saveTeamParams)
     logOperation('shidian', '切换阵1', {
       cardType: '灯神信息',
@@ -668,8 +674,8 @@ const switchTeam = async () => {
     
     // 使用fight_startlevel获取最新阵容
     message.info('正在获取最新阵容...')
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // 执行命令前等待
+    await waitCommandDelay()
     const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
     
     let currentHeroes = teamInfo.value[1]
@@ -715,8 +721,8 @@ const switchTeam = async () => {
             heroId: currentHero.heroId,
             targetHeroId: targetHeroId
           }
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
+          // 执行命令前等待
+          await waitCommandDelay()
           await tokenStore.sendHeroExchange(token.id, exchangeParams)
           logOperation('shidian', '切换阵容', {
             cardType: '灯神信息',
@@ -728,9 +734,9 @@ const switchTeam = async () => {
           message.success(`位置${i+1}英雄更换成功: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
           
           // 每次更换后重新获取最新阵容
-          await new Promise(resolve => setTimeout(resolve, 300))
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
+          await waitCommandDelay()
+          // 执行命令前等待
+          await waitCommandDelay()
           const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
           if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
             const battleTeam = refreshResult.battleData.leftTeam.team
@@ -767,7 +773,7 @@ const switchTeam = async () => {
               }
             }
           }
-          await new Promise(resolve => setTimeout(resolve, 200))
+          await waitCommandDelay()
         } catch (error) {
           message.error(`位置${i+1}英雄更换失败: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
           console.error(`更换英雄失败: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`, error)
@@ -782,8 +788,8 @@ const switchTeam = async () => {
             heroId: targetHeroId,
             targetHeroId: targetHeroId
           }
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
+          // 执行命令前等待
+          await waitCommandDelay()
           await tokenStore.sendHeroExchange(token.id, exchangeParams)
           logOperation('shidian', '切换阵容', {
             cardType: '灯神信息',
@@ -795,9 +801,9 @@ const switchTeam = async () => {
           message.success(`位置${i+1}英雄添加成功: ${getHeroName(targetHeroId)}`)
           
           // 每次更换后重新获取最新阵容
-          await new Promise(resolve => setTimeout(resolve, 300))
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
+          await waitCommandDelay()
+          // 执行命令前等待
+          await waitCommandDelay()
           const refreshResult = await tokenStore.sendFightStartLevel(token.id, {})
           if (refreshResult && refreshResult.battleData && refreshResult.battleData.leftTeam && refreshResult.battleData.leftTeam.team) {
             const battleTeam = refreshResult.battleData.leftTeam.team
@@ -834,7 +840,7 @@ const switchTeam = async () => {
               }
             }
           }
-          await new Promise(resolve => setTimeout(resolve, 200))
+          await waitCommandDelay()
         } catch (error) {
           message.error(`位置${i+1}英雄添加失败: ${getHeroName(targetHeroId)}`)
           console.error(`添加英雄失败: ${getHeroName(targetHeroId)}`, error)
@@ -978,8 +984,8 @@ const changeTech = async () => {
             message: `执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)}`
           })
           
-          // 每次执行间隔：500ms
-          await new Promise(resolve => setTimeout(resolve, 500))
+          // 每次执行间隔
+          await waitCommandDelay()
         } catch (error) {
           console.error(`军团重置研究失败: type=${type}, advanced=false`, error)
           message.warning(`军团重置研究失败: type=${type}, advanced=false`)
@@ -1105,8 +1111,8 @@ const changeTech = async () => {
               
               message.success(`${tech.name}升级成功 (${i+1}/${tech.count})`)
               
-              // 每次执行间隔：500ms
-              await new Promise(resolve => setTimeout(resolve, 500))
+              // 每次执行间隔
+              await waitCommandDelay()
             } catch (error) {
               console.error(`${tech.name}升级失败: researchId=${tech.researchId}, isMax=false`, error)
               message.warning(`${tech.name}升级失败`)
@@ -1195,8 +1201,8 @@ const changeTech = async () => {
                 message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)}`
               })
               
-              // 每次执行间隔：500ms
-              await new Promise(resolve => setTimeout(resolve, 500))
+              // 每次执行间隔
+              await waitCommandDelay()
             } catch (error) {
               console.error(`研究失败: researchId=${researchId}, isMax=true`, error)
               message.warning(`研究失败: researchId=${researchId}, isMax=true`)
@@ -1497,8 +1503,8 @@ const lampGodAction = async () => {
             message: `执行命令: fight_startgenie, 第 ${i + 1} 次, 参数: ${JSON.stringify(fightParams)}`
           })
           message.success(`${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
-          // 每次战斗间隔：500ms
-          await new Promise(resolve => setTimeout(resolve, 500))
+          // 每次战斗间隔
+          await waitCommandDelay()
         } catch (error) {
           console.error(`${type.name} 灯神战斗第 ${i + 1} 次失败:`, error)
           const errorMessage = error.message || ''
@@ -1619,8 +1625,8 @@ const sweepAction = async () => {
           message: `执行命令: genie_sweep, 参数: ${JSON.stringify(sweepParams)}, 剩余魔毯: ${remainingCarpetCount}`
         })
         
-        // 每次扫荡间隔：500ms
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // 每次扫荡间隔
+        await waitCommandDelay()
       } catch (error) {
         console.error('扫荡执行失败:', error)
         message.error(`扫荡执行失败: ${error.message || '未知错误'}`)
@@ -1766,8 +1772,8 @@ const lampGodFight = async () => {
             lordWeaponId: selectedWeaponId.value
           })
           message.success(`${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
-          // 每次战斗间隔：500ms
-          await new Promise(resolve => setTimeout(resolve, 500))
+          // 每次战斗间隔
+          await waitCommandDelay()
         } catch (error) {
           console.error(`${type.name} 灯神战斗第 ${i + 1} 次失败:`, error)
           message.warning(`${type.name} 灯神战斗第 ${i + 1} 次失败: ${error.message || error}`)

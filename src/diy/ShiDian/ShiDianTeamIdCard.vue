@@ -372,7 +372,7 @@ const executeNightmare8 = async () => {
     // 连接游戏并检查枕头数量
     connectingTokens.value.add(dian87Token.id)
     await tokenStore.selectToken(dian87Token.id)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await waitCommandDelay()
     
     // 模拟点击十殿枕头按钮获取枕头数量
     try {
@@ -428,7 +428,7 @@ const executeNightmare8 = async () => {
         message.info(`处理 ${dian8Token.name} (${i + 1}/${dian8Tokens.length})...`)
         
         await tokenStore.selectToken(dian8Token.id)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
         
         // 模拟点击十殿枕头按钮获取枕头数量
         const roleInfo = await tokenStore.sendGetRoleInfo(dian8Token.id)
@@ -462,7 +462,7 @@ const executeNightmare8 = async () => {
       }
 
       if (i < dian8Tokens.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await waitCommandDelay()
       }
     }
     

@@ -45,7 +45,7 @@
             <span>一键金鱼</span>
           </router-link>
           <router-link
-            to="/admin/resource-manager"
+            to="/admin/token-group"
             class="nav-item"
             active-class="active"
           >
@@ -167,7 +167,7 @@
           <span>一键金鱼</span>
         </router-link>
         <router-link
-          to="/admin/resource-manager"
+          to="/admin/token-group"
           class="drawer-item"
           @click="isMobileMenuOpen = false"
         >
