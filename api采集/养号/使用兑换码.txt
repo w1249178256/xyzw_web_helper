@@ -1,0 +1,240 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/4/17 22:23:57
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 3
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/4/17 22:23:49
+服务: SystemService
+方法: claimCdkReward
+参数: [{"key":"happy666","platformType":"h5"}]
+结果:
+{
+  "_raw": {
+    "seq": 21,
+    "ack": 0,
+    "time": 1776435829997,
+    "resp": 21,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 388,
+        "buyDiamond": 388,
+        "items": {
+          "1003": {
+            "itemId": 1003,
+            "quantity": 588,
+            "ext": null
+          },
+          "1006": {
+            "itemId": 1006,
+            "quantity": 588,
+            "ext": null
+          },
+          "3001": {
+            "quantity": 26
+          }
+        },
+        "statistics": {
+          "cdk:happy666_0": 1776435829
+        }
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 2,
+          "value": 388,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 588,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 588,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3001,
+          "value": 5,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1776435829586_m3pihbflp
+
+记录 #2:
+----------------------------------------
+时间: 2026/4/17 22:23:29
+服务: MailService
+方法: getList
+参数: [{"lastId":0,"size":60,"category":[0,4,5]}]
+结果:
+{
+  "_raw": {
+    "seq": 20,
+    "ack": 0,
+    "time": 1776435810036,
+    "resp": 20,
+    "cmd": "mail_getlistresp",
+    "body": {
+      "list": [
+        {
+          "id": 21998687556,
+          "roleId": 721083389,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30043\"}",
+          "content": "{\"id\":\"30044\",\"params\":[\"叁伍肆零\"]}",
+          "createdAt": "2026-03-29T14:11:33.694Z",
+          "expireAt": "2026-05-17T09:35:37.524Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3001",
+              "num": 20,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "3008",
+              "num": 20,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "3009",
+              "num": 20,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 20,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "3012",
+              "num": 20,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 50,
+              "ext": "黄金联赛盐山全服奖励"
+            },
+            {
+              "type": "3",
+              "id": "5095",
+              "num": 1,
+              "ext": "黄金联赛盐山全服奖励"
+            }
+          ],
+          "extType": "yanShanReward",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21998687555,
+          "roleId": 721083389,
+          "type": 1,
+          "category": 5,
+          "fromId": 0,
+          "from": "《咸鱼之王》运营团队",
+          "title": "{\"id\":\"100001190\"}",
+          "content": "{\"id\":\"100001191\"}",
+          "createdAt": "2026-04-16T12:00:00.007Z",
+          "expireAt": "2026-05-17T09:35:37.524Z",
+          "state": 1,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21998687102,
+          "roleId": 721083389,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10050\"}",
+          "content": "{\"id\":\"10051\"}",
+          "createdAt": "2026-04-17T09:35:33.655Z",
+          "expireAt": "2026-05-17T09:35:33.655Z",
+          "state": 2,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1776435809627_09r968fi9
+
+记录 #3:
+----------------------------------------
+时间: 2026/4/17 22:23:22
+服务: RoleService
+方法: backClaimReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 19,
+    "ack": 18,
+    "time": 1776435802514,
+    "resp": 19,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "medallion": null
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1776435802105_3uwxi3lhz
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

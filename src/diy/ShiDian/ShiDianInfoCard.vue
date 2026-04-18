@@ -207,7 +207,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, defineExpose, ref, computed, toRaw, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { defineProps, defineEmits, defineExpose, ref, computed, toRaw, nextTick, onMounted, onBeforeUnmount, inject } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useNightmareExecutionStore } from '@/stores/nightmareExecutionStore'
@@ -223,6 +223,12 @@ const tokenStore = useTokenStore()
 const message = useMessage()
 const logStore = useOperationLogStore()
 const executionStore = useNightmareExecutionStore()
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 const emit = defineEmits(['reset-dian-labels'])
 
@@ -258,6 +264,23 @@ onMounted(() => {
   if (savedTeamId) {
     displayTeamId.value = parseInt(savedTeamId)
   }
+  
+  // 如果 shidian_teamId 为空，尝试从 shidian_teamIds 加载十殿一的 TeamID
+  if (!displayTeamId.value) {
+    try {
+      const savedTeamIds = localStorage.getItem('shidian_teamIds')
+      if (savedTeamIds) {
+        const settings = JSON.parse(savedTeamIds)
+        if (settings.teamIds && Array.isArray(settings.teamIds) && settings.teamIds[0]) {
+          displayTeamId.value = parseInt(settings.teamIds[0])
+          console.log(`从 shidian_teamIds 加载十殿一 TeamID: ${displayTeamId.value}`)
+        }
+      }
+    } catch (error) {
+      console.error('加载 shidian_teamIds 失败:', error)
+    }
+  }
+  
   const savedRoomId = localStorage.getItem('shidian_roomId')
   if (savedRoomId) {
     displayRoomId.value = parseInt(savedRoomId)
@@ -596,8 +619,7 @@ const getNightmareRoleInfo = async (token) => {
     // 先获取roleId
     let roleId = null
     try {
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
       if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
         roleId = roleInfo.role.roleId
@@ -612,9 +634,7 @@ const getNightmareRoleInfo = async (token) => {
       roleId = token.id
     }
 
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
-    // 使用获取到的roleId执行nightmare_getroleinfo操作
+    await waitCommandDelay()
     const result = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) })
     
     if (result) {
@@ -710,8 +730,7 @@ const claimNightmareRewardsForCard = async (token) => {
     let roleId = null
     try {
       message.info(`正在为 ${token.name || token.id} 获取角色信息...`)
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
       if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
         roleId = roleInfo.role.roleId
@@ -729,8 +748,7 @@ const claimNightmareRewardsForCard = async (token) => {
     if (roleId) {
       try {
         message.info(`正在为 ${token.name || token.id} 执行转盘奖励次数领取...`)
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400))
+        await waitCommandDelay()
         await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
         message.success(`${token.name || token.id} 转盘奖励次数领取成功（前置执行）`)
       } catch (error) {
@@ -743,8 +761,7 @@ const claimNightmareRewardsForCard = async (token) => {
     if (roleId) {
       try {
         message.info(`正在为 ${token.name || token.id} 获取十殿角色信息...`)
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400))
+        await waitCommandDelay()
         const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
         if (nightmareInfo) {
           message.success(`${token.name || token.id} 十殿角色信息获取成功`)
@@ -759,20 +776,17 @@ const claimNightmareRewardsForCard = async (token) => {
     // 领取十殿图鉴奖励
     try {
       message.info(`正在为 ${token.name || token.id} 领取十殿图鉴奖励...`)
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       await tokenStore.sendNightmareClaimBook(token.id)
       message.success(`${token.name || token.id} 十殿图鉴奖励领取成功`)
     } catch (error) {
       message.warning(`${token.name || token.id} 十殿图鉴奖励领取失败，继续执行后续操作`)
       console.error('十殿图鉴奖励领取失败:', error)
     }
-    await new Promise(resolve => setTimeout(resolve, 500))
     // 领取十殿周奖励
     try {
       message.info(`正在为 ${token.name || token.id} 领取十殿周奖励...`)
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       await tokenStore.sendNightmareClaimWeekReward(token.id)
       message.success(`${token.name || token.id} 十殿周奖励领取成功`)
     } catch (error) {
@@ -786,8 +800,7 @@ const claimNightmareRewardsForCard = async (token) => {
         message.info(`正在为 ${token.name || token.id} 执行转盘操作...`)
         
         // 先获取初始十殿信息，包含bookScore
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 400))
+        await waitCommandDelay()
         const initialNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
         
         if (!initialNightmareInfo) {
@@ -811,8 +824,7 @@ const claimNightmareRewardsForCard = async (token) => {
         
         while (iteration < maxIterations) {
           // 获取十殿信息以检查转盘次数
-          // 执行命令前等待400ms
-          await new Promise(resolve => setTimeout(resolve, 400))
+          await waitCommandDelay()
           const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
           
           if (!nightmareInfo) {
@@ -821,7 +833,6 @@ const claimNightmareRewardsForCard = async (token) => {
           }
           
           // 获取 turntableLeftCnt
-          // 从 nightmareInfo 中提取数据，可能需要根据实际返回结构调整
           const turntableLeftCnt = nightmareInfo.turntableLeftCnt || 
                                    nightmareInfo.weekAward?.turntableLeftCnt || 
                                    (nightmareInfo.weekAward && typeof nightmareInfo.weekAward === 'object' 
@@ -838,12 +849,9 @@ const claimNightmareRewardsForCard = async (token) => {
           if (bookScore > 0 && bookScore % 5 === 0) {
             try {
               message.info(`${token.name || token.id} bookScore为${bookScore}，是5的倍数，执行转盘奖励次数领取...`)
-              // 执行1次 nightmare_claimturnrewardtimes
-              // 执行命令前等待400ms
-              await new Promise(resolve => setTimeout(resolve, 400))
+              await waitCommandDelay()
               await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
               message.success(`${token.name || token.id} 转盘奖励次数领取成功（执行1次）`)
-              // 执行转盘奖励次数领取后，转盘次数+1
               message.info(`${token.name || token.id} 转盘次数+1`)
             } catch (error) {
               message.warning(`${token.name || token.id} 转盘奖励次数领取失败`)
@@ -855,8 +863,7 @@ const claimNightmareRewardsForCard = async (token) => {
           if (bookScore === 50) {
             try {
               message.info(`${token.name || token.id} bookScore为${bookScore}，执行十殿图鉴奖励领取...`)
-              // 执行命令前等待400ms
-              await new Promise(resolve => setTimeout(resolve, 400))
+              await waitCommandDelay()
               await tokenStore.sendNightmareClaimBook(token.id)
               message.success(`${token.name || token.id} 十殿图鉴奖励领取成功`)
             } catch (error) {
@@ -867,8 +874,7 @@ const claimNightmareRewardsForCard = async (token) => {
           
           // 执行转盘
           try {
-            // 执行命令前等待400ms
-            await new Promise(resolve => setTimeout(resolve, 400))
+            await waitCommandDelay()
             await tokenStore.sendNightmareClickTurntable(token.id, {})
             message.info(`${token.name || token.id} 转盘执行成功，剩余次数: ${turntableLeftCnt - 1}`)
             
@@ -881,7 +887,7 @@ const claimNightmareRewardsForCard = async (token) => {
           }
           
           // 等待一下再检查
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await waitCommandDelay()
           
           iteration++
         }
@@ -2491,13 +2497,10 @@ const switchToTeam1 = async (token) => {
       return
     }
 
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await waitCommandDelay()
     await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
     
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
-    // 获取队伍信息
+    await waitCommandDelay()
     const teamInfo = await tokenStore.sendMatchteamGetRoleTeamInfo(token.id, {})
     if (teamInfo) {
       displayTeamId.value = teamInfo.teamId || 0

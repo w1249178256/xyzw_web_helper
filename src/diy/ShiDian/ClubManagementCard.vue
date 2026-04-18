@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, computed, onBeforeUnmount } from 'vue'
+import { defineProps, defineEmits, ref, computed, onBeforeUnmount, inject } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import { logOperation } from '@/utils/operationLogger'
@@ -125,6 +125,12 @@ import { People } from '@vicons/ionicons5'
 
 const tokenStore = useTokenStore()
 const message = useMessage()
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 const legionTokens = ref('')
 const exportClubInfoTokens = ref('')
@@ -306,7 +312,7 @@ const handleAutoAcceptGift = async () => {
     
     while (status !== 'connected' && retryCount < maxRetries) {
       tokenStore.selectToken(token.id, true)
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
       status = tokenStore.getWebSocketStatus(token.id)
       retryCount++
       
@@ -613,8 +619,8 @@ const handleLegacyHangup = async () => {
         // 模拟点击token昵称（选择并连接token）
         tokenStore.selectToken(token.id, true)
         
-        // 等待1秒
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // 等待执行间隔
+        await waitCommandDelay()
         
         // 检查连接状态
         status = tokenStore.getWebSocketStatus(token.id)
@@ -638,8 +644,8 @@ const handleLegacyHangup = async () => {
     message.info('正在领取功法挂机奖励...')
     
     try {
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      // 执行命令前等待执行间隔
+      await waitCommandDelay()
       const res = await tokenStore.sendMessageWithPromise(
         token.id,
         'legacy_claimhangup',
@@ -984,7 +990,7 @@ const handleLegacyCollect = async () => {
       
       while (status !== 'connected' && retryCount < maxRetries) {
         tokenStore.selectToken(token.id, true)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
         status = tokenStore.getWebSocketStatus(token.id)
         retryCount++
         
@@ -1003,8 +1009,7 @@ const handleLegacyCollect = async () => {
     
     // 1. 使用 role_getroleinfo 获取 items:37007 数量
     message.info('正在获取功法残卷数量...')
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await waitCommandDelay()
     const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
     const legacyFragmentCount = roleInfo?.role?.items?.[37007]?.quantity || 0
     
@@ -1019,15 +1024,14 @@ const handleLegacyCollect = async () => {
     // 2. 使用 role_commitpassword 命令
     message.info('正在提交密码...')
     try {
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       await tokenStore.sendRoleCommitPassword(token.id, {
         password: legacyPassword.value ? parseInt(legacyPassword.value) : 946215
       })
       message.success('密码提交成功')
       
       // 提交密码后需要等待一段时间使其生效
-      await new Promise(resolve => setTimeout(resolve, 300))
+      await waitCommandDelay()
     } catch (error) {
       console.error('提交密码失败:', error)
       message.warning('提交密码失败，但继续执行')
@@ -1036,8 +1040,7 @@ const handleLegacyCollect = async () => {
     // 3. 使用 legacy_sendgift 命令，itemCnt 设为获取的 items:37007 数量
     message.info(`正在赠送功法残卷，数量: ${legacyFragmentCount}...`)
     try {
-      // 执行命令前等待400ms
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitCommandDelay()
       const giftRes = await tokenStore.sendLegacySendGift(token.id, {
         itemCnt: legacyFragmentCount,
         targetId: legacyTargetId.value ? parseInt(legacyTargetId.value) : 111582820
@@ -1288,7 +1291,7 @@ const handleBatchLegacyClaimGift = async () => {
           status: 'success',
           message: '收集功法成功'
         })
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await waitCommandDelay()
 
         let legacyFragmentCount = 0
         try {
@@ -1321,7 +1324,7 @@ const handleBatchLegacyClaimGift = async () => {
             console.info(`[${globalIndex + 1}] ${token.name || token.id} 提交密码成功`)
             
             // 提交密码后需要等待一段时间使其生效
-            await new Promise(resolve => setTimeout(resolve, 300))
+            await waitCommandDelay()
           } catch (error) {
             console.error(`[${globalIndex + 1}] ${token.name || token.id} 提交密码失败:`, error)
             console.info(`[${globalIndex + 1}] ${token.name || token.id} 提交密码失败，但继续执行`)
@@ -1420,7 +1423,7 @@ const handleBatchLegacyClaimGift = async () => {
                 status: 'success',
                 message: `通行证Token 第${j + 1}次接受礼物成功`
               })
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await waitCommandDelay()
             } catch (error) {
               console.error(`通行证Token ${token.name || token.id} 第${j + 1}次接受礼物失败:`, error)
               message.error(`通行证Token ${token.name || token.id} 第${j + 1}次接受礼物失败: ${error.message || error}`)
@@ -1497,7 +1500,7 @@ const handleAcceptGift = async () => {
 
       let count = 0
       while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await waitCommandDelay()
         count++
       }
 
@@ -1509,8 +1512,7 @@ const handleAcceptGift = async () => {
     }
 
     // 执行legacy_claimgift
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await waitCommandDelay()
     await tokenStore.sendLegacyClaimGift(token.id, {})
     message.success('接受礼物成功')
     logOperation('shidian', '接受礼物', {
@@ -1653,7 +1655,7 @@ const handleExportLegacyDetails = async () => {
 
       let count = 0
       while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await waitCommandDelay()
         count++
       }
 
@@ -1886,7 +1888,7 @@ const handleExportClubInfo = async () => {
 
         while (status !== 'connected' && retryCount < maxRetries) {
           tokenStore.selectToken(token.id, true)
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await waitCommandDelay()
           status = tokenStore.getWebSocketStatus(token.id)
           retryCount++
 
@@ -1950,7 +1952,7 @@ const handleExportClubInfo = async () => {
           })
         }
 
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await waitCommandDelay()
       } catch (error) {
         console.error(`[${tokenIndex}] ${token.name || token.id} 处理失败:`, error)
         clubInfoList.push({
@@ -2055,7 +2057,7 @@ const handleBookUpgrade = async () => {
         } catch (err) {
           break
         }
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
       }
     }
     
@@ -2073,7 +2075,7 @@ const handleBookUpgrade = async () => {
       } catch (err) {
         break
       }
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await waitCommandDelay()
     }
     
     message.success('图鉴升星和领取奖励完成')
@@ -2137,7 +2139,7 @@ const handleBatchBookUpgrade = async () => {
               } catch (err) {
                 break
               }
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await waitCommandDelay()
             }
           }
           
@@ -2154,7 +2156,7 @@ const handleBatchBookUpgrade = async () => {
             } catch (err) {
               break
             }
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await waitCommandDelay()
           }
           
           message.success(`[${globalIndex + 1}] ${token.name || token.id} 图鉴完成`)
@@ -2232,8 +2234,7 @@ const handleRefreshLegacyInfo = async () => {
     isRefreshLegacyInfoRunning.value = true
     message.info('正在刷新图鉴信息...')
     
-    // 执行命令前等待400ms
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await waitCommandDelay()
     const legacyInfo = await tokenStore.sendLegacyGetInfo(token.id, {})
     
     if (!legacyInfo) {
@@ -2398,7 +2399,7 @@ const handleLegacyBook = async () => {
         }
         
         // 添加延迟避免请求过快
-        await new Promise(resolve => setTimeout(resolve, 400))
+        await waitCommandDelay()
       }
     }
     
@@ -2564,7 +2565,7 @@ const handleBatchLegacyBook = async () => {
                 console.error(`[${globalIndex + 1}] 激活图鉴 ${legacyId} 失败:`, err)
               }
               
-              await new Promise(resolve => setTimeout(resolve, 400))
+              await waitCommandDelay()
             }
           }
           
@@ -2696,7 +2697,7 @@ const handleBatchRecruitWeek = async () => {
               
               message.success(`[${globalIndex + 1}] ${token.name || token.id} 使用${recruitNumber}个招募令进行招募`)
               
-              await new Promise(resolve => setTimeout(resolve, 300))
+              await waitCommandDelay()
               
               if (totalRecruits > 0 && totalRecruits % 100 === 0) {
                 try {
@@ -2704,7 +2705,7 @@ const handleBatchRecruitWeek = async () => {
                   mailClaimCount++
                   message.success(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件附件成功`)
                   
-                  await new Promise(resolve => setTimeout(resolve, 300))
+                  await waitCommandDelay()
                 } catch (mailError) {
                   console.error(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件失败:`, mailError)
                 }
@@ -2856,13 +2857,13 @@ const handleBatchLegacyBeginHangup = async () => {
         try {
           message.info(`[${globalIndex + 1}/${tokens.length}] ${token.name || token.id} 正在开启功法挂机...`)
           
-          // 等待 1 秒后执行
-          await new Promise(resolve => setTimeout(resolve, 1000))
+          // 等待执行间隔后执行
+          await waitCommandDelay()
           
           // 先发送 legacy_getinfo 获取功法信息
           console.log(`[${globalIndex + 1}] ${token.name || token.id} 正在获取功法信息...`);
           await tokenStore.sendLegacyGetInfo(token.id, {});
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await waitCommandDelay();
           
           // 发送 legacy_beginhangup 开始挂机
           await tokenStore.sendLegacyBeginHangup(token.id, {})

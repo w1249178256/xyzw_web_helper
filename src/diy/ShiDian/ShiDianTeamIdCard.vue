@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, toRaw } from 'vue'
+import { ref, computed, onMounted, toRaw, inject } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import { People } from '@vicons/ionicons5'
@@ -87,10 +87,16 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update-pillow-count'])
+const emit = defineEmits(['update-pillow-count', 'join-token', 'auto-join-shidian'])
 
 const tokenStore = useTokenStore()
 const message = useMessage()
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 // 辅助函数：获取 token 的序号（基于名称排序后的顺序）
 const getTokenIndex = (token) => {
@@ -135,9 +141,10 @@ const handleTeamIdChange = async (index, value) => {
 const saveDropdownSettings = async () => {
   try {
     const settings = {
-      teamIds: teamIds.value
+      teamIds: [...teamIds.value]
     }
     localStorage.setItem('shidian_teamIds', JSON.stringify(settings))
+    console.log('TeamID 已保存到 localStorage:', settings.teamIds)
   } catch (error) {
     console.error('保存设置失败:', error)
   }
@@ -159,15 +166,15 @@ const loadDropdownSettings = async () => {
 }
 
 // 清空单个 TeamID
-const clearSingleTeamId = (index) => {
+const clearSingleTeamId = async (index) => {
   teamIds.value[index] = ''
-  saveDropdownSettings()
+  await saveDropdownSettings()
 }
 
 // 清空所有 TeamID
-const clearAllTeamIds = () => {
+const clearAllTeamIds = async () => {
   teamIds.value = ['', '', '', '', '']
-  saveDropdownSettings()
+  await saveDropdownSettings()
   message.success('已清空所有 TeamID')
 }
 
@@ -180,15 +187,21 @@ const clearAllNightmareLabels = async () => {
     let resetCount = 0
     
     for (const token of allTokens) {
+      // 跳过昵称开头为 02 和 05 的 token
+      const name = token.name || ''
+      if (name.startsWith('02') || name.startsWith('05')) {
+        continue
+      }
+      
       if (token.remark) {
         const remark = token.remark.trim()
         if (dianLabels.some(label => remark.includes(label))) {
           const newRemark = remark
-            .replace(/殿 [一二三四五]/g, '')
+            .replace(/殿[一二三四五]/g, '')
             .replace(/\s+/g, ' ')
             .trim()
           
-          await tokenStore.updateTokenRemark(token.id, newRemark)
+          await tokenStore.updateToken(token.id, { remark: newRemark })
           resetCount++
         }
       }
@@ -226,6 +239,9 @@ const addMembersToTeams = async () => {
     const gameTokens = toRaw(tokenStore.gameTokens)
     const dianLabels = ['一', '二', '三', '四', '五']
     
+    // 记录已分配的 token ID，避免重复分配
+    const assignedTokenIds = new Set()
+    
     // 为每个十殿队伍添加成员
     for (let teamIdx = 0; teamIdx < 5; teamIdx++) {
       const currentTeamId = teamIds.value[teamIdx]
@@ -233,35 +249,38 @@ const addMembersToTeams = async () => {
       
       message.info(`正在处理十殿${dianLabels[teamIdx]}...`)
       
-      // 查找名称前缀为 2 和 5 的 token（排除已加入的）
+      // 查找名称前缀为 02 和 05 的 token（排除已加入任何殿的）
       const prefix2Token = gameTokens.find(t => {
         const name = t.name || ''
-        return name.startsWith('2') && t.remark && !t.remark.includes(`殿${dianLabels[teamIdx]}`)
+        // 排除已分配的 token，以及 remark 中包含任何殿标签的 token
+        if (assignedTokenIds.has(t.id)) return false
+        if (t.remark && /殿[一二三四五]/.test(t.remark)) return false
+        return name.startsWith('02')
       })
       
       const prefix5Token = gameTokens.find(t => {
         const name = t.name || ''
-        return name.startsWith('5') && t.remark && !t.remark.includes(`殿${dianLabels[teamIdx]}`)
+        // 排除已分配的 token，以及 remark 中包含任何殿标签的 token
+        if (assignedTokenIds.has(t.id)) return false
+        if (t.remark && /殿[一二三四五]/.test(t.remark)) return false
+        return name.startsWith('05')
       })
       
       const tokensToAdd = [prefix2Token, prefix5Token].filter(Boolean)
       
       if (tokensToAdd.length === 0) {
-        message.warning(`十殿${dianLabels[teamIdx]}：未找到合适的 token（前缀 2 和 5）`)
+        message.warning(`十殿${dianLabels[teamIdx]}：未找到合适的 token（前缀 02 和 05）`)
         continue
       }
       
       for (const token of tokensToAdd) {
         try {
           connectingTokens.value.add(token.id)
+          assignedTokenIds.add(token.id)
           message.info(`${token.name} 正在加入十殿${dianLabels[teamIdx]}...`)
           
-          await tokenStore.selectToken(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
-          await tokenStore.sendGameMessage(token.id, 'matchteam_join', { 
-            teamId: parseInt(currentTeamId) 
-          })
+          // 触发事件，让父组件调用 joinShiDian
+          emit('join-token', token, teamIdx + 1)
           
           message.success(`${token.name} 已成功加入十殿${dianLabels[teamIdx]}`)
           
@@ -276,7 +295,7 @@ const addMembersToTeams = async () => {
           connectingTokens.value.delete(token.id)
           
           if (tokensToAdd.indexOf(token) < tokensToAdd.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            await waitCommandDelay()
           }
         } catch (error) {
           console.error(`${token.name} 加入失败:`, error)
@@ -293,7 +312,7 @@ const addMembersToTeams = async () => {
       }
       
       if (teamIdx < 4) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await waitCommandDelay()
       }
     }
     
@@ -314,71 +333,8 @@ const autoJoinShiDian = async () => {
     return
   }
 
-  isAutoJoinRunning.value = true
-  stopAutoJoinFlag.value = false
-  
-  try {
-    for (let teamIdx = 1; teamIdx <= 5; teamIdx++) {
-      if (stopAutoJoinFlag.value) {
-        message.info('已停止自动加入十殿')
-        break
-      }
-
-      const currentTeamId = teamIds.value[teamIdx - 1]
-      if (!currentTeamId) continue
-
-      const tokensToJoin = tokenStore.gameTokens.filter(token => {
-        return token.remark && token.remark.includes(`殿${['一', '二', '三', '四', '五'][teamIdx - 1]}`)
-      })
-
-      for (const token of tokensToJoin) {
-        if (stopAutoJoinFlag.value) break
-
-        try {
-          connectingTokens.value.add(token.id)
-          
-          await tokenStore.selectToken(token.id)
-          await new Promise(resolve => setTimeout(resolve, 500))
-
-          await tokenStore.sendGameMessage(token.id, 'matchteam_join', { 
-            teamId: parseInt(currentTeamId) 
-          })
-          
-          message.success(`${token.name} 已加入十殿 ${currentTeamId}`)
-          
-          logOperation('shidian', '自动加入十殿', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'success',
-            message: `${token.name} 已加入十殿 ${currentTeamId}`
-          })
-        } catch (error) {
-          console.error(`Token ${token.name} 加入十殿失败:`, error)
-          logOperation('shidian', '自动加入十殿', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${token.name} 加入十殿失败：${error.message}`
-          })
-        } finally {
-          connectingTokens.value.delete(token.id)
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-    }
-
-    if (!stopAutoJoinFlag.value) {
-      message.success('自动加入十殿完成')
-    }
-  } catch (error) {
-    console.error('自动加入十殿失败:', error)
-    message.error('自动加入十殿失败')
-  } finally {
-    isAutoJoinRunning.value = false
-  }
+  // 触发事件，让父组件执行自动加入十殿
+  emit('auto-join-shidian')
 }
 
 // 停止自动加入十殿

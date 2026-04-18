@@ -1517,6 +1517,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "hero_heroupgradestar", params);
   };
 
+  // 发送英雄合成
+  const sendHeroSynthetic = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_synthetic", params);
+  };
+
   // 发送图鉴升级
   const sendBookUpgrade = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "book_upgrade", params);
@@ -2200,6 +2205,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendHeroSkillAwake,
     sendSystemHangupUpgrade,
     sendHeroUpgradeStar,
+    sendHeroSynthetic,
     sendBookUpgrade,
     sendBookClaimPointReward,
     sendMergeboxClaimMergeProgress,

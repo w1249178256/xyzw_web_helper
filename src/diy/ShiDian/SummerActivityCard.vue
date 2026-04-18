@@ -146,7 +146,7 @@
 <script setup>
 // @unocss-include
 // uno-css-ignore-file
-import { ref, computed } from "vue";
+import { ref, computed, watch, inject } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
 import { logOperation, logCommand } from "@/utils/operationLogger";
@@ -157,6 +157,12 @@ import ConnectionPoolManager from "@/utils/connectionPoolManager";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
+
+// 注入执行间隔
+const commandDelay = inject('commandDelay', ref(600))
+
+// 辅助函数：等待执行间隔
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -365,8 +371,7 @@ const getUsedItems = async () => {
       'activity_getactegameinfo',
       { actId: Number(activityId.value) },
       (async () => {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await waitCommandDelay();
         return tokenStore.sendActivityGetActeGameInfo(
           selectedTokenId.value,
           { actId: Number(activityId.value) }
@@ -425,8 +430,7 @@ const getRemainingItems = async () => {
       'role_getroleinfo',
       {},
       (async () => {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await waitCommandDelay();
         return tokenStore.sendGetRoleInfo(selectedTokenId.value);
       })(),
       true,
@@ -563,8 +567,7 @@ const startTower = async () => {
       'towers_start',
       { towerType: bossSelect.value },
       (async () => {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await waitCommandDelay();
         return tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value });
       })(),
       true,
@@ -609,8 +612,7 @@ const fightTower = async () => {
       'towers_fight',
       { towerType: bossSelect.value },
       (async () => {
-        // 执行命令前等待400ms
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await waitCommandDelay();
         return tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value });
       })(),
       true,
@@ -1192,7 +1194,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     // 模拟点击暑期活动子卡片切换阵2按钮
     console.log("正在切换到阵容2...");
     await switchToTeam2(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await waitCommandDelay();
 
     // 使用fight_startlevel获取当前阵容
     console.log("正在获取当前阵容信息...");
@@ -1207,12 +1209,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       true,
       '暑期活动'
     );
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await waitCommandDelay();
 
     // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
     console.log("正在设置队伍...");
     await setTeam(tokenId);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await waitCommandDelay();
 
     // 遍历每个零胜场BOSS
     for (let i = 0; i < zeroWinBosses.length; i++) {

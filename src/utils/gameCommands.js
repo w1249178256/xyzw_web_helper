@@ -275,7 +275,7 @@ export class GameCommands {
     return {
       ack,
       body: this.g_utils.bon.encode({
-        goodsId: 1,
+        goodsId: params.goodsId,
         ...params,
       }),
       cmd: "store_buy",
@@ -1641,6 +1641,23 @@ export class GameCommands {
       time: Date.now()
     }
   }
+
+  /**
+   * 咸将合成
+   */
+  hero_synthetic(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        itemId:params.itemId,
+        ...params
+      }),
+      cmd: "hero_synthetic",
+      seq,
+      time: Date.now()
+    }
+  }
+
 
   /**
    * 咸将升级

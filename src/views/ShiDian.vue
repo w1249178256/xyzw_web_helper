@@ -49,6 +49,8 @@
         <ShiDianTeamIdCard 
           :selected-token-id="selectedTokenId"
           @update-pillow-count="handleUpdatePillowCount"
+          @join-token="handleJoinTokenFromTeamIdCard"
+          @auto-join-shidian="autoJoinShiDian"
         />
 
         <!-- 俱乐部管理卡片 -->
@@ -96,6 +98,27 @@
         <div class="section-header">
           <h2>选择Token</h2>
           <div class="header-actions">
+            <n-input-number
+              v-model:value="commandDelay"
+              :min="100"
+              :max="5000"
+              :step="100"
+              size="small"
+              style="width: 120px; margin-right: 8px;"
+              placeholder="执行间隔(ms)"
+            >
+              <template #prefix>
+                <span>间隔</span>
+              </template>
+            </n-input-number>
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-icon size="18" style="cursor: help; margin-right: 8px; color: #666;">
+                  <HelpCircleOutline />
+                </n-icon>
+              </template>
+              本页面所有命令均使用此间隔
+            </n-tooltip>
             <n-button @click="showImportForm = true" type="primary" size="small">
               <template #icon>
                 <n-icon><Add /></n-icon>
@@ -180,12 +203,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, nextTick, provide } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useNightmareExecutionStore } from '@/stores/nightmareExecutionStore'
 import { useMessage, useDialog } from 'naive-ui'
-import { Add, Refresh, TrashBin, EllipsisHorizontal, Star, Home, Create, SyncCircle, Key, Gift, People } from '@vicons/ionicons5'
+import { Add, Refresh, TrashBin, EllipsisHorizontal, Star, Home, Create, SyncCircle, Key, Gift, People, HelpCircleOutline } from '@vicons/ionicons5'
 import ManualTokenForm from '@/views/TokenImport/manual.vue'
 import UrlTokenForm from '@/views/TokenImport/url.vue'
 import BinTokenForm from '@/views/TokenImport/bin.vue'
@@ -215,6 +238,10 @@ const refreshingTokens = ref(new Set())
 const teamId = ref('')
 const teamIds = ref(['', '', '', '', '']) // 五个十殿的 teamId
 const shidianInfoCardRef = ref(null)
+const commandDelay = ref(600) // 执行间隔（毫秒）
+
+// 提供执行间隔给子组件
+provide('commandDelay', commandDelay)
 
 // 辅助函数：获取 token 的序号（基于名称排序后的顺序）
 const getTokenIndex = (token) => {
@@ -740,6 +767,23 @@ const loadDropdownSettings = async () => {
   } else {
     console.log('没有保存的下拉框设置')
   }
+  
+  // 如果 teamIds 为空，尝试从 ShiDianTeamIdCard.vue 保存的 shidian_teamIds 加载
+  if (!teamIds.value.some(id => id)) {
+    try {
+      const savedTeamIds = localStorage.getItem('shidian_teamIds')
+      if (savedTeamIds) {
+        const settings = JSON.parse(savedTeamIds)
+        if (settings.teamIds && Array.isArray(settings.teamIds)) {
+          teamIds.value = settings.teamIds
+          console.log('从 shidian_teamIds 加载 TeamIDs:', teamIds.value)
+        }
+      }
+    } catch (error) {
+      console.error('加载 shidian_teamIds 失败:', error)
+    }
+  }
+  
   // 从 token 的 remark 字段解析下拉框值（如果 localStorage 中没有该 token 的设置，则从 remark 读取）
   parseRemarkToDropdowns()
   console.log('最终 tokenNightmareTeam:', tokenNightmareTeam.value)
@@ -802,7 +846,7 @@ const startShiDianManagement = (token) => {
   }, 1000)
 }
 
-// 加入十殿（调用子卡片的方法）
+// 加入十殿
 const joinShiDian = async (token, teamIndex = null) => {
   if (!token) {
     message.warning('请先选择 Token')
@@ -822,22 +866,45 @@ const joinShiDian = async (token, teamIndex = null) => {
     return
   }
 
-  // 检查是否输入了对应队伍的 teamId
-  const currentTeamId = teamIds.value[teamIdx - 1]
+  // 实时从 localStorage 读取 TeamID，确保获取最新值
+  let currentTeamId = null
+  try {
+    const savedTeamIds = localStorage.getItem('shidian_teamIds')
+    if (savedTeamIds) {
+      const settings = JSON.parse(savedTeamIds)
+      if (settings.teamIds && Array.isArray(settings.teamIds) && settings.teamIds[teamIdx - 1]) {
+        currentTeamId = settings.teamIds[teamIdx - 1]
+        // 同步到本地状态
+        teamIds.value[teamIdx - 1] = currentTeamId
+      }
+    }
+  } catch (error) {
+    console.error('读取 shidian_teamIds 失败:', error)
+  }
+  
   if (!currentTeamId) {
     message.warning(`请先在十殿 TeamID 卡片中输入十殿${['一', '二', '三', '四', '五'][teamIdx - 1]}的 TeamID`)
     return
   }
 
-  // 调用子卡片的方法，传入对应的 teamId
-  if (shidianInfoCardRef.value && shidianInfoCardRef.value.joinNightmareRoom) {
-    await shidianInfoCardRef.value.joinNightmareRoom(token, currentTeamId)
-    // 设置信息显示状态为 true
-    tokenInfoDisplay.value[token.id] = true
-    await saveDropdownSettings()
-  } else {
-    message.error('无法调用十殿信息卡片的方法')
-  }
+  // 直接发送加入十殿消息
+  await tokenStore.selectToken(token.id)
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  await tokenStore.sendGameMessage(token.id, 'matchteam_join', { 
+    teamId: parseInt(currentTeamId) 
+  })
+  
+  await new Promise(resolve => setTimeout(resolve, 500))
+  
+  await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { 
+    teamId: parseInt(currentTeamId),
+    isPrepare: 1
+  })
+  
+  // 设置信息显示状态为 true
+  tokenInfoDisplay.value[token.id] = true
+  await saveDropdownSettings()
 }
 
 // 清空所有 Token 的十殿标签
@@ -882,6 +949,20 @@ const clearAllNightmareLabels = async () => {
 // 自动加入十殿
 const autoJoinShiDian = async () => {
   console.log('autoJoinShiDian 被调用')
+  
+  // 实时从 localStorage 读取 TeamID，确保获取最新值
+  try {
+    const savedTeamIds = localStorage.getItem('shidian_teamIds')
+    if (savedTeamIds) {
+      const settings = JSON.parse(savedTeamIds)
+      if (settings.teamIds && Array.isArray(settings.teamIds)) {
+        teamIds.value = settings.teamIds
+        console.log('从 shidian_teamIds 加载 TeamIDs:', teamIds.value)
+      }
+    }
+  } catch (error) {
+    console.error('读取 shidian_teamIds 失败:', error)
+  }
   
   const hasTeamIds = teamIds.value.some(id => id)
   console.log('hasTeamIds:', hasTeamIds, 'teamIds:', teamIds.value)
@@ -931,21 +1012,160 @@ const autoJoinShiDian = async () => {
     isAutoJoinRunning.value = true
     
     try {
-      // 第一步：处理十殿五（从前往后，枕头=5 的 token）
-      if (teamIds.value[4]) { // 十殿五的 TeamID
-        console.log('开始处理十殿五')
-        await processNightmareTeam(5, 'forward')
-      }
+      // 导入连接池管理器
+      const { ConnectionPoolManager } = await import('@/utils/connectionPoolManager.js')
+      const connectionPool = new ConnectionPoolManager(tokenStore, {
+        maxConnections: 1,
+        connectionTimeout: 5000,
+        idleTimeout: 60000,
+        queueTimeout: 120000,
+        reconnectDelay: 1000,
+        maxRetries: 3
+      })
       
-      // 第二步：处理十殿一到四（从后往前）
-      for (let i = 3; i >= 0; i--) {
-        if (teamIds.value[i]) {
-          console.log(`开始处理十殿${['一', '二', '三', '四'][i]}`)
-          await processNightmareTeam(i + 1, 'backward')
+      // 获取所有 token，排除 02/05/07 前缀
+      const tokens = tokenStore.gameTokens.filter(token => {
+        const name = token.name || ''
+        return !name.startsWith('02') && !name.startsWith('05') && !name.startsWith('07')
+      })
+      
+      // 先检查所有 token 的枕头数量，只保留枕头=5 的 token
+      const tokensWithPillow5 = []
+      for (const token of tokens) {
+        if (!token || !token.id) continue
+        
+        // 检查是否已加入十殿
+        const currentTeam = tokenNightmareTeam.value[token.id]
+        if (currentTeam !== null && currentTeam !== undefined) continue
+        
+        try {
+          await connectionPool.acquire(token.id)
+          
+          const status = tokenStore.getWebSocketStatus(token.id)
+          if (status !== 'connected') {
+            await connectionPool.release(token.id, true)
+            continue
+          }
+          
+          // 等待初始化
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 获取枕头数量
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          const pillowItem = roleInfo?.role?.items?.['5054']
+          const pillowCount = pillowItem?.quantity ?? 0
+          
+          console.log(`Token ${token.name} 枕头数量: ${pillowCount}`)
+          
+          if (pillowCount === 5) {
+            tokensWithPillow5.push(token)
+          }
+          
+          await connectionPool.release(token.id, true)
+        } catch (error) {
+          console.error(`检查 Token ${token.name} 枕头数量失败:`, error)
+          try {
+            await connectionPool.release(token.id, true)
+          } catch (e) {}
         }
       }
       
+      if (tokensWithPillow5.length === 0) {
+        message.info('没有找到枕头数量为 5 的 Token')
+        isAutoJoinRunning.value = false
+        await connectionPool.destroy()
+        return
+      }
+      
+      console.log(`找到 ${tokensWithPillow5.length} 个枕头数量为 5 的 Token`)
+      
+      // 将枕头=5 的 token 分配到各殿（按殿五到殿一的顺序）
+      const allTokensToProcess = []
+      let tokenIndex = 0
+      
+      for (let teamIdx = 5; teamIdx >= 1; teamIdx--) {
+        if (!teamIds.value[teamIdx - 1]) continue
+        
+        // 每殿分配 2 个 token
+        for (let i = 0; i < 2 && tokenIndex < tokensWithPillow5.length; i++) {
+          allTokensToProcess.push({ token: tokensWithPillow5[tokenIndex], teamIndex: teamIdx })
+          tokenIndex++
+        }
+      }
+      
+      if (allTokensToProcess.length === 0) {
+        message.info('没有需要处理的 Token')
+        isAutoJoinRunning.value = false
+        await connectionPool.destroy()
+        return
+      }
+      
+      // 使用连接池执行批量操作
+      await connectionPool.batchOperate(
+        allTokensToProcess.map(item => item.token),
+        async (token, globalIndex) => {
+          try {
+            const item = allTokensToProcess[globalIndex]
+            const teamIdx = item.teamIndex
+            const teamId = teamIds.value[teamIdx - 1]
+            
+            if (!teamId) {
+              return { success: false, message: 'TeamID 为空' }
+            }
+            
+            // 发送加入十殿消息
+            await tokenStore.sendGameMessage(token.id, 'matchteam_join', { 
+              teamId: parseInt(teamId) 
+            })
+            
+            await new Promise(resolve => setTimeout(resolve, 500))
+            
+            // 发送准备消息
+            await tokenStore.sendGameMessage(token.id, 'matchteam_memberprepare', { 
+              teamId: parseInt(teamId),
+              isPrepare: 1
+            })
+            
+            // 设置信息显示状态
+            tokenInfoDisplay.value[token.id] = true
+            
+            // 更新 tokenNightmareTeam
+            tokenNightmareTeam.value[token.id] = teamIdx
+            
+            return { success: true, message: `已加入十殿${['一', '二', '三', '四', '五'][teamIdx - 1]}` }
+          } catch (error) {
+            return { success: false, error: error.message }
+          }
+        },
+        {
+          batchSize: 1,
+          delayBetween: 1000,
+          keepConnections: false,
+          onProgress: (progress) => {
+            if (progress.type === 'batch-start') {
+              message.info(`正在处理第 ${progress.batchIndex} 个 Token（共 ${progress.totalBatches} 个）...`)
+            } else if (progress.type === 'token-start') {
+              message.info(`[${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
+            } else if (progress.type === 'token-success') {
+              message.success(`[${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+            } else if (progress.type === 'token-error') {
+              if (progress.status === 'warning') {
+                message.warning(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+              } else {
+                message.error(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+              }
+            }
+          }
+        }
+      )
+      
+      // 保存设置
+      await saveDropdownSettings()
+      
       message.success('自动分配 Token 完成')
+      
+      // 销毁连接池
+      await connectionPool.destroy()
     } catch (error) {
       if (error.message === '用户中断操作') {
         message.info('已停止自动加入十殿')
@@ -1081,6 +1301,16 @@ const processNightmareTeam = async (teamIndex, direction) => {
   }
   
   message.info(`十殿${['一', '二', '三', '四', '五'][teamIndex - 1]}完成，加入 ${joinedCount}/${maxJoinCount} 个 Token`)
+}
+
+// 处理从十殿 TeamID 卡片触发的加入十殿请求
+const handleJoinTokenFromTeamIdCard = async (token, teamIndex) => {
+  try {
+    await joinShiDian(token, teamIndex)
+  } catch (error) {
+    console.error(`${token.name || token.id} 加入十殿失败:`, error)
+    message.error(`${token.name || token.id} 加入十殿失败：${error.message}`)
+  }
 }
 
 // 格式化数字

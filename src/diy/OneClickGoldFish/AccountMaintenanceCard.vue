@@ -44,6 +44,24 @@
             :loading="isUpgradingLuBuStar"
           />
           <CustomizedCard 
+            mode="button-with-select"
+            :button-text="isBatchHeroSynthetic ? '批量英雄合成中...' : '批量英雄合成'"
+            :select-value="selectedSyntheticHero"
+            @update:select-value="(val) => selectedSyntheticHero = val"
+            :select-options="syntheticHeroOptions"
+            placeholder="选择英雄"
+            :disabled="isBatchHeroSynthetic"
+            :loading="isBatchHeroSynthetic"
+            @button-click="handleBatchHeroSynthetic"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchHeroBattle ? '批量上阵吕布中...' : '批量上阵吕布'"
+            @button-click="handleBatchHeroBattle"
+            :disabled="isBatchHeroBattle"
+            :loading="isBatchHeroBattle"
+          />
+          <CustomizedCard 
             mode="button"
             :name="isUsingTorch ? '批量使用火把中...' : '批量使用火把'"
             @button-click="handleUseTorch"
@@ -59,44 +77,19 @@
           />
           <CustomizedCard 
             mode="button"
-            name="领取宝箱奖励"
-            @button-click="handleClaimBoxRewards"
-            :disabled="!selectedTokenId || isClaimingBoxRewards"
-            :loading="isClaimingBoxRewards"
+            :name="isBatchClaimingBoxRewards ? '批量领取宝箱奖励中...' : '批量领取宝箱奖励'"
+            @button-click="handleBatchClaimBoxRewards"
+            :disabled="isBatchClaimingBoxRewards"
+            :loading="isBatchClaimingBoxRewards"
           />
           <CustomizedCard 
             mode="button"
-            name="领取邮件"
-            @button-click="handleClaimEmails"
-            :disabled="!selectedTokenId || isClaimingEmails"
-            :loading="isClaimingEmails"
+            :name="isBatchClaimingEmails ? '批量领取邮件中...' : '批量领取邮件'"
+            @button-click="handleBatchClaimEmails"
+            :disabled="isBatchClaimingEmails"
+            :loading="isBatchClaimingEmails"
           />
-          <CustomizedCard 
-            mode="button"
-            name="领取宝箱周奖励"
-            @button-click="handleClaimBoxWeekReward"
-            :disabled="!selectedTokenId || isClaimingBoxWeekReward"
-            :loading="isClaimingBoxWeekReward"
-          />
-          <!-- 一键宝箱周详细流程：
-          1. 准备阶段：使用 getroleinfo 获取宝箱数量(M,Q,H,B)，使用 activity_get 获取已用宝箱分Y
-          2. 计算阶段：计算宝箱总分Z=(M+Q*10+H*20+B*50)+Y*0.43，开箱轮数l=1+floor((Z-J-4500)/3500)，最多4轮
-          3. 开宝箱阶段：按铂金→黄金→青铜→木质顺序，使用 item_openbox 命令每次开10个宝箱
-             每次开箱后计算YY=Y+MK*10+QK*100+HK*200+BK*500，超过目标则获取实际Y验证
-          4. 领取奖励阶段（开宝箱阶段内）：
-             - 使用 item_batchclaimboxpointreward 领取宝箱奖励
-             - 使用 mail_claimallattachment 领取邮件
-             - 使用 getroleinfo 重新获取宝箱数量
-          5. 检查阶段：使用 activity_get 检查已用宝箱分，决定是否继续下一轮或进入最终阶段
-          6. 最终阶段：领取邮件和宝箱周奖励(activity_claimweekactreward) l+1次
-          使用命令：getroleinfo, item_openbox, item_batchclaimboxpointreward, mail_claimallattachment, activity_get, activity_claimweekactreward -->
-          <CustomizedCard 
-            mode="button"
-            name="一键宝箱周"
-            @button-click="handleOneClickBoxWeek"
-            :disabled="!selectedTokenId || isBoxWeekRunning"
-            :loading="isBoxWeekRunning"
-          />
+          <!-- 领取宝箱周奖励和一键宝箱周按钮已移除 -->
           <CustomizedCard 
             mode="name-input"
             name="基准宝箱分"
@@ -361,6 +354,7 @@ const isBatchBoxWeekRunning = ref(false)
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
 const selectedCrystalHero = ref(null)
+const selectedSyntheticHero = ref('lvbu')
 
 // 英雄选项（从HERO_DICT生成，只保留红色武将，即ID以1开头的）
 const heroOptions = computed(() => {
@@ -372,9 +366,17 @@ const heroOptions = computed(() => {
     })).sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
 })
 
+// 英雄合成下拉选项
+const syntheticHeroOptions = computed(() => {
+  return [
+    { label: '吕布', value: 'lvbu' },
+    { label: '全部', value: 'all' }
+  ]
+})
+
 // 新增状态
-const isClaimingBoxRewards = ref(false)
-const isClaimingEmails = ref(false)
+const isBatchClaimingBoxRewards = ref(false)
+const isBatchClaimingEmails = ref(false)
 const isCalculatingBoxScore = ref(false)
 const isCalculatingUsedBoxScore = ref(false)
 const isClaimingBoxWeekReward = ref(false)
@@ -391,6 +393,8 @@ const isExportingTeam = ref(false)
 const isBatchUpgradingLord = ref(false)
 const isBatchActivatingToyTeam = ref(false)
 const isBatchUpgradingToyTeamStar = ref(false)
+const isBatchHeroSynthetic = ref(false)
+const isBatchHeroBattle = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
@@ -2000,6 +2004,290 @@ const handleUpgradeLuBuStar = async () => {
     })
   } finally {
     isUpgradingLuBuStar.value = false
+  }
+}
+
+// 批量英雄合成
+const handleBatchHeroSynthetic = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量英雄合成（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量英雄合成',
+    status: 'info',
+    message: `开始批量英雄合成（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchHeroSynthetic.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          
+          // 根据选择确定 itemId
+          let itemId
+          if (selectedSyntheticHero.value === 'lvbu') {
+            // 选择吕布，执行参数 107
+            itemId = 107
+            message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成吕布...`)
+          } else {
+            // 选择全部，参照英雄升星执行全部红将、橙将、紫将
+            // 红将：101-120，橙将：201-228，紫将：301-314
+            const allHeroes = []
+            
+            // 红将
+            for (let i = 101; i <= 120; i++) {
+              allHeroes.push(i)
+            }
+            // 橙将
+            for (let i = 201; i <= 228; i++) {
+              allHeroes.push(i)
+            }
+            // 紫将
+            for (let i = 301; i <= 314; i++) {
+              allHeroes.push(i)
+            }
+            
+            // 逐个执行英雄合成
+            for (const heroId of allHeroes) {
+              try {
+                await tokenStore.sendHeroSynthetic(token.id, { itemId: heroId })
+                await new Promise(resolve => setTimeout(resolve, 500))
+              } catch (error) {
+                // 忽略单个英雄合成失败
+              }
+            }
+            
+            message.success(`[${tokenIndex}] ${token.name || token.id} 全部英雄合成完成`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量英雄合成',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、全部英雄合成完成`
+            })
+            
+            return { success: true }
+          }
+          
+          // 执行吕布合成
+          await tokenStore.sendHeroSynthetic(token.id, { itemId: itemId })
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 英雄合成成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量英雄合成',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、英雄合成成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 英雄合成失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 英雄合成失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量英雄合成',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、英雄合成失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量英雄合成完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量英雄合成',
+      status: 'success',
+      message: `批量英雄合成完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量英雄合成出错:', error)
+    message.error(`批量英雄合成出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量英雄合成',
+      status: 'error',
+      message: `批量英雄合成出错：${error.message || error}`
+    })
+  } finally {
+    isBatchHeroSynthetic.value = false
+  }
+}
+
+// 批量上阵吕布
+const handleBatchHeroBattle = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量上阵吕布（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量上阵吕布',
+    status: 'info',
+    message: `开始批量上阵吕布（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchHeroBattle.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在上阵吕布...`)
+          
+          await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 107, slot: 0 })
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 上阵吕布成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵吕布',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、上阵吕布成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵吕布失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵吕布失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵吕布',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、上阵吕布失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量上阵吕布完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵吕布',
+      status: 'success',
+      message: `批量上阵吕布完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量上阵吕布出错:', error)
+    message.error(`批量上阵吕布出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵吕布',
+      status: 'error',
+      message: `批量上阵吕布出错：${error.message || error}`
+    })
+  } finally {
+    isBatchHeroBattle.value = false
   }
 }
 
@@ -5348,113 +5636,239 @@ const handleExportTeam = async () => {
   }
 }
 
-// 领取宝箱奖励
-const handleClaimBoxRewards = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+// 批量领取宝箱奖励
+const handleBatchClaimBoxRewards = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
     return
   }
   
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量领取宝箱奖励（${rangeText}），共${targetTokens.length}个Token...`)
   
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接Token')
-    return
-  }
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量领取宝箱奖励',
+    status: 'info',
+    message: `开始批量领取宝箱奖励（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchClaimingBoxRewards.value = true
   
   try {
-    isClaimingBoxRewards.value = true
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在领取宝箱奖励...`)
+          
+          await tokenStore.sendBatchClaimBoxPointReward(token.id)
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 领取宝箱奖励成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量领取宝箱奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、领取宝箱奖励成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 领取宝箱奖励失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 领取宝箱奖励失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量领取宝箱奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、领取宝箱奖励失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
     
-    const result = await tokenStore.sendBatchClaimBoxPointReward(token.id)
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
     
-    message.success('领取宝箱奖励成功')
-    
-    // 添加操作日志
+    message.success(`批量领取宝箱奖励完成，成功${successCount}个，失败${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '领取宝箱奖励',
-      tokenId: token.id,
-      tokenName: token.name,
+      operation: '批量领取宝箱奖励',
       status: 'success',
-      message: '领取宝箱奖励成功'
+      message: `批量领取宝箱奖励完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
-    console.error('领取宝箱奖励失败:', error)
-    message.error(`领取宝箱奖励失败: ${error.message || '未知错误'}`)
-    
-    // 添加操作日志
+    console.error('批量领取宝箱奖励出错:', error)
+    message.error(`批量领取宝箱奖励出错：${error.message || error}`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '领取宝箱奖励',
-      tokenId: token.id,
-      tokenName: token.name,
+      operation: '批量领取宝箱奖励',
       status: 'error',
-      message: `领取宝箱奖励失败: ${error.message || '未知错误'}`
+      message: `批量领取宝箱奖励出错：${error.message || error}`
     })
   } finally {
-    isClaimingBoxRewards.value = false
+    isBatchClaimingBoxRewards.value = false
   }
 }
 
-// 领取邮件
-const handleClaimEmails = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+// 批量领取邮件
+const handleBatchClaimEmails = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
     return
   }
   
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量领取邮件（${rangeText}），共${targetTokens.length}个Token...`)
   
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接Token')
-    return
-  }
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量领取邮件',
+    status: 'info',
+    message: `开始批量领取邮件（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchClaimingEmails.value = true
   
   try {
-    isClaimingEmails.value = true
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在领取邮件...`)
+          
+          await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 领取邮件成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量领取邮件',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、领取邮件成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 领取邮件失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量领取邮件',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、领取邮件失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
     
-    const result = await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
     
-    message.success('领取邮件成功')
-    
-    // 添加操作日志
+    message.success(`批量领取邮件完成，成功${successCount}个，失败${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '领取邮件',
-      tokenId: token.id,
-      tokenName: token.name,
+      operation: '批量领取邮件',
       status: 'success',
-      message: '领取邮件成功'
+      message: `批量领取邮件完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
-    console.error('领取邮件失败:', error)
-    message.error(`领取邮件失败: ${error.message || '未知错误'}`)
-    
-    // 添加操作日志
+    console.error('批量领取邮件出错:', error)
+    message.error(`批量领取邮件出错：${error.message || error}`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '领取邮件',
-      tokenId: token.id,
-      tokenName: token.name,
+      operation: '批量领取邮件',
       status: 'error',
-      message: `领取邮件失败: ${error.message || '未知错误'}`
+      message: `批量领取邮件出错：${error.message || error}`
     })
   } finally {
-    isClaimingEmails.value = false
+    isBatchClaimingEmails.value = false
   }
 }
 

@@ -604,14 +604,99 @@ const handleExecuteScheduledTasks = async () => {
           
           if (scheduledTasks.value.store_purchase) {
             try {
-              // 黑市采购
-              await tokenStore.sendMessageWithPromise(
+              // 获取主公等级
+              const roleResult = await tokenStore.sendMessageWithPromise(
                 token.id,
-                'store_purchase',
+                'role_getroleinfo',
                 {},
                 5000
               )
               await new Promise(resolve => setTimeout(resolve, 500))
+              
+              let lordLevel = 0
+              if (roleResult && roleResult.role && roleResult.role.lord) {
+                lordLevel = roleResult.role.lord.level || 0
+              } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.lord) {
+                lordLevel = roleResult._raw.body.role.lord.level || 0
+              } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.lord) {
+                lordLevel = roleResult.body.role.lord.level || 0
+              }
+              
+              if (lordLevel === 0) {
+                throw new Error('无法获取主公等级')
+              }
+              
+              if (lordLevel > 4000) {
+                // 主公等级大于4000，执行原有store_purchase
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_purchase',
+                  {},
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+              } else {
+                // 主公等级小于等于4000，执行新的采购流程
+                // 1. 执行store_buy，参数goodsId: 1
+                let result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_buy',
+                  { goodsId: 1 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                if (result && result.error) {
+                  throw new Error(result.error)
+                }
+                
+                // 2. 执行store_buy，参数goodsId: 3
+                result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_buy',
+                  { goodsId: 3 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                if (result && result.error) {
+                  throw new Error(result.error)
+                }
+                
+                // 3. 执行store_refresh，参数storeId: 1
+                result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_refresh',
+                  { storeId: 1 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                if (result && result.error) {
+                  throw new Error(result.error)
+                }
+                
+                // 4. 执行store_buy，参数goodsId: 1
+                result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_buy',
+                  { goodsId: 1 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                if (result && result.error) {
+                  throw new Error(result.error)
+                }
+                
+                // 5. 执行store_buy，参数goodsId: 3
+                result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'store_buy',
+                  { goodsId: 3 },
+                  5000
+                )
+                await new Promise(resolve => setTimeout(resolve, 500))
+                if (result && result.error) {
+                  throw new Error(result.error)
+                }
+              }
               
               logStore.addLog({
                 page: 'fish-helper',

@@ -302,6 +302,7 @@ export function registerDefaultCommands(reg) {
     .register("hero_lordupgradelevel") //主公升级
     .register("hero_lordupgradeorder") //主公进阶
     .register("hero_rebirth") //武将重新birth
+    .register("hero_synthetic", { itemId: 107 }) //英雄合成
 
     // 升星相关
     .register("hero_heroupgradestar")
@@ -1217,6 +1218,7 @@ export class XyzwWebSocketClient {
       hero_rebirthresp: "hero_rebirth",
       hero_heroupgradelevelresp: "hero_heroupgradelevel",
       hero_heroupgradeorderresp: "hero_heroupgradeorder",
+      hero_syntheticresp: "hero_synthetic",
       book_upgraderesp: "book_upgrade",
       book_claimpointrewardresp: "book_claimpointreward",
       // 军团信息
