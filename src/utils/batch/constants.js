@@ -63,6 +63,9 @@ export const availableTasks = [
   { label: "一键怪异塔合成", value: "batchMergeItems" },
   { label: "一键领取蟠桃园任务", value: "batchClaimPeachTasks" },
   { label: "一键扫荡灯神", value: "batchGenieSweep" },
+  { label: "一键俱乐部BOSS", value: "batchLegionBoss" },
+  { label: "一键每日免费礼包", value: "batchFreeGift" },
+  { label: "一键每日咸王", value: "batchDailyBoss" },
   { label: "一键购买梦境商品", value: "batchBuyDreamItems" },
 ];
 
