@@ -2027,6 +2027,168 @@ export function createTasksItem(deps) {
     message.success("按积分开箱结束");
   };
 
+  /**
+   * 俱乐部BOSS - ForToken版本
+   */
+  const batchLegionBossForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始俱乐部BOSS`,
+        type: "info",
+      });
+
+      try {
+        await tokenStore.sendPresetteamSaveTeam(
+          tokenId,
+          { teamId: 1 },
+          5000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (switchError) {
+        const switchErrorMsg = switchError.message || switchError.toString();
+        if (!switchErrorMsg.includes('200020')) {
+          throw switchError;
+        }
+      }
+
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        'fight_startlegionboss',
+        {},
+        5000
+      );
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部BOSS完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部BOSS失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
+   * 每日免费礼包 - ForToken版本
+   */
+  const batchFreeGiftForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始每日免费礼包`,
+        type: "info",
+      });
+
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'system_signinreward',
+          {},
+          5000
+        );
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 签到成功`,
+          type: "success",
+        });
+      } catch (signinError) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 签到跳过: ${signinError.message}`,
+          type: "warning",
+        });
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'discount_claimreward',
+          { discountId: 1 },
+          5000
+        );
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费礼包领取成功`,
+          type: "success",
+        });
+      } catch (discountError) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费礼包领取失败: ${discountError.message}`,
+          type: "warning",
+        });
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 每日免费礼包完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 每日免费礼包异常: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
+   * 每日咸王 - ForToken版本
+   */
+  const batchDailyBossForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    const todayBossId = getTodayBossId();
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始每日咸王（BOSS ID: ${todayBossId}）`,
+        type: "info",
+      });
+
+      for (let i = 0; i < 3; i++) {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'fight_startboss',
+          { bossId: todayBossId },
+          12000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 咸王挑战完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 咸王挑战失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
   return {
     batchOpenBox,
     batchOpenBoxByPoints,
@@ -2043,7 +2205,10 @@ export function createTasksItem(deps) {
     batchGenieSweep,
     batchGenieSweepForToken,
     batchLegionBoss,
+    batchLegionBossForToken,
     batchFreeGift,
+    batchFreeGiftForToken,
     batchDailyBoss,
+    batchDailyBossForToken,
   };
 }

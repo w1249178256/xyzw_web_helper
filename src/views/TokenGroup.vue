@@ -2922,6 +2922,7 @@ import { Settings, Add, Refresh, TrashBin, EllipsisHorizontal, Create } from "@v
 import ManualTokenForm from '@/views/TokenImport/manual.vue'
 import UrlTokenForm from '@/views/TokenImport/url.vue'
 import BinTokenForm from '@/views/TokenImport/bin.vue'
+import ConnectionPoolManager from '@/utils/connectionPoolManager'
 
 // Import batch task modules
 import {
@@ -4637,6 +4638,7 @@ const verifyTaskDependencies = async (task) => {
 };
 
 // Execute a scheduled task with dependency verification
+// 改为按Token遍历：连接Token后执行所有任务，再连接下一个Token
 const executeScheduledTask = async (task) => {
   addLog({
     time: new Date().toLocaleTimeString(),
@@ -4657,7 +4659,7 @@ const executeScheduledTask = async (task) => {
     }
 
     // Filter out tokens that don't exist in current tokens.value
-    const availableTokens = (
+    const availableTokenIds = (
       task.connectedTokens || task.selectedTokens
     ).filter((tokenId) => {
       return tokens.value.some((t) => t.id === tokenId);
@@ -4677,7 +4679,7 @@ const executeScheduledTask = async (task) => {
       });
     }
 
-    if (availableTokens.length === 0) {
+    if (availableTokenIds.length === 0) {
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `=== 定时任务 ${task.name} 没有可用的Token，取消执行 ===`,
@@ -4686,13 +4688,9 @@ const executeScheduledTask = async (task) => {
       return;
     }
 
-    // Always use the latest selectedTokens from the task that exist in current tokens.value
-    selectedTokens.value = [...availableTokens];
-
-    // Execute selected tasks in parallel
-    const taskPromises = task.selectedTasks.map(async (taskName) => {
-      if (shouldStop.value) return;
-
+    // 过滤出有效的任务列表
+    const validTasks = task.selectedTasks.filter((taskName) => {
+      // 检查活动时间
       if (
         ["batchbaoku45", "batchbaoku13"].includes(taskName) &&
         !isbaokuActivityOpen.value
@@ -4702,7 +4700,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在宝库开放时间)`,
           type: "warning",
         });
-        return;
+        return false;
       }
 
       if (
@@ -4714,7 +4712,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在梦境开放时间)`,
           type: "warning",
         });
-        return;
+        return false;
       }
 
       if (
@@ -4726,7 +4724,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在发车开放时间)`,
           type: "warning",
         });
-        return;
+        return false;
       }
 
       if (
@@ -4738,7 +4736,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在竞技场开放时间)`,
           type: "warning",
         });
-        return;
+        return false;
       }
 
       if (
@@ -4755,44 +4753,110 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在怪异塔开放时间)`,
           type: "warning",
         });
-        return;
+        return false;
       }
+
+      return true;
+    });
+
+    if (validTasks.length === 0) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `=== 定时任务 ${task.name} 没有可执行的任务，取消执行 ===`,
+        type: "error",
+      });
+      return;
+    }
+
+    // 按Token遍历：连接Token后执行所有任务，再连接下一个Token
+    for (let i = 0; i < availableTokenIds.length; i++) {
+      if (shouldStop.value) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 用户停止执行 ===`,
+          type: "warning",
+        });
+        break;
+      }
+
+      const tokenId = availableTokenIds[i];
+      const token = tokens.value.find((t) => t.id === tokenId);
+      if (!token) continue;
 
       addLog({
         time: new Date().toLocaleTimeString(),
-        message: `执行任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName}`,
+        message: `=== 连接Token: ${token.name || token.id} (${i + 1}/${availableTokenIds.length}) ===`,
         type: "info",
       });
 
-      // Call the task function dynamically
-      const taskFunction = eval(taskName);
-      if (typeof taskFunction === "function") {
-        // For batch operations, pass isScheduledTask = true
-        // 具体的batch任务函数内部会使用ensureConnection管理并行连接
-        if (
-          [
-            "batchOpenBox",
-            "batchOpenBoxByPoints",
-            "batchFish",
-            "batchRecruit",
-            "batchLegacyGiftSendEnhanced",
-          ].includes(taskName)
-        ) {
-          await taskFunction(true);
-        } else {
-          await taskFunction();
+      try {
+        // 连接Token
+        await scheduledTaskPool.acquire(tokenId);
+
+        // 执行所有选中的任务
+        for (const taskName of validTasks) {
+          if (shouldStop.value) break;
+
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `执行任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName}`,
+            type: "info",
+          });
+
+          try {
+            // 优先使用ForToken版本的任务函数（直接接受tokenId参数）
+            const forTokenTaskName = taskName + 'ForToken';
+            const forTokenTaskFunction = eval(forTokenTaskName);
+            
+            if (typeof forTokenTaskFunction === "function") {
+              await forTokenTaskFunction(tokenId);
+            } else {
+              const taskFunction = eval(taskName);
+              if (typeof taskFunction === "function") {
+                // 对于需要批量参数的任务，传递isScheduledTask = true
+                if (
+                  [
+                    "batchOpenBox",
+                    "batchOpenBoxByPoints",
+                    "batchFish",
+                    "batchRecruit",
+                    "batchLegacyGiftSendEnhanced",
+                  ].includes(taskName)
+                ) {
+                  await taskFunction(true);
+                } else {
+                  await taskFunction();
+                }
+              } else {
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `任务函数不存在: ${taskName}`,
+                  type: "error",
+                });
+              }
+            }
+          } catch (taskError) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `任务 ${availableTasks.find((t) => t.value === taskName)?.label || taskName} 执行失败: ${taskError.message}`,
+              type: "error",
+            });
+          }
+
+          // 任务间延迟
+          await new Promise((resolve) => setTimeout(resolve, batchSettings.taskDelay || 600));
         }
-      } else {
+      } catch (error) {
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `任务函数不存在: ${taskName}`,
+          message: `Token ${token.name || token.id} 执行失败: ${error.message}`,
           type: "error",
         });
+      } finally {
+        // 释放连接
+        await scheduledTaskPool.release(tokenId, true);
       }
-    });
-
-    // Wait for all tasks to complete
-    await Promise.all(taskPromises);
+    }
 
     addLog({
       time: new Date().toLocaleTimeString(),
@@ -5904,14 +5968,17 @@ const createTaskDeps = () => ({
 const tasksHangUp = createTasksHangUp(createTaskDeps());
 const {
   claimHangUpRewards,
+  claimHangUpRewardsForToken,
   batchAddHangUpTime,
+  batchAddHangUpTimeForToken,
   batchStudy,
   batchclubsign,
+  batchclubsignForToken,
   batchWarGuessCheer,
 } = tasksHangUp;
 
 const tasksBottle = createTasksBottle(createTaskDeps());
-const { resetBottles, batchlingguanzi } = tasksBottle;
+const { resetBottles, batchlingguanzi, resetBottlesForToken, batchlingguanziForToken } = tasksBottle;
 
 const tasksTower = createTasksTower(createTaskDeps());
 const {
@@ -5939,22 +6006,33 @@ const {
   batchClaimPeachTasks,
   batchGenieSweep,
   batchLegionBoss,
+  batchLegionBossForToken,
   batchFreeGift,
+  batchFreeGiftForToken,
   batchDailyBoss,
+  batchDailyBossForToken,
 } = tasksItem;
+
+const scheduledTaskPool = new ConnectionPoolManager(tokenStore, {
+  maxConnections: batchSettings.maxActive,
+  connectionTimeout: batchSettings.connectionTimeout,
+  reconnectDelay: batchSettings.reconnectDelay,
+  maxRetries: 3
+});
 
 const tasksDungeon = createTasksDungeon(createTaskDeps());
 const { batchbaoku13, batchbaoku45, batchmengjing, batchBuyDreamItems } =
   tasksDungeon;
 
 const tasksArena = createTasksArena(createTaskDeps());
-const { batcharenafight, batchTopUpFish, batchTopUpArena } = tasksArena;
+const { batcharenafight, batchTopUpFish, batchTopUpArena, batcharenafightForToken } = tasksArena;
 
 const tasksStore = createTasksStore(createTaskDeps());
 const {
   legion_storebuygoods,
   legionStoreBuySkinCoins,
   store_purchase,
+  store_purchaseForToken,
   collection_claimfreereward,
 } = tasksStore;
 
