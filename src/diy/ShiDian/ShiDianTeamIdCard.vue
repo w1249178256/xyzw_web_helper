@@ -66,19 +66,26 @@
           placeholder="输入队伍号"
           @button-click="executeNightmare8()"
         />
+        <CustomizedCard 
+          mode="button-placeholder"
+          button-text="批量切换阵2"
+          :disabled="isSwitchingTeam2 || !tokenStore.hasTokens"
+          @button-click="batchSwitchTeam2"
+        />
       </CustomizedCard>
     </template>
   </MyCard>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, toRaw, inject } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, toRaw, inject } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import { People } from '@vicons/ionicons5'
 import { logOperation } from '@/utils/operationLogger'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import MyCard from '@/components/Common/MyCard.vue'
+import ConnectionPoolManager from '@/utils/connectionPoolManager.js'
 
 const props = defineProps({
   selectedTokenId: {
@@ -87,7 +94,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update-pillow-count', 'join-token', 'auto-join-shidian'])
+const emit = defineEmits(['update-pillow-count', 'join-token', 'auto-join-shidian', 'clear-nightmare-labels'])
 
 const tokenStore = useTokenStore()
 const message = useMessage()
@@ -120,6 +127,29 @@ const isAddingMembers = ref(false)
 const teamIdForDian8 = ref('')
 const isExecutingNightmare8 = ref(false)
 const connectingTokens = ref(new Set())
+
+// 批量切换阵2相关变量
+const isSwitchingTeam2 = ref(false)
+
+// 初始化连接池管理器
+const connectionPool = new ConnectionPoolManager(tokenStore, {
+  maxConnections: 5,
+  connectionTimeout: 3000,
+  idleTimeout: 60000,
+  queueTimeout: 120000,
+  reconnectDelay: 1000,
+  maxRetries: 3
+})
+
+// 组件卸载前清理连接池
+onBeforeUnmount(async () => {
+  try {
+    await connectionPool.destroy()
+    console.log('[ShiDianTeamIdCard] 连接池已清理')
+  } catch (error) {
+    console.error('[ShiDianTeamIdCard] 清理连接池失败:', error)
+  }
+})
 
 // 处理 TeamID 输入变化
 const handleTeamIdChange = async (index, value) => {
@@ -181,31 +211,50 @@ const clearAllTeamIds = async () => {
 // 清空十殿标签
 const clearAllNightmareLabels = async () => {
   try {
-    const allTokens = tokenStore.gameTokens
-    const dianLabels = ['殿一', '殿二', '殿三', '殿四', '殿五']
+    const allTokens = toRaw(tokenStore.gameTokens)
     
     let resetCount = 0
     
+    console.log('总Token数量:', allTokens.length)
+    
+    // 读取当前的十殿标签数据
+    const savedData = localStorage.getItem('pageTokenData_shidian')
+    let pageData = savedData ? JSON.parse(savedData) : {}
+    let tokenNightmareTeam = pageData.dropdownSettings?.tokenNightmareTeam || {}
+    
+    console.log('当前十殿标签数据:', tokenNightmareTeam)
+    
     for (const token of allTokens) {
-      // 跳过昵称开头为 02 和 05 的 token
       const name = token.name || ''
-      if (name.startsWith('02') || name.startsWith('05')) {
+      
+      console.log(`Token: ${name}, 当前标签: ${tokenNightmareTeam[token.id]}`)
+      
+      // 跳过昵称开头为 02、05 和 07 的 token
+      if (name.startsWith('02') || name.startsWith('05') || name.startsWith('07')) {
+        console.log(`跳过 ${name} (前缀02/05/07)`)
         continue
       }
       
-      if (token.remark) {
-        const remark = token.remark.trim()
-        if (dianLabels.some(label => remark.includes(label))) {
-          const newRemark = remark
-            .replace(/殿[一二三四五]/g, '')
-            .replace(/\s+/g, ' ')
-            .trim()
-          
-          await tokenStore.updateToken(token.id, { remark: newRemark })
-          resetCount++
-        }
+      // 如果该token有十殿标签（0-5），则清空
+      if (tokenNightmareTeam[token.id] !== null && tokenNightmareTeam[token.id] !== undefined) {
+        console.log(`清空 ${name} 的十殿标签: ${tokenNightmareTeam[token.id]}`)
+        delete tokenNightmareTeam[token.id]
+        resetCount++
       }
     }
+    
+    // 保存更新后的数据
+    if (!pageData.dropdownSettings) {
+      pageData.dropdownSettings = {}
+    }
+    pageData.dropdownSettings.tokenNightmareTeam = tokenNightmareTeam
+    localStorage.setItem('pageTokenData_shidian', JSON.stringify(pageData))
+    
+    // 通知父组件更新 tokenNightmareTeam
+    emit('clear-nightmare-labels')
+    
+    console.log('清空完成，数量:', resetCount)
+    console.log('更新后的十殿标签数据:', tokenNightmareTeam)
     
     message.success(`已清空 ${resetCount} 个 Token 的十殿标签`)
     logOperation('shidian', '清空十殿标签', {
@@ -486,12 +535,99 @@ const executeNightmare8 = async () => {
   }
 }
 
+// 批量切换阵2
+const batchSwitchTeam2 = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  isSwitchingTeam2.value = true
+  
+  try {
+    message.info('开始批量切换阵2...')
+    
+    const gameTokens = toRaw(tokenStore.gameTokens)
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < gameTokens.length; i++) {
+      const token = gameTokens[i]
+      if (!token || !token.id) continue
+      
+      try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          message.warning(`${token.name} 连接失败`)
+          failCount++
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          message.warning(`${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          continue
+        }
+        
+        message.info(`正在切换 ${token.name} 到阵2...`)
+        
+        await tokenStore.sendGameMessage(token.id, 'presetteam_saveteam', { 
+          teamId: 2 
+        })
+        
+        message.success(`${token.name} 已切换到阵2`)
+        successCount++
+        
+        await connectionPool.release(token.id, true)
+        
+      } catch (error) {
+        console.error(`${token.name} 切换阵2失败:`, error)
+        message.error(`${token.name} 切换阵2失败：${error.message}`)
+        failCount++
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
+      }
+      
+      if (i < gameTokens.length - 1) {
+        await waitCommandDelay()
+      }
+    }
+    
+    message.success(`批量切换阵2完成！成功: ${successCount}，失败: ${failCount}`)
+    
+    logOperation('shidian', '批量切换阵2', {
+      cardType: '十殿 TeamID',
+      status: 'success',
+      message: `批量切换阵2完成，成功: ${successCount}，失败: ${failCount}`
+    })
+    
+  } catch (error) {
+    console.error('批量切换阵2失败:', error)
+    message.error(`批量切换阵2失败：${error.message || '未知错误'}`)
+    logOperation('shidian', '批量切换阵2', {
+      cardType: '十殿 TeamID',
+      status: 'error',
+      message: `批量切换阵2失败：${error.message}`
+    })
+  } finally {
+    isSwitchingTeam2.value = false
+  }
+}
+
 // 暴露方法给父组件
 defineExpose({
   autoJoinShiDian,
   stopAutoJoinShiDian,
   addMembersToTeams,
-  executeNightmare8
+  executeNightmare8,
+  batchSwitchTeam2
 })
 
 // 组件挂载时加载设置

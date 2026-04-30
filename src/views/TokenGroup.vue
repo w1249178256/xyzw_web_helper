@@ -4769,6 +4769,7 @@ const executeScheduledTask = async (task) => {
     }
 
     // 按Token遍历：连接Token后执行所有任务，再连接下一个Token
+    // 保持连接到所有任务完成，不频繁断开（参照金鱼页面）
     for (let i = 0; i < availableTokenIds.length; i++) {
       if (shouldStop.value) {
         addLog({
@@ -4793,6 +4794,9 @@ const executeScheduledTask = async (task) => {
         // 连接Token
         await scheduledTaskPool.acquire(tokenId);
 
+        // 等待游戏数据初始化完成（关键步骤！）
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // 执行所有选中的任务
         for (const taskName of validTasks) {
           if (shouldStop.value) break;
@@ -4806,12 +4810,12 @@ const executeScheduledTask = async (task) => {
           try {
             // 优先使用ForToken版本的任务函数（直接接受tokenId参数）
             const forTokenTaskName = taskName + 'ForToken';
-            const forTokenTaskFunction = eval(forTokenTaskName);
+            const forTokenTaskFunction = taskFunctionMap[forTokenTaskName];
             
             if (typeof forTokenTaskFunction === "function") {
               await forTokenTaskFunction(tokenId);
             } else {
-              const taskFunction = eval(taskName);
+              const taskFunction = taskFunctionMap[taskName];
               if (typeof taskFunction === "function") {
                 // 对于需要批量参数的任务，传递isScheduledTask = true
                 if (
@@ -4844,7 +4848,7 @@ const executeScheduledTask = async (task) => {
           }
 
           // 任务间延迟
-          await new Promise((resolve) => setTimeout(resolve, batchSettings.taskDelay || 600));
+          await new Promise((resolve) => setTimeout(resolve, 600));
         }
       } catch (error) {
         addLog({
@@ -4852,9 +4856,24 @@ const executeScheduledTask = async (task) => {
           message: `Token ${token.name || token.id} 执行失败: ${error.message}`,
           type: "error",
         });
-      } finally {
-        // 释放连接
-        await scheduledTaskPool.release(tokenId, true);
+      }
+      // 不断开连接，保持到所有任务完成
+    }
+
+    // 所有Token任务完成后，统一断开所有连接（参照金鱼页面）
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `=== 所有任务执行完成，正在断开所有连接 ===`,
+      type: "info",
+    });
+    for (const tokenId of availableTokenIds) {
+      try {
+        const status = tokenStore.getWebSocketStatus(tokenId);
+        if (status === 'connected') {
+          await scheduledTaskPool.release(tokenId, true);
+        }
+      } catch (error) {
+        console.error(`断开连接失败:`, error);
       }
     }
 
@@ -6005,6 +6024,7 @@ const {
   batchClaimStarRewards,
   batchClaimPeachTasks,
   batchGenieSweep,
+  batchGenieSweepForToken,
   batchLegionBoss,
   batchLegionBossForToken,
   batchFreeGift,
@@ -6037,7 +6057,73 @@ const {
 } = tasksStore;
 
 const tasksLegacy = createTasksLegacy(createTaskDeps());
-const { batchLegacyClaim, batchLegacyGiftSendEnhanced } = tasksLegacy;
+const { batchLegacyClaim, batchLegacyClaimForToken, batchLegacyGiftSendEnhanced } = tasksLegacy;
+
+// 创建任务函数映射表（替代eval，避免构建后变量名混淆问题）
+const taskFunctionMap = {
+  // HangUp
+  claimHangUpRewards,
+  claimHangUpRewardsForToken,
+  batchAddHangUpTime,
+  batchAddHangUpTimeForToken,
+  batchStudy,
+  batchclubsign,
+  batchclubsignForToken,
+  batchWarGuessCheer,
+  // Bottle
+  resetBottles,
+  batchlingguanzi,
+  resetBottlesForToken,
+  batchlingguanziForToken,
+  // Tower
+  climbTower,
+  climbWeirdTower,
+  batchClaimFreeEnergy,
+  skinChallenge,
+  batchUseItems,
+  batchMergeItems,
+  // Car
+  batchSmartSendCar,
+  batchClaimCars,
+  // Item
+  batchOpenBox,
+  batchOpenBoxByPoints,
+  batchClaimBoxPointReward,
+  batchFish,
+  batchRecruit,
+  batchHeroUpgrade,
+  batchBookUpgrade,
+  batchClaimStarRewards,
+  batchClaimPeachTasks,
+  batchGenieSweep,
+  batchGenieSweepForToken,
+  batchLegionBoss,
+  batchLegionBossForToken,
+  batchFreeGift,
+  batchFreeGiftForToken,
+  batchDailyBoss,
+  batchDailyBossForToken,
+  // Dungeon
+  batchbaoku13,
+  batchbaoku45,
+  batchmengjing,
+  batchBuyDreamItems,
+  // Arena
+  batcharenafight,
+  batchTopUpFish,
+  batchTopUpArena,
+  batcharenafightForToken,
+  // Store
+  legion_storebuygoods,
+  legionStoreBuySkinCoins,
+  store_purchase,
+  store_purchaseForToken,
+  collection_claimfreereward,
+  // Legacy
+  batchLegacyClaim,
+  batchLegacyClaimForToken,
+  batchLegacyGiftSendEnhanced,
+};
 
 const startBatch = async () => {
   if (selectedTokens.value.length === 0) return;

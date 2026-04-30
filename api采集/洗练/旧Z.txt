@@ -1,0 +1,4070 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/4/27 08:32:12
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 8
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/4/27 08:31:45
+服务: EquipmentService
+方法: quench
+参数: [{"heroId":102,"part":1,"lockedSlot":[]}]
+结果:
+{
+  "_raw": {
+    "seq": 30,
+    "ack": 29,
+    "time": 1777249906494,
+    "resp": 30,
+    "code": 200040,
+    "error": "版本过低，请升级"
+  },
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1777249905812_u13xa9chl
+
+记录 #2:
+----------------------------------------
+时间: 2026/4/27 08:31:44
+服务: MailService
+方法: getList
+参数: [{"lastId":0,"size":60,"category":[0,4,5]}]
+结果:
+{
+  "_raw": {
+    "seq": 29,
+    "ack": 0,
+    "time": 1777249905231,
+    "resp": 29,
+    "cmd": "mail_getlistresp",
+    "body": {
+      "list": [
+        {
+          "id": 22070014866,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30117\"}",
+          "content": "{\"id\":\"30118\"}",
+          "createdAt": "2026-04-26T16:01:43.095Z",
+          "expireAt": "2026-05-26T16:01:43.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 20,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 1000,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 10000,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 5,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1020",
+              "num": 5,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 5000,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 20,
+              "ext": "十殿罗盘寻宝奖励补发"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22070014864,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30115\"}",
+          "content": "{\"id\":\"30116\"}",
+          "createdAt": "2026-04-26T16:01:43.094Z",
+          "expireAt": "2026-05-26T16:01:43.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1037",
+              "num": 5,
+              "ext": "十殿罗盘入梦铃奖励补发"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22069074808,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"19\"]}",
+          "createdAt": "2026-04-26T15:32:46.121Z",
+          "expireAt": "2026-05-26T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1500,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22066534070,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10028\"}",
+          "content": "{\"id\":\"10106\",\"params\":[\"65\"]}",
+          "createdAt": "2026-04-26T14:21:56.891Z",
+          "expireAt": "2026-05-26T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 200,
+              "ext": "竞技场每周奖励"
+            },
+            {
+              "type": "3",
+              "id": "2003",
+              "num": 1,
+              "ext": "竞技场每周奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1777219246
+          }
+        },
+        {
+          "id": 22066534043,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"65\"]}",
+          "createdAt": "2026-04-26T14:21:56.883Z",
+          "expireAt": "2026-05-26T16:00:00.002Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 20,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 5,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1777219228
+          }
+        },
+        {
+          "id": 22062225535,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"18\"]}",
+          "createdAt": "2026-04-25T15:32:46.589Z",
+          "expireAt": "2026-05-25T15:32:24.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1500,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22060720071,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"60\"]}",
+          "createdAt": "2026-04-25T14:21:12.866Z",
+          "expireAt": "2026-05-25T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1777132857
+          }
+        },
+        {
+          "id": 22059489217,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30078\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30080\",\"params\":[\"灰盐岛中级战场\",\"63\"]}",
+          "createdAt": "2026-04-25T13:04:39.641Z",
+          "expireAt": "2026-05-25T13:00:20.132Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 3500,
+              "ext": "盐场争霸赛个人排行奖励"
+            },
+            {
+              "type": "3",
+              "id": "1013",
+              "num": 1,
+              "ext": "盐场争霸赛个人排行奖励"
+            },
+            {
+              "type": "3",
+              "id": "1019",
+              "num": 10,
+              "ext": "盐场争霸赛个人排行奖励"
+            },
+            {
+              "type": "3",
+              "id": "10002",
+              "num": 40,
+              "ext": "盐场争霸赛个人排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22059234777,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30073\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30075\",\"params\":[\"灰盐岛中级战场\",\"10\"]}",
+          "createdAt": "2026-04-25T13:04:09.026Z",
+          "expireAt": "2026-05-25T13:00:00.651Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 8200,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 40,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "1019",
+              "num": 35,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "1038",
+              "num": 30,
+              "ext": "盐场争霸赛排名奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22058453102,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30172\"}",
+          "content": "{\"id\":\"30173\",\"params\":[\"1\"]}",
+          "createdAt": "2026-04-25T13:02:35.064Z",
+          "expireAt": "2026-05-25T13:00:00.651Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 1500,
+              "ext": "盐场四圣祝福奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22056106477,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30067\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30068\",\"params\":[\"灰盐岛中级战场\",\"\\n等风夜行\\n相符7\\n相符42-3\\n阿林349\\n仁771黯涩\\n德威\\n锦衣·羽生\\n神州丶西大\\n相符42-1\\n小72-黯涩\\n相符41-3\\n相符5\\n锦衣·情话\\n相符2\\n等风后山\\n相符43-1\\n微月光吕布\\n相符49-2\\n相符3\\n锦衣、宇峯\\n月光布\\n锦衣•  德威\\n相符48-1\\n93阿瑟\\n相符41-2\\n机✨周瑜\\n\"]}",
+          "createdAt": "2026-04-25T10:06:01.180Z",
+          "expireAt": "2026-05-25T10:00:00.001Z",
+          "state": 2,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22052068909,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"19\"]}",
+          "createdAt": "2026-04-24T15:32:45.869Z",
+          "expireAt": "2026-05-24T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1500,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22050535008,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"49\"]}",
+          "createdAt": "2026-04-24T14:21:06.192Z",
+          "expireAt": "2026-05-24T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1777046429
+          }
+        },
+        {
+          "id": 22048131782,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30315\"}",
+          "content": "{\"id\":\"30316\"}",
+          "createdAt": "2026-04-24T05:50:26.856Z",
+          "expireAt": "2026-05-24T05:50:26.856Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 70,
+              "ext": "怪异咸将塔抽奖活动普通抽奖补发:260417"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22045656491,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30231\"}",
+          "content": "{\"id\":\"30232\"}",
+          "createdAt": "2026-04-23T18:57:26.518Z",
+          "expireAt": "2026-05-23T18:57:26.506Z",
+          "state": 2,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22043588599,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30220\"}",
+          "content": "{\"id\":\"30221\",\"params\":[\"空山新雨后✨\",\"1\"]}",
+          "createdAt": "2026-04-23T17:48:06.934Z",
+          "expireAt": "2026-05-23T17:48:06.934Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 2700,
+              "ext": "赛车军团排名结算"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "赛车军团排名结算"
+            },
+            {
+              "type": "3",
+              "id": "3012",
+              "num": 2,
+              "ext": "赛车军团排名结算"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22043104208,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 5,
+          "fromId": 0,
+          "from": "《咸鱼之王》运营团队",
+          "title": "{\"id\":\"100001196\"}",
+          "content": "{\"id\":\"100001197\"}",
+          "createdAt": "2026-04-23T12:00:00.003Z",
+          "expireAt": "2026-05-23T16:37:31.337Z",
+          "state": 1,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22043104013,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30313\"}",
+          "content": "{\"id\":\"30314\"}",
+          "createdAt": "2026-04-23T16:37:27.876Z",
+          "expireAt": "2026-04-30T16:37:27.875Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "55",
+              "id": "37001",
+              "num": 2,
+              "ext": "《爬塔之路过期补发》"
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 600,
+              "ext": "《爬塔之路过期补发》"
+            },
+            {
+              "type": "2",
+              "id": "0",
+              "num": 700,
+              "ext": "《爬塔之路过期补发》"
+            },
+            {
+              "type": "3",
+              "id": "1006",
+              "num": 1050,
+              "ext": "《爬塔之路过期补发》"
+            },
+            {
+              "type": "3",
+              "id": "1016",
+              "num": 450,
+              "ext": "《爬塔之路过期补发》"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22040178288,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"57\"]}",
+          "createdAt": "2026-04-23T14:21:08.233Z",
+          "expireAt": "2026-05-23T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776960044
+          }
+        },
+        {
+          "id": 22037698994,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10038\"}",
+          "content": "{\"id\":\"10039\"}",
+          "createdAt": "2026-04-22T23:10:47.681Z",
+          "expireAt": "2026-05-22T23:10:47.681Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 500,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1001",
+              "num": 5,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 2500,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22037463385,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"1003\"}",
+          "content": "{\"id\":\"1004\",\"params\":[\"23\"]}",
+          "createdAt": "2026-04-22T20:14:13.243Z",
+          "expireAt": "2026-05-22T20:14:13.243Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 4550,
+              "ext": "军团BOSS奖励"
+            },
+            {
+              "type": "1",
+              "id": "0",
+              "num": 119000,
+              "ext": "军团BOSS奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22036071132,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"23\"]}",
+          "createdAt": "2026-04-22T15:32:46.784Z",
+          "expireAt": "2026-05-22T15:32:24.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22034701767,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"52\"]}",
+          "createdAt": "2026-04-22T14:21:11.742Z",
+          "expireAt": "2026-05-22T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776873654
+          }
+        },
+        {
+          "id": 22031242796,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"24\"]}",
+          "createdAt": "2026-04-21T15:32:46.038Z",
+          "expireAt": "2026-05-21T15:32:24.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22029912029,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"45\"]}",
+          "createdAt": "2026-04-21T14:21:09.420Z",
+          "expireAt": "2026-05-21T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776787256
+          }
+        },
+        {
+          "id": 22027531315,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-20T17:08:59.718Z",
+          "expireAt": "2026-05-20T17:08:59.718Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 50,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1013",
+              "num": 2,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22026423495,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"24\"]}",
+          "createdAt": "2026-04-20T15:32:47.009Z",
+          "expireAt": "2026-05-20T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22025184587,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"67\"]}",
+          "createdAt": "2026-04-20T14:21:12.322Z",
+          "expireAt": "2026-05-20T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 20,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 5,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776700801
+          }
+        },
+        {
+          "id": 22022450141,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10040\"}",
+          "content": "{\"id\":\"10041\"}",
+          "createdAt": "2026-04-19T16:29:36.692Z",
+          "expireAt": "2026-05-19T16:29:36.692Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 500,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1006",
+              "num": 2000,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1013",
+              "num": 5,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22021953901,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30117\"}",
+          "content": "{\"id\":\"30118\"}",
+          "createdAt": "2026-04-19T16:01:35.954Z",
+          "expireAt": "2026-05-19T16:01:35.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 2000,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 20,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 1000,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 50,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1020",
+              "num": 5,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 5,
+              "ext": "十殿罗盘寻宝奖励补发"
+            },
+            {
+              "type": "3",
+              "id": "1023",
+              "num": 5,
+              "ext": "十殿罗盘寻宝奖励补发"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22021075929,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"24\"]}",
+          "createdAt": "2026-04-19T15:32:46.262Z",
+          "expireAt": "2026-05-19T15:32:24.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22018805147,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10028\"}",
+          "content": "{\"id\":\"10106\",\"params\":[\"49\"]}",
+          "createdAt": "2026-04-19T14:23:38.699Z",
+          "expireAt": "2026-05-19T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 300,
+              "ext": "竞技场每周奖励"
+            },
+            {
+              "type": "3",
+              "id": "2003",
+              "num": 1,
+              "ext": "竞技场每周奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776614450
+          }
+        },
+        {
+          "id": 22018805121,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"49\"]}",
+          "createdAt": "2026-04-19T14:23:38.690Z",
+          "expireAt": "2026-05-19T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776614418
+          }
+        },
+        {
+          "id": 22013576514,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"24\"]}",
+          "createdAt": "2026-04-18T15:32:45.269Z",
+          "expireAt": "2026-05-18T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22012094084,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"61\"]}",
+          "createdAt": "2026-04-18T14:21:46.819Z",
+          "expireAt": "2026-05-18T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 20,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 5,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776528035
+          }
+        },
+        {
+          "id": 22011140900,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30172\"}",
+          "content": "{\"id\":\"30173\",\"params\":[\"1\"]}",
+          "createdAt": "2026-04-18T13:05:26.490Z",
+          "expireAt": "2026-05-18T13:00:00.298Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 1800,
+              "ext": "盐场四圣祝福奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22010103791,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30078\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30080\",\"params\":[\"灰盐岛中级战场\",\"205\"]}",
+          "createdAt": "2026-04-18T13:03:23.892Z",
+          "expireAt": "2026-05-18T13:00:39.870Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 3200,
+              "ext": "盐场争霸赛个人排行奖励"
+            },
+            {
+              "type": "3",
+              "id": "1019",
+              "num": 10,
+              "ext": "盐场争霸赛个人排行奖励"
+            },
+            {
+              "type": "3",
+              "id": "10002",
+              "num": 30,
+              "ext": "盐场争霸赛个人排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22009937603,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30073\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30075\",\"params\":[\"灰盐岛中级战场\",\"4\"]}",
+          "createdAt": "2026-04-18T13:03:03.873Z",
+          "expireAt": "2026-05-18T13:00:00.300Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 9400,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 45,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "1019",
+              "num": 45,
+              "ext": "盐场争霸赛排名奖励"
+            },
+            {
+              "type": "3",
+              "id": "1038",
+              "num": 35,
+              "ext": "盐场争霸赛排名奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22008951246,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30168\"}",
+          "content": "{\"id\":\"30169\",\"params\":[\"3\",\"御仙宫⚔️\\n李太白 \\n序列 2nd\"]}",
+          "createdAt": "2026-04-18T13:01:06.712Z",
+          "expireAt": "2026-05-18T13:00:00.297Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 3000,
+              "ext": "盐场首次占领大本营奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22008061966,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-18T11:19:21.412Z",
+          "expireAt": "2026-05-18T11:19:21.412Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3007",
+              "num": 150,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1013",
+              "num": 1,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22008061965,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-18T11:19:21.410Z",
+          "expireAt": "2026-05-18T11:19:21.410Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 30,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1013",
+              "num": 1,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22007187451,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30067\",\"params\":[\"灰盐岛中级战场\"]}",
+          "content": "{\"id\":\"30068\",\"params\":[\"灰盐岛中级战场\",\"\\n仁771黯涩\\n相符7\\n锦衣、宇峯\\n等风后山\\n等风夜行\\n相符2\\n月光布\\n微月光吕布\\n机✨周瑜\\n相符48-1\\n小72-黯涩\\n相符4\\n相符42-3\\n相符43-1\\n德威\\n神州丶西大\\n93阿瑟\\n相符42-1\\n阿林349\\n相符41-2\\n相符5\\n相符3\\n锦衣•  德威\\n相符49-2\\n锦衣·情话\\n\"]}",
+          "createdAt": "2026-04-18T10:06:05.109Z",
+          "expireAt": "2026-05-18T10:00:00.000Z",
+          "state": 2,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22004410266,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10038\"}",
+          "content": "{\"id\":\"10039\"}",
+          "createdAt": "2026-04-17T23:21:22.731Z",
+          "expireAt": "2026-05-17T23:21:22.731Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 500,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1001",
+              "num": 5,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 2500,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22002346678,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"23\"]}",
+          "createdAt": "2026-04-17T15:32:45.776Z",
+          "expireAt": "2026-05-17T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1200,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 22000765373,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"59\"]}",
+          "createdAt": "2026-04-17T14:22:17.570Z",
+          "expireAt": "2026-05-17T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776441646
+          }
+        },
+        {
+          "id": 21997900960,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-17T07:30:54.456Z",
+          "expireAt": "2026-05-17T07:30:54.456Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3007",
+              "num": 100,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1012",
+              "num": 5,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21997900959,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-17T07:30:54.453Z",
+          "expireAt": "2026-05-17T07:30:54.453Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3201",
+              "num": 20,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1011",
+              "num": 5,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21997899390,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-17T07:30:40.546Z",
+          "expireAt": "2026-05-17T07:30:40.546Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3007",
+              "num": 50,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1016",
+              "num": 2000,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21997899389,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10127\"}",
+          "content": "{\"id\":\"10128\"}",
+          "createdAt": "2026-04-17T07:30:40.544Z",
+          "expireAt": "2026-05-17T07:30:40.544Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1001",
+              "num": 5,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21994684496,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"20051\",\"params\":[\"投石寻宝\"]}",
+          "content": "{\"id\":\"20052\",\"params\":[\"投石寻宝\"]}",
+          "createdAt": "2026-04-17T01:31:14.367Z",
+          "expireAt": "2026-05-17T01:31:14.367Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "3007",
+              "num": 5,
+              "ext": "足球电玩活动补发邮件奖励"
+            },
+            {
+              "type": "3",
+              "id": "1022",
+              "num": 100,
+              "ext": "足球电玩活动补发邮件奖励"
+            },
+            {
+              "type": "3",
+              "id": "1006",
+              "num": 66,
+              "ext": "足球电玩活动补发邮件奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21992593562,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30231\"}",
+          "content": "{\"id\":\"30232\"}",
+          "createdAt": "2026-04-16T18:42:31.370Z",
+          "expireAt": "2026-05-16T18:42:31.363Z",
+          "state": 2,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21989525533,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30162\"}",
+          "content": "{\"id\":\"30163\",\"params\":[\"16\"]}",
+          "createdAt": "2026-04-16T15:32:46.301Z",
+          "expireAt": "2026-05-16T15:32:24.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1014",
+              "num": 1500,
+              "ext": "咸神试炼每日排行奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21987904435,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"62\"]}",
+          "createdAt": "2026-04-16T14:22:16.873Z",
+          "expireAt": "2026-05-16T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 20,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 5,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776355223
+          }
+        },
+        {
+          "id": 21986676924,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 5,
+          "fromId": 0,
+          "from": "《咸鱼之王》运营团队",
+          "title": "{\"id\":\"100001190\"}",
+          "content": "{\"id\":\"100001191\"}",
+          "createdAt": "2026-04-16T12:00:00.007Z",
+          "expireAt": "2026-05-16T12:22:53.019Z",
+          "state": 1,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21983045256,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-15T16:00:03.022Z",
+          "expireAt": "2026-05-15T16:55:26.168Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260416"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21980202141,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"39\"]}",
+          "createdAt": "2026-04-15T14:22:12.386Z",
+          "expireAt": "2026-05-15T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776268837
+          }
+        },
+        {
+          "id": 21978423848,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"30222\"}",
+          "content": "{\"id\":\"30223\"}",
+          "createdAt": "2026-04-15T05:23:54.792Z",
+          "expireAt": "2026-05-15T05:23:54.792Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 331,
+              "ext": "赛车零件重置补发"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21975916880,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-14T16:00:03.062Z",
+          "expireAt": "2026-05-14T16:20:59.172Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260415"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21973381771,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"55\"]}",
+          "createdAt": "2026-04-14T14:22:14.586Z",
+          "expireAt": "2026-05-14T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776182441
+          }
+        },
+        {
+          "id": 21969382091,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-13T16:00:03.044Z",
+          "expireAt": "2026-05-13T17:18:21.916Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260414"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21966569984,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"41\"]}",
+          "createdAt": "2026-04-13T14:22:13.421Z",
+          "expireAt": "2026-05-13T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776096024
+          }
+        },
+        {
+          "id": 21962811684,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10115\"}",
+          "content": "{\"id\":\"10116\"}",
+          "createdAt": "2026-04-12T23:41:23.292Z",
+          "expireAt": "2026-05-12T23:41:23.292Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "1006",
+              "num": 468,
+              "ext": "《竞技通行证过期补发》"
+            },
+            {
+              "type": "3",
+              "id": "1016",
+              "num": 218,
+              "ext": "《竞技通行证过期补发》"
+            },
+            {
+              "type": "2",
+              "id": "0",
+              "num": 475,
+              "ext": "《竞技通行证过期补发》"
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 288,
+              "ext": "《竞技通行证过期补发》"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21961054517,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-12T16:00:03.034Z",
+          "expireAt": "2026-05-12T16:52:30.044Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260413"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21957500283,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10028\"}",
+          "content": "{\"id\":\"10106\",\"params\":[\"32\"]}",
+          "createdAt": "2026-04-12T14:31:11.364Z",
+          "expireAt": "2026-05-12T15:59:59.999Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 300,
+              "ext": "竞技场每周奖励"
+            },
+            {
+              "type": "3",
+              "id": "2003",
+              "num": 1,
+              "ext": "竞技场每周奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776009608
+          }
+        },
+        {
+          "id": 21957500266,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"32\"]}",
+          "createdAt": "2026-04-12T14:31:11.356Z",
+          "expireAt": "2026-05-12T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1776009627
+          }
+        },
+        {
+          "id": 21952479963,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10038\"}",
+          "content": "{\"id\":\"10039\"}",
+          "createdAt": "2026-04-12T01:34:11.533Z",
+          "expireAt": "2026-05-12T01:34:11.533Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 300,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1001",
+              "num": 5,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 2500,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21950819995,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-11T16:00:03.068Z",
+          "expireAt": "2026-05-11T16:54:45.628Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260412"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21948217752,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"24\"]}",
+          "createdAt": "2026-04-11T14:24:46.387Z",
+          "expireAt": "2026-05-11T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 50,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2002",
+              "num": 2,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775923217
+          }
+        },
+        {
+          "id": 21937865205,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-10T16:00:03.053Z",
+          "expireAt": "2026-05-10T16:47:20.573Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260411"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21935014142,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"26\"]}",
+          "createdAt": "2026-04-10T14:25:12.285Z",
+          "expireAt": "2026-05-10T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 50,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2002",
+              "num": 2,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775836820
+          }
+        },
+        {
+          "id": 21928314801,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"dropDailyMail_3\"}",
+          "content": "{\"id\":\"dropDailyMail_4\"}",
+          "createdAt": "2026-04-10T04:03:03.178Z",
+          "expireAt": "2026-05-10T04:48:42.779Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "3",
+              "id": "5269",
+              "num": 2,
+              "ext": "20260410"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21921219226,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"35\"]}",
+          "createdAt": "2026-04-09T14:24:55.810Z",
+          "expireAt": "2026-05-09T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775750408
+          }
+        },
+        {
+          "id": 21919891157,
+          "roleId": 460379015,
+          "type": 1,
+          "category": 5,
+          "fromId": 0,
+          "from": "《咸鱼之王》运营团队",
+          "title": "{\"id\":\"100001186\"}",
+          "content": "{\"id\":\"100001187\"}",
+          "createdAt": "2026-04-09T12:00:00.003Z",
+          "expireAt": "2026-05-09T12:28:44.600Z",
+          "state": 1,
+          "haveAttachments": false,
+          "attachments": [],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21915863801,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"40\"]}",
+          "createdAt": "2026-04-08T14:25:00.833Z",
+          "expireAt": "2026-05-08T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775664005
+          }
+        },
+        {
+          "id": 21911184252,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"51\"]}",
+          "createdAt": "2026-04-07T14:25:00.338Z",
+          "expireAt": "2026-05-07T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775577657
+          }
+        },
+        {
+          "id": 21909179965,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10038\"}",
+          "content": "{\"id\":\"10039\"}",
+          "createdAt": "2026-04-07T01:29:25.210Z",
+          "expireAt": "2026-05-07T01:29:25.210Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 200,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1001",
+              "num": 5,
+              "ext": ""
+            },
+            {
+              "type": "3",
+              "id": "1003",
+              "num": 2500,
+              "ext": ""
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": null
+        },
+        {
+          "id": 21906554256,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"60\"]}",
+          "createdAt": "2026-04-06T14:25:02.359Z",
+          "expireAt": "2026-05-06T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775491224
+          }
+        },
+        {
+          "id": 21899916691,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10028\"}",
+          "content": "{\"id\":\"10106\",\"params\":[\"32\"]}",
+          "createdAt": "2026-04-05T14:28:05.422Z",
+          "expireAt": "2026-05-05T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 300,
+              "ext": "竞技场每周奖励"
+            },
+            {
+              "type": "3",
+              "id": "2003",
+              "num": 1,
+              "ext": "竞技场每周奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775404814
+          }
+        },
+        {
+          "id": 21899916669,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"32\"]}",
+          "createdAt": "2026-04-05T14:28:05.414Z",
+          "expireAt": "2026-05-05T16:00:00.001Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775404843
+          }
+        },
+        {
+          "id": 21892939103,
+          "roleId": 460379015,
+          "type": 0,
+          "category": 0,
+          "fromId": 0,
+          "from": "{\"id\":\"10101\"}",
+          "title": "{\"id\":\"10026\"}",
+          "content": "{\"id\":\"10105\",\"params\":[\"38\"]}",
+          "createdAt": "2026-04-04T14:24:57.494Z",
+          "expireAt": "2026-05-04T16:00:00.000Z",
+          "state": 3,
+          "haveAttachments": true,
+          "attachments": [
+            {
+              "type": "2",
+              "id": "0",
+              "num": 30,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "3010",
+              "num": 10,
+              "ext": "竞技场每日奖励"
+            },
+            {
+              "type": "3",
+              "id": "2001",
+              "num": 1,
+              "ext": "竞技场每日奖励"
+            }
+          ],
+          "extType": "",
+          "ext": "",
+          "custom": {
+            "showTime": 1775318441
+          }
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1777249904544_8y2dbgfac
+
+记录 #3:
+----------------------------------------
+时间: 2026/4/27 08:31:37
+服务: RoleService
+方法: backClaimReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 28,
+    "ack": 0,
+    "time": 1777249897900,
+    "resp": 28,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "heroes": {
+          "101": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "102": {
+            "attribute": {
+              "52": 0.3499999940395355,
+              "56": 0.006000000238418579,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "103": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "104": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "105": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "106": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "107": {
+            "attribute": {
+              "53": 0.4000000059604645,
+              "54": 0.05000000074505806,
+              "57": 0.4140000061690807,
+              "59": 0.4000000059604645,
+              "60": 0.012000000178813934,
+              "61": 0.7000000029802322,
+              "63": 0.004000000059604645,
+              "65": 0.004000000059604645,
+              "67": 0.06400000095367432,
+              "68": 0.04000000059604645,
+              "70": 0.22800000339746476
+            }
+          },
+          "108": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "109": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "58": 0.30000001192092896,
+              "59": 0.4000000059604645
+            }
+          },
+          "110": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "111": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "112": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": 0.4000000059604645,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "113": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "114": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "115": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "116": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.6000000089406967,
+              "59": 1.0000000298023224,
+              "61": 0.4000000059604645
+            }
+          },
+          "117": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "118": {
+            "attribute": {
+              "51": 1.3300000086426735,
+              "53": 0.4000000059604645,
+              "54": 0.006000000089406967,
+              "56": 0.42750001698732376,
+              "57": 1.2340000258386135,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "119": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "120": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "121": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "201": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "202": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "203": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "204": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "205": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "206": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "207": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "208": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "209": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "210": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "211": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "212": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "213": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "214": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "215": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "216": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "217": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "218": {
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "219": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "220": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "221": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "222": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "223": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "224": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "225": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "226": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "227": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "228": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "301": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "302": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "303": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "304": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "305": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "306": {
+            "attribute": {
+              "51": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "226": 0.15000000596046448,
+              "228": 0.15000000596046448,
+              "229": 0.20000000298023224,
+              "230": 0.15000000596046448
+            }
+          },
+          "307": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "308": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "309": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "310": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          },
+          "311": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "312": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "313": {
+            "attribute": {
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645
+            }
+          },
+          "314": {
+            "attribute": {
+              "54": 0.05000000074505806,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.20000000298023224
+            }
+          }
+        },
+        "medallion": null
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 34
+}
+异步: 是
+调用ID: call_1777249897207_4ym3zup9x
+
+记录 #4:
+----------------------------------------
+时间: 2026/4/27 08:31:33
+服务: FriendService
+方法: applyList
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 27,
+    "ack": 26,
+    "time": 1777249894653,
+    "resp": 27,
+    "cmd": "friend_applylistresp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 20
+}
+异步: 是
+调用ID: call_1777249893974_pkjqgox3a
+
+记录 #5:
+----------------------------------------
+时间: 2026/4/27 08:31:33
+服务: FriendService
+方法: list
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 26,
+    "ack": 25,
+    "time": 1777249894629,
+    "resp": 26,
+    "cmd": "friend_resp",
+    "body": {
+      "friendList": {
+        "106533214": {
+          "roleId": 106533214,
+          "serverId": 8640,
+          "serverViewId": 8613,
+          "name": "区区老余",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/u0y1UeK3J4GMUDLTx26yJVCzXe5KIwwrmiaYZIhxicC25gDwarfAxKMh1pWdQZiaVvesaj5xSHbLV05gyl7icfOe5A/132",
+          "level": 5345,
+          "levelId": 7500,
+          "power": 1410503254,
+          "bossId": 106622332,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI1N6lRaDcBVP86u7RHeeM9Vrql1S8ypfDlqdcDgw1S5DhMCrXw0Ghjr8iaFwXpvicwz4EwkmFylSuQ/132",
+          "medallion": null,
+          "medallionStorage": {
+            "2002": {
+              "expire": 1688054400,
+              "created": 1687464379
+            }
+          },
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1774721246,
+          "presented": 1777221539,
+          "lastLogin": 1776394752,
+          "lastOnline": 1776394758,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-01-04T08:51:11.294Z"
+        },
+        "436382722": {
+          "roleId": 436382722,
+          "serverId": 2008976,
+          "serverViewId": 8949,
+          "name": "相符3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "level": 6000,
+          "levelId": 8738,
+          "power": 10125009291,
+          "bossId": 438230729,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1777221539,
+          "presented": 1777221539,
+          "lastLogin": 1777247889,
+          "lastOnline": 1777247889,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:11:17.294Z"
+        },
+        "437409906": {
+          "roleId": 437409906,
+          "serverId": 2008972,
+          "serverViewId": 8945,
+          "name": "相符205",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4321,
+          "levelId": 6098,
+          "power": 387539495,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": 1777226807,
+          "lastOnline": 1777226929,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:55.000Z"
+        },
+        "437443470": {
+          "roleId": 437443470,
+          "serverId": 2008975,
+          "serverViewId": 8948,
+          "name": "相符208",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4095,
+          "levelId": 5428,
+          "power": 525759947,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777226909,
+          "lastOnline": 1777227424,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:07.456Z"
+        },
+        "437453864": {
+          "roleId": 437453864,
+          "serverId": 2008977,
+          "serverViewId": 8950,
+          "name": "相符210",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4300,
+          "levelId": 5023,
+          "power": 456840162,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1772211614,
+          "presented": 1777221539,
+          "lastLogin": 1777226941,
+          "lastOnline": 1777227455,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:09.938Z"
+        },
+        "437462700": {
+          "roleId": 437462700,
+          "serverId": 2008978,
+          "serverViewId": 8951,
+          "name": "相符211",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4100,
+          "levelId": 5811,
+          "power": 393158852,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777226974,
+          "lastOnline": 1777227425,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:12.309Z"
+        },
+        "437471875": {
+          "roleId": 437471875,
+          "serverId": 2008979,
+          "serverViewId": 8952,
+          "name": "相符212",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4260,
+          "levelId": 5370,
+          "power": 495327939,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777245436,
+          "lastOnline": 1777245442,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:14.571Z"
+        },
+        "437482569": {
+          "roleId": 437482569,
+          "serverId": 2008980,
+          "serverViewId": 8953,
+          "name": "相符213",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4500,
+          "levelId": 5658,
+          "power": 361781025,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777245437,
+          "lastOnline": 1777245442,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:17.020Z"
+        },
+        "437492097": {
+          "roleId": 437492097,
+          "serverId": 2008981,
+          "serverViewId": 8954,
+          "name": "相符214",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4386,
+          "levelId": 4933,
+          "power": 390011365,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777227076,
+          "lastOnline": 1777227463,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:22.017Z"
+        },
+        "438187089": {
+          "roleId": 438187089,
+          "serverId": 2008987,
+          "serverViewId": 8960,
+          "name": "相符220",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4100,
+          "levelId": 5287,
+          "power": 426874523,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777227277,
+          "lastOnline": 1777227469,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:09:30.204Z"
+        },
+        "438196321": {
+          "roleId": 438196321,
+          "serverId": 2008986,
+          "serverViewId": 8959,
+          "name": "相符219",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4400,
+          "levelId": 5335,
+          "power": 362916485,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777227244,
+          "lastOnline": 1777227436,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:41.164Z"
+        },
+        "438210109": {
+          "roleId": 438210109,
+          "serverId": 2008985,
+          "serverViewId": 8958,
+          "name": "相符218",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTI2Xiaw8umib7psJVqc9EqCy2DTIOibVPYA9WpaykrXzQrIWKckSAB4kCZQwVwp4VRKKYGXAicoibaAatQ/132",
+          "level": 4315,
+          "levelId": 5013,
+          "power": 329123128,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1776445073,
+          "presented": 1777221539,
+          "lastLogin": 1777245433,
+          "lastOnline": 1777245438,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T13:10:38.852Z"
+        },
+        "459400329": {
+          "roleId": 459400329,
+          "serverId": 2008972,
+          "serverViewId": 8945,
+          "name": "相符245",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 53,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "medallion": [],
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": 1697180758,
+          "lastOnline": 1697180758,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:36:41.797Z"
+        },
+        "459452007": {
+          "roleId": 459452007,
+          "serverId": 2008974,
+          "serverViewId": 8947,
+          "name": "相符247",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 200,
+          "levelId": 53,
+          "power": 19414,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:44:40.337Z"
+        },
+        "459478160": {
+          "roleId": 459478160,
+          "serverId": 2008975,
+          "serverViewId": 8948,
+          "name": "相符248",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 52,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:45:59.826Z"
+        },
+        "459528287": {
+          "roleId": 459528287,
+          "serverId": 2008977,
+          "serverViewId": 8950,
+          "name": "相符250",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 53,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:48:01.943Z"
+        },
+        "459536409": {
+          "roleId": 459536409,
+          "serverId": 2008982,
+          "serverViewId": 8955,
+          "name": "相符55-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "level": 6000,
+          "levelId": 8060,
+          "power": 1928904510,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1771620371,
+          "presented": 1777221539,
+          "lastLogin": 1777244911,
+          "lastOnline": 1777245179,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T01:44:04.701Z"
+        },
+        "459594073": {
+          "roleId": 459594073,
+          "serverId": 2008970,
+          "serverViewId": 8943,
+          "name": "相符243",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 52,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:29:12.631Z"
+        },
+        "459614851": {
+          "roleId": 459614851,
+          "serverId": 2008969,
+          "serverViewId": 8942,
+          "name": "相符242",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 53,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:28:44.765Z"
+        },
+        "459626812": {
+          "roleId": 459626812,
+          "serverId": 2008978,
+          "serverViewId": 8951,
+          "name": "相符51-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "level": 6000,
+          "levelId": 8210,
+          "power": 1924885212,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1774643478,
+          "presented": 1777221539,
+          "lastLogin": 1777249542,
+          "lastOnline": 1777249542,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T00:23:27.207Z"
+        },
+        "459635678": {
+          "roleId": 459635678,
+          "serverId": 2008968,
+          "serverViewId": 8941,
+          "name": "相符241",
+          "headImg": "https://p3.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osf1sAiycA1YAXhAhMB4DeGCCJnNI0uAAD5gEz.jpeg?from=3782654143",
+          "level": 250,
+          "levelId": 52,
+          "power": 23726,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T06:27:48.558Z"
+        },
+        "459682523": {
+          "roleId": 459682523,
+          "serverId": 2008980,
+          "serverViewId": 8953,
+          "name": "相符53-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+          "level": 6000,
+          "levelId": 8033,
+          "power": 1865158346,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/32ic6hrJicXvEsGjRgvKHwkx5rrvB5NicgMicFQ2YNIJhsn8CDsLUVvMqx2lAswFZ5v01fTQkGtLtmGOqiaWJzCpSbg/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1771427386,
+          "presented": 1777221539,
+          "lastLogin": 1777244872,
+          "lastOnline": 1777245179,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T01:39:27.131Z"
+        },
+        "460025209": {
+          "roleId": 460025209,
+          "serverId": 2008987,
+          "serverViewId": 8960,
+          "name": "相符60-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "level": 6000,
+          "levelId": 8008,
+          "power": 1910561919,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/MPgGqicP68QXUezS9SZ5mVVtqRM3K0I4F2O6Doe5vnb7o0RRicVdWJIK9PibcUQPYt9Ggib6888qvxsK4RAibLjcHUw/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1771427386,
+          "presented": 1777221539,
+          "lastLogin": 1777244987,
+          "lastOnline": 1777245118,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T02:11:30.038Z"
+        },
+        "460322933": {
+          "roleId": 460322933,
+          "serverId": 2008973,
+          "serverViewId": 8946,
+          "name": "相符46-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "level": 6000,
+          "levelId": 8113,
+          "power": 3450503446,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLlcQBDb9IOwQWVXuc5sIuZQj8qXRaicicRHY1XLltohnnSqjyzr3fWVv2ibRfKVNPZNneKYUhp9HpSw/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1774643478,
+          "presented": 1777221539,
+          "lastLogin": 1777245889,
+          "lastOnline": 1777245889,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-12T14:44:11.095Z"
+        },
+        "460463466": {
+          "roleId": 460463466,
+          "serverId": 2008985,
+          "serverViewId": 8958,
+          "name": "相符58-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+          "level": 6000,
+          "levelId": 8050,
+          "power": 1900160076,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1771427386,
+          "presented": 1777221539,
+          "lastLogin": 1777244955,
+          "lastOnline": 1777245149,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2023-10-13T02:03:37.654Z"
+        },
+        "586281307": {
+          "roleId": 586281307,
+          "serverId": 9004,
+          "serverViewId": 8977,
+          "name": "相符4",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+          "level": 6000,
+          "levelId": 8616,
+          "power": 8447519332,
+          "bossId": 687427051,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/c5nI4icicDXjleVjv1t78DibIPLhRS2CkMkDBSSTBhLDzJ2rYibsEXYk1owOCwurhJjcx0reo8bE0ygYdNmLrfuVf81Hl9KTGSKPzYvr24MCJhY/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 1775798699,
+          "presented": 1777221539,
+          "lastLogin": 1777246840,
+          "lastOnline": 1777246840,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2025-07-18T03:18:16.608Z"
+        },
+        "706686028": {
+          "roleId": 706686028,
+          "serverId": 2008929,
+          "serverViewId": 8902,
+          "name": "相符002-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "level": 4862,
+          "levelId": 7454,
+          "power": 983402732,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaELXoQurjs3U3lnbmdiaxYZk73TU3h6LQ03cnyc340OKqJta1YPqOqzLyIB6kjZIU9O5X9AxiaHsvMoXY2hQViawjEP7DicrM1Kf55MeTBmt5gSibzg/132",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": true,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": 1777248239,
+          "lastOnline": 1777249887,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2025-04-17T12:59:54.722Z"
+        },
+        "706686494": {
+          "roleId": 706686494,
+          "serverId": 2008932,
+          "serverViewId": 8905,
+          "name": "相符005-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/pPmCWhl2lqHiaJWND4hQYicOC8XbCyYkWZdkrQvdmQFxj0WiccCib6hmKuc8M1Ko7qcKyPDUHA27KUzkQfhlUqwV4SoUmfS1fedib6ELSYoX7fb0/132",
+          "level": 4836,
+          "levelId": 7038,
+          "power": 798441850,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": true,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1777221539,
+          "lastLogin": 1777248524,
+          "lastOnline": 1777249855,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2025-04-18T07:42:47.425Z"
+        }
+      },
+      "leftReceiveCnt": 55
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 72
+}
+异步: 是
+调用ID: call_1777249893900_ggfbhnpi0
+
+记录 #6:
+----------------------------------------
+时间: 2026/4/27 08:31:33
+服务: MailService
+方法: getBattlefieldReportList
+参数: [{"lastId":0,"category":1,"size":60}]
+结果:
+{
+  "_raw": {
+    "seq": 24,
+    "ack": 0,
+    "time": 1777249893850,
+    "resp": 24,
+    "cmd": "mail_getlistresp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1777249893166_h5hipj631
+
+记录 #7:
+----------------------------------------
+时间: 2026/4/27 08:31:32
+服务: BossService
+方法: getState
+参数: [{"bossId":9905}]
+结果:
+{
+  "_raw": {
+    "seq": 23,
+    "ack": 22,
+    "time": 1777249893450,
+    "resp": 23,
+    "cmd": "boss_getstateresp",
+    "body": {
+      "hurt": 100013818478
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1777249892766_vufh0facw
+
+记录 #8:
+----------------------------------------
+时间: 2026/4/27 08:31:32
+服务: StoreService
+方法: goodsList
+参数: [{"storeId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 22,
+    "ack": 0,
+    "time": 1777249893448,
+    "resp": 22,
+    "cmd": "store_goodslistresp",
+    "body": {
+      "goodsList": {
+        "1": {
+          "buy_quantity": 0,
+          "discount": 0.5
+        },
+        "2": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "3": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "4": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "5": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "6": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "7": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "8": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "9": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "10": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "11": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "12": {
+          "buy_quantity": 1,
+          "discount": 0.800000011920929
+        },
+        "13": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "14": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "15": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "16": {
+          "buy_quantity": 0,
+          "discount": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1777249892766_y0t82af2a
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -31,6 +31,44 @@ export function createTasksLegacy(deps) {
   } = deps;
 
   /**
+   * 批量领取功法残卷 - ForToken版本
+   */
+  const batchLegacyClaimForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      await ensureConnection(tokenId);
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始领取功法残卷`,
+        type: "info",
+      });
+
+      const LegacyClaimHangUpResp = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "legacy_claimhangup",
+        {},
+        5000,
+      );
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 成功领取功法残卷${LegacyClaimHangUpResp.reward[0].value}，共有${LegacyClaimHangUpResp.role.items[37007].quantity}个`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取功法残卷失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 批量领取功法残卷
    */
   const batchLegacyClaim = async () => {
@@ -342,6 +380,7 @@ export function createTasksLegacy(deps) {
 
   return {
     batchLegacyClaim,
+    batchLegacyClaimForToken,
     batchLegacyGiftSendEnhanced,
   };
 }

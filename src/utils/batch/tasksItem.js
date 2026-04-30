@@ -800,131 +800,57 @@ export function createTasksItem(deps) {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
-    try {
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `${token.name} 开始灯神扫荡`,
-        type: "info",
-      });
+    await ensureConnection(tokenId);
+    
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `${token.name} 开始灯神扫荡`,
+      type: "info",
+    });
 
-      const roleInfoRes = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "role_getroleinfo",
-        {},
-        5000
-      );
-      
-      const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
-      const genieData = role.genie || {};
-      const sweepTicketCount = role.items?.[1021]?.quantity || 0;
-
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `${token.name} 当前扫荡券数量: ${sweepTicketCount}`,
-        type: "info",
-      });
-
-      if (sweepTicketCount <= 0) {
+    // 执行3次genie_buysweep命令
+    for (let i = 0; i < 3; i++) {
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'genie_buysweep',
+          {},
+          5000
+        );
+      } catch (error) {
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `${token.name} 扫荡券不足，停止扫荡`,
+          message: `${token.name} genie_buysweep ${i + 1}/3 失败: ${error.message}`,
           type: "warning",
         });
-        return;
       }
-
-      let maxLayer = -1;
-      let bestGenieId = -1;
-
-      for (let i = 1; i <= 4; i++) {
-        if (genieData[i] !== undefined) {
-          const currentLayer = genieData[i] + 1;
-          if (currentLayer > maxLayer) {
-            maxLayer = currentLayer;
-            bestGenieId = i;
-          }
-        }
-      }
-
-      if (bestGenieId === -1) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 未找到可扫荡的灯神关卡`,
-          type: "warning",
-        });
-        return;
-      }
-
-      const genieNames = { 1: "魏国", 2: "蜀国", 3: "吴国", 4: "群雄", 5: "深海" };
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `${token.name} 扫荡: ${genieNames[bestGenieId]}灯神 (第${maxLayer}层)`,
-        type: "info",
-      });
-
-      let remainingTickets = sweepTicketCount;
-      
-      while (remainingTickets > 0 && !shouldStop.value) {
-        const sweepCnt = Math.min(remainingTickets, 20);
-        
-        try {
-          const res = await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "genie_sweep",
-            { 
-              genieId: bestGenieId,
-              sweepCnt: sweepCnt 
-            },
-            5000
-          );
-
-          const ok = res && (res.role || res.role.items);
-          
-          if (ok) {
-            addLog({
-              time: new Date().toLocaleTimeString(),
-              message: `${token.name} 扫荡成功 ${sweepCnt} 次`,
-              type: "success",
-            });
-            remainingTickets = res.role.items?.[1021]?.quantity || 0;
-          } else {
-            addLog({
-              time: new Date().toLocaleTimeString(),
-              message: `${token.name} 扫荡失败: ${res.hint || "未知错误"}`,
-              type: "error",
-            });
-            break;
-          }
-        } catch (err) {
-          addLog({
-            time: new Date().toLocaleTimeString(),
-            message: `${token.name} 扫荡请求异常: ${err.message}`,
-            type: "error",
-          });
-          break;
-        }
-
-        if (remainingTickets > 0) {
-          await new Promise((r) => setTimeout(r, delayConfig.action));
-        }
-      }
-
-      await tokenStore.sendMessage(tokenId, "role_getroleinfo");
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `${token.name} 灯神扫荡完成`,
-        type: "success",
-      });
-
-    } catch (error) {
-      console.error(error);
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `灯神扫荡失败: ${error.message}`,
-        type: "error",
-      });
-      throw error;
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
+    
+    // 灯神扫荡 - 循环执行4次，每次使用不同的genieId（1-4）
+    for (let genieId = 1; genieId <= 4; genieId++) {
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'genie_sweep',
+          { genieId: genieId, sweepCnt: 1 },
+          5000
+        );
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} genie_sweep 灯神${genieId} 失败: ${error.message}`,
+          type: "warning",
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `${token.name} 灯神扫荡完成`,
+      type: "success",
+    });
   };
 
   /**
@@ -2035,6 +1961,8 @@ export function createTasksItem(deps) {
     if (!token) return;
 
     try {
+      await ensureConnection(tokenId);
+      
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始俱乐部BOSS`,
@@ -2085,6 +2013,8 @@ export function createTasksItem(deps) {
     if (!token) return;
 
     try {
+      await ensureConnection(tokenId);
+      
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始每日免费礼包`,
@@ -2158,6 +2088,8 @@ export function createTasksItem(deps) {
     const todayBossId = getTodayBossId();
 
     try {
+      await ensureConnection(tokenId);
+      
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始每日咸王（BOSS ID: ${todayBossId}）`,

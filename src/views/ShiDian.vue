@@ -51,6 +51,7 @@
           @update-pillow-count="handleUpdatePillowCount"
           @join-token="handleJoinTokenFromTeamIdCard"
           @auto-join-shidian="autoJoinShiDian"
+          @clear-nightmare-labels="handleClearNightmareLabels"
         />
 
         <!-- 俱乐部管理卡片 -->
@@ -1960,6 +1961,13 @@ const handleUpdatePillowCount = async (tokenId, pillowCount) => {
   tokenPillowCount.value[tokenId] = pillowCount
   await saveDropdownSettings()
   console.log(`Token ${tokenId} 十殿枕头数量已更新为: ${pillowCount}`)
+}
+
+// 处理清空十殿标签事件
+const handleClearNightmareLabels = async () => {
+  console.log('收到清空十殿标签事件，重新加载下拉框设置')
+  // 重新从 localStorage 加载下拉框设置，确保 tokenNightmareTeam 同步
+  await loadDropdownSettings()
 }
 
 </script>

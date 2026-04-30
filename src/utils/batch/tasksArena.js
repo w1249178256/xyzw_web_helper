@@ -42,120 +42,85 @@ export function createTasksArena(deps) {
     if (!token) return;
 
     try {
+      await ensureConnection(tokenId);
+      
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始竞技场战斗`,
         type: "info",
       });
 
-      // 检查咸神门票 (ID: 1007)
-      let role = tokenStore.gameData?.roleInfo?.role;
-      if (!role) {
-        try {
-          const roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
-          role = roleInfo?.role;
-        } catch {}
-      }
-      const ticketCount = role?.items?.[1007]?.quantity || 0;
-      addLog({
-        time: new Date().toLocaleTimeString(),
-        message: `${token.name} 当前咸神门票: ${ticketCount}`,
-        type: "info",
-      });
-
-      if (ticketCount <= 0) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 咸神门票不足，无法进行竞技场战斗`,
-          type: "warning",
-        });
-        return;
-      }
-
-      const teamInfo = await tokenStore.sendMessageWithPromise(
+      // 开始竞技场
+      await tokenStore.sendMessageWithPromise(
         tokenId,
-        "presetteam_getinfo",
+        'arena_startarea',
         {},
-        5000,
+        5000
       );
-      if (!teamInfo || !teamInfo.presetTeamInfo) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `阵容信息异常: ${JSON.stringify(teamInfo)}`,
-          type: "warning",
-        });
-      }
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      // 加载该Token的独立配置
-      const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
-      const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
-      let Isswitching = false;
-      if (currentFormation === tokenSettings.arenaFormation) {
+      // 进行 3 次战斗
+      for (let i = 1; i <= 3; i++) {
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `当前已是阵容${tokenSettings.arenaFormation}，无需切换`,
-          type: "info",
-        });
-      } else {
-        await tokenStore.sendMessageWithPromise(
-          tokenId,
-          "presetteam_saveteam",
-          { teamId: tokenSettings.arenaFormation },
-          5000,
-        );
-        Isswitching = true;
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `成功切换到阵容${tokenSettings.arenaFormation}`,
-          type: "info",
-        });
-      }
-      
-      const fights = Math.min(3, ticketCount);
-      if (fights < 3) {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 咸神门票仅剩 ${ticketCount} 张，将执行 ${fights} 次战斗`,
-          type: "warning",
-        });
-      }
-
-      for (let i = 0; i < fights; i++) {
-        if (shouldStop.value) break;
-
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 开始第 ${i + 1} 次竞技场战斗`,
+          message: `${token.name} 竞技场战斗 ${i}/3`,
           type: "info",
         });
 
-        const res = await tokenStore.sendMessageWithPromise(
-          tokenId,
-          "arena_challenge",
-          { 
-            defId: tokenSettings.arenaPlayerId,
-            defName: tokenSettings.arenaPlayerName,
-          },
-          10000,
-        );
-
-        if (res?.result === 0) {
+        // 获取对手列表
+        let targets;
+        try {
+          targets = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'arena_getareatarget',
+            {},
+            5000
+          );
+        } catch (err) {
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `${token.name} 第 ${i + 1} 次竞技场战斗胜利`,
+            message: `${token.name} 竞技场战斗${i} - 获取对手失败：${err.message}`,
+            type: "error",
+          });
+          break;
+        }
+
+        // 选择对手 ID
+        let targetId = null;
+        if (targets) {
+          const candidate =
+            targets?.rankList?.[0] ||
+            targets?.roleList?.[0] ||
+            targets?.targets?.[0] ||
+            targets?.targetList?.[0] ||
+            targets?.list?.[0];
+          if (candidate) {
+            targetId = candidate?.roleId || candidate?.id || candidate?.targetId;
+          }
+        }
+
+        if (targetId) {
+          // 开始战斗
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'fight_startareaarena',
+            { targetId },
+            10000
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 竞技场战斗${i}完成`,
             type: "success",
           });
         } else {
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `${token.name} 第 ${i + 1} 次竞技场战斗失败: ${res.hint || "未知错误"}`,
-            type: "error",
+            message: `${token.name} 竞技场战斗${i} - 未找到目标`,
+            type: "warning",
           });
         }
 
-        if (i < fights - 1) {
-          await new Promise((r) => setTimeout(r, delayConfig.action));
-        }
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
       addLog({
