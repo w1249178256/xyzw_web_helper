@@ -107,9 +107,15 @@
         />
         <CustomizedCard
           mode="button-placeholder"
-          button-text="批量使用福币"
+          button-text="批量使用10福币"
           :disabled="isRunning"
           @button-click="batchUseFuCoin()"
+        />
+        <CustomizedCard
+          mode="button-placeholder"
+          button-text="批量使用单个福币"
+          :disabled="isRunning"
+          @button-click="batchUseSingleFuCoin()"
         />
         <CustomizedCard
           mode="button-placeholder"
@@ -3170,14 +3176,13 @@ const setTeam = async (tokenId = null) => {
   }
 };
 
-// 批量使用福币
+// 批量使用10福币
 const batchUseFuCoin = async () => {
   if (isRunning.value) {
     message.warning("操作正在进行中，请稍后再试");
     return;
   }
 
-  // 按token昵称排序的token列表（与页面显示顺序一致）
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase();
     const nameB = (b.name || '未命名').toLowerCase();
@@ -3189,7 +3194,6 @@ const batchUseFuCoin = async () => {
     return;
   }
   
-  // 解析执行范围（如果为空则执行全部）
   const tokenIndices = connectionPool.parseTokenRange(executionRange.value);
   const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices);
   
@@ -3198,62 +3202,59 @@ const batchUseFuCoin = async () => {
     return;
   }
   
-  // 获取每个token在sortedTokens中的序号（用于显示）
   const getTokenIndex = (token) => {
     const index = sortedTokensList.findIndex(t => t.id === token.id);
     return index + 1;
   };
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部";
-  message.info(`开始批量使用福币（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`);
-  logOperation('shidian', '批量使用福币', {
+  message.info(`开始批量使用10福币（${rangeText}），共${targetTokens.length}个Token...`);
+  logOperation('shidian', '批量使用10福币', {
     cardType: '暑期活动',
     status: 'info',
-    message: `开始批量使用福币，${rangeText}，共${targetTokens.length}个Token`
+    message: `开始批量使用10福币，${rangeText}，共${targetTokens.length}个Token`
   });
 
   isRunning.value = true;
   try {
-    // 使用连接池执行批量操作
     const results = await connectionPool.batchOperate(
       targetTokens,
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token);
-          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行使用福币...`);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行使用10福币...`);
           
-          // 执行使用福币（使用内部函数，避免isRunning冲突）
-          const success = await useFuCoinInternal(token.id);
-          
-          if (success) {
-            console.log(`Token ${token.name} 使用福币成功`);
-            logOperation('shidian', '批量使用福币', {
-              cardType: '暑期活动',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: '使用福币完成'
-            });
-            return { success: true, token: token };
-          } else {
-            console.log(`Token ${token.name} 使用福币失败`);
-            logOperation('shidian', '批量使用福币', {
-              cardType: '暑期活动',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'error',
-              message: '使用福币失败'
-            });
-            return { success: false, token: token, error: '使用福币失败' };
+          for (let i = 0; i < 20; i++) {
+            await logCommand(
+              'shidian',
+              '批量使用10福币',
+              token.id,
+              token.name || '',
+              'activity_maydaylottery',
+              { times: 10 },
+              tokenStore.sendActivityMaydaylottery(token.id, { times: 10 }),
+              true,
+              '暑期活动'
+            );
+            await waitCommandDelay();
           }
+          
+          logOperation('shidian', '批量使用10福币', {
+            cardType: '暑期活动',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: '使用10福币完成'
+          });
+          return { success: true, token: token };
         } catch (error) {
-          console.error(`Token ${token.name} 使用福币失败:`, error);
-          logOperation('shidian', '批量使用福币', {
+          console.error(`Token ${token.name} 使用10福币失败:`, error);
+          logOperation('shidian', '批量使用10福币', {
             cardType: '暑期活动',
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `使用福币失败: ${error.message || error}`
+            message: `使用10福币失败: ${error.message || error}`
           });
           return { success: false, token: token, error: error.message || error };
         }
@@ -3285,34 +3286,166 @@ const batchUseFuCoin = async () => {
       }
     );
 
-    // 统计结果
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
     const failedTokens = results.filter(r => !r.success).map(r => r.token.name);
 
     if (failCount > 0) {
       const failedTokensStr = failedTokens.join('、');
-      message.success(`批量使用福币完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`);
-      logOperation('shidian', '批量使用福币', {
-        cardType: '暑期活动',
-        status: 'success',
-        message: `批量使用福币完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
-      });
+      message.success(`批量使用10福币完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`);
     } else {
-      message.success(`批量使用福币完成：成功${successCount}个，失败${failCount}个`);
-      logOperation('shidian', '批量使用福币', {
-        cardType: '暑期活动',
-        status: 'success',
-        message: `批量使用福币完成：成功${successCount}个，失败${failCount}个`
-      });
+      message.success(`批量使用10福币完成：成功${successCount}个，失败${failCount}个`);
     }
+    logOperation('shidian', '批量使用10福币', {
+      cardType: '暑期活动',
+      status: 'success',
+      message: `批量使用10福币完成：成功${successCount}个，失败${failCount}个`
+    });
   } catch (error) {
-    console.error("批量使用福币失败:", error);
-    message.error(`批量使用福币失败: ${error.message || error}`);
-    logOperation('shidian', '批量使用福币', {
+    console.error("批量使用10福币失败:", error);
+    message.error(`批量使用10福币失败: ${error.message || error}`);
+    logOperation('shidian', '批量使用10福币', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量使用福币失败: ${error.message || error}`
+      message: `批量使用10福币失败: ${error.message || error}`
+    });
+  } finally {
+    isRunning.value = false;
+  }
+};
+
+// 批量使用单个福币
+const batchUseSingleFuCoin = async () => {
+  if (isRunning.value) {
+    message.warning("操作正在进行中，请稍后再试");
+    return;
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase();
+    const nameB = (b.name || '未命名').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  
+  if (sortedTokensList.length === 0) {
+    message.warning("没有可用的Token");
+    return;
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value);
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices);
+  
+  if (targetTokens.length === 0) {
+    message.warning("执行范围内没有有效的Token");
+    return;
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id);
+    return index + 1;
+  };
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部";
+  message.info(`开始批量使用单个福币（${rangeText}），共${targetTokens.length}个Token...`);
+  logOperation('shidian', '批量使用单个福币', {
+    cardType: '暑期活动',
+    status: 'info',
+    message: `开始批量使用单个福币，${rangeText}，共${targetTokens.length}个Token`
+  });
+
+  isRunning.value = true;
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token);
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行使用单个福币...`);
+          
+          for (let i = 0; i < 10; i++) {
+            await logCommand(
+              'shidian',
+              '批量使用单个福币',
+              token.id,
+              token.name || '',
+              'activity_maydaylottery',
+              { times: 1 },
+              tokenStore.sendActivityMaydaylottery(token.id, { times: 1 }),
+              true,
+              '暑期活动'
+            );
+            await waitCommandDelay();
+          }
+          
+          logOperation('shidian', '批量使用单个福币', {
+            cardType: '暑期活动',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: '使用单个福币完成'
+          });
+          return { success: true, token: token };
+        } catch (error) {
+          console.error(`Token ${token.name} 使用单个福币失败:`, error);
+          logOperation('shidian', '批量使用单个福币', {
+            cardType: '暑期活动',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `使用单个福币失败: ${error.message || error}`
+          });
+          return { success: false, token: token, error: error.message || error };
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`);
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`);
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`);
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId);
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1;
+            if (progress.status === 'warning') {
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
+            } else {
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`);
+            }
+          }
+        }
+      }
+    );
+
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+    const failedTokens = results.filter(r => !r.success).map(r => r.token.name);
+
+    if (failCount > 0) {
+      const failedTokensStr = failedTokens.join('、');
+      message.success(`批量使用单个福币完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`);
+    } else {
+      message.success(`批量使用单个福币完成：成功${successCount}个，失败${failCount}个`);
+    }
+    logOperation('shidian', '批量使用单个福币', {
+      cardType: '暑期活动',
+      status: 'success',
+      message: `批量使用单个福币完成：成功${successCount}个，失败${failCount}个`
+    });
+  } catch (error) {
+    console.error("批量使用单个福币失败:", error);
+    message.error(`批量使用单个福币失败: ${error.message || error}`);
+    logOperation('shidian', '批量使用单个福币', {
+      cardType: '暑期活动',
+      status: 'error',
+      message: `批量使用单个福币失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;

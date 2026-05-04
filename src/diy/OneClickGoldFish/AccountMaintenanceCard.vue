@@ -392,6 +392,7 @@ const heroOptions = computed(() => {
 const syntheticHeroOptions = computed(() => {
   return [
     { label: '吕布', value: 'lvbu' },
+    { label: '张飞', value: 'zhangfei' },
     { label: '全部', value: 'all' }
   ]
 })
@@ -2236,6 +2237,10 @@ const handleBatchHeroSynthetic = async () => {
             // 选择吕布，执行参数 107
             itemId = 107
             message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成吕布...`)
+          } else if (selectedSyntheticHero.value === 'zhangfei') {
+            // 选择张飞，执行参数 204
+            itemId = 204
+            message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成张飞...`)
           } else {
             // 选择全部，参照英雄升星执行全部红将、橙将、紫将
             // 红将：101-120，橙将：201-228，紫将：301-314
@@ -2278,7 +2283,7 @@ const handleBatchHeroSynthetic = async () => {
             return { success: true }
           }
           
-          // 执行吕布合成
+          // 执行英雄合成
           await tokenStore.sendHeroSynthetic(token.id, { itemId: itemId })
           
           message.success(`[${tokenIndex}] ${token.name || token.id} 英雄合成成功`)
@@ -2634,9 +2639,11 @@ const handleBatchMayDayExchange = async () => {
           message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在执行五一万能兑换...`)
           
           for (let i = 0; i < 3; i++) {
-            await tokenStore.sendActivityExchange(token.id, [
-              { activityId: 2605014, goodsId: 260501422, quantity: 1 }
-            ])
+            await tokenStore.sendActivityExchange(token.id, {
+              activityId: 2605014,
+              goodsId: 260501422,
+              quantity: 1
+            })
             await new Promise(resolve => setTimeout(resolve, 500))
           }
           

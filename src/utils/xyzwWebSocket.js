@@ -161,6 +161,7 @@ export function registerDefaultCommands(reg) {
     .register("system_claimhanguporder")
     .register("system_claimcdkreward")
     .register("common_claimtotalreward")
+    .register("activity_exchange")
     .register("system_signinreward")
     .register("system_mysharecallback", { isSkipShareCard: true, type: 2 })
     .register("system_custom", { key: "", value: 0 })
@@ -1165,6 +1166,7 @@ export class XyzwWebSocketClient {
       system_claimhanguporderresp: "system_claimhanguporder",
       system_claimcdkrewardresp: "system_claimcdkreward",
       common_claimtotalrewardresp: "common_claimtotalreward",
+      activity_exchangeresp: "activity_exchange",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
       bottlehelper_claimresp: "bottlehelper_claim",
       bottlehelper_startresp: "bottlehelper_start",

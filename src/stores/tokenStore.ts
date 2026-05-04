@@ -1457,6 +1457,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "activity_maydaylottery", params);
   };
 
+  // 发送活动兑换
+  const sendActivityExchange = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_exchange", params);
+  };
+
   // 发送使用金鱼助威道具
   const sendAutumnUseItem = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "autumn_useitem", params);
@@ -2213,6 +2218,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegacyBeginHangup,
     sendActivityCommonBuyGoods,
     sendActivityMaydaylottery,
+    sendActivityExchange,
     sendAutumnUseItem,
     sendTowerBuyEnergy,
     sendLordWeaponUpgradeActiveSkillLevel,

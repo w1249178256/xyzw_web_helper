@@ -1982,6 +1982,26 @@ export class GameCommands {
       time: Date.now()
     }
   }
+  
+  
+    /**
+   * 五一兑换
+   */
+  activity_exchange(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        activityId:2605014,
+        	goodsId:260501422,
+        	quantity:1,
+          ...params
+      }),
+      cmd: "activity_exchange",
+      seq,
+      time: Date.now()
+    }
+  }
+  
 
   /**
    * 暑期活动战斗
