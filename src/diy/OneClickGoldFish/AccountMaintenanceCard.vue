@@ -63,6 +63,20 @@
           />
           <CustomizedCard 
             mode="button"
+            :name="isBatchHeroZhangFei ? '批量上阵张飞中...' : '批量上阵张飞'"
+            @button-click="handleBatchHeroZhangFei"
+            :disabled="isBatchHeroZhangFei"
+            :loading="isBatchHeroZhangFei"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchMayDayExchange ? '批量五一万能兑换中...' : '批量五一万能兑换'"
+            @button-click="handleBatchMayDayExchange"
+            :disabled="isBatchMayDayExchange"
+            :loading="isBatchMayDayExchange"
+          />
+          <CustomizedCard 
+            mode="button"
             :name="isUsingTorch ? '批量使用火把中...' : '批量使用火把'"
             @button-click="handleUseTorch"
             :disabled="isUsingTorch"
@@ -150,6 +164,13 @@
             @button-click="handleBatchUpgradeHangup"
             :disabled="isBatchUpgradingHangup"
             :loading="isBatchUpgradingHangup"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchClaimingHangupReward ? '批量领取推图层数奖励中...' : '批量领取推图层数奖励'"
+            @button-click="handleBatchClaimHangupReward"
+            :disabled="isBatchClaimingHangupReward"
+            :loading="isBatchClaimingHangupReward"
           />
           <CustomizedCard 
             mode="button"
@@ -346,6 +367,7 @@ const isBatchUpgradingEquipment = ref(false)
 const isBatchAwakingSkill = ref(false)
 const isBatchQuenching = ref(false)
 const isBatchUpgradingHangup = ref(false)
+const isBatchClaimingHangupReward = ref(false)
 const isBoxWeekRunning = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
@@ -395,6 +417,8 @@ const isBatchActivatingToyTeam = ref(false)
 const isBatchUpgradingToyTeamStar = ref(false)
 const isBatchHeroSynthetic = ref(false)
 const isBatchHeroBattle = ref(false)
+const isBatchHeroZhangFei = ref(false)
+const isBatchMayDayExchange = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
@@ -1597,6 +1621,96 @@ const handleBatchUpgradeHangup = async () => {
   }
 }
 
+const handleBatchClaimHangupReward = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+
+  try {
+    isBatchClaimingHangupReward.value = true
+
+    message.info(`开始批量领取推图层数奖励（${rangeText}），共${targetTokens.length}个Token...`)
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取推图层数奖励...`)
+
+          await tokenStore.sendClaimHangupOrder(token.id, {})
+          await new Promise(resolve => setTimeout(resolve, 300))
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 领取推图层数奖励完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '领取推图层数奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、领取推图层数奖励完成`
+          })
+          return { success: true, tokenId: token.id }
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 领取推图层数奖励失败:`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 领取推图层数奖励失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '领取推图层数奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name || token.id}、领取推图层数奖励失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+
+    message.success(`批量领取推图层数奖励完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '领取推图层数奖励',
+      status: 'success',
+      message: `批量领取推图层数奖励完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+
+    results.forEach(r => {
+      logStore.clearLogsByToken(r.tokenId, '领取推图层数奖励')
+    })
+
+  } catch (error) {
+    console.error('批量领取推图层数奖励失败:', error)
+    message.error(`批量领取推图层数奖励失败: ${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '领取推图层数奖励',
+      status: 'error',
+      message: `批量领取推图层数奖励失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchClaimingHangupReward.value = false
+  }
+}
+
 // 批量使用万能红
 const handleUseUniversalRed = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
@@ -2359,6 +2473,247 @@ const handleBatchHeroBattle = async () => {
   }
 }
 
+// 批量上阵张飞
+const handleBatchHeroZhangFei = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量上阵张飞（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量上阵张飞',
+    status: 'info',
+    message: `开始批量上阵张飞（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchHeroZhangFei.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在上阵张飞...`)
+          
+          await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 204, slot: 1 })
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 上阵张飞成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵张飞',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、上阵张飞成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵张飞失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵张飞失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵张飞',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、上阵张飞失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量上阵张飞完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵张飞',
+      status: 'success',
+      message: `批量上阵张飞完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量上阵张飞出错:', error)
+    message.error(`批量上阵张飞出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵张飞',
+      status: 'error',
+      message: `批量上阵张飞出错：${error.message || error}`
+    })
+  } finally {
+    isBatchHeroZhangFei.value = false
+  }
+}
+
+// 批量五一万能兑换
+const handleBatchMayDayExchange = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量五一万能兑换（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量五一万能兑换',
+    status: 'info',
+    message: `开始批量五一万能兑换（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchMayDayExchange.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在执行五一万能兑换...`)
+          
+          for (let i = 0; i < 3; i++) {
+            await tokenStore.sendActivityExchange(token.id, [
+              { activityId: 2605014, goodsId: 260501422, quantity: 1 }
+            ])
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 五一万能兑换成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量五一万能兑换',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、五一万能兑换成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 五一万能兑换失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 五一万能兑换失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量五一万能兑换',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、五一万能兑换失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量五一万能兑换完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量五一万能兑换',
+      status: 'success',
+      message: `批量五一万能兑换完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量五一万能兑换出错:', error)
+    message.error(`批量五一万能兑换出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量五一万能兑换',
+      status: 'error',
+      message: `批量五一万能兑换出错：${error.message || error}`
+    })
+  } finally {
+    isBatchMayDayExchange.value = false
+  }
+}
+
 // 购买升级赤羽
 const handleUpgradeChiYu = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
@@ -3104,19 +3459,19 @@ const executeBoxWeekForToken = async (token) => {
       
       if (shouldBreak) break
       
-      // 木质宝箱，每次10个
-      const woodTimes = Math.floor(M / 10)
+      // 木质宝箱，每次100个
+      const woodTimes = Math.floor(M / 100)
       for (let i = 0; i < woodTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 10 })
-        M -= 10
+        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 100 })
+        M -= 100
         MK++
         // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
+        const remainingM = M - MK * 100
         const remainingQ = Q - QK * 10
         const remainingH = H - HK * 10
         const remainingB = B - BK * 10
         // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
+        const YY = Y + MK * 100 + QK * 100 + HK * 200 + BK * 500
         const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开木质宝箱: ${MK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
         message.info(openBoxLog)
         // 添加操作日志
@@ -4764,7 +5119,7 @@ const handleBatchUnloadHeroes = async () => {
   }
   
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量下阵武将（${rangeText}），共${targetTokens.length}个 Token，下阵位置：1-4 号位`)
+  message.info(`开始批量下阵武将（${rangeText}），共${targetTokens.length}个 Token，下阵位置：2-4 号位`)
   logStore.addLog({
     page: 'fish-helper',
     cardType: '养号',
@@ -4783,9 +5138,8 @@ const handleBatchUnloadHeroes = async () => {
           const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在下阵武将...`)
           
-          // 下阵 1-4 号位（slot: 1-4）
+          // 下阵 2-4 号位（slot: 2-4）
           const unloadSlots = [
-            { slot: 1, positionName: '1 号位' },
             { slot: 2, positionName: '2 号位' },
             { slot: 3, positionName: '3 号位' },
             { slot: 4, positionName: '4 号位' }
@@ -6518,19 +6872,19 @@ const handleOneClickBoxWeek = async () => {
       
       if (shouldBreak) break
       
-      // 木质宝箱，每次10个
-      const woodTimes = Math.floor(M / 10)
+      // 木质宝箱，每次100个
+      const woodTimes = Math.floor(M / 100)
       for (let i = 0; i < woodTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 10 })
-        M -= 10
+        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 100 })
+        M -= 100
         MK++
         // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
+        const remainingM = M - MK * 100
         const remainingQ = Q - QK * 10
         const remainingH = H - HK * 10
         const remainingB = B - BK * 10
         // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
+        const YY = Y + MK * 100 + QK * 100 + HK * 200 + BK * 500
         const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开木质宝箱: ${MK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
         message.info(openBoxLog)
         // 添加操作日志

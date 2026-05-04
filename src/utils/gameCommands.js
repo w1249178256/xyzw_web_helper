@@ -151,7 +151,25 @@ export class GameCommands {
       time: Date.now(),
     };
   }
+  
+  
+  /**
+   * 领取挂机层数奖励
+   */
+  system_claimhanguporder(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        ...params,
+      }),
+      cmd: "system_claimhanguporder",
+      seq,
+      time: Date.now(),
+    };
+  }
 
+  
+  
   /**
    * 领取挂机奖励
    */
@@ -1915,7 +1933,7 @@ export class GameCommands {
   }
 
   /**
-   * 领取暑期免费道具
+   * 领取五一免费道具
    */
   activity_commonbuygoods(ack = 0, seq = 0, params = {}) {
     return {
@@ -1929,6 +1947,25 @@ export class GameCommands {
       time: Date.now()
     }
   }
+
+
+  /**
+   * 领取五一累充道具
+   */
+  common_claimtotalreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        activityId: params.activityId,
+        configId: params.configId,
+          ...params
+      }),
+      cmd: "common_claimtotalreward",
+      seq,
+      time: Date.now()
+    }
+  }
+
 
   /**
    * 使用五一福币
@@ -2349,6 +2386,24 @@ export class GameCommands {
       time: Date.now()
     }
   }
+  
+          /**
+   * 兑换码
+   */
+  system_claimcdkreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  key:params.key,
+      	  platformType:h5,
+          ...params
+      }),
+      cmd: "system_claimcdkreward",
+      seq,
+      time: Date.now()
+    }
+  }
+  
   
         /**
    * 活动周奖励

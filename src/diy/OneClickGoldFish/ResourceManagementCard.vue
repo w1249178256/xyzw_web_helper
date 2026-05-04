@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -26,6 +26,14 @@
             v-model:inputValue="resourceTokens" 
             placeholder="留空执行全部，或输入 1-20 或 1,2,3" 
             @update:inputValue="handleResourceTokensInput" 
+          />
+          
+          <!-- 金币袋子开关 -->
+          <CustomizedCard 
+            mode="name-switch" 
+            name="金币袋子" 
+            :switch-value="useGoldCoinBag"
+            @update:switch-value="useGoldCoinBag = $event"
           />
         
           <!-- 资源项列表 -->
@@ -76,6 +84,9 @@ const props = defineProps({
 const isUsingResources = ref(false)
 const isBatchUsingResources = ref(false)
 const isRefreshingItems = ref(false)
+
+// 金币袋子开关（默认开启）
+const useGoldCoinBag = ref(true)
 
 // 执行范围
 const resourceTokens = ref('')
@@ -310,6 +321,10 @@ const useAllResources = async () => {
       
       // 遍历所有袋子类型，使用每个袋子
       for (const itemType of itemTypes.value) {
+        // 如果金币袋子开关关闭，跳过金币袋子
+        if (itemType.id === 3001 && !useGoldCoinBag.value) {
+          continue
+        }
         const count = getItemCount(itemType.id)
         if (count > 0) {
           await useBag(itemType.id, count)
@@ -432,6 +447,10 @@ const batchUseResources = async () => {
         // 遍历所有袋子类型，使用每个袋子
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在使用所有袋子...`)
         for (const itemType of itemTypes.value) {
+          // 如果金币袋子开关关闭，跳过金币袋子
+          if (itemType.id === 3001 && !useGoldCoinBag.value) {
+            continue
+          }
           // 每次使用前重新获取token数据，确保获取最新的物品数量
           const currentToken = tokenStore.gameTokens.find(t => t.id === token.id)
           if (!currentToken) {

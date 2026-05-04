@@ -73,6 +73,12 @@
           @button-click="batchSwitchTeam2"
         />
       </CustomizedCard>
+      
+      <!-- 操作日志 -->
+      <OperationLogCard 
+        page="shidian" 
+        card-type="十殿 TeamID"
+      />
     </template>
   </MyCard>
 </template>
@@ -85,6 +91,7 @@ import { People } from '@vicons/ionicons5'
 import { logOperation } from '@/utils/operationLogger'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import MyCard from '@/components/Common/MyCard.vue'
+import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import ConnectionPoolManager from '@/utils/connectionPoolManager.js'
 
 const props = defineProps({

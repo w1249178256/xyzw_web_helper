@@ -409,7 +409,29 @@ export function createTasksStore(deps) {
           throw new Error(result.error);
         }
 
-        // 2. 执行store_buy，参数goodsId: 3
+        // 2. 执行store_buy，参数goodsId: 2
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:2...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:2 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 3. 执行store_buy，参数goodsId: 3
         addLog({
           time: new Date().toLocaleTimeString(),
           message: `${token.name} 执行store_buy goodsId:3...`,
@@ -431,7 +453,7 @@ export function createTasksStore(deps) {
           throw new Error(result.error);
         }
 
-        // 3. 执行store_refresh，参数storeId: 1
+        // 4. 执行store_refresh，参数storeId: 1
         addLog({
           time: new Date().toLocaleTimeString(),
           message: `${token.name} 执行store_refresh storeId:1...`,
@@ -453,7 +475,7 @@ export function createTasksStore(deps) {
           throw new Error(result.error);
         }
 
-        // 4. 执行store_buy，参数goodsId: 1
+        // 5. 执行store_buy，参数goodsId: 1
         addLog({
           time: new Date().toLocaleTimeString(),
           message: `${token.name} 执行store_buy goodsId:1...`,
@@ -475,7 +497,29 @@ export function createTasksStore(deps) {
           throw new Error(result.error);
         }
 
-        // 5. 执行store_buy，参数goodsId: 3
+        // 6. 执行store_buy，参数goodsId: 2
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:2...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:2 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 7. 执行store_buy，参数goodsId: 3
         addLog({
           time: new Date().toLocaleTimeString(),
           message: `${token.name} 执行store_buy goodsId:3...`,

@@ -1592,6 +1592,26 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "item_consume", params);
   };
 
+  // 发送领取挂机层数奖励
+  const sendClaimHangupOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimhanguporder", params);
+  };
+
+  // 发送领取CDK奖励
+  const sendClaimCdkReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimcdkreward", params);
+  };
+
+  // 发送领取CDK奖励（系统）
+  const sendSystemClaimCdkReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimcdkreward", params);
+  };
+
+  // 发送领取累充奖励
+  const sendClaimTotalReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "common_claimtotalreward", params);
+  };
+
   // 发送武将上阵/下阵
   const sendHeroGoIntoBattle = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
@@ -2220,6 +2240,10 @@ export const useTokenStore = defineStore("tokens", () => {
     sendMailClaimAllAttachment,
     sendItemOpenPack,
     sendItemConsume,
+    sendClaimHangupOrder,
+    sendClaimCdkReward,
+    sendSystemClaimCdkReward,
+    sendClaimTotalReward,
     sendHeroGoIntoBattle,
     sendChargeCreateOrder,
     sendBossTowerStartBoss,
