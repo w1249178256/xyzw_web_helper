@@ -70,6 +70,13 @@
           />
           <CustomizedCard 
             mode="button"
+            :name="isBatchStoryTeam ? '批量上阵推图中...' : '批量上阵推图'"
+            @button-click="handleBatchStoryTeam"
+            :disabled="isBatchStoryTeam"
+            :loading="isBatchStoryTeam"
+          />
+          <CustomizedCard 
+            mode="button"
             :name="isBatchMayDayExchange ? '批量五一万能兑换中...' : '批量五一万能兑换'"
             @button-click="handleBatchMayDayExchange"
             :disabled="isBatchMayDayExchange"
@@ -419,6 +426,7 @@ const isBatchUpgradingToyTeamStar = ref(false)
 const isBatchHeroSynthetic = ref(false)
 const isBatchHeroBattle = ref(false)
 const isBatchHeroZhangFei = ref(false)
+const isBatchStoryTeam = ref(false)
 const isBatchMayDayExchange = ref(false)
 
 // 执行范围
@@ -2596,6 +2604,131 @@ const handleBatchHeroZhangFei = async () => {
   }
 }
 
+// 批量上阵推图
+const handleBatchStoryTeam = async () => {
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量上阵推图（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量上阵推图',
+    status: 'info',
+    message: `开始批量上阵推图（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchStoryTeam.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在上阵推图武将...`)
+          
+          // 黄月英(110)位置2，太史慈(106)位置3，魏延(217)位置4
+          await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 110, slot: 2 })
+          await new Promise(resolve => setTimeout(resolve, 600))
+          
+          await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 106, slot: 3 })
+          await new Promise(resolve => setTimeout(resolve, 600))
+          
+          await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 217, slot: 4 })
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 上阵推图武将成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵推图',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、上阵推图武将成功`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵推图武将失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵推图武将失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵推图',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、上阵推图武将失败：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量上阵推图完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵推图',
+      status: 'success',
+      message: `批量上阵推图完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量上阵推图出错:', error)
+    message.error(`批量上阵推图出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵推图',
+      status: 'error',
+      message: `批量上阵推图出错：${error.message || error}`
+    })
+  } finally {
+    isBatchStoryTeam.value = false
+  }
+}
+
 // 批量五一万能兑换
 const handleBatchMayDayExchange = async () => {
   const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
@@ -2638,13 +2771,26 @@ const handleBatchMayDayExchange = async () => {
           const tokenIndex = globalIndex + 1
           message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在执行五一万能兑换...`)
           
-          for (let i = 0; i < 3; i++) {
-            await tokenStore.sendActivityExchange(token.id, {
-              activityId: 2605014,
-              goodsId: 260501422,
-              quantity: 1
-            })
-            await new Promise(resolve => setTimeout(resolve, 500))
+          const exchangeList = [
+            { goodsId: 260501424, count: 1 },
+            { goodsId: 260501427, count: 1 },
+            { goodsId: 260501428, count: 2 },
+            { goodsId: 260501432, count: 2 }
+          ]
+          
+          for (const exchange of exchangeList) {
+            for (let i = 0; i < exchange.count; i++) {
+              try {
+                await tokenStore.sendActivityExchange(token.id, {
+                  activityId: 2605014,
+                  goodsId: exchange.goodsId,
+                  quantity: 1
+                })
+              } catch (error) {
+                // 执行失败也不停止
+              }
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
           }
           
           message.success(`[${tokenIndex}] ${token.name || token.id} 五一万能兑换成功`)
@@ -3142,8 +3288,8 @@ const executeBoxWeekForToken = async (token) => {
     
     // 计算开箱轮数l
     let l = 0
-    if (Z - J > 4500) {
-      l = 1 + Math.floor((Z - J - 4500) / 3500)
+    if (Z - J > 4200) {
+      l = 1 + Math.floor((Z - J - 4200) / 3500)
     }
     if (l > 4) l = 4
     if (l < 0) l = 0
@@ -3833,21 +3979,12 @@ const handleBatchBoxWeek = async () => {
       message: `开始批量宝箱周（${rangeText}），共${targetTokens.length}个Token`
     })
     
-    // 记录每个Token的执行结果
-    const executionResults = []
-    
     // 逐个处理Token
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       message.info(`处理第 ${i + 1}/${targetTokens.length} 个Token: ${token.name}`)
       
-      const result = await executeBoxWeekForToken(token)
-      executionResults.push({
-        tokenName: token.name,
-        tokenId: token.id,
-        boxWeekRounds: result.boxWeekRounds,
-        successfulClaimCount: result.successfulClaimCount
-      })
+      await executeBoxWeekForToken(token)
       
       // 处理完一个 Token 后，等待一段时间再处理下一个
       if (i < targetTokens.length - 1) {
@@ -3866,89 +4003,6 @@ const handleBatchBoxWeek = async () => {
       status: 'success',
       message: `批量宝箱周完成，共处理${targetTokens.length}个Token`
     })
-    
-    // 记录执行轮次不为0的token的执行情况
-    const nonZeroRoundsResults = executionResults.filter(result => result.boxWeekRounds > 0)
-    
-    if (nonZeroRoundsResults.length > 0) {
-      const summaryMessage = nonZeroRoundsResults.map(result => 
-        `Token: ${result.tokenName}，轮次: ${result.boxWeekRounds}，成功领取次数: ${result.successfulClaimCount}`
-      ).join('; ')
-      
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '批量宝箱周执行总结',
-        status: 'info',
-        message: `批量宝箱周执行总结：${summaryMessage}`,
-        details: {
-          totalTokens: targetTokens.length,
-          nonZeroRoundsTokens: nonZeroRoundsResults.length,
-          executionResults: nonZeroRoundsResults
-        }
-      })
-      
-      // 自动导出为txt文件
-      try {
-        const lines = [
-          '批量宝箱周执行总结',
-          `执行时间: ${new Date().toLocaleString()}`,
-          `总Token数: ${targetTokens.length}`,
-          `执行轮次不为0的Token数: ${nonZeroRoundsResults.length}`,
-          '',
-          'Token名称,执行轮次,成功领取次数',
-          ...nonZeroRoundsResults.map(result => 
-            `${result.tokenName},${result.boxWeekRounds},${result.successfulClaimCount}`
-          )
-        ]
-        
-        const content = lines.join('\n')
-        const blob = new Blob(['\ufeff' + content], { type: 'text/plain;charset=utf-8;' })
-        const link = document.createElement('a')
-        const url = URL.createObjectURL(blob)
-        link.setAttribute('href', url)
-        const fileName = `批量宝箱周执行总结_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}.txt`
-        link.setAttribute('download', fileName)
-        link.style.visibility = 'hidden'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
-        
-        message.success(`导出执行总结完成: ${fileName}`)
-        
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '导出执行总结',
-          status: 'success',
-          message: `导出执行总结完成: ${fileName}`
-        })
-      } catch (error) {
-        console.error('导出执行总结失败:', error)
-        message.warning(`导出执行总结失败: ${error.message || '未知错误'}`)
-        
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '导出执行总结',
-          status: 'warning',
-          message: `导出执行总结失败: ${error.message || '未知错误'}`
-        })
-      }
-    } else {
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '批量宝箱周执行总结',
-        status: 'info',
-        message: '批量宝箱周执行总结：没有执行轮次不为0的token',
-        details: {
-          totalTokens: targetTokens.length,
-          nonZeroRoundsTokens: 0
-        }
-      })
-    }
     
   } catch (error) {
     console.error('批量宝箱周失败:', error)
@@ -6580,8 +6634,8 @@ const handleOneClickBoxWeek = async () => {
     
     // 计算开箱轮数l
     let l = 0
-    if (Z - J > 4500) {
-      l = 1 + Math.floor((Z - J - 4500) / 3500)
+    if (Z - J > 4200) {
+      l = 1 + Math.floor((Z - J - 4200) / 3500)
     }
     if (l > 4) l = 4
     if (l < 0) l = 0

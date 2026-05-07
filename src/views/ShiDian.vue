@@ -239,7 +239,7 @@ const refreshingTokens = ref(new Set())
 const teamId = ref('')
 const teamIds = ref(['', '', '', '', '']) // 五个十殿的 teamId
 const shidianInfoCardRef = ref(null)
-const commandDelay = ref(600) // 执行间隔（毫秒）
+const commandDelay = ref(800) // 执行间隔（毫秒）
 
 // 提供执行间隔给子组件
 provide('commandDelay', commandDelay)

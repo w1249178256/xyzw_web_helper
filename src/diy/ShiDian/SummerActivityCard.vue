@@ -163,7 +163,7 @@ const tokenStore = useTokenStore();
 const message = useMessage();
 
 // 注入执行间隔
-const commandDelay = inject('commandDelay', ref(600))
+const commandDelay = inject('commandDelay', ref(800))
 
 // 辅助函数：等待执行间隔
 const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
@@ -1200,9 +1200,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         }
       }
       
-      // 检查哪些BOSS的层数为0
+      // 检查哪些BOSS的层数小于3
       for (let i = 1; i <= 6; i++) {
-        if (bossLevels[i] === 0) {
+        if (bossLevels[i] < 3) {
           x++;
           zeroWinBosses.push(i);
         }

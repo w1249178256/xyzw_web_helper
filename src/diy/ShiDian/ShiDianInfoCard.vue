@@ -225,7 +225,7 @@ const logStore = useOperationLogStore()
 const executionStore = useNightmareExecutionStore()
 
 // 注入执行间隔
-const commandDelay = inject('commandDelay', ref(600))
+const commandDelay = inject('commandDelay', ref(800))
 
 // 辅助函数：等待执行间隔
 const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
