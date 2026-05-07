@@ -135,6 +135,12 @@
           :disabled="isRunning"
           @button-click="batchClaimTotalCharge()"
         />
+        <CustomizedCard
+          mode="button-placeholder"
+          button-text="批量导出道具数量"
+          :disabled="isRunning"
+          @button-click="batchExportItemCount()"
+        />
       </CustomizedCard>
       
       <!-- 操作日志 -->
@@ -2987,6 +2993,182 @@ const batchBattle = async () => {
       cardType: '暑期活动',
       status: 'error',
       message: `批量战斗失败: ${error.message || error}`
+    });
+  } finally {
+    isRunning.value = false;
+  }
+};
+
+// 批量导出道具数量
+const batchExportItemCount = async () => {
+  if (!itemId.value) {
+    message.warning("请输入道具ID");
+    return;
+  }
+
+  if (isRunning.value) {
+    message.warning("操作正在进行中，请稍后再试");
+    return;
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase();
+    const nameB = (b.name || '未命名').toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+
+  const parseTokenRange = (rangeStr) => {
+    if (!rangeStr || rangeStr.trim() === '') return null;
+    const indices = new Set();
+    const parts = rangeStr.split(',');
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (trimmed.includes('-')) {
+        const [start, end] = trimmed.split('-').map(Number);
+        if (!isNaN(start) && !isNaN(end)) {
+          for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
+            indices.add(i);
+          }
+        }
+      } else {
+        const num = Number(trimmed);
+        if (!isNaN(num)) {
+          indices.add(num);
+        }
+      }
+    }
+    return Array.from(indices).sort((a, b) => a - b);
+  };
+
+  const tokenIndices = parseTokenRange(executionRange.value);
+  let targetTokens;
+  if (tokenIndices === null) {
+    targetTokens = sortedTokensList;
+  } else {
+    targetTokens = tokenIndices.map(i => sortedTokensList[i - 1]).filter(Boolean);
+  }
+
+  if (targetTokens.length === 0) {
+    message.warning("没有可用的Token");
+    return;
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id);
+    return index + 1;
+  };
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部";
+  message.info(`开始批量导出道具数量（${rangeText}），共${targetTokens.length}个Token...`);
+  logOperation('shidian', '批量导出道具数量', {
+    cardType: '暑期活动',
+    status: 'info',
+    message: `开始批量导出道具数量，${rangeText}，共${targetTokens.length}个Token，道具ID: ${itemId.value}`
+  });
+
+  isRunning.value = true;
+  const results = [];
+
+  try {
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i];
+      const tokenIndex = getTokenIndex(token);
+
+      try {
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} - 正在连接Token...`);
+
+        const status = tokenStore.getWebSocketStatus(token.id);
+        if (status !== 'connected') {
+          await tokenStore.createWebSocketConnection(token.id, token.token, token.wsUrl);
+          let retryCount = 0;
+          while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 30) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            retryCount++;
+          }
+
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            throw new Error('Token连接失败');
+          }
+        }
+
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} - 正在获取角色信息...`);
+        const roleInfo = await tokenStore.sendGetRoleInfo(token.id);
+
+        let itemCount = 0;
+        if (roleInfo && roleInfo.role && roleInfo.role.items) {
+          itemCount = roleInfo.role.items[itemId.value]?.quantity || 0;
+        }
+
+        results.push({
+          tokenName: token.name || token.id,
+          tokenId: token.id,
+          count: itemCount
+        });
+
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} - 道具数量: ${itemCount}`);
+        logOperation('shidian', '批量导出道具数量', {
+          cardType: '暑期活动',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、道具数量: ${itemCount}`
+        });
+
+      } catch (error) {
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} - 获取道具数量失败:`, error);
+        message.error(`序号 ${tokenIndex} ${token.name || token.id} - 获取失败: ${error.message || '未知错误'}`);
+        logOperation('shidian', '批量导出道具数量', {
+          cardType: '暑期活动',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name || token.id}、获取失败: ${error.message || '未知错误'}`
+        });
+        results.push({
+          tokenName: token.name || token.id,
+          tokenId: token.id,
+          count: '获取失败'
+        });
+      } finally {
+        if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
+          await tokenStore.closeWebSocketConnection(token.id);
+        }
+      }
+
+      if (i < targetTokens.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // 导出为CSV
+    const csvHeader = 'Token名称,Token ID,道具数量\n';
+    const csvRows = results.map(r => `${r.tokenName},${r.tokenId},${r.count}`).join('\n');
+    const csvContent = '\uFEFF' + csvHeader + csvRows;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `道具数量_${itemId.value}_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    message.success(`批量导出道具数量完成，共导出${results.length}个Token`);
+    logOperation('shidian', '批量导出道具数量', {
+      cardType: '暑期活动',
+      status: 'success',
+      message: `批量导出道具数量完成，共导出${results.length}个Token`
+    });
+
+  } catch (error) {
+    console.error("批量导出道具数量失败:", error);
+    message.error(`批量导出道具数量失败: ${error.message || error}`);
+    logOperation('shidian', '批量导出道具数量', {
+      cardType: '暑期活动',
+      status: 'error',
+      message: `批量导出道具数量失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
