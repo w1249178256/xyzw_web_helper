@@ -798,6 +798,24 @@ export class GameCommands {
     }
   }
 
+
+  /**
+   * 领取功法特权
+   */
+legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  id:2
+        ...params
+      }),
+      cmd: "legacy_claimchargereward",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+
   /**
    * 领取功法挂机
    */

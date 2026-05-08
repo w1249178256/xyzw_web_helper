@@ -195,6 +195,13 @@
           />
           <CustomizedCard 
             mode="button"
+            :name="isBatchRecruitWeekRunning ? '批量招募周中...' : '批量招募周'"
+            @button-click="handleBatchRecruitWeek"
+            :disabled="isBatchRecruitWeekRunning"
+            :loading="isBatchRecruitWeekRunning"
+          />
+          <CustomizedCard 
+            mode="button"
             :name="isBatchSettingStoryTeam ? '批量设置推图阵容中...' : '批量设置推图阵容'"
             @button-click="handleBatchSetStoryTeam"
             :disabled="isBatchSettingStoryTeam"
@@ -379,6 +386,7 @@ const isBoxWeekRunning = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
 const isBatchBoxWeekRunning = ref(false)
+const isBatchRecruitWeekRunning = ref(false)
 
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
@@ -4022,41 +4030,348 @@ const handleBatchBoxWeek = async () => {
 
 // 批量招募周
 const handleBatchRecruitWeek = async () => {
-  const tokenIndices = parseTokenRange(executionTokens.value)
-  const targetTokens = getTargetTokens(tokenIndices)
-  
-  if (targetTokens.length === 0) {
-    message.warning('没有可用的Token')
-    return
-  }
-  
-  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
-  
   try {
     isBatchRecruitWeekRunning.value = true
-    
-    message.info(`开始批量招募周（${rangeText}），共${targetTokens.length}个Token...`)
+    message.info('开始批量招募周...')
     
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '批量招募周',
       status: 'info',
-      message: `功能开发中，敬请期待（${rangeText}，共${targetTokens.length}个Token）`
+      message: '开始批量招募周'
     })
+
+    const tokenIndices = parseTokenRange(executionTokens.value)
+    const targetTokens = getTargetTokens(tokenIndices)
     
-    message.info('批量招募周功能开发中...')
+    if (targetTokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到 Token`)
+      return
+    }
     
+    const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+    message.info(`开始批量招募周，共 ${targetTokens.length} 个 Token（${rangeText}）`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量招募周',
+      status: 'info',
+      message: `开始批量招募周，共 ${targetTokens.length} 个 Token（${rangeText}）`
+    })
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取吕布星级...`)
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
+            throw new Error('获取角色信息失败')
+          }
+          
+          let luBuStar = 0
+          if (roleInfo.role.heroes['107']) {
+            luBuStar = roleInfo.role.heroes['107'].star || 0
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 吕布星级：${luBuStar}`)
+          
+          if (luBuStar >= 30) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 吕布已 30 星，跳过招募周`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、吕布已 30 星，跳过`
+            })
+            return { success: true, tokenId: token.id, skipped: true, reason: '吕布已 30 星' }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取活动详情...`)
+          
+          let usedRecruitCount = 0
+          try {
+            const activityInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_get',
+              { },
+              5000
+            )
+            
+            if (activityInfo?.activity?.myTotalInfo?.['1']?.num !== undefined) {
+              usedRecruitCount = activityInfo.activity.myTotalInfo['1'].num
+              console.log(`[批量招募周] activity.myTotalInfo['1'].num = ${usedRecruitCount}`)
+            } else {
+              console.warn('[批量招募周] 未找到 activity.myTotalInfo[\'1\'].num')
+            }
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令数量：${usedRecruitCount}`)
+          } catch (error) {
+            console.error(`获取活动详情失败：${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取活动详情失败，继续执行`)
+          }
+          
+          let currentRecruitCount = 0
+          try {
+            const roleInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'role_getroleinfo',
+              {},
+              5000
+            )
+            
+            const items = roleInfo?.role?.items || {}
+            if (items['1001']) {
+              currentRecruitCount = items['1001'].quantity || items['1001'].num || 0
+            }
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 现有招募令数量：${currentRecruitCount}`)
+          } catch (error) {
+            console.error(`获取角色信息失败：${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
+          }
+          
+          const totalRecruitCount = Math.floor(usedRecruitCount * 0.8 + currentRecruitCount)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 总招募令数量：${totalRecruitCount} (公式：${usedRecruitCount} * 0.8 + ${currentRecruitCount})`)
+          console.log(`[批量招募周] 总招募令数量：${totalRecruitCount}, 已用：${usedRecruitCount}, 现有：${currentRecruitCount}`)
+          
+          const maxRounds = Math.floor(totalRecruitCount / 400)
+          console.log(`[批量招募周] 计划轮数：${maxRounds}`)
+          
+          const theoreticalUsed = maxRounds * 400
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募令对比：计划使用${maxRounds}轮，理论使用${theoreticalUsed}个，已用${usedRecruitCount}个`)
+          console.log(`[批量招募周] 招募令对比：理论使用=${theoreticalUsed}, 已用=${usedRecruitCount}`)
+          
+          if (usedRecruitCount >= theoreticalUsed && theoreticalUsed > 0) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令数量已达理论值，不再执行招募，直接领取奖励`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `${tokenIndex}、${token.name || token.id}、已用招募令数量已达理论值，不再执行招募`
+            })
+          }
+          
+          if (maxRounds === 0) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募令数量不足，无法完成一轮招募周（需要 400 个）`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、招募令数量不足，无法完成一轮招募周`
+            })
+            return { success: false, reason: 'insufficient_recruits' }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 计划执行 ${maxRounds} 轮招募周`)
+          
+          let completedRounds = 0
+          let totalRecruits = 0
+          let mailClaimCount = 0
+          let remainingRecruits = currentRecruitCount
+          
+          const shouldSkipRecruit = usedRecruitCount >= theoreticalUsed && theoreticalUsed > 0
+          
+          if (!shouldSkipRecruit) {
+            for (let round = 0; round < maxRounds; round++) {
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始第 ${round + 1} 轮招募周`)
+              
+              for (let recruit = 0; recruit < 400; recruit += 10) {
+                try {
+                  await tokenStore.sendMessageWithPromise(
+                    token.id,
+                    'hero_recruit',
+                    {
+                      byClub: false,
+                      recruitNumber: 10,
+                      recruitType: 1
+                    },
+                    5000
+                  )
+                  
+                  totalRecruits += 10
+                  remainingRecruits -= 10
+                  
+                  if (totalRecruits % 100 === 0) {
+                    try {
+                      await tokenStore.sendMessageWithPromise(
+                        token.id,
+                        'mail_claimallattachment',
+                        {},
+                        5000
+                      )
+                      mailClaimCount++
+                      message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取邮件附件成功（第${mailClaimCount}次）`)
+                    } catch (mailError) {
+                      console.error(`领取邮件失败：${mailError.message}`, mailError)
+                    }
+                  }
+                  
+                  await new Promise(resolve => setTimeout(resolve, 500))
+                } catch (recruitError) {
+                  console.error(`招募失败：${recruitError.message}`, recruitError)
+                  message.error(`[序号${tokenIndex}] ${token.name || token.id} 招募失败：${recruitError.message}`)
+                  break
+                }
+              }
+              
+              completedRounds++
+              remainingRecruits += 40
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 完成第 ${completedRounds} 轮招募周，获得 40 招募令奖励`)
+              
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
+          } else {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 跳过招募阶段，直接领取奖励`)
+          }
+          
+          let claimSuccessRounds = 0
+          const claimTimes = 4
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取招募周奖励，执行${claimTimes}次`)
+          console.log(`[批量招募周] 开始领取奖励，执行${claimTimes}次`)
+          
+          for (let i = 0; i < claimTimes; i++) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimweekactreward',
+                {
+                  selectRewardsMap: {
+                    '1': 1
+                  },
+                  typ: 1
+                },
+                5000
+              )
+              claimSuccessRounds++
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励成功`)
+              await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (claimError) {
+              console.error(`领取第 ${i + 1} 次奖励失败：${claimError.message}`, claimError)
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取第 ${i + 1} 次奖励失败：${claimError.message || '服务器错误'}，继续执行`)
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 领取奖励完成，成功${claimSuccessRounds}/${claimTimes}次`)
+          
+          const successMsg = `${token.name || token.id} 招募周完成，计划${maxRounds}轮，完成${completedRounds}轮，领取奖励${claimSuccessRounds}轮，共招募${totalRecruits}个，领取邮件${mailClaimCount}次，剩余招募令${remainingRecruits}个`
+          message.success(successMsg)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量招募周',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、${token.name || token.id}、${successMsg}`
+          })
+          
+          return { 
+            success: true, 
+            plannedRounds: maxRounds,
+            completedRounds, 
+            claimSuccessRounds,
+            totalRecruits, 
+            mailClaimCount,
+            remainingRecruits
+          }
+        } catch (error) {
+          console.error(`招募周失败：${error.message}`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 招募周失败：${error.message}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量招募周',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、${token.name || token.id}、招募周失败：${error.message}`
+          })
+          
+          return { success: false, error: error.message }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        keepConnections: false,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`[${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`[${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const totalTokens = results.length
+    const successCount = results.filter(r => r.success && !r.skipped).length
+    const skippedCount = results.filter(r => r.skipped).length
+    const failureCount = results.filter(r => !r.success).length
+    const totalCompletedRounds = results.reduce((sum, r) => sum + (r.completedRounds || 0), 0)
+    const totalClaimSuccessRounds = results.reduce((sum, r) => sum + (r.claimSuccessRounds || 0), 0)
+    const totalRecruits = results.reduce((sum, r) => sum + (r.totalRecruits || 0), 0)
+    const totalMailClaims = results.reduce((sum, r) => sum + (r.mailClaimCount || 0), 0)
+    
+    let summaryMessage = `批量招募周完成，共处理${totalTokens}个 Token，成功${successCount}个，跳过${skippedCount}个，失败${failureCount}个`
+    if (totalCompletedRounds > 0) {
+      summaryMessage += `，共完成${totalCompletedRounds}轮`
+    }
+    if (totalClaimSuccessRounds > 0) {
+      summaryMessage += `，领取奖励${totalClaimSuccessRounds}轮`
+    }
+    if (totalRecruits > 0) {
+      summaryMessage += `，共招募${totalRecruits}个`
+    }
+    if (totalMailClaims > 0) {
+      summaryMessage += `，领取邮件${totalMailClaims}次`
+    }
+    
+    message.success(summaryMessage)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量招募周',
+      status: 'success',
+      message: summaryMessage
+    })
   } catch (error) {
     console.error('批量招募周失败:', error)
-    message.error(`批量招募周失败: ${error.message || '未知错误'}`)
+    message.error(`批量招募周失败：${error.message}`)
     
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
       operation: '批量招募周',
       status: 'error',
-      message: `批量招募周失败: ${error.message || '未知错误'}`
+      message: `批量招募周失败：${error.message}`
     })
   } finally {
     isBatchRecruitWeekRunning.value = false

@@ -1153,6 +1153,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "legacy_claimgift", params);
   };
 
+  // 发送领取功法特权奖励
+  const sendLegacyClaimChargeReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_claimchargereward", params);
+  };
+
   // 发送提交密码
   const sendRoleCommitPassword = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "role_commitpassword", params);
@@ -2157,6 +2162,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendCollectionClaimFreeReward,
     sendLegacyClaimHangup,
     sendLegacyClaimGift,
+    sendLegacyClaimChargeReward,
     sendRoleCommitPassword,
     sendLegacySendGift,
     sendLegacyGetGifts,

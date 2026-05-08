@@ -354,6 +354,7 @@ export function registerDefaultCommands(reg) {
     // 功法
     .register("legacy_getinfo")
     .register("legacy_claimhangup")
+    .register("legacy_claimchargereward")
     // 功法残卷赠送
     .register("legacy_gift_getlist")
     .register("legacy_gift_send", { recipientId: 0, itemId: 0, quantity: 0 })
@@ -1236,6 +1237,7 @@ export class XyzwWebSocketClient {
       legion_resetresearchresp: "legion_resetresearch",
       // 功法相关响应映射
       legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_claimchargerewardresp: "legacy_claimchargereward",
       legacy_claimgiftresp: "legacy_claimgift",
       role_commitpasswordresp: "role_commitpassword",
       legacy_sendgiftresp: "legacy_sendgift",
@@ -1260,6 +1262,7 @@ export class XyzwWebSocketClient {
       // 功法相关响应映射
       legacy_getinforesp: "legacy_getinfo",
       legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_claimchargerewardresp: "legacy_claimchargereward",
       legacy_sendgiftresp: "legacy_sendgift",
       legacy_getgiftsresp: "legacy_getgifts",
       // 换皮闯关相关响应映射
