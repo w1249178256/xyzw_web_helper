@@ -66,7 +66,6 @@
           @refresh-club-info="handleRefreshClubInfo"
           @sign-in-club="handleSignInClub"
           @view-club-details="handleViewClubDetails"
-          @fetch-club-info="handleFetchClubInfo"
           @batch-fetch-club-info="handleBatchFetchClubInfo"
           @handle-legion-tokens-input="handleLegionTokensInput"
           @handle-legion-id-input="handleLegionIdInput"
@@ -1534,164 +1533,61 @@ const handleViewClubDetails = () => {
   message.info('查看俱乐部详情功能待实现')
 }
 
-// 获取单个token的俱乐部信息
-const handleFetchClubInfo = async () => {
-  if (!selectedTokenId.value) {
-    message.warning('请先选择Token')
-    return
-  }
-  
-  const token = tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
-  
-  try {
-    const status = tokenStore.getWebSocketStatus(token.id)
-    if (status !== 'connected') {
-      selectedTokenId.value = token.id
-      tokenStore.selectToken(token.id, false)
-      await new Promise(resolve => setTimeout(resolve, 500))
-    }
-    
-    await tokenStore.sendGameMessage(token.id, 'legion_getinfo', {})
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    const tokenData = tokenStore.gameTokens.find(t => t.id === token.id)
-    if (tokenData && tokenData.gameData && tokenData.gameData.legionInfo) {
-      const legionInfo = tokenData.gameData.legionInfo
-      const clubName = legionInfo?.info?.name || null
-      
-      if (clubName) {
-        clubNamesCache.value[token.id] = clubName
-        await saveClubNameToServer(token.id, clubName)
-        message.success(`获取成功: ${clubName}`)
-      } else {
-        message.warning('未加入俱乐部')
-      }
-    } else {
-      message.warning('未获取到俱乐部信息')
-    }
-  } catch (error) {
-    console.error('获取俱乐部信息失败:', error)
-    message.error('获取俱乐部信息失败')
-  }
-}
-
-// 批量获取俱乐部信息（使用连接池）
+// 获取俱乐部成员信息（只对当前连接的Token执行）
 const handleBatchFetchClubInfo = async () => {
-  if (!tokenStore.hasTokens) {
-    message.warning('没有可用的 Token')
-    return
-  }
+  const connectedToken = tokenStore.gameTokens.find(t => tokenStore.getWebSocketStatus(t.id) === 'connected')
   
-  const tokens = tokenStore.gameTokens
-  if (tokens.length === 0) {
-    message.warning('没有可用的 Token')
-    return
-  }
-  
-  // 解析执行范围（如果为空则执行全部）
-  const tokenIndices = parseTokenRange(legionTokens.value)
-  const targetTokens = tokenIndices === null 
-    ? tokens 
-    : tokenIndices
-        .map(index => {
-          const arrayIndex = index - 1
-          return tokens[arrayIndex]
-        })
-        .filter(token => token !== undefined)
-  
-  if (targetTokens.length === 0) {
-    message.warning('执行范围内没有有效的 Token')
+  if (!connectedToken) {
     return
   }
   
   isClubRunning.value = true
-  const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
-  message.info(`开始批量获取俱乐部信息（${rangeText}），共${targetTokens.length}个 Token...`)
+  message.info(`开始获取俱乐部成员信息：${connectedToken.name || connectedToken.id}...`)
   
   try {
-    // 导入连接池管理器
-    const { ConnectionPoolManager } = await import('@/utils/connectionPoolManager.js')
-    const connectionPool = new ConnectionPoolManager(tokenStore, {
-      maxConnections: 5,
-      connectionTimeout: 5000,
-      idleTimeout: 60000,
-      queueTimeout: 120000,
-      reconnectDelay: 1000,
-      maxRetries: 3
+    const legionInfo = await tokenStore.sendLegionGetInfo(connectedToken.id, {})
+    
+    const membersObj = legionInfo?.info?.members || {}
+    const members = Object.values(membersObj)
+    
+    if (members.length === 0) {
+      message.warning('未获取到俱乐部成员信息')
+      return
+    }
+    
+    const allMembers = members.map(member => {
+      const sPower = member.custom?.s_power || 0
+      const powerInYi = (sPower / 100000000).toFixed(2)
+      
+      return {
+        name: member.name || '',
+        power: powerInYi,
+        red_quench_cnt: member.custom?.red_quench_cnt || 0,
+        total_red_quench_cnt: member.custom?.total_red_quench_cnt || 0,
+        battle_red_quench_cnt: member.custom?.battle_red_quench_cnt || 0
+      }
     })
     
-    // 使用连接池进行批量操作
-    const results = await connectionPool.batchOperate(
-      targetTokens,
-      async (token, globalIndex) => {
-        try {
-          // 确保连接已建立
-          const status = tokenStore.getWebSocketStatus(token.id)
-          if (status !== 'connected') {
-            throw new Error('连接未建立')
-          }
-          
-          // 发送获取俱乐部信息请求
-          await tokenStore.sendGameMessage(token.id, 'legion_getinfo', {})
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
-          // 获取俱乐部信息
-          const tokenData = tokenStore.gameTokens.find(t => t.id === token.id)
-          if (tokenData && tokenData.gameData && tokenData.gameData.legionInfo) {
-            const legionInfo = tokenData.gameData.legionInfo
-            const clubName = legionInfo?.info?.name || null
-            
-            if (clubName) {
-              clubNamesCache.value[token.id] = clubName
-              await saveClubNameToServer(token.id, clubName)
-              return { success: true, message: `获取成功：${clubName}` }
-            } else {
-              return { success: false, message: '未加入俱乐部' }
-            }
-          } else {
-            return { success: false, message: '未获取到俱乐部信息' }
-          }
-        } catch (error) {
-          return { success: false, error: error.message }
-        }
-      },
-      {
-        batchSize: 1,
-        delayBetween: 1000,
-        keepConnections: false,
-        onProgress: (progress) => {
-          if (progress.type === 'batch-start') {
-            message.info(`正在处理第 ${progress.batchIndex} 个 Token（共 ${progress.totalBatches} 个）...`)
-          } else if (progress.type === 'token-start') {
-            message.info(`[${progress.globalIndex}/${progress.totalTokens}] ${progress.tokenName} 正在获取连接...`)
-          } else if (progress.type === 'token-success') {
-            message.success(`[${progress.globalIndex}] ${progress.tokenName} 连接成功`)
-          } else if (progress.type === 'token-error') {
-            if (progress.status === 'warning') {
-              message.warning(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
-            } else {
-              message.error(`[${progress.globalIndex}] ${progress.tokenName} ${progress.message}`)
-            }
-          }
-        }
-      }
-    )
+    const csvHeader = '名称,战力(亿),红数,总红数,盐场红数\n'
+    const csvRows = allMembers.map(m => 
+      `${m.name},${m.power},${m.red_quench_cnt},${m.total_red_quench_cnt},${m.battle_red_quench_cnt}`
+    ).join('\n')
+    const csvContent = '\uFEFF' + csvHeader + csvRows
     
-    // 销毁连接池
-    await connectionPool.destroy()
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `俱乐部成员信息_${new Date().toISOString().slice(0, 10)}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
     
-    // 汇总统计结果
-    const successCount = results.filter(r => r.success).length
-    const errorCount = results.filter(r => !r.success).length
-    
-    message.success(`批量获取俱乐部信息完成，成功${successCount}个，失败${errorCount}个`)
+    message.success(`俱乐部成员信息已导出成功，共 ${allMembers.length} 条记录`)
   } catch (error) {
-    console.error('批量获取俱乐部信息失败:', error)
-    message.error('批量获取俱乐部信息失败：' + (error.message || '未知错误'))
+    console.error('获取俱乐部成员信息失败:', error)
+    message.error('获取俱乐部成员信息失败：' + (error.message || '未知错误'))
   } finally {
     isClubRunning.value = false
   }

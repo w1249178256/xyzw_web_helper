@@ -60,14 +60,8 @@
           <!-- 俱乐部基本功能按钮 -->
           <CustomizedCard 
             mode="button" 
-            name="获取俱乐部信息" 
-            :disabled="!selectedTokenId || isRunning"
-            @button-click="fetchClubInfo"
-          />
-          <CustomizedCard 
-            mode="button" 
-            name="批量获取俱乐部信息" 
-            :disabled="isRunning"
+            name="获取俱乐部成员信息" 
+            :disabled="isRunning || !hasConnectedToken"
             @button-click="batchFetchClubInfo"
           />
           <CustomizedCard 
@@ -178,6 +172,11 @@ const sortedTokens = computed(() => {
   })
 })
 
+// 是否有已连接的Token
+const hasConnectedToken = computed(() => {
+  return tokenStore.gameTokens.some(t => tokenStore.getWebSocketStatus(t.id) === 'connected')
+})
+
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 5,
@@ -234,7 +233,6 @@ const emit = defineEmits([
   'sign-in-club',
   'view-club-details',
   'batch-fetch-club-info',
-  'fetch-club-info',
   'handle-legion-tokens-input',
   'handle-legion-id-input',
   'join-legion'
@@ -251,10 +249,6 @@ const signInClub = () => {
 
 const viewClubDetails = () => {
   emit('view-club-details')
-}
-
-const fetchClubInfo = () => {
-  emit('fetch-club-info')
 }
 
 const batchFetchClubInfo = () => {
@@ -1858,9 +1852,7 @@ const handleExportClubInfo = async () => {
     isExportClubInfoRunning.value = true
     message.info('开始导出俱乐部信息...')
 
-    // 获取执行范围的token索引
     const tokenIndices = parseTokenRange(legionTokens.value)
-    // 使用getTargetTokens获取token列表，如果tokenIndices为null，则返回全部token
     const targetTokens = getTargetTokens(tokenIndices)
     
     if (targetTokens.length === 0) {
@@ -1873,7 +1865,6 @@ const handleExportClubInfo = async () => {
 
     const clubInfoList = []
 
-    // 逐个连接token并获取俱乐部信息
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       const tokenIndex = i + 1
@@ -1881,7 +1872,6 @@ const handleExportClubInfo = async () => {
       try {
         message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在连接...`)
 
-        // 连接token
         let retryCount = 0
         const maxRetries = 5
         let status = tokenStore.getWebSocketStatus(token.id)
@@ -1899,81 +1889,54 @@ const handleExportClubInfo = async () => {
 
         if (status !== 'connected') {
           message.warning(`[${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
-          clubInfoList.push({
-            nickname: token.name || token.id,
-            clubName: '连接失败',
-            roleId: '连接失败'
-          })
           continue
         }
 
         message.success(`[${tokenIndex}] ${token.name || token.id} 连接成功`)
 
-        // 模拟点击获取俱乐部信息（调用legion_getinfo）
         try {
-          const result = await tokenStore.sendLegionGetInfo(token.id, {})
+          await tokenStore.sendLegionGetInfo(token.id, {})
+          await waitCommandDelay()
           
-          const nickname = token.name || token.id
-          const clubName = result?.info?.name || '未加入俱乐部'
+          const tokenData = tokenStore.gameTokens.find(t => t.id === token.id)
+          const legionInfo = tokenData?.gameData?.legionInfo
+          const clubName = legionInfo?.info?.name || '未加入俱乐部'
           
-          // 获取roleId
-          let roleId = '获取失败'
-          try {
-            const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
-            roleId = roleInfo?.role?.roleId || '未获取到'
-          } catch (roleError) {
-            console.error(`[${tokenIndex}] ${token.name || token.id} 获取roleId失败:`, roleError)
-            roleId = '获取失败'
-          }
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
+          const nickname = roleInfo?.role?.name || token.name || token.id
+          const realServerId = roleInfo?.role?.realServerId || 0
+          const roleId = roleInfo?.role?.roleId || 0
+          
+          const A = realServerId - 27
+          const combined = String(A) + '+' + String(roleId)
 
           clubInfoList.push({
             nickname,
             clubName,
-            roleId
+            serverId: realServerId,
+            roleId,
+            combined
           })
 
-          message.success(`[${tokenIndex}] ${nickname} 获取俱乐部信息成功: ${clubName}, roleId: ${roleId}`)
+          message.success(`[${tokenIndex}] ${nickname} 获取成功`)
         } catch (error) {
-          console.error(`[${tokenIndex}] ${token.name || token.id} 获取俱乐部信息失败:`, error)
-          
-          // 即使获取俱乐部信息失败，也尝试获取roleId
-          let roleId = '获取失败'
-          try {
-            const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
-            roleId = roleInfo?.role?.roleId || '未获取到'
-          } catch (roleError) {
-            console.error(`[${tokenIndex}] ${token.name || token.id} 获取roleId失败:`, roleError)
-          }
-          
-          clubInfoList.push({
-            nickname: token.name || token.id,
-            clubName: '获取失败',
-            roleId
-          })
+          console.error(`[${tokenIndex}] ${token.name || token.id} 获取失败:`, error)
+          message.warning(`[${tokenIndex}] ${token.name || token.id} 获取失败`)
         }
 
         await waitCommandDelay()
       } catch (error) {
         console.error(`[${tokenIndex}] ${token.name || token.id} 处理失败:`, error)
-        clubInfoList.push({
-          nickname: token.name || token.id,
-          clubName: '处理失败',
-          roleId: '处理失败'
-        })
       }
     }
 
-    // 生成导出内容
     const lines = []
-    // 标题行
-    lines.push('昵称,俱乐部名称,roleId')
+    lines.push('昵称,俱乐部名称,服务器号,角色号,综合')
     
-    // 数据行
     clubInfoList.forEach(info => {
-      lines.push(`${info.nickname},${info.clubName},${info.roleId || '未获取到'}`)
+      lines.push(`${info.nickname},${info.clubName},${info.serverId},${info.roleId},${info.combined}`)
     })
 
-    // 导出文件
     const content = lines.join('\n')
     const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
@@ -1987,7 +1950,6 @@ const handleExportClubInfo = async () => {
 
     message.success(`俱乐部信息已导出成功，共 ${clubInfoList.length} 条记录`)
     
-    // 记录日志
     logOperation('shidian', '导出俱乐部信息', {
       cardType: '俱乐部管理',
       tokenId: null,
@@ -1999,7 +1961,6 @@ const handleExportClubInfo = async () => {
     console.error('导出俱乐部信息失败:', error)
     message.error(`导出俱乐部信息失败: ${error.message || error}`)
     
-    // 记录错误日志
     logOperation('shidian', '导出俱乐部信息', {
       cardType: '俱乐部管理',
       tokenId: null,
