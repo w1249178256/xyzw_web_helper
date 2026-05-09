@@ -144,7 +144,7 @@
       size="small"
       :placeholder="placeholder"
       class="execution-range-input"
-      :maxlength="20"
+      :maxlength="100"
     />
   </div>
 

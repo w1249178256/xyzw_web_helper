@@ -439,6 +439,8 @@ const isBatchMayDayExchange = ref(false)
 
 // 执行范围
 const executionTokens = ref('')
+const legacyTargetId = ref('111582820')
+const legacyPassword = ref('946215')
 
 // 按token昵称排序的token列表
 const sortedTokens = [...tokenStore.gameTokens].sort((a, b) => {
@@ -450,6 +452,16 @@ const sortedTokens = [...tokenStore.gameTokens].sort((a, b) => {
 // 处理执行范围输入
 const handleExecutionTokensInput = (value) => {
   executionTokens.value = value
+}
+
+// 处理赠送目标ID输入
+const handleLegacyTargetIdInput = (value) => {
+  legacyTargetId.value = value
+}
+
+// 处理安全密码输入
+const handleLegacyPasswordInput = (value) => {
+  legacyPassword.value = value
 }
 
 // 解析执行范围

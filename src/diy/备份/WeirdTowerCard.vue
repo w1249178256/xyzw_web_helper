@@ -134,7 +134,7 @@ const message = useMessage()
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 20,
-  connectionTimeout: 3000,
+  connectionTimeout: 10000,
   maxRetries: 2
 })
 

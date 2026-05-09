@@ -32,6 +32,13 @@
               @update:inputValue="handleBatchTokensInput" 
             />
             <CustomizedCard 
+              mode="button-number-input" 
+              name="执行间隔(ms)" 
+              v-model:inputValue="commandDelay" 
+              placeholder="输入间隔毫秒" 
+              @update:inputValue="handleCommandDelayInput" 
+            />
+            <CustomizedCard 
               mode="button" 
               name="开始爬塔" 
               :disabled="!selectedTokenId || isRunning || towerEnergy <= 0"
@@ -134,7 +141,7 @@ const message = useMessage()
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 20,
-  connectionTimeout: 10000,
+  connectionTimeout: 3000,
   maxRetries: 2
 })
 
@@ -173,6 +180,7 @@ const isBatchRunning = ref(false)
 const isUsingItems = ref(false)
 const isMerging = ref(false)
 const batchTokens = ref('')
+const commandDelay = ref(localStorage.getItem('weirdTowerCommandDelay') || '1200')
 const stopFlag = ref(false)
 const stopItemFlag = ref(false)
 const stopMergeFlag = ref(false)
@@ -252,6 +260,13 @@ const isWeirdTowerActivityOpen = computed(() => {
 const handleBatchTokensInput = (value) => {
   batchTokens.value = value
 }
+
+const handleCommandDelayInput = (value) => {
+  commandDelay.value = value
+  localStorage.setItem('weirdTowerCommandDelay', value)
+}
+
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, parseInt(commandDelay.value) || 1200))
 
 // 解析执行范围
 const parseTokenRange = (rangeStr) => {
@@ -417,7 +432,7 @@ const startTowerClimb = async () => {
         message.success(`成功领取第${Math.floor(towerId / 10)}章通关奖励！`)
       }
 
-      await new Promise((res) => setTimeout(res, 1000)) // 每次间隔400毫秒
+      await waitCommandDelay() // 每次间隔
     }
     
     // 获取免费道具数量
@@ -446,7 +461,7 @@ const startTowerClimb = async () => {
       // 忽略免费道具领取失败
     }
     
-    await new Promise((res) => setTimeout(res, 1000))
+    await waitCommandDelay()
     
     // 获取最终状态
     const finalTowerId = currentTowerId.value
@@ -630,7 +645,7 @@ const batchClaimLegionPrivilege = async () => {
           try {
             await tokenStore.sendEvotowerClaimLegionPrivilege(token.id, {})
             successCount++
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await waitCommandDelay()
           } catch (error) {
             // 如果领取失败（如已领取过），跳过剩余领取
             console.log(`序号 ${tokenIndex} ${token.name || token.id} 第${i+1}次领取失败，跳过剩余领取:`, error.message)
@@ -999,7 +1014,7 @@ const startUseItems = async () => {
       lotteryLeftCnt--
       processedCount++
 
-      await new Promise((res) => setTimeout(res, 1000))
+      await waitCommandDelay()
     }
 
     // 领取累计奖励
@@ -1120,9 +1135,9 @@ const autoMergeItems = async () => {
                { actType: 1, taskId: parseInt(taskId) },
                2000
              ).catch(() => {})
-             await new Promise((res) => setTimeout(res, 1000))
+             await waitCommandDelay()
+            }
           }
-        }
       }
 
       // 解析 gridMap
@@ -1178,7 +1193,7 @@ const autoMergeItems = async () => {
           { actType: 1 },
           10000 
         )
-        await new Promise((res) => setTimeout(res, 1000))
+        await waitCommandDelay()
       } else {
         // 8级以下手动合成
         for (const id in groupedItems) {
@@ -1200,13 +1215,13 @@ const autoMergeItems = async () => {
               },
               1000
             ).catch(() => {})
-            await new Promise((res) => setTimeout(res, 1000))
+            await waitCommandDelay()
           }
         }
       }
       
       // 继续下一轮循环
-      await new Promise((res) => setTimeout(res, 1000))
+      await waitCommandDelay()
     }
 
     message.success("一键合成操作完成")
@@ -1358,7 +1373,7 @@ const handleBatchClimb = async () => {
         const initFloor = (currentTowerId % 10) + 1
         const initDisplayFloor = `${initChapter}-${initFloor}`
         
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await waitCommandDelay()
         
         // 记录初始信息
         logStore.addLog({
@@ -1458,7 +1473,7 @@ const handleBatchClimb = async () => {
             })
           }
 
-          await new Promise((res) => setTimeout(res, 1000))
+          await waitCommandDelay()
         }
         
         // 计算显示层数

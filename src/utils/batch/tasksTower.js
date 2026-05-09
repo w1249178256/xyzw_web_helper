@@ -383,11 +383,6 @@ export function createTasksTower(deps) {
 
             count++;
             consecutiveFailures = 0;
-            addLog({
-              time: new Date().toLocaleTimeString(),
-              message: `${token.name} 爬怪异塔第 ${count} 次`,
-              type: "info",
-            });
 
             await new Promise((r) => setTimeout(r, 500));
 
@@ -397,6 +392,15 @@ export function createTasksTower(deps) {
               {},
               5000,
             );
+
+            const currentTowerId = evotowerinfo2?.evoTower?.towerId || 0;
+            const chapter = Math.floor(currentTowerId / 10);
+            const floor = currentTowerId % 10;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 爬怪异塔当前层数: ${chapter}-${floor}`,
+              type: "info",
+            });
 
             // 检查并领取每日任务奖励
             if (evotowerinfo2 && evotowerinfo2.evoTower && evotowerinfo2.evoTower.taskClaimMap) {
