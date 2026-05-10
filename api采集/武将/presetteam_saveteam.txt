@@ -1,0 +1,2505 @@
+{
+  "ack": 0,
+  "body": {
+    "teamId": 2
+  },
+  "cmd": "presetteam_saveteam",
+  "seq": 40,
+  "time": 1770979336749
+}
+时间: 2026/2/13 09:34:40
+服务: PresetTeamService
+方法: saveTeam
+参数: [{"teamId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 37,
+    "ack": 0,
+    "time": 1770946481779,
+    "resp": 36,
+    "cmd": "presetteam_saveteamresp",
+    "body": {
+      "role": {
+        "gold": 264883103594,
+        "power": 11570565939,
+        "lordWeaponId": 3,
+        "lordWeapon": {
+          "1": {
+            "attachmentUid": 1064
+          },
+          "3": {
+            "attachmentUid": 1001,
+            "level": 150,
+            "passiveSkill": {
+              "9": {
+                "level": 50
+              },
+              "10": {
+                "level": 50
+              },
+              "11": {
+                "level": 50
+              },
+              "12": {
+                "level": 50
+              }
+            }
+          },
+          "5": {
+            "attachmentUid": 1065,
+            "level": 1,
+            "passiveSkill": {
+              "17": {
+                "level": 1
+              },
+              "18": {
+                "level": 1
+              },
+              "19": {
+                "level": 1
+              },
+              "20": {
+                "level": 1
+              }
+            }
+          },
+          "6": {
+            "attachmentUid": 1067,
+            "level": 1,
+            "passiveSkill": {
+              "21": {
+                "level": 1
+              },
+              "22": {
+                "level": 1
+              },
+              "23": {
+                "level": 1
+              },
+              "24": {
+                "level": 1
+              }
+            }
+          },
+          "7": {
+            "attachmentUid": 1003,
+            "level": 44,
+            "passiveSkill": {
+              "25": {
+                "level": 50
+              },
+              "26": {
+                "level": 50
+              },
+              "27": {
+                "level": 50
+              },
+              "28": {
+                "level": 30
+              }
+            }
+          },
+          "8": {
+            "attachmentUid": 1005,
+            "level": 150,
+            "passiveSkill": {
+              "29": {
+                "level": 50
+              },
+              "30": {
+                "level": 50
+              },
+              "31": {
+                "level": 50
+              },
+              "32": {
+                "level": 50
+              }
+            }
+          },
+          "9": {
+            "attachmentUid": 1072,
+            "level": 1,
+            "passiveSkill": {
+              "33": {
+                "level": 1
+              },
+              "34": {
+                "level": 1
+              },
+              "35": {
+                "level": 1
+              },
+              "36": {
+                "level": 1
+              }
+            }
+          }
+        },
+        "heroes": {
+          "101": {
+            "level": 6000,
+            "order": 19,
+            "power": 1952225424,
+            "attack": 661417857,
+            "defense": 188386116,
+            "hp": 5464924555,
+            "speed": 14240,
+            "artifactId": 11045,
+            "pearlId": 1,
+            "attachmentUid": 1054,
+            "trumpId": 60,
+            "attackExt": 5.115909099578857,
+            "defenseExt": 5.115909099578857,
+            "hpExt": 5.115909099578857,
+            "attribute": {
+              "51": 1.1720000025629997,
+              "52": 0.052499999105930326,
+              "53": 0.15000000596046448,
+              "56": 0.762500025331974,
+              "57": 1.3100000269711018,
+              "59": 0.4000000059604645,
+              "60": 0.03400000050663948,
+              "61": 0.7620000113546848,
+              "63": 0.18400000274181366,
+              "66": 0.00800000011920929,
+              "70": 0.26400000393390655,
+              "101": 0.06,
+              "102": 0.06,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null,
+              "301": 0.3540000015497208
+            },
+            "equipment": {
+              "1": {
+                "level": 4000,
+                "attack": 45492,
+                "quenchTimes": 10552,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 17,
+                    "attrNum": 2,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 15,
+                    "attrNum": 1,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 6,
+                    "attrId": 14,
+                    "attrNum": 89,
+                    "isLocked": true
+                  },
+                  "4": {
+                    "colorId": 3,
+                    "attrId": 6,
+                    "attrNum": 15,
+                    "isLocked": false
+                  },
+                  "5": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 84,
+                    "isLocked": true
+                  }
+                },
+                "quenchTimes2": 10243,
+                "quenches2": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 19,
+                    "attrNum": 2,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 6,
+                    "attrNum": 97,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 15,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 3,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "5": {
+                    "colorId": 1,
+                    "attrId": 9,
+                    "attrNum": 2,
+                    "isLocked": false
+                  }
+                },
+                "quenchAttackExt": 45492,
+                "quenchLogId": "111582820-628803",
+                "quenchLogId2": "111582820-16065120"
+              },
+              "2": {
+                "level": 4000,
+                "hp": 198972,
+                "quenchTimes": 5981,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 9,
+                    "attrNum": 85,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 5,
+                    "attrNum": 85,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 6,
+                    "attrId": 15,
+                    "attrNum": 91,
+                    "isLocked": true
+                  },
+                  "4": {
+                    "colorId": 3,
+                    "attrId": 13,
+                    "attrNum": 17,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 118326,
+                "quenchLogId": "111582820-159464"
+              },
+              "3": {
+                "level": 4000,
+                "defense": 50679,
+                "quenchTimes": 1780,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 81,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 5,
+                    "attrId": 10,
+                    "attrNum": 67,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 3,
+                    "attrId": 2,
+                    "attrNum": 11,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 6,
+                    "attrId": 14,
+                    "attrNum": 92,
+                    "isLocked": true
+                  }
+                },
+                "quenchDefenseExt": 8800,
+                "quenchLogId": "111582820-2128226"
+              },
+              "4": {
+                "level": 4000,
+                "hp": 183666,
+                "quenchTimes": 2249,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 10,
+                    "attrNum": 86,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 5,
+                    "attrNum": 1,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 5,
+                    "attrId": 21,
+                    "attrNum": 66,
+                    "isLocked": true
+                  },
+                  "4": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 84,
+                    "isLocked": true
+                  }
+                },
+                "quenchHpExt": 40500,
+                "quenchLogId": "111582820-2128331"
+              }
+            },
+            "battleTeamSlot": 0,
+            "skill": [
+              {
+                "skillId": 90006,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 90007,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 90008,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              }
+            ],
+            "appendSkill": [
+              {
+                "skillId": 1033008,
+                "level": 1,
+                "active": true,
+                "affiliated": 11045
+              },
+              {
+                "skillId": 11045,
+                "level": 1,
+                "active": true,
+                "affiliated": 11045
+              }
+            ]
+          },
+          "102": {
+            "level": 900,
+            "order": 6,
+            "power": 288702968,
+            "attack": 58995199,
+            "defense": 3106595,
+            "hp": 1082603633,
+            "speed": 11383,
+            "attachmentUid": 1043,
+            "trumpId": 361,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            },
+            "skill": [
+              {
+                "skillId": 1026,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1027,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1028,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              }
+            ],
+            "useSkin": 10201
+          },
+          "103": {
+            "power": 269038807,
+            "attack": 53411515,
+            "hp": 1026666800,
+            "speed": 10914,
+            "artifactId": -1,
+            "attachmentUid": 1006,
+            "trumpId": 1,
+            "attribute": {
+              "51": null,
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            },
+            "useSkin": 10301
+          },
+          "104": {
+            "level": 6000,
+            "order": 19,
+            "power": 2472999876,
+            "attack": 434950970,
+            "defense": 158531275,
+            "hp": 9131262847,
+            "speed": 14073,
+            "attachmentUid": 1013,
+            "trumpId": 420,
+            "attackExt": 5.115909099578857,
+            "defenseExt": 5.115909099578857,
+            "hpExt": 5.115909099578857,
+            "attribute": {
+              "52": 0.3289999943971634,
+              "53": 0.15600000604987144,
+              "54": 1.1760000026226043,
+              "56": 0.4120000064373016,
+              "57": 0.4000000059604645,
+              "58": 0.03200000047683716,
+              "59": 0.4120000061392784,
+              "60": 0.03000000044703484,
+              "61": 0.4000000059604645,
+              "62": 0.06999999880790711,
+              "64": 0.5580000008642674,
+              "66": 9.032000000476836,
+              "68": 0.004000000059604645,
+              "70": 1.0720000159740448,
+              "101": 0.06,
+              "102": 0.06,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            },
+            "equipment": {
+              "1": {
+                "level": 4000,
+                "attack": 45492,
+                "quenchTimes": 1089,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 13,
+                    "attrNum": 3,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 8,
+                    "attrNum": 88,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 3,
+                    "attrId": 11,
+                    "attrNum": 16,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 6,
+                    "attrId": 21,
+                    "attrNum": 84,
+                    "isLocked": true
+                  }
+                },
+                "quenchAttackExt": 5382,
+                "quenchLogId": "111582820-5275212"
+              },
+              "2": {
+                "level": 4000,
+                "hp": 198972,
+                "quenchTimes": 10077,
+                "quenches": {
+                  "1": {
+                    "colorId": 2,
+                    "attrId": 17,
+                    "attrNum": 8,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 21,
+                    "attrNum": 91,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 19,
+                    "attrNum": 1,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 2,
+                    "attrId": 1,
+                    "attrNum": 8,
+                    "isLocked": false
+                  },
+                  "5": {
+                    "colorId": 2,
+                    "attrId": 12,
+                    "attrNum": 6,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 198783,
+                "quenchLogId": "111582820-5275623"
+              },
+              "3": {
+                "level": 4000,
+                "defense": 50679,
+                "quenchTimes": 1553,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 6,
+                    "attrNum": 94,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 21,
+                    "attrNum": 93,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 13,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 2,
+                    "attrId": 1,
+                    "attrNum": 10,
+                    "isLocked": false
+                  }
+                },
+                "quenchDefenseExt": 7590,
+                "quenchLogId": "111582820-5276286"
+              },
+              "4": {
+                "level": 4000,
+                "hp": 183666,
+                "quenchTimes": 1185,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 9,
+                    "attrNum": 82,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 91,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 2,
+                    "attrId": 13,
+                    "attrNum": 7,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 7,
+                    "attrNum": 3,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 21492,
+                "quenchLogId": "111582820-5276557"
+              }
+            },
+            "battleTeamSlot": 3,
+            "skill": [
+              {
+                "skillId": 7006,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 7007,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 7008,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              }
+            ],
+            "appendSkill": [
+              {
+                "skillId": 1033012,
+                "level": 1,
+                "active": true,
+                "affiliated": 12065
+              }
+            ]
+          },
+          "105": {
+            "power": 1624055566,
+            "attack": 387254625,
+            "defense": 156415629,
+            "hp": 5323452856,
+            "speed": 14009,
+            "artifactId": -1,
+            "pearlId": 0,
+            "attachmentUid": 1023,
+            "trumpId": 360,
+            "attribute": {
+              "51": 0.0020000000298023225,
+              "52": null,
+              "53": 0.15000000596046448,
+              "54": 0.012000000178813934,
+              "56": 0.18000000715255737,
+              "57": 0.4000000059604645,
+              "58": 0.014000000208616258,
+              "59": 0.4000000059604645,
+              "60": 0.00800000011920929,
+              "61": 0.4000000059604645,
+              "63": null,
+              "66": null,
+              "67": 0.22000000327825547,
+              "68": 0.036000000536441805,
+              "70": null,
+              "101": null,
+              "102": null,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null,
+              "301": null
+            },
+            "equipment": {
+              "1": {
+                "quenchTimes": 1146,
+                "quenches": {
+                  "1": {
+                    "attrId": 11,
+                    "attrNum": 5
+                  },
+                  "2": {
+                    "colorId": 2,
+                    "attrId": 3,
+                    "attrNum": 9
+                  },
+                  "3": {
+                    "attrId": 1
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 8,
+                    "attrNum": 3
+                  },
+                  "5": null
+                },
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 4968,
+                "quenchLogId": "111582820-15376500",
+                "quenchLogId2": ""
+              },
+              "2": {
+                "quenchTimes": 719,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 8,
+                    "attrNum": 3,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 2,
+                    "attrId": 19,
+                    "attrNum": 9,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 11,
+                    "attrNum": 2,
+                    "isLocked": false
+                  },
+                  "4": null
+                },
+                "quenchHpExt": 13650,
+                "quenchLogId": "111582820-13730542"
+              },
+              "3": {
+                "quenchTimes": 652,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 13,
+                    "attrNum": 4,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 87
+                  },
+                  "3": {
+                    "colorId": 2,
+                    "attrId": 4,
+                    "attrNum": 10
+                  },
+                  "4": null
+                },
+                "quenchDefenseExt": 3400,
+                "quenchLogId": "111582820-16827211"
+              },
+              "4": {
+                "quenchTimes": 951,
+                "quenches": {
+                  "1": {
+                    "attrId": 1,
+                    "attrNum": 87
+                  },
+                  "3": {
+                    "attrId": 18,
+                    "attrNum": 55,
+                    "isLocked": false
+                  },
+                  "4": null
+                },
+                "quenchHpExt": 17964,
+                "quenchLogId": "111582820-16096883"
+              }
+            },
+            "battleTeamSlot": -1,
+            "appendSkill": [],
+            "useSkin": 10504
+          },
+          "106": {
+            "power": 1975933288,
+            "attack": 540267017,
+            "hp": 6277018194,
+            "attribute": {
+              "52": 0.017499999701976778,
+              "53": 0.32800000861287115,
+              "54": 0.20200000301003457,
+              "56": 0.7815000310540199,
+              "57": 0.45000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "62": 0.28699999511241914,
+              "63": 0.04800000071525574,
+              "65": 0.08800000131130219,
+              "66": 0.01600000023841858,
+              "67": 0.012000000178813934,
+              "70": 0.6960000103712083,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "301": 0.04000000059604645
+            },
+            "battleTeamSlot": 4
+          },
+          "107": {
+            "power": 269212789,
+            "attack": 53451434,
+            "hp": 1027308653,
+            "speed": 10914,
+            "artifactId": 13045,
+            "attachmentUid": 1050,
+            "attribute": {
+              "51": 1,
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "108": {
+            "level": 1,
+            "order": 0,
+            "power": 269639297,
+            "attack": 53511220,
+            "defense": 56698,
+            "hp": 1028976160,
+            "speed": 12013,
+            "attachmentUid": 1022,
+            "attribute": {
+              "53": null,
+              "54": 0.25,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "63": null,
+              "69": null,
+              "71": null,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            },
+            "skill": [
+              {
+                "skillId": 1086,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1087,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1088,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ],
+            "useSkin": 10801
+          },
+          "109": {
+            "level": 6000,
+            "order": 19,
+            "power": 2238581611,
+            "attack": 630839270,
+            "defense": 149757055,
+            "hp": 7113938222,
+            "speed": 15384,
+            "artifactId": 13055,
+            "pearlId": 0,
+            "attachmentUid": 1030,
+            "trumpId": 60,
+            "attackExt": 5.115909099578857,
+            "defenseExt": 5.115909099578857,
+            "hpExt": 5.115909099578857,
+            "attribute": {
+              "52": 0.4890000087022781,
+              "53": null,
+              "54": 0.27000000029802323,
+              "56": 0.52450001090765,
+              "57": 0.4000000059604645,
+              "58": 0.31000001206994054,
+              "59": 0.4000000059604645,
+              "60": 0.010000000149011612,
+              "61": 0.45800000682473185,
+              "62": null,
+              "63": 0.6780000026524067,
+              "70": null,
+              "71": null,
+              "101": 0.06,
+              "102": 0.06,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            },
+            "equipment": {
+              "1": {
+                "level": 4000,
+                "attack": 45492,
+                "quenchTimes": 10205,
+                "quenches": {
+                  "1": {
+                    "colorId": 2,
+                    "attrId": 8,
+                    "attrNum": 10,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 92,
+                    "isLocked": true
+                  },
+                  "3": {
+                    "colorId": 5,
+                    "attrId": 6,
+                    "attrNum": 54,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 2,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "5": {
+                    "colorId": 1,
+                    "attrId": 15,
+                    "attrNum": 4,
+                    "isLocked": false
+                  }
+                },
+                "quenchTimes2": 10019,
+                "quenches2": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 8,
+                    "attrNum": 4,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 2,
+                    "attrNum": 2,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 1,
+                    "attrId": 12,
+                    "attrNum": 3,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 14,
+                    "attrNum": 3,
+                    "isLocked": false
+                  },
+                  "5": {
+                    "colorId": 1,
+                    "attrId": 7,
+                    "attrNum": 2,
+                    "isLocked": false
+                  }
+                },
+                "quenchAttackExt": 45492,
+                "quenchLogId": "111582820-2198087",
+                "quenchLogId2": "111582820-19549265"
+              },
+              "2": {
+                "level": 4000,
+                "hp": 198972,
+                "quenchTimes": 1348,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 15,
+                    "attrNum": 85,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 13,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 88,
+                    "isLocked": true
+                  },
+                  "4": {
+                    "colorId": 1,
+                    "attrId": 9,
+                    "attrNum": 5,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 26676,
+                "quenchLogId": "111582820-2198290"
+              },
+              "3": {
+                "level": 4000,
+                "defense": 50679,
+                "quenchTimes": 1197,
+                "quenches": {
+                  "1": {
+                    "colorId": 6,
+                    "attrId": 9,
+                    "attrNum": 87,
+                    "isLocked": true
+                  },
+                  "2": {
+                    "colorId": 1,
+                    "attrId": 11,
+                    "attrNum": 5,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 4,
+                    "attrId": 14,
+                    "attrNum": 26,
+                    "isLocked": false
+                  },
+                  "4": {
+                    "colorId": 5,
+                    "attrId": 1,
+                    "attrNum": 65,
+                    "isLocked": true
+                  }
+                },
+                "quenchDefenseExt": 5600,
+                "quenchLogId": "111582820-1576438"
+              },
+              "4": {
+                "level": 4000,
+                "hp": 183666,
+                "quenchTimes": 2956,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 14,
+                    "attrNum": 3,
+                    "isLocked": false
+                  },
+                  "2": {
+                    "colorId": 2,
+                    "attrId": 2,
+                    "attrNum": 8,
+                    "isLocked": false
+                  },
+                  "3": {
+                    "colorId": 6,
+                    "attrId": 1,
+                    "attrNum": 85,
+                    "isLocked": true
+                  },
+                  "4": {
+                    "colorId": 6,
+                    "attrId": 9,
+                    "attrNum": 91,
+                    "isLocked": true
+                  }
+                },
+                "quenchHpExt": 53676,
+                "quenchLogId": "111582820-2198259"
+              }
+            },
+            "battleTeamSlot": 1,
+            "skill": [
+              {
+                "skillId": 1096,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1097,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1098,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              }
+            ],
+            "useSkin": 1007
+          },
+          "110": {
+            "level": 1,
+            "order": 0,
+            "power": 269082482,
+            "attack": 53445078,
+            "defense": 37774,
+            "hp": 1026708107,
+            "speed": 11012,
+            "artifactId": 13025,
+            "pearlId": 0,
+            "attachmentUid": 1036,
+            "trumpId": 0,
+            "attackExt": 0,
+            "defenseExt": 0,
+            "hpExt": 0,
+            "attribute": {
+              "51": null,
+              "53": 0.550000011920929,
+              "54": 0.20000000298023224,
+              "56": null,
+              "57": 0.20000000298023224,
+              "58": null,
+              "59": 0.4000000059604645,
+              "60": null,
+              "61": 0.9000000059604645,
+              "64": null,
+              "67": null,
+              "68": null,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            },
+            "equipment": {
+              "1": {
+                "level": 1,
+                "attack": 9,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchAttackExt": 0,
+                "quenchLogId": ""
+              },
+              "2": {
+                "level": 1,
+                "hp": 37,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              },
+              "3": {
+                "level": 1,
+                "defense": 10,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchDefenseExt": 0,
+                "quenchLogId": ""
+              },
+              "4": {
+                "level": 1,
+                "hp": 35,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              }
+            },
+            "skill": [
+              {
+                "skillId": 1106,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1107,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1108,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ],
+            "appendSkill": []
+          },
+          "111": {
+            "level": 1,
+            "order": 0,
+            "power": 269198207,
+            "attack": 53400158,
+            "defense": 38011,
+            "hp": 1027472222,
+            "speed": 12664,
+            "attachmentUid": 1057,
+            "trumpId": 0,
+            "attackExt": 0,
+            "defenseExt": 0,
+            "hpExt": 0,
+            "attribute": {
+              "52": 0.5,
+              "53": null,
+              "54": 0.32200000628829,
+              "56": 0.1305000051856041,
+              "57": 0.4000000059604645,
+              "58": null,
+              "59": 0.4000000059604645,
+              "60": null,
+              "61": 0.4000000059604645,
+              "62": null,
+              "66": null,
+              "68": null,
+              "70": null,
+              "80": 0.0800000011920929,
+              "101": null,
+              "102": null,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            },
+            "equipment": {
+              "1": {
+                "level": 1,
+                "attack": 9,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchAttackExt": 0,
+                "quenchLogId": ""
+              },
+              "2": {
+                "level": 1,
+                "hp": 37,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              },
+              "3": {
+                "level": 1,
+                "defense": 10,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchDefenseExt": 0,
+                "quenchLogId": ""
+              },
+              "4": {
+                "level": 1,
+                "hp": 35,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              }
+            },
+            "battleTeamSlot": -1,
+            "skill": [
+              {
+                "skillId": 1117,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1118,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1119,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ],
+            "appendSkill": [
+              {
+                "skillId": 11065,
+                "level": 1,
+                "active": true,
+                "affiliated": 11075
+              }
+            ],
+            "useSkin": 11101
+          },
+          "112": {
+            "level": 900,
+            "order": 6,
+            "power": 292455514,
+            "attack": 58969564,
+            "defense": 2688059,
+            "hp": 1102109674,
+            "speed": 11163,
+            "artifactId": 12095,
+            "pearlId": 4,
+            "attachmentUid": 1011,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": 1,
+              "56": 0.00900000035762787,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "62": 0.5,
+              "70": 0.10800000160932541,
+              "71": 0.04200000166893005
+            },
+            "skill": [
+              {
+                "skillId": 1126,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1127,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1128,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              }
+            ]
+          },
+          "113": {
+            "power": 2930825740,
+            "attack": 298903745,
+            "hp": 11992806587,
+            "artifactId": 12135,
+            "pearlId": 5,
+            "attribute": {
+              "52": 0.8009999948740005,
+              "53": 0.00800000011920929,
+              "54": 0.71000000461936,
+              "56": 0.550000011920929,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4180000062286854,
+              "63": 0.32200000032782555,
+              "65": 0.012000000178813934,
+              "66": 0.7560000112652778,
+              "68": 0.004000000059604645,
+              "70": 0.020000000298023225,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            },
+            "battleTeamSlot": 2,
+            "appendSkill": []
+          },
+          "114": {
+            "power": 269002556,
+            "attack": 53423629,
+            "hp": 1026459717,
+            "speed": 10664,
+            "attachmentUid": 1018,
+            "trumpId": 361,
+            "attribute": {
+              "51": 1.1500000059604645,
+              "52": 0.3499999940395355,
+              "53": null,
+              "56": 0.0015000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645,
+              "63": 0.022000000327825547,
+              "70": 0.07200000107288361
+            },
+            "useSkin": 2015
+          },
+          "115": {
+            "power": 269018500,
+            "attack": 53398261,
+            "hp": 1026632094,
+            "attachmentUid": 1051,
+            "trumpId": 361,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "116": {
+            "level": 2800,
+            "order": 13,
+            "power": 750450435,
+            "attack": 196689273,
+            "defense": 52827749,
+            "hp": 2445771850,
+            "speed": 12552,
+            "artifactId": 13015,
+            "attachmentUid": 1029,
+            "trumpId": 117,
+            "attackExt": 2.4522712230682373,
+            "defenseExt": 2.4522712230682373,
+            "hpExt": 2.4522712230682373,
+            "attribute": {
+              "9": 50,
+              "53": 0.35999999940395355,
+              "54": 0.20000000298023224,
+              "57": 0.6000000089406967,
+              "59": 1.0000000298023224,
+              "60": 0.01600000023841858,
+              "61": 0.4000000059604645,
+              "70": 0.028000000417232516,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            },
+            "equipment": {
+              "1": {
+                "quenchTimes": 1,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 21,
+                    "attrNum": 3,
+                    "isLocked": false
+                  }
+                },
+                "quenchAttackExt": 9
+              },
+              "2": {
+                "quenchTimes": 1,
+                "quenches": {
+                  "1": {
+                    "colorId": 2,
+                    "attrId": 13,
+                    "attrNum": 8,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 78
+              },
+              "3": {
+                "quenchTimes": 1,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 21,
+                    "attrNum": 4,
+                    "isLocked": false
+                  }
+                }
+              },
+              "4": {
+                "quenchTimes": 1,
+                "quenches": {
+                  "1": {
+                    "colorId": 1,
+                    "attrId": 1,
+                    "attrNum": 2,
+                    "isLocked": false
+                  }
+                },
+                "quenchHpExt": 36
+              }
+            }
+          },
+          "117": {
+            "power": 268993531,
+            "attack": 53385113,
+            "hp": 1026581832,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            },
+            "useSkin": 11703
+          },
+          "118": {
+            "power": 268976970,
+            "attack": 53386126,
+            "hp": 1026506327,
+            "speed": 10665,
+            "attachmentUid": 1068,
+            "trumpId": 0,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            },
+            "useSkin": 0
+          },
+          "119": {
+            "level": 1,
+            "order": 0,
+            "power": 268992564,
+            "attack": 53432153,
+            "defense": 28710,
+            "hp": 1026374275,
+            "speed": 12014,
+            "attachmentUid": 1035,
+            "trumpId": 361,
+            "attackExt": 0,
+            "defenseExt": 0,
+            "hpExt": 0,
+            "attribute": {
+              "52": 0.3499999940395355,
+              "53": null,
+              "54": 0.25,
+              "56": 0.0435000017285347,
+              "57": 0.4000000059604645,
+              "58": null,
+              "59": 0.4000000059604645,
+              "60": null,
+              "61": 0.4000000059604645,
+              "62": 0.034999999403953555,
+              "63": null,
+              "70": 0.04800000071525574,
+              "101": null,
+              "102": null,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            },
+            "equipment": {
+              "1": {
+                "level": 1,
+                "attack": 9,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": ""
+              },
+              "2": {
+                "level": 1,
+                "hp": 37,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              },
+              "3": {
+                "level": 1,
+                "defense": 10,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchDefenseExt": 0,
+                "quenchLogId": ""
+              },
+              "4": {
+                "level": 1,
+                "hp": 35,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0,
+                "quenchLogId": ""
+              }
+            },
+            "battleTeamSlot": -1,
+            "skill": [
+              {
+                "skillId": 1196,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1197,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 1198,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ],
+            "appendSkill": [
+              {
+                "skillId": 11115,
+                "level": 1,
+                "active": true,
+                "affiliated": 11115
+              }
+            ],
+            "useSkin": 0
+          },
+          "120": {
+            "power": 273384304,
+            "attack": 54376201,
+            "hp": 1042247756,
+            "speed": 10863,
+            "attachmentUid": 1070,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "201": {
+            "power": 268445807,
+            "attack": 53290677,
+            "hp": 1024503743,
+            "speed": 10913,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "202": {
+            "power": 268456550,
+            "attack": 53284400,
+            "hp": 1024579196,
+            "attachmentUid": 1038,
+            "trumpId": 1,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "203": {
+            "power": 268446562,
+            "attack": 53284521,
+            "hp": 1024535296,
+            "attachmentUid": 1025,
+            "trumpId": 1,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "204": {
+            "power": 268440522,
+            "attack": 53286075,
+            "hp": 1024499572,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "205": {
+            "power": 268442131,
+            "attack": 53295042,
+            "hp": 1024467106,
+            "speed": 10915,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "206": {
+            "power": 268435782,
+            "attack": 53284567,
+            "hp": 1024484849,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "207": {
+            "power": 268469435,
+            "attack": 53294523,
+            "hp": 1024596815,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "208": {
+            "power": 268423616,
+            "attack": 53281124,
+            "hp": 1024449593,
+            "speed": 10664,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "209": {
+            "power": 268453184,
+            "attack": 53289429,
+            "hp": 1024542956,
+            "attachmentUid": 1058,
+            "trumpId": 0,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "210": {
+            "level": 300,
+            "order": 3,
+            "power": 270008975,
+            "attack": 53543195,
+            "defense": 168793,
+            "hp": 1030178586,
+            "speed": 10841,
+            "attachmentUid": 1020,
+            "trumpId": 361,
+            "attackExt": 0.3310000002384186,
+            "defenseExt": 0.3310000002384186,
+            "hpExt": 0.3310000002384186,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "58": 0.30000001192092896,
+              "59": 0.6500000059604645,
+              "60": null,
+              "61": 0.4000000059604645,
+              "70": null
+            },
+            "equipment": {
+              "1": {
+                "level": 1,
+                "attack": 9,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchAttackExt": 0
+              },
+              "2": {
+                "level": 1,
+                "hp": 37,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0
+              },
+              "3": {
+                "level": 1,
+                "defense": 10,
+                "quenchTimes": 0,
+                "quenches": null
+              },
+              "4": {
+                "level": 1,
+                "hp": 35,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchHpExt": 0
+              }
+            },
+            "skill": [
+              {
+                "skillId": 2102,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 2103,
+                "level": 1,
+                "active": true,
+                "affiliated": 0
+              },
+              {
+                "skillId": 2104,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ]
+          },
+          "211": {
+            "power": 268492503,
+            "attack": 53293233,
+            "hp": 1024706481,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "212": {
+            "power": 268429911,
+            "attack": 53292254,
+            "hp": 1024426581,
+            "speed": 10863,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "213": {
+            "level": 1,
+            "order": 0,
+            "power": 268482096,
+            "attack": 53287725,
+            "defense": 14215,
+            "hp": 1024683686,
+            "speed": 10663,
+            "attachmentUid": 1059,
+            "attackExt": 0,
+            "defenseExt": 0,
+            "hpExt": 0,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            },
+            "skill": [
+              {
+                "skillId": 2132,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 2133,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 2134,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ]
+          },
+          "214": {
+            "power": 268493398,
+            "attack": 53293286,
+            "hp": 1024709236,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "215": {
+            "power": 269001786,
+            "attack": 53397470,
+            "hp": 1026572109,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "216": {
+            "power": 268420570,
+            "attack": 53289382,
+            "hp": 1024398321,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "217": {
+            "power": 268419149,
+            "attack": 53280930,
+            "hp": 1024428002,
+            "speed": 10663,
+            "artifactId": -1,
+            "attachmentUid": 1042,
+            "trumpId": 361,
+            "attribute": {
+              "9": null,
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "218": {
+            "power": 268433779,
+            "attack": 53293157,
+            "hp": 1024440577,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "54": 0.20000000298023224,
+              "57": 0.20000000298023224,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "219": {
+            "power": 268430490,
+            "attack": 53278805,
+            "hp": 1024488491,
+            "speed": 10662,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "220": {
+            "power": 268428242,
+            "attack": 53282848,
+            "hp": 1024459453,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "221": {
+            "power": 268452357,
+            "attack": 53289300,
+            "hp": 1024539666,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "222": {
+            "power": 268430672,
+            "attack": 53284177,
+            "hp": 1024465551,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "223": {
+            "power": 268140457,
+            "attack": 53228917,
+            "hp": 1023385762,
+            "speed": 10860,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "224": {
+            "power": 268148202,
+            "attack": 53230832,
+            "hp": 1023412754,
+            "speed": 10863,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "225": {
+            "power": 268426828,
+            "attack": 53281432,
+            "hp": 1024460767,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "226": {
+            "power": 268441961,
+            "attack": 53290163,
+            "hp": 1024488888,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "227": {
+            "power": 268923369,
+            "attack": 53396336,
+            "hp": 1026220157,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "228": {
+            "power": 268979042,
+            "attack": 53382620,
+            "hp": 1026529594,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "301": {
+            "power": 268939964,
+            "attack": 53403219,
+            "hp": 1026263272,
+            "speed": 10913,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "302": {
+            "power": 268948634,
+            "attack": 53395450,
+            "hp": 1026333117,
+            "speed": 10861,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "303": {
+            "power": 268902055,
+            "attack": 53383694,
+            "hp": 1026183944,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "304": {
+            "power": 268133879,
+            "attack": 53227302,
+            "hp": 1023362919,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "305": {
+            "power": 268136944,
+            "attack": 53228069,
+            "hp": 1023373538,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "306": {
+            "power": 268896056,
+            "attack": 53358466,
+            "hp": 1026267354,
+            "speed": 10658,
+            "attribute": {
+              "51": 0.15000000596046448,
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.6500000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "307": {
+            "power": 268953498,
+            "attack": 53378118,
+            "hp": 1026433968,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "308": {
+            "power": 268930189,
+            "attack": 53374678,
+            "hp": 1026346463,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "309": {
+            "power": 268930306,
+            "attack": 53387565,
+            "hp": 1026287801,
+            "speed": 10860,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "310": {
+            "power": 268135507,
+            "attack": 53228030,
+            "hp": 1023367215,
+            "speed": 10912,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          },
+          "311": {
+            "power": 268923666,
+            "attack": 53385258,
+            "hp": 1026268707,
+            "attribute": {
+              "53": null,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null
+            }
+          },
+          "312": {
+            "level": 900,
+            "order": 6,
+            "power": 281223913,
+            "attack": 57338907,
+            "defense": 2265596,
+            "hp": 1057919808,
+            "speed": 11424,
+            "attackExt": 0.7715610265731812,
+            "defenseExt": 0.7715610265731812,
+            "hpExt": 0.7715610265731812,
+            "attribute": {
+              "53": null,
+              "54": 0.21000000461935997,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "313": {
+            "power": 268425819,
+            "attack": 53287328,
+            "hp": 1024429502,
+            "speed": 10860,
+            "attribute": {
+              "53": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645,
+              "226": null,
+              "228": null,
+              "229": null,
+              "230": null,
+              "231": null
+            }
+          },
+          "314": {
+            "power": 268427846,
+            "attack": 53291469,
+            "hp": 1024421057,
+            "speed": 10913,
+            "attribute": {
+              "53": null,
+              "54": 0.15000000596046448,
+              "57": 0.4000000059604645,
+              "59": 0.4000000059604645,
+              "61": 0.4000000059604645
+            }
+          }
+        },
+        "items": {
+          "1003": {
+            "quantity": 5814698
+          },
+          "1006": {
+            "quantity": 2720585
+          },
+          "1014": {
+            "quantity": 1682816
+          },
+          "11155": {
+            "quantity": 1
+          },
+          "12105": {
+            "quantity": 1
+          },
+          "12135": {
+            "quantity": 0
+          },
+          "13055": {
+            "quantity": 4
+          }
+        },
+        "battleTeam": {
+          "0": {
+            "heroId": 101
+          },
+          "1": {
+            "heroId": 109
+          },
+          "2": {
+            "heroId": 113
+          },
+          "3": {
+            "heroId": 104
+          },
+          "4": {
+            "heroId": 106
+          }
+        },
+        "legionResearch": {
+          "101": 60,
+          "102": 50,
+          "103": 40,
+          "104": 30,
+          "105": 20,
+          "106": 18,
+          "107": 20,
+          "108": 20,
+          "206": 17,
+          "209": null,
+          "210": null,
+          "211": null,
+          "212": null,
+          "213": null,
+          "309": null,
+          "310": null,
+          "312": null,
+          "313": null,
+          "401": 60,
+          "402": 50,
+          "403": 40,
+          "404": 30,
+          "405": 20,
+          "406": 13,
+          "407": 20,
+          "408": 20,
+          "509": null,
+          "510": null,
+          "512": null,
+          "513": null,
+          "609": null,
+          "610": null,
+          "611": null,
+          "612": null,
+          "613": null
+        },
+        "statistics": {
+          "using:preset:team:id": 1,
+          "task:complete:22": 11570565939,
+          "task:complete:26": 264883103594
+        },
+        "pearlMap": {
+          "2": {
+            "skillId": 0
+          },
+          "6": {
+            "skillId": 1033012
+          },
+          "10": {
+            "skillId": 0
+          }
+        },
+        "pearlSkillStorage": {
+          "1033011": 1
+        }
+      },
+      "teamId": 1,
+      "rewardList": [
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 349416,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1014,
+          "value": 1429972,
+          "ext": 0
+        },
+        {
+          "type": 1,
+          "itemId": 1,
+          "value": 118752709,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 77
+}
+异步: 是
+调用ID: call_1770946480511_dvk3rwwco
+

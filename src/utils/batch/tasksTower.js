@@ -127,7 +127,7 @@ export function createTasksTower(deps) {
               type: "info",
             });
 
-            await new Promise((r) => setTimeout(r, 1000));
+            await new Promise((r) => setTimeout(r, 2000));
 
             // Refresh energy
             // 默认每5次刷新一次，或体力不足时刷新
@@ -383,11 +383,6 @@ export function createTasksTower(deps) {
 
             count++;
             consecutiveFailures = 0;
-            addLog({
-              time: new Date().toLocaleTimeString(),
-              message: `${token.name} 爬怪异塔第 ${count} 次`,
-              type: "info",
-            });
 
             await new Promise((r) => setTimeout(r, 500));
 
@@ -397,6 +392,15 @@ export function createTasksTower(deps) {
               {},
               5000,
             );
+
+            const currentTowerId = evotowerinfo2?.evoTower?.towerId || 0;
+            const chapter = Math.floor(currentTowerId / 10);
+            const floor = currentTowerId % 10;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 爬怪异塔当前层数: ${chapter}-${floor}`,
+              type: "info",
+            });
 
             // 检查并领取每日任务奖励
             if (evotowerinfo2 && evotowerinfo2.evoTower && evotowerinfo2.evoTower.taskClaimMap) {
@@ -430,12 +434,12 @@ export function createTasksTower(deps) {
 
             // 检查是否刚通关10层
             const towerId = evotowerinfo2?.evoTower?.towerId || 0;
-            const floor = (towerId % 10) + 1;
+            const currentFloor = (towerId % 10) + 1;
             if (
               fightResult &&
               fightResult.winList &&
               fightResult.winList[0] === true &&
-              floor === 1
+              currentFloor === 1
             ) {
               await tokenStore.sendMessageWithPromise(
                 tokenId,
@@ -1217,6 +1221,168 @@ export function createTasksTower(deps) {
     message.success("批量一键合成结束");
   };
 
+  /**
+   * 为单个Token执行一键爬塔（用于执行选中功能）
+   * @param {string} tokenId - Token ID
+   */
+  const batchTowerClimbForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) {
+      throw new Error(`Token not found: ${tokenId}`);
+    }
+
+    // 加载该Token的独立配置
+    const tokenSettings = loadSettings ? (loadSettings(tokenId) || currentSettings) : currentSettings;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始一键爬塔...`,
+        type: "info",
+      });
+
+      const teamInfo = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "presetteam_getinfo",
+        {},
+        5000,
+      );
+      if (!teamInfo || !teamInfo.presetTeamInfo) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 阵容信息异常`,
+          type: "warning",
+        });
+      }
+
+      const currentFormation = teamInfo?.presetTeamInfo?.useTeamId;
+      let Isswitching = false;
+      if (currentFormation === tokenSettings.towerFormation) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 当前已是阵容${tokenSettings.towerFormation}，无需切换`,
+          type: "info",
+        });
+      } else {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "presetteam_saveteam",
+          { teamId: tokenSettings.towerFormation },
+          5000,
+        );
+        Isswitching = true;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 成功切换到阵容${tokenSettings.towerFormation}`,
+          type: "info",
+        });
+      }
+
+      // Initial check
+      await tokenStore
+        .sendMessageWithPromise(tokenId, "tower_getinfo", {}, 5000)
+        .catch(() => {});
+      let roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+      let energy = roleInfo?.role?.tower?.energy || 0;
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 初始体力: ${energy}`,
+        type: "info",
+      });
+
+      let count = 0;
+      const MAX_CLIMB = 500;
+      let consecutiveFailures = 0;
+
+      while (energy > 0 && count < MAX_CLIMB) {
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "fight_starttower",
+            {},
+            5000,
+          );
+          count++;
+          consecutiveFailures = 0;
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 爬塔第 ${count} 次`,
+            type: "info",
+          });
+
+          await new Promise((r) => setTimeout(r, 2000));
+
+          // Refresh energy
+          tokenStore.sendMessage(tokenId, "tower_getinfo");
+          roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+
+          const storeRoleInfo = tokenStore.gameData?.roleInfo;
+          energy =
+            storeRoleInfo?.role?.tower?.energy ??
+            roleInfo?.role?.tower?.energy ??
+            0;
+        } catch (err) {
+          if (err.message && err.message.includes("200400")) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 爬塔次数已用完 (200400)`,
+              type: "info",
+            });
+            break;
+          }
+
+          consecutiveFailures++;
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 战斗出错: ${err.message} (重试 ${consecutiveFailures}/3)`,
+            type: "warning",
+          });
+
+          if (consecutiveFailures >= 3) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 连续失败次数过多，停止爬塔`,
+              type: "error",
+            });
+            break;
+          }
+
+          await new Promise((r) => setTimeout(r, 2000));
+
+          try {
+            roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+            energy = roleInfo?.role?.tower?.energy || 0;
+          } catch (e) {
+            // 忽略刷新失败
+          }
+        }
+      }
+      
+      if (Isswitching) {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "presetteam_saveteam",
+          { teamId: currentFormation },
+          5000,
+        );
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 一键爬塔完成，共 ${count} 次`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 一键爬塔失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
   return {
     climbTower,
     climbWeirdTower,
@@ -1224,6 +1390,7 @@ export function createTasksTower(deps) {
     skinChallenge,
     batchUseItems,
     batchMergeItems,
+    batchTowerClimbForToken,
   };
 }
 

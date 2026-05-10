@@ -35,6 +35,112 @@ export function createTasksArena(deps) {
   } = deps;
 
   /**
+   * 一键竞技场战斗3次（单个Token）
+   */
+  const batcharenafightForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      await ensureConnection(tokenId);
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始竞技场战斗`,
+        type: "info",
+      });
+
+      // 开始竞技场
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        'arena_startarea',
+        {},
+        5000
+      );
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 进行 3 次战斗
+      for (let i = 1; i <= 3; i++) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 竞技场战斗 ${i}/3`,
+          type: "info",
+        });
+
+        // 获取对手列表
+        let targets;
+        try {
+          targets = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'arena_getareatarget',
+            {},
+            5000
+          );
+        } catch (err) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 竞技场战斗${i} - 获取对手失败：${err.message}`,
+            type: "error",
+          });
+          break;
+        }
+
+        // 选择对手 ID
+        let targetId = null;
+        if (targets) {
+          const candidate =
+            targets?.rankList?.[0] ||
+            targets?.roleList?.[0] ||
+            targets?.targets?.[0] ||
+            targets?.targetList?.[0] ||
+            targets?.list?.[0];
+          if (candidate) {
+            targetId = candidate?.roleId || candidate?.id || candidate?.targetId;
+          }
+        }
+
+        if (targetId) {
+          // 开始战斗
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'fight_startareaarena',
+            { targetId },
+            10000
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 竞技场战斗${i}完成`,
+            type: "success",
+          });
+        } else {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 竞技场战斗${i} - 未找到目标`,
+            type: "warning",
+          });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 竞技场战斗完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 竞技场战斗失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 一键竞技场战斗3次
    */
   const batcharenafight = async () => {
@@ -914,5 +1020,6 @@ export function createTasksArena(deps) {
     batcharenafight,
     batchTopUpFish,
     batchTopUpArena,
+    batcharenafightForToken,
   };
 }

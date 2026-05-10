@@ -38,6 +38,42 @@ const my_routes = [
     component: () => import('@/layout/DefaultLayout.vue'),
     children: [
       {
+        path: 'shidian',
+        name: 'ShiDian',
+        component: () => import('@/views/ShiDian.vue'),
+        meta: {
+          title: '⚔️',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'fish-helper',
+        name: 'FishHelper',
+        component: () => import('@/views/FishHelper.vue'),
+        meta: {
+          title: '🐋',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'token-group',
+        name: 'TokenGroup',
+        component: () => import('@/views/TokenGroup.vue'),
+        meta: {
+          title: 'Token 分组',
+          requiresToken: true
+        }
+      },
+      {
+        path: 'common-tasks',
+        name: 'CommonTasks',
+        component: () => import('@/views/CommonTasks.vue'),
+        meta: {
+          title: '常用任务',
+          requiresToken: true
+        }
+      },
+      {
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/Dashboard.vue'),
@@ -158,7 +194,7 @@ router.beforeEach((to, from, next) => {
   const tokenStore = useTokenStore()
 
   // 设置页面标题
-  document.title = to.meta.title ? `${to.meta.title} - XYZW 游戏管理系统` : 'XYZW 游戏管理系统'
+  document.title = to.meta.title ? `${to.meta.title} - 🚀` : '🚀'
   if(to.name==="LegionWar"&&!isNowInLegionWarTime()){
   // if(to.name==="LegionWar"&&isNowInLegionWarTime()){
     next('/admin/dashboard');

@@ -1,0 +1,619 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/4/17 22:16:19
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 4
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+
+记录 #2:
+----------------------------------------
+时间: 2026/4/17 22:16:10
+服务: HeroService
+方法: synthetic
+参数: [{"itemId":107}]
+结果:
+{
+  "_raw": {
+    "seq": 28,
+    "ack": 0,
+    "time": 1776435370412,
+    "resp": 27,
+    "cmd": "syncresp",
+    "body": {
+      "role": {
+        "heroes": {
+          "107": {
+            "heroId": 107,
+            "level": 1,
+            "order": 0,
+            "star": 0,
+            "color": 3,
+            "skinId": 0,
+            "power": 794,
+            "attack": 185,
+            "defense": 185,
+            "hp": 2225,
+            "speed": 13,
+            "artifactId": 0,
+            "pearlId": 0,
+            "attachmentUid": 1001,
+            "curTrump": 0,
+            "trumpId": 0,
+            "transTrumpId": 0,
+            "trumpId2": 0,
+            "transTrumpId2": 0,
+            "attackExt": 0,
+            "defenseExt": 0,
+            "hpExt": 0,
+            "attribute": {
+              "101": 0,
+              "102": 0
+            },
+            "equipment": {
+              "1": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "enchantUId": 0,
+                "enchantUId2": 0,
+                "level": 1,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 9,
+                "defense": 0,
+                "hp": 0,
+                "curQuenchId": 0,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 0,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": "",
+                "seed": 0
+              },
+              "2": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "enchantUId": 0,
+                "enchantUId2": 0,
+                "level": 1,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 0,
+                "defense": 0,
+                "hp": 37,
+                "curQuenchId": 0,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 0,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": "",
+                "seed": 0
+              },
+              "3": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "enchantUId": 0,
+                "enchantUId2": 0,
+                "level": 1,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 0,
+                "defense": 10,
+                "hp": 0,
+                "curQuenchId": 0,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 0,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": "",
+                "seed": 0
+              },
+              "4": {
+                "equipId": 0,
+                "equipConfId": 0,
+                "equipSlot": 0,
+                "enchantUId": 0,
+                "enchantUId2": 0,
+                "level": 1,
+                "forgeExp": 0,
+                "forge": 0,
+                "star": 0,
+                "attack": 0,
+                "defense": 0,
+                "hp": 35,
+                "curQuenchId": 0,
+                "quenchTimes": 0,
+                "quenches": null,
+                "quenchTimes2": 0,
+                "quenches2": null,
+                "quenchAttackExt": 0,
+                "quenchDefenseExt": 0,
+                "quenchHpExt": 0,
+                "quenchLogId": "",
+                "quenchLogId2": "",
+                "seed": 0
+              }
+            },
+            "battleTeamSlot": -1,
+            "isActive": false,
+            "skill": [
+              {
+                "skillId": 202,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 203,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              },
+              {
+                "skillId": 204,
+                "level": 1,
+                "active": false,
+                "affiliated": 0
+              }
+            ],
+            "activeSkill": 0,
+            "awakeSkill": null,
+            "appendSkill": [],
+            "useSkin": 0,
+            "skin": {},
+            "bookStar": -1,
+            "bookLevel": 0,
+            "bookValue": 0,
+            "bookAttack": 0,
+            "bookHp": 0,
+            "recordFlag": false,
+            "forbidSNTime": 0,
+            "hB": null
+          }
+        },
+        "items": {
+          "107": {
+            "quantity": 42
+          }
+        },
+        "achievement": {
+          "4": {
+            "completeValue": 1
+          }
+        },
+        "statistics": {
+          "task:complete:5": 1,
+          "task:complete:7": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1776435370010_b52qfmle2
+
+记录 #3:
+----------------------------------------
+时间: 2026/4/17 22:16:01
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 26,
+    "ack": 0,
+    "time": 1776435361509,
+    "resp": 26,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 2,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 21
+}
+异步: 是
+调用ID: call_1776435361111_jb0ipwqo5
+
+记录 #4:
+----------------------------------------
+时间: 2026/4/17 22:15:57
+服务: ItemService
+方法: openPack
+参数: [{"itemId":3201,"number":50,"index":6}]
+结果:
+{
+  "_raw": {
+    "seq": 25,
+    "ack": 0,
+    "time": 1776435358047,
+    "resp": 25,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "items": {
+          "107": {
+            "itemId": 107,
+            "quantity": 50,
+            "ext": null
+          },
+          "3201": null
+        },
+        "pack": {}
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 107,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1776435357647_4zpe0vvxn
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

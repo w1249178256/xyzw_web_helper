@@ -10,8 +10,6 @@ import useIndexedDB from "@/hooks/useIndexedDB";
 import { generateRandomSeed } from "@/utils/randomSeed";
 import {
   transformToken,
-  setAuthUserRateLimiterCallback,
-  scheduleAuthUserRequest,
 } from "@/utils/token";
 import { emitPlus, $emit } from "./events/index.js";
 import router from "@/router";
@@ -340,32 +338,30 @@ export const useTokenStore = defineStore("tokens", () => {
     const gameToken = gameTokens.value.find((t) => t.id === tokenId);
     if (!gameToken) return false;
 
-    wsLogger.info(`尝试自动刷新Token [${tokenId}]`);
+    wsLogger.info(`尝试自动刷新 Token [${tokenId}]`);
     let refreshSuccess = false;
 
     try {
       if (gameToken.importMethod === "url" && gameToken.sourceUrl) {
-        // URL形式token刷新
-        const token = await scheduleAuthUserRequest(async () => {
-          const response = await fetch(gameToken.sourceUrl!);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.token) {
-              return data.token;
-            }
+        // URL 形式 token 刷新
+        const response = await fetch(gameToken.sourceUrl!);
+        let token: string | null = null;
+        if (response.ok) {
+          const data = await response.json();
+          if (data.token) {
+            token = data.token;
           }
-          return null;
-        });
+        }
         if (token) {
           updateToken(tokenId, { ...gameToken, token });
-          wsLogger.info(`从URL获取token成功: ${gameToken.name}`);
+          wsLogger.info(`从 URL 获取 token 成功：${gameToken.name}`);
           refreshSuccess = true;
         }
       } else if (
         gameToken.importMethod === "bin" ||
         gameToken.importMethod === "wxQrcode"
       ) {
-        // Bin形式token刷新
+        // Bin 形式 token 刷新
         let userToken: ArrayBuffer | null = await getArrayBuffer(tokenId);
         let usedOldKey = false;
 
@@ -396,25 +392,40 @@ export const useTokenStore = defineStore("tokens", () => {
     }
 
     if (refreshSuccess) {
-      wsLogger.info(`Token刷新成功 [${tokenId}]`);
+      wsLogger.info(`Token 刷新成功 [${tokenId}]`);
 
       const currentPath = router.currentRoute.value.path;
+      // 如果是强制重连或在特定页面，或者是因为 token 错误触发的刷新，立即重连
       const shouldReconnect =
         forceReconnect ||
         currentPath === "/tokens" ||
         currentPath === "/admin/game-features";
 
       if (shouldReconnect) {
-        wsLogger.info(`触发自动重连 [${tokenId}]`);
+        wsLogger.info(`触发强制重连 [${tokenId}]`);
         // 重置重连状态以允许立即重连
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].reconnectAttempts = 0;
         }
         selectToken(tokenId, true);
+      } else {
+        // Token 刷新成功，检查当前连接状态
+        const conn = wsConnections.value[tokenId];
+        if (conn && conn.status === "connected") {
+          // 连接仍然有效，保持连接
+          wsLogger.info(`Token 已刷新，保持现有连接 [${tokenId}]`);
+        } else {
+          // 连接已断开，需要重连
+          wsLogger.info(`Token 已刷新但连接已断开，触发重连 [${tokenId}]`);
+          if (wsConnections.value[tokenId]) {
+            wsConnections.value[tokenId].reconnectAttempts = 0;
+          }
+          selectToken(tokenId, true);
+        }
       }
       return true;
     } else {
-      wsLogger.error(`Token刷新失败，请手动重新导入 [${tokenId}]`);
+      wsLogger.error(`Token 刷新失败，请手动重新导入 [${tokenId}]`);
       return false;
     }
   };
@@ -433,19 +444,21 @@ export const useTokenStore = defineStore("tokens", () => {
       if (message.error) {
         const errText = String(message.error).toLowerCase();
         gameLogger.warn(`消息处理跳过 [${tokenId}]:`, message.error);
-        if (errText.includes("token") && errText.includes("expired")) {
+        
+        // 检查 token 相关错误（包括 "check token error" 和 "token expired"）
+        if (errText.includes("token")) {
           const conn = wsConnections.value[tokenId];
           if (conn) {
             conn.status = "error";
             conn.lastError = {
               timestamp: new Date().toISOString(),
-              error: "token expired",
+              error: message.error,
             };
           }
 
           const gameToken = gameTokens.value.find((t) => t.id === tokenId);
           if (gameToken) {
-            // 调用统一的Token刷新逻辑
+            // 调用统一的 Token 刷新逻辑
             const refreshed = await attemptTokenRefresh(tokenId);
             if (!refreshed) {
               wsLogger.error(
@@ -795,12 +808,33 @@ export const useTokenStore = defineStore("tokens", () => {
           conn.status = "disconnected";
           conn.randomSeedSynced = false;
 
-          // 如果连接异常断开(1006)且从未连接成功(握手失败)，尝试刷新Token
-          // connectedAt 为 null 表示 socket.onopen 还没触发就断开了，通常意味着握手失败（如403 Forbidden）
+          // 如果连接异常断开 (1006) 且从未连接成功 (握手失败)，尝试刷新 Token
+          // connectedAt 为 null 表示 socket.onopen 还没触发就断开了，通常意味着握手失败（如 403 Forbidden）
           if (event.code === 1006 && !conn.connectedAt) {
-            wsLogger.warn(`检测到握手失败(1006)，尝试刷新Token [${tokenId}]`);
+            wsLogger.warn(`检测到握手失败 (1006)，尝试刷新 Token [${tokenId}]`);
             // 强制刷新并重连
             await attemptTokenRefresh(tokenId, true);
+          }
+          // 如果已经连接过但收到 token 错误后断开，检查是否刚刚刷新过
+          else if (event.code === 1006 && conn.connectedAt) {
+            // 检查最后一条错误消息是否是 token 相关
+            if (conn.lastError?.error && String(conn.lastError.error).toLowerCase().includes('token')) {
+              const lastAttempt = tokenRefreshAttempts.value[tokenId] || 0;
+              const now = Date.now();
+              
+              // 如果 10 秒内已经刷新过，直接重连，不再刷新
+              if (now - lastAttempt < 10000) {
+                wsLogger.warn(`检测到 Token 错误后断开连接，但刚刚已刷新，直接重连 [${tokenId}]`);
+                // 重置重连状态并触发重连
+                if (wsConnections.value[tokenId]) {
+                  wsConnections.value[tokenId].reconnectAttempts = 0;
+                }
+                selectToken(tokenId, true);
+              } else {
+                wsLogger.warn(`检测到 Token 错误后断开连接，尝试刷新 Token [${tokenId}]`);
+                await attemptTokenRefresh(tokenId, true);
+              }
+            }
           }
         }
         updateCrossTabConnectionState(tokenId, "disconnected");
@@ -964,12 +998,16 @@ export const useTokenStore = defineStore("tokens", () => {
   ) => {
     const connection = wsConnections.value[tokenId];
     if (!connection || connection.status !== "connected") {
-      return Promise.reject(new Error(`WebSocket未连接 [${tokenId}]`));
+      const error = new Error(`WebSocket 未连接 [${tokenId}]`);
+      error.isWebSocketError = true;  // 标记为 WebSocket 错误
+      return Promise.reject(error);
     }
 
     const client = connection.client;
     if (!client) {
-      return Promise.reject(new Error(`WebSocket客户端不存在 [${tokenId}]`));
+      const error = new Error(`WebSocket 客户端不存在 [${tokenId}]`);
+      error.isWebSocketError = true;  // 标记为 WebSocket 错误
+      return Promise.reject(error);
     }
 
     // 为战斗相关命令自动注入 battleVersion
@@ -1093,6 +1131,550 @@ export const useTokenStore = defineStore("tokens", () => {
       msg: message,
       msgType: 1,
     });
+  };
+
+  // 发送军团商店购买商品
+  const sendLegionStoreBuyGoods = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_storebuygoods", params);
+  };
+
+  // 发送领取珍宝阁每日免费奖励
+  const sendCollectionClaimFreeReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "collection_claimfreereward", params);
+  };
+
+  // 发送领取功法挂机奖励
+  const sendLegacyClaimHangup = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_claimhangup", params);
+  };
+
+  // 发送领取功法礼物
+  const sendLegacyClaimGift = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_claimgift", params);
+  };
+
+  // 发送领取功法特权奖励
+  const sendLegacyClaimChargeReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_claimchargereward", params);
+  };
+
+  // 发送提交密码
+  const sendRoleCommitPassword = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "role_commitpassword", params);
+  };
+
+  // 发送赠送功法
+  const sendLegacySendGift = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_sendgift", params);
+  };
+
+  // 发送获取功法赠送详情
+  const sendLegacyGetGifts = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_getgifts", params);
+  };
+
+  // 发送获取功法详情
+  const sendLegacyGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_getinfo", params);
+  };
+
+  // 发送获取目标阵容信息
+  const sendRoleGetTargetTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "role_gettargetteam", params);
+  };
+
+  // 发送激活功法图鉴
+  const sendLegacyActivate = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_activatebook", params);
+  };
+
+  // 发送获取军团信息
+  const sendLegionGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_getinfo", params);
+  };
+
+  // 发送获取盐场对手信息
+  const sendLegionGetOpponent = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_getopponent", params);
+  };
+
+  // 发送获取盐场俱乐部信息
+  const sendLegionGetInfobyid = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_getinfobyid", params);
+  };
+
+  // 发送获取盐场
+  const sendLegionGetBattlefield = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_getbattlefield", params);
+  };
+
+  // 发送盐场入场
+  const sendWarSetBattleTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "war_setbattleteam", params);
+  };
+
+  // 发送获取噩梦信息
+  const sendNightmareGetRoleInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_getroleinfo", params);
+  };
+
+  // 发送十殿转盘
+  const sendNightmareClickTurntable = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_clickturntable", params);
+  };
+
+  // 发送十殿转盘奖励次数
+  const sendNightmareClaimTurnRewardTimes = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_claimturnrewardtimes", params);
+  };
+
+  // 发送十殿战斗
+  const sendNightmareFight = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_fight", params);
+  };
+
+  // 发送设置十殿出战人员
+  const sendNightmareSetFighter = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_setfighter", params);
+  };
+
+  // 发送十殿恢复
+  const sendNightmareRestore = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_restore", params);
+  };
+
+  // 发送十殿图鉴奖励领取
+  const sendNightmareClaimBook = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_claimbook", params);
+  };
+
+  // 发送十殿周奖励领取
+  const sendNightmareClaimWeekReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_claimweekreward", params);
+  };
+
+  // 发送十殿解散
+  const sendNightmareDismiss = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "nightmare_dismiss", params);
+  };
+
+  // 发送获取角色队伍信息
+  const sendMatchteamGetRoleTeamInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_getroleteaminfo", params);
+  };
+
+  // 发送踢出队伍成员
+  const sendMatchteamKick = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_kick", params);
+  };
+
+  // 发送打开队伍
+  const sendMatchteamOpenTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_openteam", params);
+  };
+
+  // 发送离开队伍
+  const sendMatchteamLeave = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_leave", params);
+  };
+
+  // 发送保存预设队伍（切换阵容）
+  const sendPresetteamSaveTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "presetteam_saveteam", params);
+  };
+
+  // 发送设置阵容
+  const sendTeamSetTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "team_setteam", params);
+  };
+
+  // 发送加入队伍
+  const sendMatchTeamJoin = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_join", params);
+  };
+
+  // 发转让队伍
+  const sendMatchTeamSetLeader = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_setleader", params);
+  };
+
+  // 发送队伍成员准备
+  const sendMatchTeamMemberPrepare = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_memberprepare", params);
+  };
+
+  // 发送获取队伍信息
+  const sendMatchTeamGetTeamInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "matchteam_getteaminfo", params);
+  };
+
+  // 发送开始灯神战斗
+  const sendFightStartGenie = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "fight_startgenie", params);
+  };
+
+  // 发送开始关卡战斗（用于获取当前阵容信息）
+  const sendFightStartLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "fight_startlevel", params);
+  };
+
+  // 发送英雄交换
+  const sendHeroExchange = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_exchange", params);
+  };
+
+  // 发送咸将升级
+  const sendHeroUpgradeLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_heroupgradelevel", params);
+  };
+
+  // 发送咸将模拟
+  const sendHeroSimulation = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_simulation", params);
+  };
+
+  // 发送咸将升阶
+  const sendHeroUpgradeOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_heroupgradeorder", params);
+  };
+
+  // 发送计算英雄战力
+  const sendHeroCalcpowerbyteam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_calcpowerbyteam", params);
+  };
+
+  // 发送灯神扫荡
+  const sendGenieSweep = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "genie_sweep", params);
+  };
+
+  // 发送科技交换
+  const sendLegionExchangeResearch = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_exchangeresearch", params);
+  };
+
+  // 发送军团研究
+  const sendLegionResearch = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_research", params);
+  };
+
+  // 发送重置军团研究
+  const sendLegionResetResearch = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_resetresearch", params);
+  };
+
+  // 发送获取预设队伍信息
+  const sendPresetteamGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "presetteam_getinfo", params);
+  };
+
+  // 发送黑市周购买
+  const sendActivityBuyStoreGoods = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_buystoregoods", params);
+  };
+
+  // 发送点击黑市购买
+  const sendStorePurchase = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "store_purchase", params);
+  };
+
+  // 发送设置黑市购买清单
+  const sendStoreSetPurchase = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "store_setpurchase", params);
+  };
+
+  // 发送获取黑市购买设置
+  const sendStoreGetPurchase = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "store_getpurchase", params);
+  };
+
+  // 发送领取宝箱奖励
+  const sendItemClaimBoxPointReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_claimboxpointreward", params);
+  };
+
+  // 发送批量领取宝箱奖励
+  const sendBatchClaimBoxPointReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_batchclaimboxpointreward", params);
+  };
+
+  // 发送获取活动信息
+  const sendActivityGet = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_get", params);
+  };
+
+  // 发送活动购买商品
+  const sendActivityBuyGoods = (tokenId: string, params = { type: 1, goodsId: 8304 }) => {
+    return sendMessageWithPromise(tokenId, "activity_buygoods", params);
+  };
+
+  // 发送神器升星
+  const sendArtifactUpgradeStar = (tokenId: string, params = { heroId: 107, itemId: 13041 }) => {
+    return sendMessageWithPromise(tokenId, "artifact_upgradestar", params);
+  };
+
+  // 发送领取活动周奖励
+  const sendActivityClaimWeekActReward = (tokenId: string, params = {}) => {
+    const defaultParams = {
+      selectRewardsMap: { 0: 1 },
+      typ: 2
+    };
+    return sendMessageWithPromise(tokenId, "activity_claimweekactreward", { ...defaultParams, ...params });
+  };
+
+  // 发送领取任务奖励
+  const sendActivityClaimTaskReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_claimtaskreward", params);
+  };
+
+  // 发送获取活动游戏信息
+  const sendActivityGetActeGameInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_getactegameinfo", params);
+  };
+
+  // 发送领取活动游戏阶段奖励
+  const sendActivityActeGameStageClaim = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_actegamestageclaim", params);
+  };
+
+  // 发送开始活动游戏
+  const sendActivityStarteGame = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_startegame", params);
+  };
+
+  // 发送开始活动游戏（使用道具）
+  const sendActivityStartActeGame = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_startactegame", params);
+  };
+
+  // 发送开始功法挂机
+  const sendLegacyBeginHangup = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legacy_beginhangup", params);
+  };
+
+  // 发送活动通用购买商品
+  const sendActivityCommonBuyGoods = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_commonbuygoods", params);
+  };
+
+  // 发送五一抽奖活动
+  const sendActivityMaydaylottery = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_maydaylottery", params);
+  };
+
+  // 发送活动兑换
+  const sendActivityExchange = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "activity_exchange", params);
+  };
+
+  // 发送使用金鱼助威道具
+  const sendAutumnUseItem = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "autumn_useitem", params);
+  };
+
+  // 发送购买鱼干
+  const sendTowerBuyEnergy = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "tower_buyenergy", params);
+  };
+
+  // 发送神具主动升级
+  const sendLordWeaponUpgradeActiveSkillLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_upgradeactiveskilllevel", params);
+  };
+
+  // 发送神具被动升级
+  const sendLordWeaponUpgradePassiveSkillLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_upgradepassiveskilllevel", params);
+  };
+
+  // 发送主公武器解锁
+  const sendLordWeaponUnlockt = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_unlockt", params);
+  };
+
+  // 发送主公武器解锁（新命令）
+  const sendLordWeaponUnlock = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_unlock", params);
+  };
+
+  // 发送主公武器获取
+  const sendLordWeaponGet = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "lordweapon_get", params);
+  };
+
+  // 发送水晶升级
+  const sendTrumpUpgrade = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "trump_upgrade", params);
+  };
+
+  // 发送装备批量升级
+  const sendEquipmentBatchUpgradeLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "equipment_batchupgradelevel", params);
+  };
+
+  // 发送英雄技能觉醒
+  const sendHeroSkillAwake = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_skillawake", params);
+  };
+
+  // 发送挂机升级
+  const sendSystemHangupUpgrade = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_hangupupgrade", params);
+  };
+
+  // 发送武将升星
+  const sendHeroUpgradeStar = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_heroupgradestar", params);
+  };
+
+  // 发送英雄合成
+  const sendHeroSynthetic = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_synthetic", params);
+  };
+
+  // 发送图鉴升级
+  const sendBookUpgrade = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "book_upgrade", params);
+  };
+
+  // 发送图鉴领取积分奖励
+  const sendBookClaimPointReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "book_claimpointreward", params);
+  };
+
+  // 发送融合盒领取融合进度
+  const sendMergeboxClaimMergeProgress = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_claimmergeprogress", params);
+  };
+
+  // 发送融合盒领取消耗进度
+  const sendMergeboxClaimCostProgress = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_claimcostprogress", params);
+  };
+
+  // 发送融合盒领取免费能量
+  const sendMergeboxClaimFreeEnergy = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_claimfreeenergy", params);
+  };
+
+  // 发送进化塔领取任务
+  const sendEvotowerClaimTask = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "evotower_claimtask", params);
+  };
+
+  // 发送进化塔领取军团特权
+  const sendEvotowerClaimLegionPrivilege = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "evotower_claimlegionprivilege", params);
+  };
+
+  // 发送融合盒合并物品
+  const sendMergeboxMergeItem = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_mergeitem", params);
+  };
+
+  // 发送融合盒开盒
+  const sendMergeboxOpenBox = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_openbox", params);
+  };
+
+  // 发送塔开始
+  const sendTowersStart = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "towers_start", params);
+  };
+
+  // 发送塔战斗
+  const sendTowersFight = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "towers_fight", params);
+  };
+
+  // 发送塔信息获取
+  const sendTowersGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "towers_getinfo", params);
+  };
+
+  // 发送领取所有邮件附件
+  const sendMailClaimAllAttachment = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mail_claimallattachment", params);
+  };
+
+  // 发送打开道具包
+  const sendItemOpenPack = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_openpack", params);
+  };
+
+  // 发送使用道具
+  const sendItemConsume = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_consume", params);
+  };
+
+  // 发送领取挂机层数奖励
+  const sendClaimHangupOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimhanguporder", params);
+  };
+
+  // 发送领取CDK奖励
+  const sendClaimCdkReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimcdkreward", params);
+  };
+
+  // 发送领取CDK奖励（系统）
+  const sendSystemClaimCdkReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_claimcdkreward", params);
+  };
+
+  // 发送领取累充奖励
+  const sendClaimTotalReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "common_claimtotalreward", params);
+  };
+
+  // 发送武将上阵/下阵
+  const sendHeroGoIntoBattle = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
+  };
+
+  // 发送主公升级
+  const sendHeroLordUpgradeLevel = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_lordupgradelevel", params);
+  };
+
+  // 发送主公进阶
+  const sendHeroLordUpgradeOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_lordupgradeorder", params);
+  };
+
+  // 发送购买咸鱼币订单
+  const sendChargeCreateOrder = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "charge_createorder", params);
+  };
+
+  // 发送宝库Boss战斗
+  const sendBossTowerStartBoss = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_startboss", params);
+  };
+
+  // 发送获取宝库信息
+  const sendBossTowerGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_getinfo", params);
+  };
+
+  // 发送搜索宝库队伍
+  const sendBossTowerSearchTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_searchteam", params);
+  };
+
+  // 发送领取宝库奖励
+  const sendBossTowerClaimReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_claimreward", params);
+  };
+
+  // 发送宝库使用钥匙
+  const sendBossTowerStartBox = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_startbox", params);
+  };
+
+  // 发送宝库使用boom
+  const sendBossTowerBoom = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "bosstower_boom", params);
   };
 
   // 发送自定义游戏消息
@@ -1432,17 +2014,6 @@ export const useTokenStore = defineStore("tokens", () => {
     // 设置跨标签页监听
     setupCrossTabListener();
 
-    // 设置限流等待回调
-    setAuthUserRateLimiterCallback((waitTimeMs: number, queueSize: number) => {
-      const waitSeconds = Math.ceil(waitTimeMs / 1000);
-      $emit.emit("token:refresh:waiting", {
-        waitTimeMs,
-        waitSeconds,
-        queueSize,
-        timestamp: Date.now(),
-      });
-    });
-
     tokenLogger.info("Token Store 初始化完成，连接监控已启动");
   };
   const setBattleVersion = (version: number | null) => {
@@ -1592,6 +2163,113 @@ export const useTokenStore = defineStore("tokens", () => {
     sendSignIn,
     sendClaimDailyReward,
     sendGetTeamInfo,
+    sendLegionStoreBuyGoods,
+    sendCollectionClaimFreeReward,
+    sendLegacyClaimHangup,
+    sendLegacyClaimGift,
+    sendLegacyClaimChargeReward,
+    sendRoleCommitPassword,
+    sendLegacySendGift,
+    sendLegacyGetGifts,
+    sendLegacyGetInfo,
+    sendRoleGetTargetTeam,
+    sendLegacyActivate,
+    sendLegionGetInfo,
+    sendLegionGetOpponent,
+    sendLegionGetInfobyid,
+    sendLegionGetBattlefield,
+    sendWarSetBattleTeam,
+    sendNightmareGetRoleInfo,
+    sendNightmareClickTurntable,
+    sendNightmareClaimTurnRewardTimes,
+    sendNightmareFight,
+    sendNightmareSetFighter,
+    sendNightmareRestore,
+    sendNightmareClaimBook,
+    sendNightmareClaimWeekReward,
+    sendMatchteamGetRoleTeamInfo,
+    sendMatchteamKick,
+    sendMatchteamOpenTeam,
+    sendMatchteamLeave,
+    sendPresetteamSaveTeam,
+    sendPresetteamGetInfo,
+    sendTeamSetTeam,
+    sendMatchTeamJoin,
+    sendMatchTeamSetLeader,
+    sendMatchTeamMemberPrepare,
+    sendMatchTeamGetTeamInfo,
+    sendFightStartGenie,
+    sendFightStartLevel,
+    sendHeroExchange,
+    sendHeroUpgradeLevel,
+    sendHeroLordUpgradeLevel,
+    sendHeroSimulation,
+    sendHeroUpgradeOrder,
+    sendHeroLordUpgradeOrder,
+    sendHeroCalcpowerbyteam,
+    sendGenieSweep,
+    sendLegionExchangeResearch,
+    sendLegionResearch,
+    sendLegionResetResearch,
+    sendActivityBuyStoreGoods,
+    sendStorePurchase,
+    sendStoreSetPurchase,
+    sendStoreGetPurchase,
+    sendItemClaimBoxPointReward,
+    sendBatchClaimBoxPointReward,
+    sendActivityGet,
+    sendActivityBuyGoods,
+    sendArtifactUpgradeStar,
+    sendActivityClaimWeekActReward,
+    sendActivityClaimTaskReward,
+    sendActivityGetActeGameInfo,
+    sendActivityActeGameStageClaim,
+    sendActivityStarteGame,
+    sendActivityStartActeGame,
+    sendLegacyBeginHangup,
+    sendActivityCommonBuyGoods,
+    sendActivityMaydaylottery,
+    sendActivityExchange,
+    sendAutumnUseItem,
+    sendTowerBuyEnergy,
+    sendLordWeaponUpgradeActiveSkillLevel,
+    sendLordWeaponUpgradePassiveSkillLevel,
+    sendLordWeaponUnlockt,
+    sendLordWeaponUnlock,
+    sendLordWeaponGet,
+    sendTrumpUpgrade,
+    sendEquipmentBatchUpgradeLevel,
+    sendHeroSkillAwake,
+    sendSystemHangupUpgrade,
+    sendHeroUpgradeStar,
+    sendHeroSynthetic,
+    sendBookUpgrade,
+    sendBookClaimPointReward,
+    sendMergeboxClaimMergeProgress,
+    sendMergeboxClaimCostProgress,
+    sendMergeboxClaimFreeEnergy,
+    sendEvotowerClaimTask,
+    sendEvotowerClaimLegionPrivilege,
+    sendMergeboxMergeItem,
+    sendMergeboxOpenBox,
+    sendTowersStart,
+    sendTowersFight,
+    sendTowersGetInfo,
+    sendMailClaimAllAttachment,
+    sendItemOpenPack,
+    sendItemConsume,
+    sendClaimHangupOrder,
+    sendClaimCdkReward,
+    sendSystemClaimCdkReward,
+    sendClaimTotalReward,
+    sendHeroGoIntoBattle,
+    sendChargeCreateOrder,
+    sendBossTowerStartBoss,
+    sendBossTowerGetInfo,
+    sendBossTowerSearchTeam,
+    sendBossTowerClaimReward,
+    sendBossTowerStartBox,
+    sendBossTowerBoom,
     sendGameMessage,
 
     // 工具方法

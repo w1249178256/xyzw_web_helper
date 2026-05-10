@@ -1,0 +1,50 @@
+时间: 2026/1/27 20:52:52
+服务: MergeBoxService
+方法: openBox
+参数: [{"pos":{"gridX":7,"gridY":3},"actType":1}]
+结果:
+{
+  "_raw": {
+    "seq": 117,
+    "ack": 0,
+    "time": 1769518326480,
+    "resp": 90,
+    "cmd": "mergebox_openboxresp",
+    "body": {
+      "mergeBox": {
+        "gridMap": {
+          "2": {
+            "7": {
+              "gridConfId": 0,
+              "gridItemId": 1,
+              "gridType": 2,
+              "openCnt": 0,
+              "isLock": false
+            }
+          },
+          "7": {
+            "3": {
+              "openCnt": 24
+            }
+          }
+        },
+        "groupItemRecord": {
+          "1": {
+            "1": 24
+          }
+        },
+        "costTotalCnt": 26
+      },
+      "newPosList": [
+        {
+          "gridX": 2,
+          "gridY": 7
+        }
+      ],
+      "autoUseItemId": -1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}

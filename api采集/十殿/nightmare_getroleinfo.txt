@@ -1,0 +1,121 @@
+{
+  "_raw": {
+    "seq": 5,
+    "ack": 0,
+    "time": 1773196844160,
+    "resp": 5,
+    "cmd": "nightmare_getroleinforesp",
+    "body": {
+      "nightMareData": {
+        "roleId": 153241293,
+        "serverId": 8928,
+        "love": 5,
+        "roomId": "",
+        "fightCoinResetTime": 1772989033,
+        "todayFightCnt": 0,
+        "tFResetTime": 1773187432,
+        "fightInfo": {
+          "1772764817": "24176505",
+          "1772765093": "24176522",
+          "1772765350": "24176544"
+        },
+        "killAward": {
+          "1": true,
+          "2": true,
+          "3": true,
+          "4": true,
+          "5": true,
+          "6": true
+        },
+        "weekAward": {
+          "20260302": {
+            "maxLevel": 6,
+            "levelReward": {
+              "1": 1772763232,
+              "2": 1772763232,
+              "3": 1772763232,
+              "4": 1772763232,
+              "5": 1772985692,
+              "6": 1772985692
+            },
+            "turntableReward": {
+              "1": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 5000,
+                  "ext": 0
+                }
+              ],
+              "2": [
+                {
+                  "type": 3,
+                  "itemId": 1020,
+                  "value": 5,
+                  "ext": 0
+                }
+              ],
+              "3": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 1000,
+                  "ext": 0
+                }
+              ],
+              "4": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 1000,
+                  "ext": 0
+                }
+              ],
+              "5": [
+                {
+                  "type": 3,
+                  "itemId": 1023,
+                  "value": 50,
+                  "ext": 0
+                }
+              ],
+              "6": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 1000,
+                  "ext": 0
+                }
+              ]
+            },
+            "turntableCnt": 0,
+            "turntableLeftCnt": 0
+          }
+        },
+        "bookScore": 6,
+        "bookRewardConfId": 0,
+        "bookFlushTime": 1766332800,
+        "turnRewardTime": 0,
+        "charmData": {},
+        "charmGift": {},
+        "fixLoveRank": 4,
+        "charmResetTime": 1772989033,
+        "taskClaimMap": {},
+        "warOrderTime": 0
+      },
+      "charmLeftNumMap": {
+        "1": 21,
+        "2": 0,
+        "3": 16,
+        "4": 2,
+        "5": 0,
+        "6": 0
+      },
+      "nextBookFlushTime": 1773590400
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

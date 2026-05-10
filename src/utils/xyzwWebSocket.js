@@ -18,6 +18,7 @@ const errorCodeMap = {
   3300060: "扫荡条件不满足",
   1300050: "请修改您的采购次数",
   200020: "出了点小问题，请尝试重启游戏解决～",
+  200050: "金币数量不足",
   200160: "模块未开启",
   7500140: "请先输入密码",
   7500100: "密码输入错误",
@@ -27,6 +28,7 @@ const errorCodeMap = {
   2300190: "今天已经签到过了",
   2300370: "俱乐部商品购买数量超出上限",
   400000: "物品不存在",
+  400060: "需要升阶",
   1500020: "能量不足",
   2300070: "未加入俱乐部",
   3500020: "没有可领取的奖励",
@@ -39,7 +41,10 @@ const errorCodeMap = {
   12400000: "挂机奖励领取过于频繁",
   2300250: "俱乐部BOSS今日攻打次数已用完",
   400010: "物品数量不足",
+  400090: "武将等级不能大于主公等级",
+  400340: "操作过快",
   7900023: "已达到使用次数上限",
+  7900022: "已经击杀所有 boss",
   12300040: "没有空格子了",
   12300080: "未达到解锁条件",
   200330: "无效的ID",
@@ -153,6 +158,10 @@ export function registerDefaultCommands(reg) {
     .register("system_getdatabundlever", { isAudit: false })
     .register("system_buygold", { buyNum: 1 })
     .register("system_claimhangupreward")
+    .register("system_claimhanguporder")
+    .register("system_claimcdkreward")
+    .register("common_claimtotalreward")
+    .register("activity_exchange")
     .register("system_signinreward")
     .register("system_mysharecallback", { isSkipShareCard: true, type: 2 })
     .register("system_custom", { key: "", value: 0 })
@@ -172,6 +181,7 @@ export function registerDefaultCommands(reg) {
     .register("item_openbox", { itemId: 2001, number: 10 })
     .register("item_batchclaimboxpointreward")
     .register("item_openpack")
+    .register("item_consume", { itemId: 1008, quantity: 1 })
     .register("rank_getserverrank")
 
     // 竞技场
@@ -245,6 +255,7 @@ export function registerDefaultCommands(reg) {
     .register("mergebox_automergeitem", { actType: 1 })
     .register("mergebox_mergeitem", { actType: 1 })
     .register("mergebox_claimcostprogress", { actType: 1 })
+    .register("mergebox_claimfreeenergy", { actType: 1 })
     .register("mergebox_claimmergeprogress", { actType: 1 })
     .register("evotower_claimtask", { taskId: 1 })
 
@@ -293,7 +304,10 @@ export function registerDefaultCommands(reg) {
     // 武将升级相关
     .register("hero_heroupgradelevel") //武将升级
     .register("hero_heroupgradeorder") //武将进阶
+    .register("hero_lordupgradelevel") //主公升级
+    .register("hero_lordupgradeorder") //主公进阶
     .register("hero_rebirth") //武将重新birth
+    .register("hero_synthetic", { itemId: 107 }) //英雄合成
 
     // 升星相关
     .register("hero_heroupgradestar")
@@ -310,6 +324,7 @@ export function registerDefaultCommands(reg) {
     .register("dungeon_buymerchant")
     // 活动/任务
     .register("activity_get")
+    .register("activity_buygoods", { type: 1, goodsId: 8304 })
     .register("activity_recyclewarorderrewardclaim")
     .register("legion_getpayloadtask")
     .register("legion_getpayloadkillrecord")
@@ -319,6 +334,9 @@ export function registerDefaultCommands(reg) {
     .register("warguess_startguess")
     .register("warguess_getguesscoinreward")
     .register("legion_payloadsignup") // 蟠桃报名
+
+    // 神器相关
+    .register("artifact_upgradestar", { heroId: 107, itemId: 13041 })
 
     // 珍宝阁相关
     .register("collection_claimfreereward")
@@ -340,6 +358,7 @@ export function registerDefaultCommands(reg) {
     // 功法
     .register("legacy_getinfo")
     .register("legacy_claimhangup")
+    .register("legacy_claimchargereward")
     // 功法残卷赠送
     .register("legacy_gift_getlist")
     .register("legacy_gift_send", { recipientId: 0, itemId: 0, quantity: 0 })
@@ -384,7 +403,107 @@ export function registerDefaultCommands(reg) {
     .register("towers_fight")
 
     //发送游戏内消息
-    .register("system_sendchatmessage");
+    .register("system_sendchatmessage")
+
+    // 物品相关（新增）
+    .register("item_claimboxpointreward")
+    .register("item_openpack", { itemId: 0, number: 0, index: 0 })
+
+    // 商店相关（新增）
+    .register("store_setpurchase", { purchaseCnt: 2, purchaseItemList: [
+      {discount: 4, itemId: 2002}, {discount: 5, itemId: 2003}, 
+      {discount: 8, itemId: 2004}, {discount: 7, itemId: 1012}
+    ]})
+    .register("store_getpurchase")
+
+    // 爬塔相关（新增）
+    .register("tower_buyenergy", { buyNum: 0 })
+
+    // 功法相关（新增）
+    .register("legacy_claimgift")
+    .register("legacy_getgifts", { typ: 1 })
+
+    // 队伍相关（新增）
+    .register("hero_calcpowerbyteam", { battleTeam: {}, lordWeaponId: 1 })
+    .register("team_setteam", { teamType: 11, battleTeam: {}, lordWeaponId: 3, cCMonsterId: 0 })
+    .register("matchteam_join", { teamId: "" })
+    .register("matchteam_memberprepare", { teamId: "", isPrepare: 1 })
+    .register("matchteam_kick")
+    .register("matchteam_setleader")
+    .register("matchteam_openteam")
+    .register("matchteam_getteaminfo")
+
+    // 活动相关（新增）
+    .register("activity_claimtaskreward", { activityId: 2510031, missionid: 0 })
+    .register("activity_getactegameinfo")
+    .register("activity_actegamestageclaim")
+    .register("activity_startegame")
+    .register("activity_startactegame")
+    .register("activity_commonbuygoods")
+    .register("activity_maydaylottery")
+    .register("activity_claimweekactreward")
+    .register("mergebox_claimmergeprogress")
+    .register("mergebox_claimcostprogress")
+    .register("mergebox_claimfreeenergy")
+    .register("evotower_claimtask")
+    .register("evotower_claimlegionprivilege")
+    .register("mergebox_mergeitem")
+    .register("mergebox_openbox")
+    .register("legacy_beginhangup")
+
+    // 塔相关（新增）
+    .register("towers_getinfo")
+    .register("towers_start")
+    .register("towers_fight")
+
+    // 十殿相关（新增）
+    .register("nightmare_claimweekreward")
+    .register("nightmare_clickturntable")
+    .register("nightmare_claimturnrewardtimes")
+    .register("nightmare_buycharm", { charmId: 0, num: 5 })
+    .register("nightmare_claimbook", { roleId: 0 })
+    .register("nightmare_restore")
+    .register("nightmare_fight")
+    .register("nightmare_setfighter")
+    .register("nightmare_dismiss")
+
+    // 咸王宝库（新增）
+    .register("matchteam_create", { teamCfgId: 6, param: 0, setting: { name: "", notice: "", secret: 0, apply: 0, applyList: [] }, custom: { leaderId: "", teamId: "" } })
+    .register("matchteam_create_shidian", { teamCfgId: 1, param: 0, setting: { name: "相符的队伍", notice: "", secret: 1, apply: 0, applyList: [] }, custom: {} }, "matchteam_create")
+    .register("matchteam_create_baoku", { teamCfgId: 6, param: 0, setting: { name: "", notice: "", secret: 0, apply: 0, applyList: [] }, custom: { leaderId: "", teamId: "" } }, "matchteam_create")
+    .register("bosstower_searchteam")
+    .register("bosstower_claimreward")
+    .register("bosstower_boom")
+    .register("charge_createorder")
+
+    // 新增缺失的命令
+    .register("fight_startgenie")
+    .register("legion_applyjoin")
+    .register("war_setbattleteam")
+    .register("activity_buystoregoods")
+    .register("autumn_useitem")
+    .register("lordweapon_upgradeactiveskilllevel")
+    .register("lordweapon_upgradepassiveskilllevel")
+    .register("lordweapon_unlock")
+    .register("lordweapon_get")
+    .register("trump_upgrade")
+    .register("hero_heroupgradestar")
+    .register("hero_heroupgradelevel")
+    .register("hero_simulation")
+    .register("hero_heroupgradeorder")
+    .register("book_upgrade")
+    .register("book_bookupgradestar")
+    .register("book_claimpointreward")
+    .register("nightmare_getroleinfo")
+    .register("hero_exchange", { heroId: 0 })
+    .register("legion_exchangeresearch", { researchId: 0 })
+    .register("legion_research", { researchId: 0 })
+    .register("legion_resetresearch", {})
+    .register("equipment_quench", { equipmentId: 0, quenchType: 1 })
+    .register("hero_gointobattle", { heroId: 0, slot: 0 })
+    .register("equipment_batchupgradelevel", { heroId: 107 })
+    .register("hero_skillawake", { heroId: 107, index: -1 })
+    .register("system_hangupupgrade", { upgradeNum: 10 })
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1050,6 +1169,10 @@ export class XyzwWebSocketClient {
       hero_recruitresp: "hero_recruit",
       friend_batchresp: "friend_batch",
       system_claimhanguprewardresp: "system_claimhangupreward",
+      system_claimhanguporderresp: "system_claimhanguporder",
+      system_claimcdkrewardresp: "system_claimcdkreward",
+      common_claimtotalrewardresp: "common_claimtotalreward",
+      activity_exchangeresp: "activity_exchange",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
       bottlehelper_claimresp: "bottlehelper_claim",
       bottlehelper_startresp: "bottlehelper_start",
@@ -1077,6 +1200,7 @@ export class XyzwWebSocketClient {
       mergebox_automergeitemresp: "mergebox_automergeitem",
       mergebox_mergeitemresp: "mergebox_mergeitem",
       mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
+      mergebox_claimfreeenergyresp: "mergebox_claimfreeenergy",
       mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
       evotower_claimtaskresp: "evotower_claimtask",
       item_openpackresp: "item_openpack",
@@ -1106,11 +1230,25 @@ export class XyzwWebSocketClient {
       hero_heroupgradestarresp: "hero_heroupgradestar",
       hero_heroupgradelevelresp: "hero_heroupgradelevel",
       hero_heroupgradeorderresp: "hero_heroupgradeorder",
+      hero_syntheticresp: "hero_synthetic",
       book_upgraderesp: "book_upgrade",
       book_claimpointrewardresp: "book_claimpointreward",
       // 军团信息
       legion_getinforesp: "legion_getinfo",
       legion_getinforresp: "legion_getinfo",
+      legion_researchresp: "legion_research",
+      legion_resetresearchresp: "legion_resetresearch",
+      // 功法相关响应映射
+      legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_claimchargerewardresp: "legacy_claimchargereward",
+      legacy_claimgiftresp: "legacy_claimgift",
+      role_commitpasswordresp: "role_commitpassword",
+      legacy_sendgiftresp: "legacy_sendgift",
+      legacy_getgiftsresp: "legacy_getgifts",
+      legacy_getinforesp: "legacy_getinfo",
+      // 主公武器相关响应映射
+      lordweapon_unlockresp: "lordweapon_unlock",
+      lordweapon_getresp: "lordweapon_get",
       // 车辆相关响应映射
       car_getrolecarresp: "car_getrolecar",
       car_refreshresp: "car_refresh",
@@ -1127,6 +1265,7 @@ export class XyzwWebSocketClient {
       // 功法相关响应映射
       legacy_getinforesp: "legacy_getinfo",
       legacy_claimhangupresp: "legacy_claimhangup",
+      legacy_claimchargerewardresp: "legacy_claimchargereward",
       legacy_sendgiftresp: "legacy_sendgift",
       legacy_getgiftsresp: "legacy_getgifts",
       // 换皮闯关相关响应映射

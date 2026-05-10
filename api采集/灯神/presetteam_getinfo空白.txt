@@ -1,0 +1,18 @@
+{
+  "_raw": {
+    "seq": 3,
+    "ack": 0,
+    "time": 1770293740472,
+    "resp": 3,
+    "cmd": "presetteam_getinforesp",
+    "body": {
+      "presetTeamInfo": {
+        "roleId": 687427488
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

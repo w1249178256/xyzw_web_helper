@@ -1,0 +1,31 @@
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 3,
+    "quenchId": 0,
+    "quenches": {
+      "1": {
+        "attrId": 16,
+        "attrNum": 1,
+        "colorId": 1,
+        "isLocked": false
+      },
+      "2": {
+        "attrId": 6,
+        "attrNum": 4,
+        "colorId": 1,
+        "isLocked": false
+      },
+      "3": {
+        "attrId": 14,
+        "attrNum": 68,
+        "colorId": 5,
+        "isLocked": false
+      }
+    }
+  },
+  "cmd": "equipment_confirm",
+  "seq": 35,
+  "time": 1773705900790
+}

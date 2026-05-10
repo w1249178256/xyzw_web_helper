@@ -1,0 +1,30 @@
+发送
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 1,
+    "quenchId": 0,
+    "quenches": {},
+    "seed": 0,
+    "skipOrange": false
+  },
+  "cmd": "equipment_quench",
+  "seq": 3,
+  "time": 1772862095109
+}
+{
+  "ack": 0,
+  "body": {
+    "heroId": 107,
+    "part": 2,
+    "quenchId": 0,
+    "quenches": {},
+    "seed": 0,
+    "skipOrange": false
+  },
+  "cmd": "equipment_quench",
+  "seq": 2,
+  "time": 1772862172286
+}
+

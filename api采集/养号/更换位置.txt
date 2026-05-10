@@ -1,0 +1,357 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/3/2 08:41:06
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 1
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/3/2 08:40:47
+服务: FightService
+方法: startLevel
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 70,
+    "ack": 0,
+    "time": 1772412049069,
+    "resp": 69,
+    "cmd": "fight_startlevelresp",
+    "body": {
+      "battleData": {
+        "randomSeed": 8258,
+        "version": 240489,
+        "leftTeam": {
+          "roleId": 460379015,
+          "power": 2982607483,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 116,
+              "type": 0,
+              "index": 0,
+              "level": 1099,
+              "attack": 66311855,
+              "defense": 8854447,
+              "curHp": 1113576805,
+              "hp": 1113576805,
+              "curEnergy": -1,
+              "speed": 10738,
+              "color": 3,
+              "star": 30,
+              "order": 6,
+              "skin": 11601,
+              "skinName": "",
+              "activeSkill": 1165,
+              "attribute": {
+                "5": 0.1,
+                "7": 0.1,
+                "53": 0.15,
+                "54": 0.2,
+                "57": 0.6,
+                "59": 1,
+                "61": 0.4,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1166,
+                1167,
+                1168
+              ],
+              "recordFlag": false
+            },
+            "1": {
+              "id": 102,
+              "type": 0,
+              "index": 1,
+              "level": 851,
+              "attack": 53133844,
+              "defense": 1509566,
+              "curHp": 996985739,
+              "hp": 996985739,
+              "curEnergy": -1,
+              "speed": 10631,
+              "color": 3,
+              "star": 20,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 1021,
+              "attribute": {
+                "5": 0.1,
+                "7": 0.1,
+                "53": 0.15,
+                "57": 0.4,
+                "59": 0.4,
+                "61": 0.4,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1022,
+                1023,
+                1024
+              ],
+              "recordFlag": false
+            },
+            "2": {
+              "id": 107,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 653277593,
+              "defense": 145762385,
+              "curHp": 4589231107,
+              "hp": 4589231107,
+              "curEnergy": -1,
+              "speed": 14123,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {
+                "5": 0.1,
+                "7": 0.1,
+                "51": 1.164,
+                "54": 0.15,
+                "56": 0.4995,
+                "57": 0.83,
+                "59": 0.4,
+                "60": 0.024,
+                "61": 0.4,
+                "66": 0.08,
+                "68": 0.02,
+                "69": 0.068,
+                "70": 0.368,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                206,
+                207,
+                208,
+                111350
+              ],
+              "recordFlag": false
+            },
+            "3": {
+              "id": 112,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 94682513,
+              "defense": 25901232,
+              "curHp": 1455367540,
+              "hp": 1455367540,
+              "curEnergy": -1,
+              "speed": 12333,
+              "color": 3,
+              "star": 19,
+              "order": 19,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 1121,
+              "attribute": {
+                "5": 0.1,
+                "7": 0.1,
+                "9": 50,
+                "51": 0.01,
+                "53": 0.43,
+                "57": 0.21,
+                "59": 0.408,
+                "61": 0.036,
+                "66": 0.232,
+                "69": 0.012,
+                "70": 0.46,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                1122,
+                1123,
+                1124,
+                1033014
+              ],
+              "recordFlag": false
+            },
+            "4": {
+              "id": 104,
+              "type": 0,
+              "index": 4,
+              "level": 861,
+              "attack": 53455289,
+              "defense": 1503492,
+              "curHp": 998471170,
+              "hp": 998471170,
+              "curEnergy": -1,
+              "speed": 10574,
+              "color": 3,
+              "star": 20,
+              "order": 5,
+              "skin": -1,
+              "skinName": "",
+              "activeSkill": 7001,
+              "attribute": {
+                "5": 0.1,
+                "7": 0.1,
+                "53": 0.15,
+                "54": 1,
+                "57": 0.4,
+                "59": 0.4,
+                "61": 0.4,
+                "66": 9,
+                "101": 0,
+                "102": 0
+              },
+              "skill": [
+                7002,
+                7003,
+                7004
+              ],
+              "recordFlag": false
+            }
+          },
+          "weaponId": 3,
+          "weaponActiveLevelId": 420,
+          "lordSkill": []
+        },
+        "rightTeam": {
+          "team": {
+            "10": {
+              "id": 9109,
+              "type": 1,
+              "index": 10,
+              "level": 8188,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "11": {
+              "id": 9109,
+              "type": 1,
+              "index": 11,
+              "level": 8188,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "12": {
+              "id": 9108,
+              "type": 1,
+              "index": 12,
+              "level": 8188,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "14": {
+              "id": 9108,
+              "type": 1,
+              "index": 14,
+              "level": 8188,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            },
+            "26": {
+              "id": 41016,
+              "type": 1,
+              "index": 26,
+              "level": 8188,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": null,
+              "skill": null,
+              "recordFlag": false
+            }
+          }
+        },
+        "options": {
+          "autoSpeed": 100,
+          "IsActLevel": 0,
+          "levelId": 8188
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1772412047094_6n1fmr57n
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

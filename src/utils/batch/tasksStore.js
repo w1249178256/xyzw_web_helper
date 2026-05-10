@@ -309,6 +309,256 @@ export function createTasksStore(deps) {
   };
 
   /**
+   * 黑市一键采购（单个Token）
+   */
+  const store_purchaseForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始黑市采购`,
+        type: "info",
+      });
+
+      // 获取主公等级
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 获取主公等级...`,
+        type: "info",
+      });
+      const roleResult = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "role_getroleinfo",
+        {},
+        5000,
+      );
+      await new Promise((r) => setTimeout(r, delayConfig.action));
+
+      let lordLevel = 0;
+      if (roleResult && roleResult.role && roleResult.role.lord) {
+        lordLevel = roleResult.role.lord.level || 0;
+      } else if (roleResult && roleResult._raw && roleResult._raw.body && roleResult._raw.body.role && roleResult._raw.body.role.lord) {
+        lordLevel = roleResult._raw.body.role.lord.level || 0;
+      } else if (roleResult && roleResult.body && roleResult.body.role && roleResult.body.role.lord) {
+        lordLevel = roleResult.body.role.lord.level || 0;
+      }
+
+      if (lordLevel === 0) {
+        throw new Error('无法获取主公等级');
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 主公等级: ${lordLevel}`,
+        type: "info",
+      });
+
+      if (lordLevel > 4000) {
+        // 主公等级大于4000，执行原有store_purchase
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 发送黑市采购请求...`,
+          type: "info",
+        });
+        const result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_purchase",
+          {},
+          5000,
+        );
+
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 黑市采购失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        } else {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 黑市采购成功`,
+            type: "success",
+          });
+        }
+      } else {
+        // 主公等级小于等于4000，执行新的采购流程
+        // 1. 执行store_buy，参数goodsId: 1
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:1...`,
+          type: "info",
+        });
+        let result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 1 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:1 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 2. 执行store_buy，参数goodsId: 2
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:2...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:2 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 3. 执行store_buy，参数goodsId: 3
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:3...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 3 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:3 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 4. 执行store_refresh，参数storeId: 1
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_refresh storeId:1...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_refresh",
+          { storeId: 1 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_refresh 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 5. 执行store_buy，参数goodsId: 1
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:1...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 1 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:1 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 6. 执行store_buy，参数goodsId: 2
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:2...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:2 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        // 7. 执行store_buy，参数goodsId: 3
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行store_buy goodsId:3...`,
+          type: "info",
+        });
+        result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "store_buy",
+          { goodsId: 3 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, delayConfig.action));
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} store_buy goodsId:3 失败: ${result.error}`,
+            type: "error",
+          });
+          throw new Error(result.error);
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 黑市采购成功`,
+          type: "success",
+        });
+      }
+
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 黑市采购过程出错: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 黑市一键采购
    */
   const store_purchase = async () => {
@@ -395,6 +645,7 @@ export function createTasksStore(deps) {
     legion_storebuygoods,
     legionStoreBuySkinCoins,
     store_purchase,
+    store_purchaseForToken,
     collection_claimfreereward,
   };
 }

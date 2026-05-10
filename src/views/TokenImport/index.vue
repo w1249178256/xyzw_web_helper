@@ -636,7 +636,7 @@ import {
 import { NIcon, NAlert, useDialog, useMessage } from "naive-ui";
 import { h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import { transformToken, scheduleAuthUserRequest } from "@/utils/token";
+import { transformToken } from "@/utils/token";
 import { $emit } from "@/stores/events/index.ts";
 import useIndexedDB from "@/hooks/useIndexedDB";
 const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } =
@@ -833,57 +833,53 @@ const refreshToken = async (token) => {
 
   try {
     if (token.importMethod === "url") {
-      // 有源URL的token - 从URL重新获取（使用限流）
-      const data = await scheduleAuthUserRequest(async () => {
-        let response;
+      // 有源 URL 的 token - 从 URL 重新获取
+      let response;
 
-        const isLocalUrl =
-          token.sourceUrl.startsWith(window.location.origin) ||
-          token.sourceUrl.startsWith("/") ||
-          token.sourceUrl.startsWith("http://localhost") ||
-          token.sourceUrl.startsWith("http://127.0.0.1");
+      const isLocalUrl =
+        token.sourceUrl.startsWith(window.location.origin) ||
+        token.sourceUrl.startsWith("/") ||
+        token.sourceUrl.startsWith("http://localhost") ||
+        token.sourceUrl.startsWith("http://127.0.0.1");
 
-        if (isLocalUrl) {
-          response = await fetch(token.sourceUrl);
-        } else {
-          try {
-            response = await fetch(token.sourceUrl, {
-              method: "GET",
-              headers: {
-                Accept: "application/json",
-              },
-              mode: "cors",
-            });
-          } catch (corsError) {
-            throw new Error(
-              `跨域请求被阻止。请确保目标服务器支持CORS。错误详情: ${corsError.message}`,
-            );
-          }
-        }
-
-        if (!response.ok) {
+      if (isLocalUrl) {
+        response = await fetch(token.sourceUrl);
+      } else {
+        try {
+          response = await fetch(token.sourceUrl, {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+            mode: "cors",
+          });
+        } catch (corsError) {
           throw new Error(
-            `请求失败: ${response.status} ${response.statusText}`,
+            `跨域请求被阻止。请确保目标服务器支持 CORS。错误详情：${corsError.message}`,
           );
         }
+      }
 
-        const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          `请求失败：${response.status} ${response.statusText}`,
+        );
+      }
 
-        if (!result.token) {
-          throw new Error("返回数据中未找到token字段");
-        }
+      const result = await response.json();
 
-        return result;
-      });
+      if (!result.token) {
+        throw new Error("返回数据中未找到 token 字段");
+      }
 
-      // 更新token信息
+      // 更新 token 信息
       tokenStore.updateToken(token.id, {
-        token: data.token,
-        server: data.server || token.server,
+        token: result.token,
+        server: result.server || token.server,
         lastRefreshed: Date.now(),
       });
 
-      message.success("Token刷新成功");
+      message.success("Token 刷新成功");
     } else if (
       token.importMethod === "wxQrcode" ||
       token.importMethod === "bin"
