@@ -434,12 +434,12 @@ export function createTasksTower(deps) {
 
             // 检查是否刚通关10层
             const towerId = evotowerinfo2?.evoTower?.towerId || 0;
-            const floor = (towerId % 10) + 1;
+            const currentFloor = (towerId % 10) + 1;
             if (
               fightResult &&
               fightResult.winList &&
               fightResult.winList[0] === true &&
-              floor === 1
+              currentFloor === 1
             ) {
               await tokenStore.sendMessageWithPromise(
                 tokenId,

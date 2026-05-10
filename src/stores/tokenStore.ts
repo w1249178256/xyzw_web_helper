@@ -1552,6 +1552,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "mergebox_claimcostprogress", params);
   };
 
+  // 发送融合盒领取免费能量
+  const sendMergeboxClaimFreeEnergy = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "mergebox_claimfreeenergy", params);
+  };
+
   // 发送进化塔领取任务
   const sendEvotowerClaimTask = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "evotower_claimtask", params);
@@ -2242,6 +2247,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendBookClaimPointReward,
     sendMergeboxClaimMergeProgress,
     sendMergeboxClaimCostProgress,
+    sendMergeboxClaimFreeEnergy,
     sendEvotowerClaimTask,
     sendEvotowerClaimLegionPrivilege,
     sendMergeboxMergeItem,

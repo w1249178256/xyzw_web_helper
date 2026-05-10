@@ -2528,6 +2528,24 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
 
+
+  /**
+   * 怪异塔免费钥匙
+   */
+  mergebox_claimfreeenergy(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+                actType:1,
+        ...params
+      }),
+      cmd: "mergebox_claimfreeenergy",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
   /**
    * 怪异塔奖励钥匙
    */

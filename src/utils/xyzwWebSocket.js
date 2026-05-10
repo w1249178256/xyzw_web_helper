@@ -255,6 +255,7 @@ export function registerDefaultCommands(reg) {
     .register("mergebox_automergeitem", { actType: 1 })
     .register("mergebox_mergeitem", { actType: 1 })
     .register("mergebox_claimcostprogress", { actType: 1 })
+    .register("mergebox_claimfreeenergy", { actType: 1 })
     .register("mergebox_claimmergeprogress", { actType: 1 })
     .register("evotower_claimtask", { taskId: 1 })
 
@@ -440,6 +441,7 @@ export function registerDefaultCommands(reg) {
     .register("activity_claimweekactreward")
     .register("mergebox_claimmergeprogress")
     .register("mergebox_claimcostprogress")
+    .register("mergebox_claimfreeenergy")
     .register("evotower_claimtask")
     .register("evotower_claimlegionprivilege")
     .register("mergebox_mergeitem")
@@ -1195,6 +1197,7 @@ export class XyzwWebSocketClient {
       mergebox_automergeitemresp: "mergebox_automergeitem",
       mergebox_mergeitemresp: "mergebox_mergeitem",
       mergebox_claimcostprogressresp: "mergebox_claimcostprogress",
+      mergebox_claimfreeenergyresp: "mergebox_claimfreeenergy",
       mergebox_claimmergeprogressresp: "mergebox_claimmergeprogress",
       evotower_claimtaskresp: "evotower_claimtask",
       item_openpackresp: "item_openpack",

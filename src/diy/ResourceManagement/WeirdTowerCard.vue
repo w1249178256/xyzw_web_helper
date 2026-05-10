@@ -97,6 +97,12 @@
             />
             <CustomizedCard 
               mode="button" 
+              :name="isBatchClaimingFreeKey ? '批量领取中...' : '批量领取免费钥匙'" 
+              :disabled="tokenStore.gameTokens.length === 0 || isBatchClaimingFreeKey" 
+              @button-click="handleBatchClaimFreeKey" 
+            />
+            <CustomizedCard 
+              mode="button" 
               name="批量怪异塔" 
               :disabled="!selectedTokenId || isRunning"
               @button-click="batchWeirdTower" 
@@ -107,6 +113,18 @@
               :disabled="tokenStore.gameTokens.length === 0 || isBatchRunning" 
               @button-click="handleBatchClimb" 
             />
+            <CustomizedCard 
+              mode="button" 
+              :name="isBatchQuickClimbing ? '批量开启爬塔中...' : '批量开启爬塔'" 
+              :disabled="tokenStore.gameTokens.length === 0 || isBatchQuickClimbing" 
+              @button-click="handleBatchQuickClimb" 
+            />
+            <CustomizedCard 
+              mode="button" 
+              :name="isExportingTowerInfo ? '导出中...' : '批量导出爬塔信息'" 
+              :disabled="tokenStore.gameTokens.length === 0 || isExportingTowerInfo" 
+              @button-click="handleExportTowerInfo" 
+            />
           </CustomizedCard>
         </div>
       </div>
@@ -115,7 +133,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="怪异塔"
-        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔']"
+        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔', '批量开启爬塔', '批量导出爬塔信息', '批量领取免费钥匙']"
       />
     </template>
   </MyCard>
@@ -188,6 +206,9 @@ const climbTimeout = ref(null)
 const itemTimeout = ref(null)
 const mergeTimeout = ref(null)
 const isBatchPrivilegeRunning = ref(false)
+const isBatchQuickClimbing = ref(false)
+const isExportingTowerInfo = ref(false)
+const isBatchClaimingFreeKey = ref(false)
 
 // 计算属性：怪异塔信息
 const evoTowerInfo = computed(() => {
@@ -1388,7 +1409,7 @@ const handleBatchClimb = async () => {
         
         // 执行爬塔逻辑（模拟点击开始爬塔按钮）
         let climbCount = 0
-        const maxClimb = 100
+        const maxClimb = 400
         
         if (currentEnergy <= 0) {
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 能量不足，跳过爬塔`)
@@ -1462,6 +1483,7 @@ const handleBatchClimb = async () => {
             )
             
             // 记录奖励领取日志
+            const currentChapter = Math.floor(currentTowerId / 10)
             logStore.addLog({
               page: 'fish-helper',
               cardType: '怪异塔',
@@ -1469,7 +1491,7 @@ const handleBatchClimb = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${initChapter}-${floor}`
+              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
             })
           }
 
@@ -1550,6 +1572,498 @@ const handleBatchClimb = async () => {
     message.error('批量爬塔失败: ' + (error.message || '未知错误'))
   } finally {
     isBatchRunning.value = false
+  }
+}
+
+const handleBatchQuickClimb = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = parseTokenRange(batchTokens.value)
+  let targetTokens = []
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices
+      .map(index => {
+        const arrayIndex = index - 1
+        const token = sortedTokensList[arrayIndex]
+        return token ? { token, index } : null
+      })
+      .filter(item => item !== null)
+      .sort((a, b) => a.index - b.index)
+      .map(item => item.token)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  try {
+    isBatchQuickClimbing.value = true
+    const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
+    message.info(`开始批量开启爬塔（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+    
+    const towerClimbOperation = async (token, globalIndex) => {
+      const tokenIndex = globalIndex + 1
+      
+      try {
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量开启爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${tokenIndex}、${token.name || token.id}、开始爬塔`
+        })
+        
+        const towerInfoRes = await tokenStore.sendMessageWithPromise(
+          token.id,
+          'evotower_getinfo',
+          {},
+          5000
+        )
+        
+        let currentEnergy = towerInfoRes?.evoTower?.energy || 0
+        let currentTowerId = towerInfoRes?.evoTower?.towerId || 0
+        
+        const initChapter = Math.floor(currentTowerId / 10) + 1
+        const initFloor = (currentTowerId % 10) + 1
+        const initDisplayFloor = `${initChapter}-${initFloor}`
+        
+        await waitCommandDelay()
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量开启爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `${tokenIndex}、${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
+        })
+        
+        let climbCount = 0
+        const maxClimb = 10
+        
+        if (currentEnergy <= 0) {
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 能量不足，跳过爬塔`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '怪异塔',
+            operation: '批量开启爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `${tokenIndex}、${token.name || token.id}、能量不足，跳过爬塔`,
+            details: {
+              remainingEnergy: 0
+            }
+          })
+          
+          return { climbCount: 0, currentFloor: initDisplayFloor, remainingEnergy: 0 }
+        }
+        
+        for (let j = 0; j < maxClimb; j++) {
+          if (currentEnergy <= 0) break
+
+          await tokenStore.sendMessageWithPromise(
+            token.id,
+            'evotower_readyfight',
+            {},
+            5000
+          )
+
+          const fightResult = await tokenStore.sendMessageWithPromise(
+            token.id,
+            'evotower_fight',
+            {
+              battleNum: 1,
+              winNum: 1
+            },
+            10000
+          )
+
+          climbCount++
+
+          const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
+            token.id,
+            'evotower_getinfo',
+            {},
+            5000
+          )
+          currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
+          currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
+
+          const floor = (currentTowerId % 10) + 1
+          if (
+            fightResult &&
+            fightResult.winList &&
+            fightResult.winList[0] === true &&
+            floor === 1
+          ) {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_claimreward',
+              {},
+              5000
+            )
+            
+            const currentChapter = Math.floor(currentTowerId / 10)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '怪异塔',
+              operation: '批量开启爬塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
+            })
+          }
+
+          await waitCommandDelay()
+        }
+        
+        const chapter = Math.floor(currentTowerId / 10) + 1
+        const floor = (currentTowerId % 10) + 1
+        const displayFloor = `${chapter}-${floor}`
+        
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} 爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`)
+
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量开启爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
+          details: {
+            climbCount,
+            currentFloor: displayFloor,
+            currentTowerId,
+            remainingEnergy: currentEnergy
+          }
+        })
+
+        return { climbCount, currentFloor: displayFloor, remainingEnergy: currentEnergy }
+      } catch (error) {
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量开启爬塔失败:`, error)
+        message.error(`序号 ${tokenIndex} ${token.name || token.id}: 爬塔失败 - ${error.message || '未知错误'}`)
+
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量开启爬塔',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
+        })
+        
+        throw error
+      }
+    }
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      towerClimbOperation,
+      {
+        batchSize: 20,
+        delayBetween: 100,
+        keepConnections: true,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`[序号${progress.globalIndex}] ${progress.tokenName} 正在连接...`)
+          } else if (progress.type === 'token-success' && progress.message === '连接成功') {
+            message.success(`[序号${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error' && progress.message === '连接失败，跳过') {
+            message.warning(`[序号${progress.globalIndex}] ${progress.tokenName} 连接失败，跳过`)
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量开启爬塔完成（成功: ${successCount}, 失败: ${failCount}）`)
+  } catch (error) {
+    console.error('批量开启爬塔失败:', error)
+    message.error('批量开启爬塔失败: ' + (error.message || '未知错误'))
+  } finally {
+    isBatchQuickClimbing.value = false
+  }
+}
+
+const handleExportTowerInfo = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = parseTokenRange(batchTokens.value)
+  let targetTokens = []
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices
+      .map(index => {
+        const arrayIndex = index - 1
+        const token = sortedTokensList[arrayIndex]
+        return token ? { token, index } : null
+      })
+      .filter(item => item !== null)
+      .sort((a, b) => a.index - b.index)
+      .map(item => item.token)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  try {
+    isExportingTowerInfo.value = true
+    message.info(`开始导出爬塔信息，共${targetTokens.length}个Token...`)
+    
+    const towerInfoList = []
+    
+    const exportOperation = async (token, globalIndex) => {
+      const tokenIndex = globalIndex + 1
+      
+      try {
+        const towerInfoRes = await tokenStore.sendMessageWithPromise(
+          token.id,
+          'evotower_getinfo',
+          {},
+          5000
+        )
+        
+        const currentTowerId = towerInfoRes?.evoTower?.towerId || 0
+        const chapter = Math.floor(currentTowerId / 10) + 1
+        const floor = (currentTowerId % 10) + 1
+        const displayFloor = `${chapter}-${floor}`
+        
+        towerInfoList.push({
+          index: tokenIndex,
+          name: token.name || token.id,
+          floor: displayFloor
+        })
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 爬塔层数：${displayFloor}`)
+        
+        await waitCommandDelay()
+        
+        return { success: true, tokenId: token.id }
+      } catch (error) {
+        console.error(`获取 ${token.name || token.id} 爬塔信息失败:`, error)
+        towerInfoList.push({
+          index: tokenIndex,
+          name: token.name || token.id,
+          floor: '获取失败'
+        })
+        
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取失败`)
+        
+        return { success: false, tokenId: token.id }
+      }
+    }
+    
+    await connectionPool.batchOperate(
+      targetTokens,
+      exportOperation,
+      {
+        batchSize: 1,
+        delayBetween: 100,
+        keepConnections: true,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`[序号${progress.globalIndex}] ${progress.tokenName} 正在连接...`)
+          } else if (progress.type === 'token-success' && progress.message === '连接成功') {
+            message.success(`[序号${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error' && progress.message === '连接失败，跳过') {
+            message.warning(`[序号${progress.globalIndex}] ${progress.tokenName} 连接失败，跳过`)
+          }
+        }
+      }
+    )
+    
+    let csvContent = '\uFEFF序号,昵称,爬塔层数\n'
+    towerInfoList.forEach(item => {
+      csvContent += `${item.index},${item.name},${item.floor}\n`
+    })
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `怪异塔爬塔信息_${new Date().toLocaleDateString()}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    message.success(`爬塔信息导出完成，共${towerInfoList.length}个Token`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '批量导出爬塔信息',
+      tokenId: '',
+      tokenName: '',
+      status: 'success',
+      message: `导出爬塔信息完成，共${towerInfoList.length}个Token`
+    })
+  } catch (error) {
+    console.error('导出爬塔信息失败:', error)
+    message.error('导出爬塔信息失败: ' + (error.message || '未知错误'))
+  } finally {
+    isExportingTowerInfo.value = false
+  }
+}
+
+const handleBatchClaimFreeKey = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = parseTokenRange(batchTokens.value)
+  let targetTokens = []
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices
+      .map(index => {
+        const arrayIndex = index - 1
+        const token = sortedTokensList[arrayIndex]
+        return token ? { token, index } : null
+      })
+      .filter(item => item !== null)
+      .sort((a, b) => a.index - b.index)
+      .map(item => item.token)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  try {
+    isBatchClaimingFreeKey.value = true
+    const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
+    message.info(`开始批量领取免费钥匙（${rangeText}），共${targetTokens.length}个Token...`)
+    
+    let successCount = 0
+    let failCount = 0
+    
+    const claimOperation = async (token, globalIndex) => {
+      const tokenIndex = globalIndex + 1
+      
+      try {
+        await tokenStore.sendMergeboxClaimFreeEnergy(token.id, { actType: 1 })
+        
+        successCount++
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取免费钥匙成功`)
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量领取免费钥匙',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name || token.id}、领取免费钥匙成功`
+        })
+        
+        await waitCommandDelay()
+        
+        return { success: true, tokenId: token.id }
+      } catch (error) {
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} 领取免费钥匙失败:`, error)
+        failCount++
+        
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取免费钥匙失败: ${error.message}`)
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '怪异塔',
+          operation: '批量领取免费钥匙',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'warning',
+          message: `${tokenIndex}、${token.name || token.id}、领取免费钥匙失败: ${error.message}`
+        })
+        
+        await waitCommandDelay()
+        
+        return { success: false, tokenId: token.id }
+      }
+    }
+    
+    await connectionPool.batchOperate(
+      targetTokens,
+      claimOperation,
+      {
+        batchSize: 1,
+        delayBetween: 100,
+        keepConnections: true,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`[序号${progress.globalIndex}] ${progress.tokenName} 正在连接...`)
+          } else if (progress.type === 'token-success' && progress.message === '连接成功') {
+            message.success(`[序号${progress.globalIndex}] ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error' && progress.message === '连接失败，跳过') {
+            message.warning(`[序号${progress.globalIndex}] ${progress.tokenName} 连接失败，跳过`)
+          }
+        }
+      }
+    )
+    
+    message.success(`批量领取免费钥匙完成（成功: ${successCount}, 失败: ${failCount}）`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '批量领取免费钥匙',
+      tokenId: '',
+      tokenName: '',
+      status: 'success',
+      message: `批量领取免费钥匙完成（成功: ${successCount}, 失败: ${failCount}）`
+    })
+  } catch (error) {
+    console.error('批量领取免费钥匙失败:', error)
+    message.error('批量领取免费钥匙失败: ' + (error.message || '未知错误'))
+  } finally {
+    isBatchClaimingFreeKey.value = false
   }
 }
 
