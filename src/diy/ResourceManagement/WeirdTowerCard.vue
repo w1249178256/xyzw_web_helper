@@ -344,7 +344,8 @@ const getTowerInfo = async (tokenId) => {
       5000
     )
     
-    // 更新角色信息
+    // 等待间隔后更新角色信息
+    await new Promise(resolve => setTimeout(resolve, 600))
     await tokenStore.sendGameMessage(tokenId, 'role_getroleinfo', {})
   } catch (error) {
     console.error('获取怪异塔信息失败:', error)

@@ -44,13 +44,18 @@
 
       <!-- 功能卡片区域 -->
       <div class="feature-cards-container" v-if="tokenStore.hasTokens">
-        <!-- 阵容助手卡片 -->
-        <UnlimitedlineCard 
+        <!-- 盐场卡片 -->
+        <SaltFieldCard 
           :selected-token-id="selectedTokenId"
         />
 
         <!-- 怪异塔卡片 -->
         <WeirdTowerCard 
+          :selected-token-id="selectedTokenId"
+        />
+
+        <!-- 阵容助手卡片 -->
+        <UnlimitedlineCard 
           :selected-token-id="selectedTokenId"
         />
       </div>
@@ -120,6 +125,7 @@ import BinTokenForm from '@/views/TokenImport/bin.vue'
 // 导入模块化卡片组件
 import UnlimitedlineCard from '@/diy/ResourceManagement/Unlimitedline.vue'
 import WeirdTowerCard from '@/diy/ResourceManagement/WeirdTowerCard.vue'
+import SaltFieldCard from '@/diy/ResourceManagement/SaltFieldCard.vue'
 
 const router = useRouter()
 const tokenStore = useTokenStore()

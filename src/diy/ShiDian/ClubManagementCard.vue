@@ -2325,11 +2325,10 @@ const handleExportClubInfo = async () => {
         message.success(`[${tokenIndex}] ${token.name || token.id} 连接成功`)
 
         try {
-          await tokenStore.sendLegionGetInfo(token.id, {})
+          const legionInfoRes = await tokenStore.sendLegionGetInfo(token.id, {})
           await waitCommandDelay()
           
-          const tokenData = tokenStore.gameTokens.find(t => t.id === token.id)
-          const legionInfo = tokenData?.gameData?.legionInfo
+          const legionInfo = legionInfoRes?.legion || legionInfoRes
           const clubName = legionInfo?.info?.name || '未加入俱乐部'
           
           const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})

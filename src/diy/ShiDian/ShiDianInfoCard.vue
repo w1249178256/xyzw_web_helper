@@ -3281,6 +3281,7 @@ const exportResources = async () => {
           colorJade: '-',
           spiritShell: '-',
           goldBrick: '-',
+          goldenRod: '-',
           chestScore: '-',
           recruitOrder: '-',
           roleId: '连接失败',
@@ -3300,9 +3301,12 @@ const exportResources = async () => {
         const whiteJade = formatValue(findItemCount(items, 1022))
         const colorJade = formatValue(findItemCount(items, 1023))
         const spiritShell = formatValue(findItemCount(items, 1033))
-        // 增加金砖、招募令数量
-        const goldBrick = formatValue(findItemCount(items, 1024)) // 金砖的物品 ID 是 1024
-        const recruitOrder = formatValue(findItemCount(items, 1044)) // 招募令的物品 ID 是 1044
+        // 金砖从role.diamond直接获取
+        const goldBrick = formatValue(roleInfo?.role?.diamond || 0)
+        // 金竿的物品 ID 是 1012
+        const goldenRod = formatValue(findItemCount(items, 1012))
+        // 招募令的物品 ID 是 1001
+        const recruitOrder = formatValue(findItemCount(items, 1001))
 
         // 宝箱总分数：计算各种宝箱数量 × 对应分数
         let chestScore = 0
@@ -3350,6 +3354,7 @@ const exportResources = async () => {
           colorJade: colorJade,
           spiritShell: spiritShell,
           goldBrick: goldBrick,
+          goldenRod: goldenRod,
           chestScore: chestScoreDisplay,
           recruitOrder: recruitOrder,
           roleId: roleId,
@@ -3364,7 +3369,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -3385,6 +3390,7 @@ const exportResources = async () => {
           colorJade: '-',
           spiritShell: '-',
           goldBrick: '-',
+          goldenRod: '-',
           chestScore: '-',
           recruitOrder: '-',
           roleId: roleId,
@@ -3418,12 +3424,12 @@ const exportResources = async () => {
     lines.push(`Token数量: ${tokenIds.length}`)
     lines.push("=".repeat(80))
     lines.push("")
-    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,宝箱总分数,招募令,十殿最高殿级,状态")
+    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,金竿,宝箱总分数,招募令,十殿最高殿级,状态")
     lines.push("-".repeat(80))
 
     results.forEach((result, index) => {
       const status = result.success ? '成功' : `失败: ${result.error || '未知错误'}`
-      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.chestScore},${result.recruitOrder},${result.maxNightmareLevel},${status}`)
+      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.goldenRod},${result.chestScore},${result.recruitOrder},${result.maxNightmareLevel},${status}`)
     })
 
     lines.push("")

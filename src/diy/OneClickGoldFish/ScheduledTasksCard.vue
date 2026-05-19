@@ -146,7 +146,7 @@ const RECRUIT_WEEK_ACTIVITY_ID = 2603132
 // 定时任务相关
 const isExecutingScheduledTasks = ref(false)
 const isBatchBlackMarketRunning = ref(false)
-const scheduledExecutionTokens = ref('')
+const scheduledExecutionTokens = ref(localStorage.getItem('scheduledExecutionTokens') || '')
 const scheduledTasks = ref({
   claimHangUp: false,
   resetBottles: false,
@@ -163,6 +163,7 @@ const scheduledTasks = ref({
 // 处理定时任务执行范围输入
 const handleScheduledExecutionTokensInput = (value) => {
   scheduledExecutionTokens.value = value
+  localStorage.setItem('scheduledExecutionTokens', value)
 }
 
 // 打开日常任务：开启所有功能

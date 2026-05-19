@@ -1208,6 +1208,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "legion_getbattlefield", params);
   };
 
+  // 发送盐场报名
+  const sendLegionSignup = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "legion_signup", params);
+  };
+
   // 发送盐场入场
   const sendWarSetBattleTeam = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "war_setbattleteam", params);
@@ -1630,6 +1635,16 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送武将上阵/下阵
   const sendHeroGoIntoBattle = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
+  };
+
+  // 发送英雄重生
+  const sendHeroRebirth = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_rebirth", params);
+  };
+
+  // 发送英雄下阵
+  const sendHeroGoBackBattle = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "hero_gobackbattle", params);
   };
 
   // 发送主公升级
@@ -2178,6 +2193,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegionGetOpponent,
     sendLegionGetInfobyid,
     sendLegionGetBattlefield,
+    sendLegionSignup,
     sendWarSetBattleTeam,
     sendNightmareGetRoleInfo,
     sendNightmareClickTurntable,
@@ -2263,6 +2279,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendSystemClaimCdkReward,
     sendClaimTotalReward,
     sendHeroGoIntoBattle,
+    sendHeroGoBackBattle,
+    sendHeroRebirth,
     sendChargeCreateOrder,
     sendBossTowerStartBoss,
     sendBossTowerGetInfo,

@@ -378,6 +378,7 @@ const refreshTowerInfo = async () => {
     
     // 发送刷新命令
     await tokenStore.sendGameMessage(token.id, 'tower_getinfo', {})
+    await new Promise(resolve => setTimeout(resolve, 600))
     const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
     
     // 获取并显示详细信息

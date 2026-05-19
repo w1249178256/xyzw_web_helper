@@ -67,10 +67,23 @@
           @button-click="executeNightmare8()"
         />
         <CustomizedCard 
+          mode="execution-range"
+          name="执行范围"
+          :input-value="executionRange"
+          placeholder="请输入执行范围，如：1-20 或 3,4,5"
+          @update:input-value="executionRange = $event"
+        />
+        <CustomizedCard 
           mode="button-placeholder"
           button-text="批量切换阵2"
           :disabled="isSwitchingTeam2 || !tokenStore.hasTokens"
           @button-click="batchSwitchTeam2"
+        />
+        <CustomizedCard 
+          mode="button-placeholder"
+          button-text="批量切换阵1"
+          :disabled="isSwitchingTeam1 || !tokenStore.hasTokens"
+          @button-click="batchSwitchTeam1"
         />
       </CustomizedCard>
       
@@ -124,6 +137,58 @@ const getTokenIndex = (token) => {
   return index >= 0 ? index + 1 : '?'
 }
 
+// 辅助函数：解析执行范围（如果为空则执行全部）
+const parseTokenRange = (rangeStr) => {
+  if (!rangeStr || !rangeStr.trim()) {
+    return null // null表示执行全部
+  }
+  
+  const tokens = []
+  const parts = rangeStr.split(',')
+  
+  for (const part of parts) {
+    const trimmed = part.trim()
+    if (trimmed.includes('-')) {
+      // 处理范围格式：1-3
+      const [start, end] = trimmed.split('-').map(Number)
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        for (let i = start; i <= end; i++) {
+          tokens.push(i)
+        }
+      }
+    } else {
+      // 处理单个数字：1
+      const num = Number(trimmed)
+      if (!isNaN(num)) {
+        tokens.push(num)
+      }
+    }
+  }
+  
+  return tokens.length > 0 ? tokens : null
+}
+
+// 辅助函数：获取目标Token列表（根据执行范围或全部）
+const getTargetTokens = (tokenIndices) => {
+  const gameTokens = toRaw(tokenStore.gameTokens)
+  const sortedTokens = [...gameTokens].sort((a, b) => {
+    const nameA = a.name || a.id || ''
+    const nameB = b.name || b.id || ''
+    return nameA.localeCompare(nameB, 'zh-CN')
+  })
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    return sortedTokens
+  }
+  
+  return tokenIndices
+    .map(index => {
+      const arrayIndex = index - 1
+      return sortedTokens[arrayIndex]
+    })
+    .filter(token => token !== undefined)
+}
+
 // TeamID 相关变量
 const teamIds = ref(['', '', '', '', ''])
 const isAutoJoinRunning = ref(false)
@@ -137,6 +202,12 @@ const connectingTokens = ref(new Set())
 
 // 批量切换阵2相关变量
 const isSwitchingTeam2 = ref(false)
+
+// 批量切换阵1相关变量
+const isSwitchingTeam1 = ref(false)
+
+// 执行范围
+const executionRange = ref('')
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -552,14 +623,23 @@ const batchSwitchTeam2 = async () => {
   isSwitchingTeam2.value = true
   
   try {
-    message.info('开始批量切换阵2...')
+    // 解析执行范围
+    const tokenIndices = parseTokenRange(executionRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
     
-    const gameTokens = toRaw(tokenStore.gameTokens)
+    if (targetTokens.length === 0) {
+      message.warning('执行范围内没有有效的Token')
+      return
+    }
+    
+    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+    message.info(`开始批量切换阵2（${rangeText}），共${targetTokens.length}个Token...`)
+    
     let successCount = 0
     let failCount = 0
     
-    for (let i = 0; i < gameTokens.length; i++) {
-      const token = gameTokens[i]
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
       if (!token || !token.id) continue
       
       try {
@@ -568,6 +648,13 @@ const batchSwitchTeam2 = async () => {
         if (!connectionAcquired) {
           message.warning(`${token.name} 连接失败`)
           failCount++
+          logOperation('shidian', '批量切换阵2', {
+            cardType: '十殿 TeamID',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${token.name} 连接失败`
+          })
           continue
         }
         
@@ -577,6 +664,13 @@ const batchSwitchTeam2 = async () => {
           message.warning(`${token.name} WebSocket未连接`)
           await connectionPool.release(token.id, false)
           failCount++
+          logOperation('shidian', '批量切换阵2', {
+            cardType: '十殿 TeamID',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${token.name} WebSocket未连接`
+          })
           continue
         }
         
@@ -588,6 +682,13 @@ const batchSwitchTeam2 = async () => {
         
         message.success(`${token.name} 已切换到阵2`)
         successCount++
+        logOperation('shidian', '批量切换阵2', {
+          cardType: '十殿 TeamID',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${token.name} 已切换到阵2`
+        })
         
         await connectionPool.release(token.id, true)
         
@@ -595,6 +696,13 @@ const batchSwitchTeam2 = async () => {
         console.error(`${token.name} 切换阵2失败:`, error)
         message.error(`${token.name} 切换阵2失败：${error.message}`)
         failCount++
+        logOperation('shidian', '批量切换阵2', {
+          cardType: '十殿 TeamID',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${token.name} 切换阵2失败：${error.message}`
+        })
         try {
           await connectionPool.release(token.id, false)
         } catch (releaseError) {
@@ -602,7 +710,7 @@ const batchSwitchTeam2 = async () => {
         }
       }
       
-      if (i < gameTokens.length - 1) {
+      if (i < targetTokens.length - 1) {
         await waitCommandDelay()
       }
     }
@@ -612,7 +720,7 @@ const batchSwitchTeam2 = async () => {
     logOperation('shidian', '批量切换阵2', {
       cardType: '十殿 TeamID',
       status: 'success',
-      message: `批量切换阵2完成，成功: ${successCount}，失败: ${failCount}`
+      message: `批量切换阵2完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
     })
     
   } catch (error) {
@@ -628,13 +736,137 @@ const batchSwitchTeam2 = async () => {
   }
 }
 
+// 批量切换阵1
+const batchSwitchTeam1 = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  isSwitchingTeam1.value = true
+  
+  try {
+    // 解析执行范围
+    const tokenIndices = parseTokenRange(executionRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
+    
+    if (targetTokens.length === 0) {
+      message.warning('执行范围内没有有效的Token')
+      return
+    }
+    
+    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+    message.info(`开始批量切换阵1（${rangeText}），共${targetTokens.length}个Token...`)
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      if (!token || !token.id) continue
+      
+      try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          message.warning(`${token.name} 连接失败`)
+          failCount++
+          logOperation('shidian', '批量切换阵1', {
+            cardType: '十殿 TeamID',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${token.name} 连接失败`
+          })
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          message.warning(`${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          logOperation('shidian', '批量切换阵1', {
+            cardType: '十殿 TeamID',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${token.name} WebSocket未连接`
+          })
+          continue
+        }
+        
+        message.info(`正在切换 ${token.name} 到阵1...`)
+        
+        await tokenStore.sendGameMessage(token.id, 'presetteam_saveteam', { 
+          teamId: 1 
+        })
+        
+        message.success(`${token.name} 已切换到阵1`)
+        successCount++
+        logOperation('shidian', '批量切换阵1', {
+          cardType: '十殿 TeamID',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${token.name} 已切换到阵1`
+        })
+        
+        await connectionPool.release(token.id, true)
+        
+      } catch (error) {
+        console.error(`${token.name} 切换阵1失败:`, error)
+        message.error(`${token.name} 切换阵1失败：${error.message}`)
+        failCount++
+        logOperation('shidian', '批量切换阵1', {
+          cardType: '十殿 TeamID',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${token.name} 切换阵1失败：${error.message}`
+        })
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
+      }
+      
+      if (i < targetTokens.length - 1) {
+        await waitCommandDelay()
+      }
+    }
+    
+    message.success(`批量切换阵1完成！成功: ${successCount}，失败: ${failCount}`)
+    
+    logOperation('shidian', '批量切换阵1', {
+      cardType: '十殿 TeamID',
+      status: 'success',
+      message: `批量切换阵1完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+    })
+    
+  } catch (error) {
+    console.error('批量切换阵1失败:', error)
+    message.error(`批量切换阵1失败：${error.message || '未知错误'}`)
+    logOperation('shidian', '批量切换阵1', {
+      cardType: '十殿 TeamID',
+      status: 'error',
+      message: `批量切换阵1失败：${error.message}`
+    })
+  } finally {
+    isSwitchingTeam1.value = false
+  }
+}
+
 // 暴露方法给父组件
 defineExpose({
   autoJoinShiDian,
   stopAutoJoinShiDian,
   addMembersToTeams,
   executeNightmare8,
-  batchSwitchTeam2
+  batchSwitchTeam2,
+  batchSwitchTeam1
 })
 
 // 组件挂载时加载设置

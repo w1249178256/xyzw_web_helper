@@ -1446,6 +1446,23 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
 
+
+  /**
+   * 盐场报名
+   */
+  legion_signup(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+                ...params
+      }),
+      cmd: "legion_signup",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
   /**
    * 获取盐场对手信息
    */
@@ -1813,6 +1830,23 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       time: Date.now()
     }
   }
+
+/**
+   * 咸将重生
+   */
+  hero_rebirth(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId: params.heroId,
+                ...params
+      }),
+      cmd: "hero_rebirth",
+      seq,
+      time: Date.now()
+    }
+  }
+
 
 
   /**
