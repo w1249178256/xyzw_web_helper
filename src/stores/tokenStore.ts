@@ -1647,6 +1647,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "hero_gobackbattle", params);
   };
 
+  // 发送地牢选择英雄
+  const sendDungeonSelectHero = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "dungeon_selecthero", params);
+  };
+
   // 发送主公升级
   const sendHeroLordUpgradeLevel = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_lordupgradelevel", params);
@@ -2281,6 +2286,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendHeroGoIntoBattle,
     sendHeroGoBackBattle,
     sendHeroRebirth,
+    sendDungeonSelectHero,
     sendChargeCreateOrder,
     sendBossTowerStartBoss,
     sendBossTowerGetInfo,

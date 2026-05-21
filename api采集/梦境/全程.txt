@@ -1,0 +1,971 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/5/20 08:34:55
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 11
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/5/20 08:32:15
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 53,
+    "ack": 0,
+    "time": 1779237135126,
+    "resp": 53,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 2,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1779237135117_a0z1oy7hz
+
+记录 #2:
+----------------------------------------
+时间: 2026/5/20 08:32:01
+服务: TowerService
+方法: getRank
+参数: [{"minRank":1,"maxRank":1}]
+结果:
+{
+  "_raw": {
+    "seq": 52,
+    "ack": 51,
+    "time": 1779237121156,
+    "resp": 52,
+    "cmd": "tower_getrankresp",
+    "body": {
+      "list": [
+        {
+          "roleId": 111924966,
+          "serverId": 8972,
+          "rank": 1,
+          "name": "红色海盗",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKya7OUARaEicJjAXWZckhVXpMicfUphPTiccAW0lB7vspUiafxouEo2cb3D7qywkjbGhjj5iak1fLcKXg/132",
+          "power": 11287579278,
+          "score": 4267,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "bottleType": 0,
+          "medallion": null,
+          "medallionStorage": {
+            "2002": {
+              "expire": 1688054400,
+              "created": 1687452795
+            }
+          },
+          "ext": 0,
+          "avatarFrame": {
+            "id": 3004,
+            "expire": -1
+          },
+          "customCard": null,
+          "legionName": "",
+          "legacy": null,
+          "petId": 0
+        }
+      ],
+      "myRank": {
+        "roleId": 687379521,
+        "serverId": 8972,
+        "rank": 80,
+        "name": "相符72-1",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+        "power": 1400799021,
+        "score": 1666
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1779237121142_6572zbx1t
+
+记录 #3:
+----------------------------------------
+时间: 2026/5/20 08:32:01
+服务: ArenaService
+方法: getAreaRank
+参数: [{"rankType":2,"minRank":0,"maxRank":0}]
+结果:
+{
+  "_raw": {
+    "seq": 51,
+    "ack": 0,
+    "time": 1779237121150,
+    "resp": 51,
+    "cmd": "arena_getarearankresp",
+    "body": {
+      "list": [
+        {
+          "roleId": 109136133,
+          "serverId": 8784,
+          "rank": 1,
+          "name": "清源妙道真君",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/109136133/1747144814.jpg",
+          "power": 9172548535,
+          "score": 1329.3220800833,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "bottleType": 0,
+          "medallion": null,
+          "medallionStorage": null,
+          "ext": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "legionName": "",
+          "legacy": {
+            "scheduleId": 2,
+            "color": 0
+          },
+          "petId": 401
+        }
+      ],
+      "myRank": {
+        "roleId": 687379521,
+        "serverId": 8972,
+        "rank": 63,
+        "name": "相符72-1",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+        "power": 1750625460,
+        "score": 1020.3220818219
+      },
+      "total": 100
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1779237121137_0gv70n88f
+
+记录 #4:
+----------------------------------------
+时间: 2026/5/20 08:31:58
+服务: TowerService
+方法: getRank
+参数: [{"minRank":1,"maxRank":1}]
+结果:
+{
+  "_raw": {
+    "seq": 50,
+    "ack": 49,
+    "time": 1779237118584,
+    "resp": 50,
+    "cmd": "tower_getrankresp",
+    "body": {
+      "list": [
+        {
+          "roleId": 111924966,
+          "serverId": 8972,
+          "rank": 1,
+          "name": "红色海盗",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKya7OUARaEicJjAXWZckhVXpMicfUphPTiccAW0lB7vspUiafxouEo2cb3D7qywkjbGhjj5iak1fLcKXg/132",
+          "power": 11287579278,
+          "score": 4267,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "bottleType": 0,
+          "medallion": null,
+          "medallionStorage": {
+            "2002": {
+              "expire": 1688054400,
+              "created": 1687452795
+            }
+          },
+          "ext": 0,
+          "avatarFrame": {
+            "id": 3004,
+            "expire": -1
+          },
+          "customCard": null,
+          "legionName": "",
+          "legacy": null,
+          "petId": 0
+        }
+      ],
+      "myRank": {
+        "roleId": 687379521,
+        "serverId": 8972,
+        "rank": 80,
+        "name": "相符72-1",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+        "power": 1400799021,
+        "score": 1666
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1779237118568_rmm8ih5qt
+
+记录 #5:
+----------------------------------------
+时间: 2026/5/20 08:31:58
+服务: ArenaService
+方法: getAreaRank
+参数: [{"rankType":2,"minRank":0,"maxRank":0}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 48,
+    "time": 1779237118549,
+    "resp": 49,
+    "cmd": "arena_getarearankresp",
+    "body": {
+      "list": [
+        {
+          "roleId": 109136133,
+          "serverId": 8784,
+          "rank": 1,
+          "name": "清源妙道真君",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/109136133/1747144814.jpg",
+          "power": 9172548535,
+          "score": 1329.3220800833,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "bottleType": 0,
+          "medallion": null,
+          "medallionStorage": null,
+          "ext": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "legionName": "",
+          "legacy": {
+            "scheduleId": 2,
+            "color": 0
+          },
+          "petId": 401
+        }
+      ],
+      "myRank": {
+        "roleId": 687379521,
+        "serverId": 8972,
+        "rank": 63,
+        "name": "相符72-1",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+        "power": 1750625460,
+        "score": 1020.3220818219
+      },
+      "total": 100
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1779237118538_b6fws1i1t
+
+记录 #6:
+----------------------------------------
+时间: 2026/5/20 08:31:58
+服务: FightService
+方法: startDungeon
+参数: [{"heroId":107}]
+结果:
+{
+  "_raw": {
+    "seq": 48,
+    "ack": 0,
+    "time": 1779237118520,
+    "resp": 48,
+    "cmd": "fight_startdungeonresp",
+    "body": {
+      "role": {
+        "dungeon": {
+          "id": 42,
+          "activeHeroId": 107,
+          "battleTeam": {
+            "0": {
+              "energy": 100
+            }
+          },
+          "pack": {
+            "1": {
+              "0": 6
+            }
+          },
+          "currMonsterId": 3038,
+          "items": {
+            "12": {
+              "quantity": 6
+            }
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 12,
+          "itemId": 12,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "battleData": {
+        "id": 75077370602,
+        "mode": 7,
+        "randomSeed": 5938,
+        "version": 240499,
+        "leftTeam": {
+          "roleId": 687379521,
+          "power": 1356554154,
+          "team": {
+            "0": {
+              "id": 107,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 404149846,
+              "defense": 144175429,
+              "curHp": 4013480998,
+              "hp": 4013480998,
+              "curEnergy": -1,
+              "speed": 4003,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {
+                "51": 1,
+                "52": 0.0175,
+                "53": 0.01,
+                "54": 0.156,
+                "56": 0.6105,
+                "57": 0.7,
+                "58": 0.018,
+                "59": 0.442,
+                "61": 0.424,
+                "63": 0.04,
+                "68": 0.02,
+                "101": 0,
+                "102": 0
+              },
+              "enchantMap": {},
+              "skill": [
+                206,
+                207,
+                208,
+                111350
+              ],
+              "recordFlag": false
+            }
+          },
+          "name": "相符72-1",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/a5398mWDbeS5f20YyML7Kib6xTI3pDNcvlgVSzpnlnG1x5dxwmWMytGNBvHJrGbFznpXXNrjwyfH1IrfIIOaOIDnY8cZiawibEmtcdic7Bu2R4I/132",
+          "lordSkill": [],
+          "levelWeaponSkillId": [],
+          "petPassiveSkillIds": []
+        },
+        "rightTeam": {
+          "team": {
+            "26": {
+              "id": 51019,
+              "type": 1,
+              "index": 26,
+              "level": 300041,
+              "attack": 0,
+              "defense": 0,
+              "curHp": 0,
+              "hp": 0,
+              "curEnergy": 0,
+              "speed": 0,
+              "color": 0,
+              "star": 0,
+              "order": 0,
+              "skin": 0,
+              "skinName": "",
+              "activeSkill": 0,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [],
+              "recordFlag": false
+            }
+          },
+          "lordSkill": [],
+          "levelWeaponSkillId": [],
+          "petPassiveSkillIds": []
+        },
+        "options": {
+          "dungeonId": 41
+        },
+        "outputCode": "f6226e222506aabfa5ae2aa6315409fe",
+        "result": {
+          "id": 75077370602,
+          "isWin": true,
+          "seed": 5938,
+          "totalFrame": 48,
+          "version": 240499,
+          "battleVersion": "1c6689abc4",
+          "memoMode": 3,
+          "inputCode": "ddca112a61c20b6627fa18e0a0959358",
+          "outputCode": "f6226e222506aabfa5ae2aa6315409fe",
+          "sponsor": {
+            "roleId": 687379521,
+            "power": 1356554154,
+            "teamInfo": [
+              {
+                "heroId": 107,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 100,
+                "club": 4,
+                "slot": 0,
+                "star": 30,
+                "damage": 404149846,
+                "takeDamage": 0,
+                "treatment": 0,
+                "hp": 4013480998,
+                "energy": 100,
+                "skin": 10701,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 404149846,
+                  "3": 404149846,
+                  "4": 404149846
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 4013480998
+            }
+          },
+          "accept": {
+            "teamInfo": [
+              {
+                "heroId": 51019,
+                "color": 2,
+                "level": 300041,
+                "order": 0,
+                "index": 26,
+                "rage": 0,
+                "club": 4,
+                "slot": 26,
+                "star": 0,
+                "damage": 0,
+                "takeDamage": 404149846,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 0,
+                "skinName": "",
+                "type": 1,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 0
+            }
+          },
+          "type": 7,
+          "round": 1,
+          "memos": []
+        }
+      },
+      "isWin": true
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 48
+}
+异步: 是
+调用ID: call_1779237118487_zaw2jy8yz
+
+记录 #7:
+----------------------------------------
+时间: 2026/5/20 08:31:42
+服务: DungeonService
+方法: selectHero
+参数: [{"battleTeam":{}}]
+结果:
+{
+  "_raw": {
+    "seq": 45,
+    "ack": 0,
+    "time": 1779237102131,
+    "resp": 45,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 274189,
+        "freeDiamond": 274189,
+        "items": {
+          "1003": {
+            "quantity": 300463
+          },
+          "1006": {
+            "quantity": 789550
+          },
+          "1016": {
+            "quantity": 25264
+          },
+          "3006": {
+            "quantity": 68
+          }
+        },
+        "dungeon": {
+          "beginTime": 1779206400,
+          "id": 41,
+          "activeHeroId": 0,
+          "battleTeam": {
+            "0": {
+              "heroId": 107,
+              "initHp": 4013480998,
+              "hp": 4013480998,
+              "speed": 4003,
+              "attack": 392378491,
+              "energy": -1,
+              "attackBuff": 0.029999999329447746,
+              "criticalDmgBuff": 0.03999999910593033,
+              "criticalHitBuff": 0,
+              "attackBuffNum": 2,
+              "criticalDmgBuffNum": 2,
+              "criticalHitBuffNum": 0,
+              "heroSnapshot": {
+                "heroId": 107,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1344782799,
+                "attack": 392378491,
+                "defense": 144175429,
+                "hp": 4013480998,
+                "speed": 4003,
+                "artifactId": 11135,
+                "pearlId": 0,
+                "trumpId": 56,
+                "transTrumpId": 0,
+                "trumpId2": 0,
+                "attackExt": 5.115909099578857,
+                "defenseExt": 5.115909099578857,
+                "hpExt": 5.115909099578857,
+                "attribute": {
+                  "51": 1,
+                  "52": 0.017499999701977,
+                  "53": 0.010000000149012,
+                  "54": 0.15600000604987,
+                  "56": 0.61050002425909,
+                  "57": 0.70000001788139,
+                  "58": 0.018000000268221,
+                  "59": 0.40200000599027,
+                  "61": 0.42400000631809,
+                  "63": 0.040000000596046,
+                  "68": 0.020000000298023,
+                  "101": 0,
+                  "102": 0
+                },
+                "equipment": {
+                  "1": {
+                    "equipId": 0,
+                    "enchantUId": 0,
+                    "enchantUId2": 0,
+                    "level": 4000,
+                    "forgeExp": 0,
+                    "forge": 0,
+                    "star": 0,
+                    "attack": 45492,
+                    "defense": 0,
+                    "hp": 0,
+                    "curQuenchId": 0,
+                    "quenchTimes": 800,
+                    "quenches": {
+                      "1": {
+                        "colorId": 3,
+                        "attrId": 14,
+                        "attrNum": 12,
+                        "isLocked": false
+                      },
+                      "2": {
+                        "colorId": 2,
+                        "attrId": 11,
+                        "attrNum": 9,
+                        "isLocked": false
+                      },
+                      "3": {
+                        "colorId": 5,
+                        "attrId": 9,
+                        "attrNum": 58,
+                        "isLocked": false
+                      }
+                    },
+                    "quenchTimes2": 0,
+                    "quenches2": {},
+                    "quenchAttackExt": 3546,
+                    "quenchDefenseExt": 0,
+                    "quenchHpExt": 0,
+                    "seed": 0
+                  },
+                  "2": {
+                    "equipId": 0,
+                    "enchantUId": 0,
+                    "enchantUId2": 0,
+                    "level": 4000,
+                    "forgeExp": 0,
+                    "forge": 0,
+                    "star": 0,
+                    "attack": 0,
+                    "defense": 0,
+                    "hp": 198972,
+                    "curQuenchId": 0,
+                    "quenchTimes": 555,
+                    "quenches": {
+                      "1": {
+                        "colorId": 1,
+                        "attrId": 6,
+                        "attrNum": 5,
+                        "isLocked": false
+                      },
+                      "2": {
+                        "colorId": 1,
+                        "attrId": 12,
+                        "attrNum": 1,
+                        "isLocked": false
+                      },
+                      "3": {
+                        "colorId": 3,
+                        "attrId": 15,
+                        "attrNum": 20,
+                        "isLocked": false
+                      }
+                    },
+                    "quenchTimes2": 0,
+                    "quenches2": {},
+                    "quenchAttackExt": 0,
+                    "quenchDefenseExt": 0,
+                    "quenchHpExt": 11232,
+                    "seed": 0
+                  },
+                  "3": {
+                    "equipId": 0,
+                    "enchantUId": 0,
+                    "enchantUId2": 0,
+                    "level": 4000,
+                    "forgeExp": 0,
+                    "forge": 0,
+                    "star": 0,
+                    "attack": 0,
+                    "defense": 50679,
+                    "hp": 0,
+                    "curQuenchId": 0,
+                    "quenchTimes": 412,
+                    "quenches": {
+                      "1": {
+                        "colorId": 1,
+                        "attrId": 8,
+                        "attrNum": 3,
+                        "isLocked": false
+                      },
+                      "2": {
+                        "colorId": 1,
+                        "attrId": 19,
+                        "attrNum": 3,
+                        "isLocked": false
+                      },
+                      "3": {
+                        "colorId": 6,
+                        "attrId": 9,
+                        "attrNum": 84,
+                        "isLocked": false
+                      }
+                    },
+                    "quenchTimes2": 0,
+                    "quenches2": {},
+                    "quenchAttackExt": 0,
+                    "quenchDefenseExt": 1820,
+                    "quenchHpExt": 0,
+                    "seed": 0
+                  },
+                  "4": {
+                    "equipId": 0,
+                    "enchantUId": 0,
+                    "enchantUId2": 0,
+                    "level": 4000,
+                    "forgeExp": 0,
+                    "forge": 0,
+                    "star": 0,
+                    "attack": 0,
+                    "defense": 0,
+                    "hp": 183666,
+                    "curQuenchId": 0,
+                    "quenchTimes": 242,
+                    "quenches": {
+                      "1": {
+                        "colorId": 5,
+                        "attrId": 9,
+                        "attrNum": 65,
+                        "isLocked": false
+                      },
+                      "2": {
+                        "colorId": 1,
+                        "attrId": 19,
+                        "attrNum": 2,
+                        "isLocked": false
+                      },
+                      "3": {
+                        "colorId": 1,
+                        "attrId": 7,
+                        "attrNum": 5,
+                        "isLocked": false
+                      }
+                    },
+                    "quenchTimes2": 0,
+                    "quenches2": {},
+                    "quenchAttackExt": 0,
+                    "quenchDefenseExt": 0,
+                    "quenchHpExt": 4860,
+                    "seed": 0
+                  }
+                },
+                "battleTeamSlot": 2,
+                "isActive": true,
+                "skill": [
+                  {
+                    "skillId": 206,
+                    "level": 1,
+                    "active": true,
+                    "affiliated": 0
+                  },
+                  {
+                    "skillId": 207,
+                    "level": 1,
+                    "active": true,
+                    "affiliated": 0
+                  },
+                  {
+                    "skillId": 208,
+                    "level": 1,
+                    "active": true,
+                    "affiliated": 0
+                  }
+                ],
+                "activeSkill": 0,
+                "awakeSkill": {
+                  "0": true,
+                  "1": true,
+                  "2": true
+                },
+                "appendSkill": [
+                  {
+                    "skillId": 111350,
+                    "level": 1,
+                    "active": true,
+                    "affiliated": 11135
+                  }
+                ],
+                "useSkin": 10701,
+                "skin": {
+                  "10701": {
+                    "skinId": 10701,
+                    "name": "",
+                    "setNameTime": 0,
+                    "setNameCnt": 0,
+                    "expiration": -1
+                  }
+                },
+                "bookStar": 30,
+                "bookLevel": 0,
+                "bookValue": 0,
+                "bookAttack": 0,
+                "bookHp": 0,
+                "recordFlag": false,
+                "forbidSNTime": 0,
+                "hB": null
+              }
+            },
+            "1": null,
+            "2": null,
+            "3": null,
+            "4": null
+          },
+          "pack": {
+            "1": {
+              "0": 5,
+              "2": 3,
+              "3": 2,
+              "4": null,
+              "5": 2,
+              "6": 1,
+              "7": 2,
+              "8": 1,
+              "9": 3,
+              "10": 1,
+              "11": 2,
+              "14": null,
+              "15": 1,
+              "18": 1,
+              "20": 3
+            },
+            "2": {
+              "0": null,
+              "1": 3,
+              "2": 4
+            }
+          },
+          "merchant": {
+            "1": [
+              0,
+              2,
+              5
+            ],
+            "3": null
+          },
+          "currMonsterId": 2010,
+          "newMerchantId": 1,
+          "items": {
+            "12": {
+              "quantity": 5
+            },
+            "14": {
+              "itemId": 14,
+              "quantity": 3,
+              "ext": null
+            }
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 12,
+          "itemId": 17,
+          "value": 2,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 120,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1016,
+          "value": 300,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3006,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 12,
+          "itemId": 13,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 70,
+          "ext": 0
+        },
+        {
+          "type": 12,
+          "itemId": 12,
+          "value": 5,
+          "ext": 0
+        },
+        {
+          "type": 12,
+          "itemId": 15,
+          "value": 2,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 110,
+          "ext": 0
+        },
+        {
+          "type": 12,
+          "itemId": 14,
+          "value": 3,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 48
+}
+异步: 是
+调用ID: call_1779237102099_jm2ky8ict
+
+
+

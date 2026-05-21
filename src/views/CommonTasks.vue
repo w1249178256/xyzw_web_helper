@@ -58,6 +58,11 @@
         <UnlimitedlineCard 
           :selected-token-id="selectedTokenId"
         />
+
+        <!-- 梦境助手卡片 -->
+        <DreamAssistantCard 
+          :selected-token-id="selectedTokenId"
+        />
       </div>
 
       <!-- Token 选择区域 -->
@@ -126,6 +131,7 @@ import BinTokenForm from '@/views/TokenImport/bin.vue'
 import UnlimitedlineCard from '@/diy/ResourceManagement/Unlimitedline.vue'
 import WeirdTowerCard from '@/diy/ResourceManagement/WeirdTowerCard.vue'
 import SaltFieldCard from '@/diy/ResourceManagement/SaltFieldCard.vue'
+import DreamAssistantCard from '@/diy/ResourceManagement/DreamAssistantCard.vue'
 
 const router = useRouter()
 const tokenStore = useTokenStore()

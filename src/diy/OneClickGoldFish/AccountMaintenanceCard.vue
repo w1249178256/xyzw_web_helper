@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿<template>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -3853,6 +3853,7 @@ const handleBatchRecruitWeek = async () => {
           }
           
           let currentRecruitCount = 0
+          let towerFloor = 0
           try {
             const roleInfo = await tokenStore.sendMessageWithPromise(
               token.id,
@@ -3866,10 +3867,32 @@ const handleBatchRecruitWeek = async () => {
               currentRecruitCount = items['1001'].quantity || items['1001'].num || 0
             }
             
+            // 获取爬塔层数
+            const tower = roleInfo?.role?.tower
+            if (tower && tower.id) {
+              towerFloor = Math.floor(tower.id / 10)
+            }
+            
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 现有招募令数量：${currentRecruitCount}`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前爬塔层数：${towerFloor}层`)
           } catch (error) {
             console.error(`获取角色信息失败：${error.message}`, error)
             message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
+          }
+          
+          // 检查爬塔层数是否超过100层
+          if (towerFloor > 100) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 爬塔层数${towerFloor}层超过100层，跳过招募周操作`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `${tokenIndex}、${token.name || token.id}、爬塔层数${towerFloor}层超过100层，跳过招募周操作`
+            })
+            return { success: false, reason: 'tower_floor_exceeded', towerFloor }
           }
           
           await waitCommandDelay()
@@ -4068,13 +4091,14 @@ const handleBatchRecruitWeek = async () => {
     const totalTokens = results.length
     const successCount = results.filter(r => r.success && !r.skipped).length
     const skippedCount = results.filter(r => r.skipped).length
+    const towerFloorSkippedCount = results.filter(r => r.reason === 'tower_floor_exceeded').length
     const failureCount = results.filter(r => !r.success).length
     const totalCompletedRounds = results.reduce((sum, r) => sum + (r.completedRounds || 0), 0)
     const totalClaimSuccessRounds = results.reduce((sum, r) => sum + (r.claimSuccessRounds || 0), 0)
     const totalRecruits = results.reduce((sum, r) => sum + (r.totalRecruits || 0), 0)
     const totalMailClaims = results.reduce((sum, r) => sum + (r.mailClaimCount || 0), 0)
     
-    let summaryMessage = `批量招募周完成，共处理${totalTokens}个 Token，成功${successCount}个，跳过${skippedCount}个，失败${failureCount}个`
+    let summaryMessage = `批量招募周完成，共处理${totalTokens}个 Token，成功${successCount}个，跳过${skippedCount}个（爬塔超100层${towerFloorSkippedCount}个），失败${failureCount}个`
     if (totalCompletedRounds > 0) {
       summaryMessage += `，共完成${totalCompletedRounds}轮`
     }
@@ -6200,9 +6224,9 @@ const handleBatchUpgradeSingleHero = async () => {
 
 const handleBatchUpgradeQunxiong = async () => {
   const qunxiongHeroes = [
-    { heroId: 122, name: '公孙瓒' },
-    { heroId: 120, name: '贾诩' },
-    { heroId: 121, name: '邢道荣' }
+    { heroId: 116, name: '公孙瓒' },
+    { heroId: 112, name: '贾诩' },
+    { heroId: 312, name: '邢道荣' }
   ]
   
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {

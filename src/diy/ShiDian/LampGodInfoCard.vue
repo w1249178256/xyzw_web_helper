@@ -206,7 +206,7 @@ const lampGodConfigs = {
     techs: ['射手', '肉盾', '辅助']
   },
   qunxiong: {
-    heroes: [116, 120, 107, 112, 312],
+    heroes: [107, 116, 120, 112, 312],
     techs: ['战士', '刺客', '法师']
   },
   deepsea: {

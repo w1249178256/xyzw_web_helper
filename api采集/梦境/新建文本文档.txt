@@ -1,0 +1,13 @@
+{
+  "ack": 0,
+  "body": {
+    "battleTeam": {
+      "0": 107,
+      "1": 112,
+      "2": 106
+    }
+  },
+  "cmd": "dungeon_selecthero",
+  "seq": 5,
+  "time": 1779238475835
+}

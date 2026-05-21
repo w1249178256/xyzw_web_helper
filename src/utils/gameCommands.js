@@ -1003,13 +1003,29 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 设置梦境挑战英雄
+   */
+  dungeon_selecthero(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  battleTeam: { "0": params.heroId },
+        ...params
+      }),
+      cmd: "dungeon_selecthero",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
    * 开始梦境挑战
    */
   fight_startdungeon(ack = 0, seq = 0, params = {}) {
     return {
       ack,
       body: this.g_utils.bon.encode({
-      	  heroId:107,
+      	  heroId:params.heroId,
         ...params
       }),
       cmd: "fight_startdungeon",

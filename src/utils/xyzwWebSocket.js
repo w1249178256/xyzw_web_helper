@@ -19,6 +19,7 @@ const errorCodeMap = {
   1300050: "请修改您的采购次数",
   200020: "出了点小问题，请尝试重启游戏解决～",
   200050: "金币数量不足",
+2600080: "武将已阵亡",
   200160: "模块未开启",
   7500140: "请先输入密码",
   7500100: "密码输入错误",
@@ -319,7 +320,7 @@ export function registerDefaultCommands(reg) {
 
     // 梦魇相关
     .register("nightmare_getroleinfo")
-    .register("dungeon_selecthero")
+    .register("dungeon_selecthero", { battleTeam: { "0": 0 } })
     .register("bosstower_gethelprank")
     .register("dungeon_buymerchant")
     // 活动/任务
