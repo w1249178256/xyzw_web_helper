@@ -159,7 +159,7 @@ const getTokenIndex = (token) => {
 }
 
 // 辅助函数：等待执行间隔
-const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, 800))
+const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, 1000))
 
 // 辅助函数：解析执行范围（如果为空则执行全部）
 const parseTokenRange = (rangeStr) => {

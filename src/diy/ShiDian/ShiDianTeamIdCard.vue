@@ -71,7 +71,7 @@
           name="执行范围"
           :input-value="executionRange"
           placeholder="请输入执行范围，如：1-20 或 3,4,5"
-          @update:input-value="executionRange = $event"
+          @update:input-value="(value) => { executionRange = value; saveDropdownSettings() }"
         />
         <CustomizedCard 
           mode="button-placeholder"
@@ -249,10 +249,11 @@ const handleTeamIdChange = async (index, value) => {
 const saveDropdownSettings = async () => {
   try {
     const settings = {
-      teamIds: [...teamIds.value]
+      teamIds: [...teamIds.value],
+      executionRange: executionRange.value
     }
     localStorage.setItem('shidian_teamIds', JSON.stringify(settings))
-    console.log('TeamID 已保存到 localStorage:', settings.teamIds)
+    console.log('设置已保存到 localStorage:', settings)
   } catch (error) {
     console.error('保存设置失败:', error)
   }
@@ -266,6 +267,9 @@ const loadDropdownSettings = async () => {
       const settings = JSON.parse(saved)
       if (settings.teamIds && Array.isArray(settings.teamIds)) {
         teamIds.value = settings.teamIds
+      }
+      if (settings.executionRange !== undefined) {
+        executionRange.value = settings.executionRange
       }
     }
   } catch (error) {
