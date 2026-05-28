@@ -79,18 +79,18 @@
           :selected-token-id="selectedTokenId"
         />
 
-        <!-- 武将信息卡片 -->
-        <HeroInfoCard 
+        <!-- 武将信息卡片（已隐藏，功能已迁移至梦境助手） -->
+        <!-- <HeroInfoCard 
           :selected-token-id="selectedTokenId"
-        />
+        /> -->
 
-        <!-- 十殿信息卡片 -->
-        <ShiDianInfoCard 
+        <!-- 十殿信息卡片（已隐藏，功能已迁移至十殿TeamID） -->
+        <!-- <ShiDianInfoCard 
           ref="shidianInfoCardRef"
           :selected-token-id="selectedTokenId"
           :team-id="teamId"
           @update-pillow-count="handleUpdatePillowCount"
-        />
+        /> -->
       </div>
 
       <!-- Token选择区域 -->

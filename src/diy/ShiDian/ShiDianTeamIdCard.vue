@@ -66,24 +66,27 @@
           placeholder="输入队伍号"
           @button-click="executeNightmare8()"
         />
+      </CustomizedCard>
+      
+      <!-- 导出资源和批量领取 -->
+      <CustomizedCard mode="container">
         <CustomizedCard 
           mode="execution-range"
           name="执行范围"
-          :input-value="executionRange"
-          placeholder="请输入执行范围，如：1-20 或 3,4,5"
-          @update:input-value="(value) => { executionRange = value; saveDropdownSettings() }"
+          v-model:inputValue="resourceExportRange"
+          placeholder="留空执行全部，或输入 1-20 或 1,2,3"
         />
         <CustomizedCard 
           mode="button-placeholder"
-          button-text="批量切换阵2"
-          :disabled="isSwitchingTeam2 || !tokenStore.hasTokens"
-          @button-click="batchSwitchTeam2"
+          button-text="导出资源"
+          :disabled="isExportingResources"
+          @button-click="exportResources()"
         />
         <CustomizedCard 
           mode="button-placeholder"
-          button-text="批量切换阵1"
-          :disabled="isSwitchingTeam1 || !tokenStore.hasTokens"
-          @button-click="batchSwitchTeam1"
+          button-text="批量领取"
+          :disabled="tokenStore.gameTokens.length === 0 || isBatchClaiming"
+          @button-click="batchClaimNightmareRewards()"
         />
       </CustomizedCard>
       
@@ -91,6 +94,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="十殿 TeamID"
+        :filter-operations="['导出资源', '批量领取']"
       />
     </template>
   </MyCard>
@@ -200,15 +204,6 @@ const teamIdForDian8 = ref('')
 const isExecutingNightmare8 = ref(false)
 const connectingTokens = ref(new Set())
 
-// 批量切换阵2相关变量
-const isSwitchingTeam2 = ref(false)
-
-// 批量切换阵1相关变量
-const isSwitchingTeam1 = ref(false)
-
-// 执行范围
-const executionRange = ref('')
-
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
   maxConnections: 5,
@@ -249,8 +244,7 @@ const handleTeamIdChange = async (index, value) => {
 const saveDropdownSettings = async () => {
   try {
     const settings = {
-      teamIds: [...teamIds.value],
-      executionRange: executionRange.value
+      teamIds: [...teamIds.value]
     }
     localStorage.setItem('shidian_teamIds', JSON.stringify(settings))
     console.log('设置已保存到 localStorage:', settings)
@@ -267,9 +261,6 @@ const loadDropdownSettings = async () => {
       const settings = JSON.parse(saved)
       if (settings.teamIds && Array.isArray(settings.teamIds)) {
         teamIds.value = settings.teamIds
-      }
-      if (settings.executionRange !== undefined) {
-        executionRange.value = settings.executionRange
       }
     }
   } catch (error) {
@@ -617,249 +608,455 @@ const executeNightmare8 = async () => {
   }
 }
 
-// 批量切换阵2
-const batchSwitchTeam2 = async () => {
-  if (!tokenStore.hasTokens) {
-    message.warning('没有可用的Token')
-    return
-  }
+// ========== 导出资源和批量领取相关 ==========
 
-  isSwitchingTeam2.value = true
-  
+// 状态变量
+const resourceExportRange = ref('')
+const isExportingResources = ref(false)
+const isBatchClaiming = ref(false)
+
+// 辅助函数：格式化数值
+const formatValue = (value) => {
+  return value > 0 ? value : '-'
+}
+
+// 辅助函数：查找物品数量
+const findItemCount = (items, itemId) => {
+  if (!items) return 0
+  if (Array.isArray(items)) {
+    const item = items.find(i => i.itemId === itemId || i.id === itemId)
+    return item ? (item.quantity || item.count || 0) : 0
+  }
+  const item = items[itemId]
+  if (!item) {
+    const found = Object.values(items).find(i => i && (i.itemId === itemId || i.id === itemId))
+    return found ? (found.quantity || found.count || 0) : 0
+  }
+  const result = item.quantity || item.count || 0
+  return result
+}
+
+// 领取十殿奖励
+const claimNightmareRewardsForCard = async (token) => {
   try {
-    // 解析执行范围
-    const tokenIndices = parseTokenRange(executionRange.value)
-    const targetTokens = getTargetTokens(tokenIndices)
-    
-    if (targetTokens.length === 0) {
-      message.warning('执行范围内没有有效的Token')
-      return
+    tokenStore.selectToken(token.id)
+    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+      tokenStore.selectToken(token.id)
+      let count = 0
+      while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
+        await waitCommandDelay()
+        count++
+      }
+      if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+        throw new Error('WebSocket连接失败')
+      }
     }
     
-    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
-    message.info(`开始批量切换阵2（${rangeText}），共${targetTokens.length}个Token...`)
-    
-    let successCount = 0
-    let failCount = 0
-    
-    for (let i = 0; i < targetTokens.length; i++) {
-      const token = targetTokens[i]
-      if (!token || !token.id) continue
-      
+    // 获取角色信息
+    let roleId = null
+    try {
+      await waitCommandDelay()
+      const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+      if (roleInfo && roleInfo.role && roleInfo.role.roleId) {
+        roleId = roleInfo.role.roleId
+      }
+    } catch (error) {
+      console.warn('获取角色信息失败:', error)
+    }
+
+    // 领取转盘奖励次数
+    if (roleId) {
       try {
-        const connectionAcquired = await connectionPool.acquire(token.id)
-        
-        if (!connectionAcquired) {
-          message.warning(`${token.name} 连接失败`)
-          failCount++
-          logOperation('shidian', '批量切换阵2', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${token.name} 连接失败`
-          })
-          continue
-        }
-        
         await waitCommandDelay()
-        
-        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
-          message.warning(`${token.name} WebSocket未连接`)
-          await connectionPool.release(token.id, false)
-          failCount++
-          logOperation('shidian', '批量切换阵2', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${token.name} WebSocket未连接`
-          })
-          continue
-        }
-        
-        message.info(`正在切换 ${token.name} 到阵2...`)
-        
-        await tokenStore.sendGameMessage(token.id, 'presetteam_saveteam', { 
-          teamId: 2 
-        })
-        
-        message.success(`${token.name} 已切换到阵2`)
-        successCount++
-        logOperation('shidian', '批量切换阵2', {
-          cardType: '十殿 TeamID',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'success',
-          message: `${token.name} 已切换到阵2`
-        })
-        
-        await connectionPool.release(token.id, true)
-        
+        await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
       } catch (error) {
-        console.error(`${token.name} 切换阵2失败:`, error)
-        message.error(`${token.name} 切换阵2失败：${error.message}`)
-        failCount++
-        logOperation('shidian', '批量切换阵2', {
-          cardType: '十殿 TeamID',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'error',
-          message: `${token.name} 切换阵2失败：${error.message}`
-        })
-        try {
-          await connectionPool.release(token.id, false)
-        } catch (releaseError) {
-          console.error('释放连接失败:', releaseError)
-        }
+        console.warn('转盘奖励次数领取失败:', error)
       }
-      
-      if (i < targetTokens.length - 1) {
+    }
+
+    // 获取十殿角色信息
+    if (roleId) {
+      try {
         await waitCommandDelay()
+        await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
+      } catch (error) {
+        console.warn('获取十殿角色信息失败:', error)
       }
     }
     
-    message.success(`批量切换阵2完成！成功: ${successCount}，失败: ${failCount}`)
+    // 领取十殿图鉴奖励
+    try {
+      await waitCommandDelay()
+      await tokenStore.sendNightmareClaimBook(token.id)
+    } catch (error) {
+      console.warn('十殿图鉴奖励领取失败:', error)
+    }
     
-    logOperation('shidian', '批量切换阵2', {
+    // 领取十殿周奖励
+    try {
+      await waitCommandDelay()
+      await tokenStore.sendNightmareClaimWeekReward(token.id)
+    } catch (error) {
+      console.warn('十殿周奖励领取失败:', error)
+    }
+    
+    // 转盘逻辑
+    if (roleId) {
+      try {
+        await waitCommandDelay()
+        const initialNightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
+        
+        let bookScore = 0
+        if (initialNightmareInfo?.nightMareData?.bookScore !== undefined) {
+          bookScore = initialNightmareInfo.nightMareData.bookScore
+        } else if (initialNightmareInfo?.bookScore !== undefined) {
+          bookScore = initialNightmareInfo.bookScore
+        }
+        
+        let maxIterations = 100
+        let iteration = 0
+        
+        while (iteration < maxIterations) {
+          await waitCommandDelay()
+          const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId })
+          
+          if (!nightmareInfo) break
+          
+          const turntableLeftCnt = nightmareInfo.turntableLeftCnt || 
+                                   nightmareInfo.weekAward?.turntableLeftCnt || 0
+          
+          if (turntableLeftCnt === 0) break
+          
+          if (bookScore > 0 && bookScore % 5 === 0) {
+            try {
+              await waitCommandDelay()
+              await tokenStore.sendNightmareClaimTurnRewardTimes(token.id, {})
+            } catch (error) {
+              console.warn('转盘奖励次数领取失败:', error)
+            }
+          }
+          
+          if (bookScore === 50) {
+            try {
+              await waitCommandDelay()
+              await tokenStore.sendNightmareClaimBook(token.id)
+            } catch (error) {
+              console.warn('十殿图鉴奖励领取失败:', error)
+            }
+          }
+          
+          try {
+            await waitCommandDelay()
+            await tokenStore.sendNightmareClickTurntable(token.id, {})
+            bookScore++
+          } catch (error) {
+            console.warn('转盘执行失败:', error)
+          }
+          
+          await waitCommandDelay()
+          iteration++
+        }
+      } catch (error) {
+        console.warn('转盘操作失败:', error)
+      }
+    }
+    
+    logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
+      tokenId: token.id,
+      tokenName: token.name,
       status: 'success',
-      message: `批量切换阵2完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+      message: `${token.name || token.id} 十殿奖励领取完成`
     })
-    
   } catch (error) {
-    console.error('批量切换阵2失败:', error)
-    message.error(`批量切换阵2失败：${error.message || '未知错误'}`)
-    logOperation('shidian', '批量切换阵2', {
+    logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
+      tokenId: token.id,
+      tokenName: token.name,
       status: 'error',
-      message: `批量切换阵2失败：${error.message}`
+      message: `${token.name || token.id} 领取十殿奖励失败: ${error.message}`
     })
-  } finally {
-    isSwitchingTeam2.value = false
+    throw error
   }
 }
 
-// 批量切换阵1
-const batchSwitchTeam1 = async () => {
-  if (!tokenStore.hasTokens) {
-    message.warning('没有可用的Token')
+// 批量领取十殿奖励
+const batchClaimNightmareRewards = async () => {
+  if (isBatchClaiming.value) {
+    message.warning('批量领取正在进行中，请稍候...')
+    return
+  }
+  
+  const gameTokens = toRaw(tokenStore.gameTokens)
+  if (gameTokens.length === 0) {
+    message.warning('请先导入Token')
     return
   }
 
-  isSwitchingTeam1.value = true
+  isBatchClaiming.value = true
+  message.info('开始单线程批量领取十殿奖励...')
   
   try {
-    // 解析执行范围
-    const tokenIndices = parseTokenRange(executionRange.value)
-    const targetTokens = getTargetTokens(tokenIndices)
+    const tokenIds = parseTokenRange(resourceExportRange.value) || gameTokens.map(t => t.id)
+    let tokens = gameTokens.filter(t => tokenIds.includes(t.id))
     
-    if (targetTokens.length === 0) {
-      message.warning('执行范围内没有有效的Token')
+    tokens.sort((a, b) => {
+      const nameA = a.name || a.id || ''
+      const nameB = b.name || b.id || ''
+      return nameA.localeCompare(nameB, 'zh-CN')
+    })
+    
+    if (tokens.length === 0) {
+      message.warning('没有符合执行范围的Token')
+      isBatchClaiming.value = false
       return
     }
     
-    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
-    message.info(`开始批量切换阵1（${rangeText}），共${targetTokens.length}个Token...`)
+    const results = []
     
-    let successCount = 0
-    let failCount = 0
-    
-    for (let i = 0; i < targetTokens.length; i++) {
-      const token = targetTokens[i]
-      if (!token || !token.id) continue
-      
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i]
       try {
-        const connectionAcquired = await connectionPool.acquire(token.id)
+        message.info(`处理Token ${i + 1}/${tokens.length}: ${token.name || token.id}`)
         
-        if (!connectionAcquired) {
-          message.warning(`${token.name} 连接失败`)
-          failCount++
-          logOperation('shidian', '批量切换阵1', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${token.name} 连接失败`
-          })
-          continue
+        await claimNightmareRewardsForCard(token)
+        
+        results.push({ tokenId: token.id, tokenName: token.name || token.id, success: true })
+        message.success(`Token ${token.name || token.id} 领取成功 (${i + 1}/${tokens.length})`)
+      } catch (error) {
+        results.push({ tokenId: token.id, tokenName: token.name || token.id, success: false, error: error.message })
+        message.warning(`Token ${token.name || token.id} 领取失败: ${error.message}`)
+      }
+    }
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量领取完成！成功: ${successCount}个，失败: ${failCount}个`)
+    logOperation('shidian', '批量领取', {
+      cardType: '十殿 TeamID',
+      status: 'success',
+      message: `批量领取完成！成功: ${successCount}个，失败: ${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量领取过程中发生错误:', error)
+    message.error(`批量领取失败: ${error.message}`)
+    logOperation('shidian', '批量领取', {
+      cardType: '十殿 TeamID',
+      status: 'error',
+      message: `批量领取失败: ${error.message}`
+    })
+  } finally {
+    isBatchClaiming.value = false
+  }
+}
+
+// 导出资源
+const exportResources = async () => {
+  if (isExportingResources.value) {
+    message.warning('导出正在进行中，请稍候...')
+    return
+  }
+
+  isExportingResources.value = true
+  try {
+    const gameTokens = toRaw(tokenStore.gameTokens)
+    const tokenIds = parseTokenRange(resourceExportRange.value) || gameTokens.map(t => t.id)
+    
+    if (tokenIds.length === 0) {
+      message.warning('没有可导出的Token')
+      return
+    }
+
+    message.info(`开始导出资源，共${tokenIds.length}个Token...`)
+
+    const results = []
+    const sortedTokens = tokenStore.gameTokens.slice().sort((a, b) => {
+      const nameA = (a.name || '未命名').toLowerCase()
+      const nameB = (b.name || '未命名').toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+
+    for (let i = 0; i < tokenIds.length; i++) {
+      const tokenId = tokenIds[i]
+      const token = sortedTokens.find(t => t.id === tokenId)
+      
+      if (!token) continue
+
+      try {
+        message.info(`正在处理Token ${i + 1}/${tokenIds.length}: ${token.name || token.id}`)
+
+        // 连接token
+        const connectionStatus = tokenStore.getWebSocketStatus(token.id)
+        if (connectionStatus !== 'connected') {
+          tokenStore.selectToken(token.id)
+          let retryCount = 0
+          while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && retryCount < 10) {
+            await waitCommandDelay()
+            retryCount++
+          }
+          
+          if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+            message.warning(`Token ${token.name || token.id} 连接失败，跳过`)
+            results.push({
+              tokenId: token.id, tokenName: token.name || token.id,
+              whiteJade: '-', colorJade: '-', spiritShell: '-', goldBrick: '-',
+              goldenRod: '-', chestScore: '-', recruitOrder: '-',
+              roleId: '连接失败', maxNightmareLevel: '-', success: false, error: '连接失败'
+            })
+            continue
+          }
         }
-        
+
+        // 执行getroleinfo获取资源
         await waitCommandDelay()
+        const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
         
-        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
-          message.warning(`${token.name} WebSocket未连接`)
-          await connectionPool.release(token.id, false)
-          failCount++
-          logOperation('shidian', '批量切换阵1', {
-            cardType: '十殿 TeamID',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `${token.name} WebSocket未连接`
-          })
-          continue
+        const items = roleInfo?.role?.items || null
+        const whiteJade = formatValue(findItemCount(items, 1022))
+        const colorJade = formatValue(findItemCount(items, 1023))
+        const spiritShell = formatValue(findItemCount(items, 1033))
+        const goldBrick = formatValue(roleInfo?.role?.diamond || 0)
+        const goldenRod = formatValue(findItemCount(items, 1012))
+        const recruitOrder = formatValue(findItemCount(items, 1001))
+
+        // 宝箱总分数
+        let chestScore = 0
+        if (items) {
+          const woodBox = items['2001']?.quantity || 0
+          const bronzeBox = items['2002']?.quantity || 0
+          const goldenBox = items['2003']?.quantity || 0
+          const platinumBox = items['2004']?.quantity || 0
+          chestScore = woodBox + bronzeBox * 10 + goldenBox * 20 + platinumBox * 50
         }
+        const chestScoreDisplay = chestScore > 0 ? chestScore : '-'
+        const roleId = roleInfo?.role?.roleId || '未获取到'
         
-        message.info(`正在切换 ${token.name} 到阵1...`)
-        
-        await tokenStore.sendGameMessage(token.id, 'presetteam_saveteam', { 
-          teamId: 1 
+        // 获取十殿最高殿级
+        let maxNightmareLevel = '-'  
+        try {
+          await waitCommandDelay()
+          const nightmareInfo = await tokenStore.sendNightmareGetRoleInfo(token.id, { roleId: parseInt(roleId) || token.id })
+          
+          if (nightmareInfo && nightmareInfo.killAward) {
+            const killAward = nightmareInfo.killAward
+            const trueKeys = Object.keys(killAward).filter(key => killAward[key] === true)
+            if (trueKeys.length > 0) {
+              maxNightmareLevel = Math.max(...trueKeys.map(key => parseInt(key)))
+            }
+          } else if (nightmareInfo && nightmareInfo.nightMareData && nightmareInfo.nightMareData.killAward) {
+            const killAward = nightmareInfo.nightMareData.killAward
+            const trueKeys = Object.keys(killAward).filter(key => killAward[key] === true)
+            if (trueKeys.length > 0) {
+              maxNightmareLevel = Math.max(...trueKeys.map(key => parseInt(key)))
+            }
+          }
+        } catch (error) {
+          console.warn(`Token ${token.name || token.id} 获取十殿信息失败:`, error)
+        }
+
+        results.push({
+          tokenId: token.id, tokenName: token.name || token.id,
+          whiteJade, colorJade, spiritShell, goldBrick, goldenRod,
+          chestScore: chestScoreDisplay, recruitOrder, roleId,
+          maxNightmareLevel, success: true
         })
-        
-        message.success(`${token.name} 已切换到阵1`)
-        successCount++
-        logOperation('shidian', '批量切换阵1', {
+
+        message.success(`Token ${token.name || token.id} 资源获取成功 (${i + 1}/${tokenIds.length})`)
+        const tokenIndex = getTokenIndex(token)
+        logOperation('shidian', '导出资源', {
           cardType: '十殿 TeamID',
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${token.name} 已切换到阵1`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
         })
-        
-        await connectionPool.release(token.id, true)
-        
       } catch (error) {
-        console.error(`${token.name} 切换阵1失败:`, error)
-        message.error(`${token.name} 切换阵1失败：${error.message}`)
-        failCount++
-        logOperation('shidian', '批量切换阵1', {
+        console.error(`Token ${token.name || token.id} 处理失败:`, error)
+        
+        let roleId = '获取失败'
+        try {
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          roleId = roleInfo?.role?.roleId || '未获取到'
+        } catch (roleError) {
+          console.error(`Token ${token.name || token.id} 获取roleId失败:`, roleError)
+        }
+        
+        results.push({
+          tokenId: token.id, tokenName: token.name || token.id,
+          whiteJade: '-', colorJade: '-', spiritShell: '-', goldBrick: '-',
+          goldenRod: '-', chestScore: '-', recruitOrder: '-',
+          roleId, maxNightmareLevel: '-', success: false, error: error.message || '未知错误'
+        })
+        message.warning(`Token ${token.name || token.id} 处理失败: ${error.message || '未知错误'}`)
+        const tokenIndex = getTokenIndex(token)
+        logOperation('shidian', '导出资源', {
           cardType: '十殿 TeamID',
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${token.name} 切换阵1失败：${error.message}`
+          message: `${tokenIndex}、${token.name || token.id}、资源获取失败: ${error.message || '未知错误'}`
         })
-        try {
-          await connectionPool.release(token.id, false)
-        } catch (releaseError) {
-          console.error('释放连接失败:', releaseError)
-        }
       }
-      
-      if (i < targetTokens.length - 1) {
+
+      if (i < tokenIds.length - 1) {
         await waitCommandDelay()
       }
     }
-    
-    message.success(`批量切换阵1完成！成功: ${successCount}，失败: ${failCount}`)
-    
-    logOperation('shidian', '批量切换阵1', {
+
+    // 生成导出文件
+    const lines = []
+    lines.push("=".repeat(80))
+    lines.push("资源导出")
+    lines.push(`导出时间: ${new Date().toLocaleString('zh-CN')}`)
+    lines.push(`执行范围: ${resourceExportRange.value || '全部Token'}`)
+    lines.push(`Token数量: ${tokenIds.length}`)
+    lines.push("=".repeat(80))
+    lines.push("")
+    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,金竿,宝箱总分数,招募令,十殿最高殿级,状态")
+    lines.push("-".repeat(80))
+
+    results.forEach((result, index) => {
+      const status = result.success ? '成功' : `失败: ${result.error || '未知错误'}`
+      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.goldenRod},${result.chestScore},${result.recruitOrder},${result.maxNightmareLevel},${status}`)
+    })
+
+    lines.push("")
+    lines.push("=".repeat(80))
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    lines.push(`总计: 成功 ${successCount} 个，失败 ${failCount} 个`)
+    lines.push("=".repeat(80))
+
+    const content = lines.join('\n')
+    const blob = new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    const fileName = `资源导出_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}_${Date.now()}.csv`
+    link.setAttribute('download', fileName)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    message.success(`资源导出完成！成功: ${successCount}个，失败: ${failCount}个`)
+    logOperation('shidian', '导出资源', {
       cardType: '十殿 TeamID',
       status: 'success',
-      message: `批量切换阵1完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+      message: `资源导出完成！成功: ${successCount}个，失败: ${failCount}个`
     })
-    
   } catch (error) {
-    console.error('批量切换阵1失败:', error)
-    message.error(`批量切换阵1失败：${error.message || '未知错误'}`)
-    logOperation('shidian', '批量切换阵1', {
+    console.error('导出资源失败:', error)
+    message.error(`导出资源失败: ${error.message || error}`)
+    logOperation('shidian', '导出资源', {
       cardType: '十殿 TeamID',
       status: 'error',
-      message: `批量切换阵1失败：${error.message}`
+      message: `导出资源失败: ${error.message || error}`
     })
   } finally {
-    isSwitchingTeam1.value = false
+    isExportingResources.value = false
   }
 }
 
@@ -869,8 +1066,8 @@ defineExpose({
   stopAutoJoinShiDian,
   addMembersToTeams,
   executeNightmare8,
-  batchSwitchTeam2,
-  batchSwitchTeam1
+  batchClaimNightmareRewards,
+  exportResources
 })
 
 // 组件挂载时加载设置

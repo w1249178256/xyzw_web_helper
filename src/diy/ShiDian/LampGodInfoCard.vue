@@ -9,66 +9,34 @@
       <h3>灯神信息</h3>
     </template>
     <template #default>
-      <!-- 第一行：阵容信息表格 -->
-      <div class="team-table-container">
-        <table class="team-table">
-          <thead>
-            <tr>
-              <th>阵容</th>
-              <th v-for="i in 5" :key="i">位置{{ i }}</th>
-              <th>科技</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr :class="{ 'current-team': currentUseTeamId === 1 }">
-              <td>阵容1</td>
-              <td v-for="i in 5" :key="i">
-                <div v-if="teamInfo[1] && teamInfo[1][i-1]">
-                  <div class="hero-info">
-                    <div class="hero-level">{{ teamInfo[1][i-1].level }}级</div>
-                    <div class="hero-name">{{ getHeroName(teamInfo[1][i-1].heroId) }}</div>
-                    <div class="hero-star">{{ getStarDisplay(teamInfo[1][i-1].star) }}</div>
-                  </div>
-                </div>
-                <div v-else class="empty-slot">空位</div>
-              </td>
-              <td class="tech-cell">
-                <div class="tech-info">
-                  <div class="tech-item">{{ getTopTechInfo(1) }}</div>
-                  <div class="tech-item">{{ getSecondTechInfo(1) }}</div>
-                </div>
-              </td>
-            </tr>
-            <tr :class="{ 'current-team': currentUseTeamId === 2 }">
-              <td>阵容2</td>
-              <td v-for="i in 5" :key="i">
-                <div v-if="teamInfo[2] && teamInfo[2][i-1]">
-                  <div class="hero-info">
-                    <div class="hero-level">{{ teamInfo[2][i-1].level }}级</div>
-                    <div class="hero-name">{{ getHeroName(teamInfo[2][i-1].heroId) }}</div>
-                    <div class="hero-star">{{ getStarDisplay(teamInfo[2][i-1].star) }}</div>
-                  </div>
-                </div>
-                <div v-else class="empty-slot">空位</div>
-              </td>
-              <td class="tech-cell">
-                <div class="tech-info">
-                  <div class="tech-item">{{ getTopTechInfo(2) }}</div>
-                  <div class="tech-item">{{ getSecondTechInfo(2) }}</div>
-                </div>
-              </td>
-            </tr>
-            <tr class="lampgod-levels-row">
-              <td>灯神层数</td>
-              <td>{{ lampGodLevels['1'] }}<br><small>魏国</small></td>
-              <td>{{ lampGodLevels['2'] }}<br><small>蜀国</small></td>
-              <td>{{ lampGodLevels['3'] }}<br><small>吴国</small></td>
-              <td>{{ lampGodLevels['4'] }}<br><small>群雄</small></td>
-              <td>{{ lampGodLevels['5'] }}<br><small>深海</small></td>
-              <td class="sweep-carpet-col">{{ sweepCarpetCount }}<br><small>扫荡魔毯</small></td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- 灯神层数信息表格 -->
+      <div class="lampgod-levels-container">
+        <div class="levels-grid">
+          <div class="level-item">
+            <div class="level-value">{{ lampGodLevels['1'] }}</div>
+            <div class="level-label">魏国</div>
+          </div>
+          <div class="level-item">
+            <div class="level-value">{{ lampGodLevels['2'] }}</div>
+            <div class="level-label">蜀国</div>
+          </div>
+          <div class="level-item">
+            <div class="level-value">{{ lampGodLevels['3'] }}</div>
+            <div class="level-label">吴国</div>
+          </div>
+          <div class="level-item">
+            <div class="level-value">{{ lampGodLevels['4'] }}</div>
+            <div class="level-label">群雄</div>
+          </div>
+          <div class="level-item">
+            <div class="level-value">{{ lampGodLevels['5'] }}</div>
+            <div class="level-label">深海</div>
+          </div>
+          <div class="level-item">
+            <div class="level-value">{{ sweepCarpetCount }}</div>
+            <div class="level-label">扫荡魔毯</div>
+          </div>
+        </div>
       </div>
       
       <!-- 所有按钮放到一个容器中 -->
@@ -86,6 +54,7 @@
         <CustomizedCard mode="execution-range" name="执行范围" v-model:inputValue="lampGodTokens" placeholder="留空执行全部，或输入 1-20 或 1,2,3" @update:inputValue="handleLampGodTokensInput" />
         <CustomizedCard mode="button" name="导出灯神信息" :disabled="isExportingLampGodInfo" @button-click="exportLampGodInfo" />
         <CustomizedCard mode="button" name="批量灯神" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchLampGodFight" />
+        <CustomizedCard mode="button" name="批量更换科技" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchChangeTech" />
         <CustomizedCard mode="button" name="批量扫荡" :disabled="tokenStore.gameTokens.length === 0" @button-click="batchSweepAction" />
         <CustomizedCard 
           mode="name-select" 
@@ -135,6 +104,21 @@ const commandDelay = inject('commandDelay', ref(600))
 
 // 辅助函数：等待执行间隔
 const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, commandDelay.value))
+
+// 按token昵称排序的token列表
+const sortedTokens = computed(() => {
+  return [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB, 'zh-CN')
+  })
+})
+
+// 辅助函数：获取token的序号（基于名称排序后的顺序）
+const getTokenIndex = (token) => {
+  const index = sortedTokens.value.findIndex(t => t.id === token.id)
+  return index + 1
+}
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -206,7 +190,7 @@ const lampGodConfigs = {
     techs: ['射手', '肉盾', '辅助']
   },
   qunxiong: {
-    heroes: [107, 116, 120, 112, 312],
+    heroes: [312, 116, 107, 120, 112],
     techs: ['战士', '刺客', '法师']
   },
   deepsea: {
@@ -1068,88 +1052,160 @@ const changeTech = async () => {
       
       let researchFailed = false
       
-      // 爬塔阵容特殊处理：战士科技109升15次，110升20次，111升10次
+      // 爬塔阵容特殊处理：按顺序升级所有科技类型
       if (selectedType === 'tower') {
-        message.info('爬塔阵容：对战士科技执行特殊升级（109升15次，110升20次，111升10次）')
+        message.info('爬塔阵容：按顺序升级所有科技（战士、法师、射手、刺客、肉盾、辅助）')
         
-        const towerTechUpgrades = [
-          { researchId: 109, count: 15, name: '战士科技109' },
-          { researchId: 110, count: 20, name: '战士科技110' },
-          { researchId: 111, count: 10, name: '战士科技111' }
+        const towerTechOrder = [
+          { type: 1, name: '战士', special: true },
+          { type: 2, name: '法师', special: false },
+          { type: 3, name: '射手', special: false },
+          { type: 4, name: '刺客', special: false },
+          { type: 6, name: '肉盾', special: false },
+          { type: 5, name: '辅助', special: false }
         ]
         
-        for (const tech of towerTechUpgrades) {
+        for (const tech of towerTechOrder) {
           if (researchFailed) break
           
-          message.info(`开始升级${tech.name}，共${tech.count}次`)
-          
-          for (let i = 0; i < tech.count; i++) {
-            if (researchFailed) break
+          if (tech.special) {
+            message.info(`开始升级${tech.name}科技（特殊：109升15次，110升20次，111升10次）`)
             
-            try {
-              const researchParams = {
-                researchId: tech.researchId,
-                isMax: false
+            const warriorTechUpgrades = [
+              { researchId: 109, count: 15, name: '战士科技109' },
+              { researchId: 110, count: 20, name: '战士科技110' },
+              { researchId: 111, count: 10, name: '战士科技111' }
+            ]
+            
+            for (const wTech of warriorTechUpgrades) {
+              if (researchFailed) break
+              
+              for (let i = 0; i < wTech.count; i++) {
+                if (researchFailed) break
+                
+                try {
+                  const researchParams = {
+                    researchId: wTech.researchId,
+                    isMax: false
+                  }
+                  message.info(`执行研究: researchId=${wTech.researchId}, isMax=false (${i+1}/${wTech.count})`)
+                  const result = await tokenStore.sendLegionResearch(token.id, researchParams)
+                  
+                  if (result && (result.msg || '').includes('资源不足') || 
+                      (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
+                    message.warning(`研究收到资源不足提示，停止执行`)
+                    logOperation('shidian', '更换科技', {
+                      cardType: '灯神信息',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
+                    })
+                    researchFailed = true
+                    break
+                  }
+                  
+                  message.success(`${wTech.name}升级成功 (${i+1}/${wTech.count})`)
+                  await waitCommandDelay()
+                } catch (error) {
+                  console.error(`${wTech.name}升级失败: researchId=${wTech.researchId}, isMax=false`, error)
+                  message.warning(`${wTech.name}升级失败`)
+                  
+                  if (error.message && error.message.includes('资源不足')) {
+                    message.warning(`研究收到资源不足提示，停止执行`)
+                    logOperation('shidian', '更换科技', {
+                      cardType: '灯神信息',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+                    })
+                    researchFailed = true
+                    break
+                  } else {
+                    logOperation('shidian', '更换科技', {
+                      cardType: '灯神信息',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'error',
+                      message: `${wTech.name}升级失败: researchId=${wTech.researchId}, isMax=false, 错误: ${error.message || '未知错误'}`
+                    })
+                  }
+                }
               }
-              message.info(`执行研究: researchId=${tech.researchId}, isMax=false (${i+1}/${tech.count})`)
-              const result = await tokenStore.sendLegionResearch(token.id, researchParams)
               
-              // 检查是否收到资源不足的提示
-              if (result && (result.msg || '').includes('资源不足') || 
-                  (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
-                message.warning(`研究收到资源不足提示，停止执行`)
+              if (!researchFailed) {
+                message.success(`${wTech.name}升级完成，共${wTech.count}次`)
                 logOperation('shidian', '更换科技', {
                   cardType: '灯神信息',
                   tokenId: token.id,
                   tokenName: token.name,
-                  status: 'warning',
-                  message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
-                })
-                researchFailed = true
-                break
-              }
-              
-              message.success(`${tech.name}升级成功 (${i+1}/${tech.count})`)
-              
-              // 每次执行间隔
-              await waitCommandDelay()
-            } catch (error) {
-              console.error(`${tech.name}升级失败: researchId=${tech.researchId}, isMax=false`, error)
-              message.warning(`${tech.name}升级失败`)
-              
-              // 检查错误信息是否包含资源不足
-              if (error.message && error.message.includes('资源不足')) {
-                message.warning(`研究收到资源不足提示，停止执行`)
-                logOperation('shidian', '更换科技', {
-                  cardType: '灯神信息',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
-                })
-                researchFailed = true
-                break
-              } else {
-                logOperation('shidian', '更换科技', {
-                  cardType: '灯神信息',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'error',
-                  message: `${tech.name}升级失败: researchId=${tech.researchId}, isMax=false, 错误: ${error.message || '未知错误'}`
+                  status: 'success',
+                  message: `${wTech.name}升级完成，共${wTech.count}次`
                 })
               }
             }
-          }
-          
-          if (!researchFailed) {
-            message.success(`${tech.name}升级完成，共${tech.count}次`)
-            logOperation('shidian', '更换科技', {
-              cardType: '灯神信息',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: `${tech.name}升级完成，共${tech.count}次`
-            })
+          } else {
+            message.info(`开始升级${tech.name}科技`)
+            
+            const prefix = tech.type * 100
+            
+            for (let subIndex = 1; subIndex <= 8; subIndex++) {
+              if (researchFailed) break
+              
+              const researchId = prefix + subIndex
+              
+              try {
+                const researchParams = {
+                  researchId: researchId,
+                  isMax: true
+                }
+                message.info(`执行研究: researchId=${researchId}, isMax=true`)
+                const result = await tokenStore.sendLegionResearch(token.id, researchParams)
+                
+                if (result && (result.msg || '').includes('资源不足') || 
+                    (result._raw && result._raw.body && result._raw.body.msg && result._raw.body.msg.includes('资源不足'))) {
+                  message.warning(`研究收到资源不足提示，停止执行`)
+                  logOperation('shidian', '更换科技', {
+                    cardType: '灯神信息',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'warning',
+                    message: `执行命令: legion_research, 参数: ${JSON.stringify(researchParams)} - 资源不足，停止执行`
+                  })
+                  researchFailed = true
+                  break
+                }
+                
+                message.success(`${tech.name}科技${subIndex}升级成功`)
+                await waitCommandDelay()
+              } catch (error) {
+                console.error(`${tech.name}科技${subIndex}升级失败: researchId=${researchId}, isMax=true`, error)
+                message.warning(`${tech.name}科技${subIndex}升级失败`)
+                
+                if (error.message && error.message.includes('资源不足')) {
+                  message.warning(`研究收到资源不足提示，停止执行`)
+                  logOperation('shidian', '更换科技', {
+                    cardType: '灯神信息',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'warning',
+                    message: `研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+                  })
+                } else {
+                  logOperation('shidian', '更换科技', {
+                    cardType: '灯神信息',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'error',
+                    message: `${tech.name}科技${subIndex}升级失败: researchId=${researchId}, isMax=true, 错误: ${error.message || '未知错误'}`
+                  })
+                }
+                
+                researchFailed = true
+                break
+              }
+            }
           }
         }
       } else {
@@ -1378,17 +1434,13 @@ const lampGodAction = async () => {
         message: `阵容比较: ${comparisonResult}`
       })
       
-      // 如果阵容不同，执行切换阵容和科技
+      // 如果阵容不同，执行切换阵容
       if (needSwitchTeam) {
         // 模拟点击切换阵容，将当前阵容使用hero_exchange切换为灯神阵容
         message.info(`${type.name} 正在切换为灯神阵容...`)
         await switchTeam()
-        
-        // 模拟点击切换科技，将当前科技切换为灯神科技
-        message.info(`${type.name} 正在切换为灯神科技...`)
-        await changeTech()
       } else {
-        message.info(`${type.name} 当前阵容与灯神阵容相同，跳过切换阵容和科技`)
+        message.info(`${type.name} 当前阵容与灯神阵容相同，跳过切换阵容`)
       }
       
       // 爬塔类型只执行前四步，不执行灯神战斗
@@ -2004,6 +2056,140 @@ const batchLampGodFight = async () => {
   }
 }
 
+// 批量更换科技功能
+const batchChangeTech = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(lampGodTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const selectedTypes = []
+  if (lampGodSelection.value.wei) selectedTypes.push('魏国')
+  if (lampGodSelection.value.shu) selectedTypes.push('蜀国')
+  if (lampGodSelection.value.wu) selectedTypes.push('吴国')
+  if (lampGodSelection.value.qunxiong) selectedTypes.push('群雄')
+  if (lampGodSelection.value.tower) selectedTypes.push('爬塔')
+  if (lampGodSelection.value.deepsea) selectedTypes.push('深海')
+  
+  if (selectedTypes.length === 0) {
+    message.warning('请至少选择一个灯神类型')
+    return
+  }
+  
+  const rangeText = lampGodTokens.value ? `范围${lampGodTokens.value}` : "全部"
+  message.info(`开始批量更换科技（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  logOperation('shidian', '批量更换科技', {
+    cardType: '灯神信息',
+    status: 'info',
+    message: `开始批量更换科技，${rangeText}，共${targetTokens.length}个Token，灯神类型: ${selectedTypes.join(', ')}`
+  })
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行更换科技...`)
+          
+          const originalSelectedTokenId = tokenStore.selectedTokenId
+          tokenStore.selectedTokenId = token.id
+          
+          try {
+            message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在切换到阵容1...`)
+            await switchToTeam1()
+          } catch (error) {
+            console.error(`序号 ${tokenIndex} ${token.name || token.id} 切换阵容1失败:`, error)
+          }
+          
+          await changeTech()
+          
+          tokenStore.selectedTokenId = originalSelectedTokenId
+          
+          message.success(`序号 ${tokenIndex} ${token.name || token.id} 更换科技完成`)
+          logOperation('shidian', '批量更换科技', {
+            cardType: '灯神信息',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: '更换科技完成'
+          })
+          return { success: true, token: token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`序号 ${tokenIndex} ${token.name || token.id} 更换科技失败:`, error)
+          message.error(`序号 ${tokenIndex} ${token.name || token.id} 更换科技失败: ${error.message || '未知错误'}`)
+          logOperation('shidian', '批量更换科技', {
+            cardType: '灯神信息',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `更换科技失败: ${error.message || '未知错误'}`
+          })
+          return { success: false, token: token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.info(`序号 ${tokenIndex} ${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            message.success(`序号 ${tokenIndex} ${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            const token = sortedTokensList.find(t => t.id === progress.tokenId)
+            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
+            if (progress.status === 'warning') {
+              message.warning(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`序号 ${tokenIndex} ${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量更换科技完成：成功${successCount}个，失败${failCount}个`)
+    logOperation('shidian', '批量更换科技', {
+      cardType: '灯神信息',
+      status: 'success',
+      message: `批量更换科技完成：成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量更换科技失败:', error)
+    message.error('批量更换科技失败')
+    logOperation('shidian', '批量更换科技', {
+      cardType: '灯神信息',
+      status: 'error',
+      message: `批量更换科技失败: ${error.message || '未知错误'}`
+    })
+  }
+}
+
 // 批量扫荡功能
 const batchSweepAction = async () => {
   // 按token昵称排序的token列表（与页面显示顺序一致）
@@ -2378,96 +2564,38 @@ const exportLampGodInfo = async () => {
 </script>
 
 <style scoped>
-.team-table-container {
+.lampgod-levels-container {
   margin-bottom: 16px;
   width: 100%;
 }
 
-.team-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
 
-.team-table th,
-.team-table td {
-  border: 1px solid #e0e0e0;
-  padding: 8px;
-  text-align: center;
-}
-
-.team-table th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.team-table td {
-  background-color: white;
-}
-
-.current-team {
-  background-color: #f0f9ff;
-}
-
-
-
-.hero-info {
+.level-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-}
-
-.hero-level {
-  font-size: 12px;
-  color: #666;
-}
-
-.hero-name {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.hero-star {
-  font-size: 12px;
-  color: #f59e0b;
-}
-
-.empty-slot {
-  color: #999;
-}
-
-.tech-cell {
-  vertical-align: top;
-}
-
-.tech-info {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.lampgod-levels-row td {
-  background-color: #f9f9f9;
+.level-value {
+  font-size: 16px;
   font-weight: bold;
-  padding: 4px;
+  color: #333;
 }
 
-.lampgod-levels-row small {
-  display: block;
-  font-size: 10px;
-  color: #666;
-  margin-top: 2px;
-}
-
-/* 为扫荡魔毯列添加特殊样式 */
-.sweep-carpet-col {
-  min-width: 60px;
-}
-
-.tech-item {
+.level-label {
   font-size: 12px;
   color: #666;
 }

@@ -289,6 +289,16 @@ const handleCommandDelayInput = (value) => {
 
 const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, parseInt(commandDelay.value) || 1200))
 
+// 辅助函数：处理"操作过快"错误
+const handleTooFastError = async (error) => {
+  const errorMsg = String(error?.message || error?.hint || error?.error || '').toLowerCase()
+  if (errorMsg.includes('操作过快')) {
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    return true
+  }
+  return false
+}
+
 // 解析执行范围
 const parseTokenRange = (rangeStr) => {
   if (!rangeStr || !rangeStr.trim()) {
@@ -1437,35 +1447,51 @@ const handleBatchClimb = async () => {
           if (currentEnergy <= 0) break
 
           // 准备战斗
-          await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_readyfight',
-            {},
-            5000
-          )
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_readyfight',
+              {},
+              5000
+            )
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
           // 执行战斗
-          const fightResult = await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_fight',
-            {
-              battleNum: 1,
-              winNum: 1
-            },
-            10000
-          )
+          let fightResult
+          try {
+            fightResult = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_fight',
+              {
+                battleNum: 1,
+                winNum: 1
+              },
+              10000
+            )
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
           climbCount++
 
           // 更新爬塔信息和能量
-          const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_getinfo',
-            {},
-            5000
-          )
-          currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
-          currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
+          try {
+            const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_getinfo',
+              {},
+              5000
+            )
+            currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
+            currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
           // 检查是否刚通关 10 层
           const floor = (currentTowerId % 10) + 1
@@ -1476,12 +1502,17 @@ const handleBatchClimb = async () => {
             floor === 1
           ) {
             // 领取通关奖励
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'evotower_claimreward',
-              {},
-              5000
-            )
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'evotower_claimreward',
+                {},
+                5000
+              )
+            } catch (error) {
+              if (await handleTooFastError(error)) { j--; continue }
+              throw error
+            }
             
             // 记录奖励领取日志
             const currentChapter = Math.floor(currentTowerId / 10)
@@ -1680,33 +1711,49 @@ const handleBatchQuickClimb = async () => {
         for (let j = 0; j < maxClimb; j++) {
           if (currentEnergy <= 0) break
 
-          await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_readyfight',
-            {},
-            5000
-          )
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_readyfight',
+              {},
+              5000
+            )
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
-          const fightResult = await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_fight',
-            {
-              battleNum: 1,
-              winNum: 1
-            },
-            10000
-          )
+          let fightResult
+          try {
+            fightResult = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_fight',
+              {
+                battleNum: 1,
+                winNum: 1
+              },
+              10000
+            )
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
           climbCount++
 
-          const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
-            token.id,
-            'evotower_getinfo',
-            {},
-            5000
-          )
-          currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
-          currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
+          try {
+            const updatedTowerInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'evotower_getinfo',
+              {},
+              5000
+            )
+            currentEnergy = updatedTowerInfo?.evoTower?.energy || 0
+            currentTowerId = updatedTowerInfo?.evoTower?.towerId || 0
+          } catch (error) {
+            if (await handleTooFastError(error)) { j--; continue }
+            throw error
+          }
 
           const floor = (currentTowerId % 10) + 1
           if (
@@ -1715,12 +1762,17 @@ const handleBatchQuickClimb = async () => {
             fightResult.winList[0] === true &&
             floor === 1
           ) {
-            await tokenStore.sendMessageWithPromise(
-              token.id,
-              'evotower_claimreward',
-              {},
-              5000
-            )
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'evotower_claimreward',
+                {},
+                5000
+              )
+            } catch (error) {
+              if (await handleTooFastError(error)) { j--; continue }
+              throw error
+            }
             
             const currentChapter = Math.floor(currentTowerId / 10)
             logStore.addLog({

@@ -40,6 +40,18 @@
               :disabled="isRunning || !tokenStore.hasTokens"
               @button-click="handleSaltFieldFormation"
             />
+            <CustomizedCard 
+              mode="button"
+              name="批量切换阵1"
+              :disabled="isRunning || !tokenStore.hasTokens"
+              @button-click="batchSwitchTeam1"
+            />
+            <CustomizedCard 
+              mode="button"
+              name="批量切换阵2"
+              :disabled="isRunning || !tokenStore.hasTokens"
+              @button-click="batchSwitchTeam2"
+            />
           </CustomizedCard>
         </div>
       </div>
@@ -48,7 +60,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="盐场"
-        :filter-operations="['盐场报名', '盐场布阵']"
+        :filter-operations="['盐场报名', '盐场布阵', '批量切换阵1', '批量切换阵2']"
       />
     </template>
   </MyCard>
@@ -454,6 +466,313 @@ const handleSaltFieldFormation = async () => {
       operation: '盐场布阵',
       status: 'error',
       message: `盐场布阵失败：${error.message}`
+    })
+  } finally {
+    isRunning.value = false
+  }
+}
+// 批量切换阵1
+const batchSwitchTeam1 = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  isRunning.value = true
+  
+  try {
+    const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+      const nameA = (a.name || '未命名').toLowerCase()
+      const nameB = (b.name || '未命名').toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+    
+    if (sortedTokensList.length === 0) {
+      message.warning('没有可用的Token')
+      return
+    }
+    
+    const tokenIndices = parseTokenRange(executionRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
+    
+    if (targetTokens.length === 0) {
+      message.warning('执行范围内没有有效的Token')
+      return
+    }
+    
+    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+    message.info(`开始批量切换阵1（${rangeText}），共${targetTokens.length}个Token...`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵1',
+      status: 'info',
+      message: `开始批量切换阵1，${rangeText}，共${targetTokens.length}个Token`
+    })
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      if (!token || !token.id) continue
+      
+      try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} 连接失败`)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '批量切换阵1',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name} 连接失败`
+          })
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '批量切换阵1',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name} WebSocket未连接`
+          })
+          continue
+        }
+        
+        const tokenIndex = getTokenIndex(token)
+        message.info(`正在切换 ${tokenIndex}、${token.name} 到阵1...`)
+        
+        await tokenStore.sendPresetteamSaveTeam(token.id, { 
+          teamId: 1 
+        })
+        
+        message.success(`${tokenIndex}、${token.name} 已切换到阵1`)
+        successCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '批量切换阵1',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name} 已切换到阵1`
+        })
+        
+        await connectionPool.release(token.id, true)
+        
+      } catch (error) {
+        console.error(`${token.name} 切换阵1失败:`, error)
+        const tokenIndex = getTokenIndex(token)
+        message.error(`${tokenIndex}、${token.name} 切换阵1失败：${error.message}`)
+        failCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '批量切换阵1',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name} 切换阵1失败：${error.message}`
+        })
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
+      }
+      
+      if (i < targetTokens.length - 1) {
+        await waitCommandDelay()
+      }
+    }
+    
+    message.success(`批量切换阵1完成！成功: ${successCount}，失败: ${failCount}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵1',
+      status: 'success',
+      message: `批量切换阵1完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+    })
+  } catch (error) {
+    console.error('批量切换阵1失败:', error)
+    message.error(`批量切换阵1失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵1',
+      status: 'error',
+      message: `批量切换阵1失败：${error.message}`
+    })
+  } finally {
+    isRunning.value = false
+  }
+}
+
+// 批量切换阵2
+const batchSwitchTeam2 = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  isRunning.value = true
+  
+  try {
+    const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+      const nameA = (a.name || '未命名').toLowerCase()
+      const nameB = (b.name || '未命名').toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+    
+    if (sortedTokensList.length === 0) {
+      message.warning('没有可用的Token')
+      return
+    }
+    
+    const tokenIndices = parseTokenRange(executionRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
+    
+    if (targetTokens.length === 0) {
+      message.warning('执行范围内没有有效的Token')
+      return
+    }
+    
+    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+    message.info(`开始批量切换阵2（${rangeText}），共${targetTokens.length}个Token...`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵2',
+      status: 'info',
+      message: `开始批量切换阵2，${rangeText}，共${targetTokens.length}个Token`
+    })
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      if (!token || !token.id) continue
+      
+      try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} 连接失败`)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '批量切换阵2',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name} 连接失败`
+          })
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '批量切换阵2',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${tokenIndex}、${token.name} WebSocket未连接`
+          })
+          continue
+        }
+        
+        const tokenIndex = getTokenIndex(token)
+        message.info(`正在切换 ${tokenIndex}、${token.name} 到阵2...`)
+        
+        await tokenStore.sendPresetteamSaveTeam(token.id, { 
+          teamId: 2 
+        })
+        
+        message.success(`${tokenIndex}、${token.name} 已切换到阵2`)
+        successCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '批量切换阵2',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `${tokenIndex}、${token.name} 已切换到阵2`
+        })
+        
+        await connectionPool.release(token.id, true)
+        
+      } catch (error) {
+        console.error(`${token.name} 切换阵2失败:`, error)
+        const tokenIndex = getTokenIndex(token)
+        message.error(`${tokenIndex}、${token.name} 切换阵2失败：${error.message}`)
+        failCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '批量切换阵2',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `${tokenIndex}、${token.name} 切换阵2失败：${error.message}`
+        })
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
+      }
+      
+      if (i < targetTokens.length - 1) {
+        await waitCommandDelay()
+      }
+    }
+    
+    message.success(`批量切换阵2完成！成功: ${successCount}，失败: ${failCount}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵2',
+      status: 'success',
+      message: `批量切换阵2完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+    })
+  } catch (error) {
+    console.error('批量切换阵2失败:', error)
+    message.error(`批量切换阵2失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '批量切换阵2',
+      status: 'error',
+      message: `批量切换阵2失败：${error.message}`
     })
   } finally {
     isRunning.value = false
