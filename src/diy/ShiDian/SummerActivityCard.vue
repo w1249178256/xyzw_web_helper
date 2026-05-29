@@ -1232,9 +1232,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         }
       }
       
-      // 检查哪些BOSS的层数小于3
+      // 检查哪些BOSS的层数小于6
       for (let i = 1; i <= 6; i++) {
-        if (bossLevels[i] < 3) {
+        if (bossLevels[i] < 6) {
           x++;
           zeroWinBosses.push(i);
         }
@@ -1242,15 +1242,15 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     }
     
     if (x === 0) {
-      console.log("没有活动次数为0的BOSS，跳过执行");
+      console.log("没有层数小于6的BOSS，跳过执行");
       return false;
     }
 
     // 计算Y = Math.floor(11/X)
     const y = Math.floor(11 / x);
     
-    console.log(`X(0胜场BOSS数): ${x}, Y(每BOSS执行次数): ${y}`);
-    console.log(`零胜场BOSS列表: ${zeroWinBosses}`);
+    console.log(`X(层数小于6的BOSS数): ${x}, Y(每BOSS执行次数): ${y}`);
+    console.log(`层数小于6的BOSS列表: ${zeroWinBosses}`);
     
     // 模拟点击暑期活动子卡片切换阵2按钮
     console.log("正在切换到阵容2...");
@@ -1296,8 +1296,9 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       while (startClickCount < executions) {
         console.log(`BOSS ${bossNumber} - 执行开始... (点击次数: ${startClickCount + 1})`);
         
+        let startSuccess = false;
+        
         try {
-          // 发送 towers_start 命令开始挑战
           await logCommand(
             'shidian',
             `一键战斗-开始塔-${bossNumber}`,
@@ -1309,14 +1310,13 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             true,
             '暑期活动'
           );
+          startSuccess = true;
           await waitCommandDelay();
         } catch (startError) {
-          // 检查是否是"操作过快"错误
           const errorMsg = startError.message || String(startError);
           if (errorMsg.includes('操作过快') || errorMsg.includes('400340')) {
             console.log(`BOSS ${bossNumber} - 操作过快，等待2分钟后重新执行`);
             await new Promise(resolve => setTimeout(resolve, 120000));
-            // 重新执行该命令
             try {
               await logCommand(
                 'shidian',
@@ -1329,25 +1329,44 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                 true,
                 '暑期活动'
               );
+              startSuccess = true;
               await waitCommandDelay();
             } catch (retryError) {
+              const retryErrorMsg = retryError.message || String(retryError);
+              if (retryErrorMsg.includes('操作过快') || retryErrorMsg.includes('400340')) {
+                console.log(`BOSS ${bossNumber} - 重试仍然操作过快，跳过本次循环`);
+                await waitCommandDelay();
+                continue;
+              }
+              if (retryErrorMsg.includes('已经击杀所有 boss') || 
+                  retryErrorMsg.includes('击杀所有') || 
+                  retryErrorMsg.includes('7900022') ||
+                  retryErrorMsg.includes('次数已用完') ||
+                  retryErrorMsg.includes('7900023')) {
+                console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行`);
+                return true;
+              }
               console.log(`BOSS ${bossNumber} - 重试开始命令失败:`, retryError);
               await waitCommandDelay();
             }
-            continue;
-          }
-          if (errorMsg.includes('已经击杀所有 boss') || 
+          } else if (errorMsg.includes('已经击杀所有 boss') || 
               errorMsg.includes('击杀所有') || 
               errorMsg.includes('7900022') ||
               errorMsg.includes('次数已用完') ||
               errorMsg.includes('7900023')) {
-            console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行该 BOSS`);
-            return true; // 停止执行该 BOSS
+            console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行`);
+            return true;
+          } else {
+            console.log(`BOSS ${bossNumber} 开始按钮点击失败，跳过本次循环`);
+            await waitCommandDelay();
           }
-          // 开始按钮点击失败，但继续执行
-          console.log(`BOSS ${bossNumber} 开始按钮点击失败，但继续执行:`, startError);
-          // 错误后等待执行间隔
+        }
+
+        if (!startSuccess) {
+          console.log(`BOSS ${bossNumber} - 开始命令未成功，跳过战斗循环`);
+          startClickCount++;
           await waitCommandDelay();
+          continue;
         }
 
         // 连续执行战斗按钮点击，直到提示错误
@@ -1483,6 +1502,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     while (startClickCount < maxStartClicks) {
       console.log(`执行开始... (点击次数: ${startClickCount + 1})`);
       
+      let startSuccess = false;
+      
       try {
         await logCommand(
           'shidian',
@@ -1495,6 +1516,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           true,
           '暑期活动'
         );
+        startSuccess = true;
         await waitCommandDelay();
       } catch (startError) {
         const errorMsg = startError.message || String(startError);
@@ -1513,8 +1535,23 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               true,
               '暑期活动'
             );
+            startSuccess = true;
             await waitCommandDelay();
           } catch (retryError) {
+            const retryErrorMsg = retryError.message || String(retryError);
+            if (retryErrorMsg.includes('操作过快') || retryErrorMsg.includes('400340')) {
+              console.log(`重试仍然操作过快，跳过本次循环`);
+              await waitCommandDelay();
+              continue;
+            }
+            if (retryErrorMsg.includes('已经击杀所有 boss') || 
+                retryErrorMsg.includes('击杀所有') || 
+                retryErrorMsg.includes('7900022') ||
+                retryErrorMsg.includes('次数已用完') ||
+                retryErrorMsg.includes('7900023')) {
+              console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
+              return true;
+            }
             console.log(`重试开始命令失败:`, retryError);
             await waitCommandDelay();
           }
@@ -1525,10 +1562,21 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             errorMsg.includes('7900023')) {
           console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
           return true;
+        } else if (errorMsg.includes('无效的ID') || errorMsg.includes('200330')) {
+          console.log("无效的ID，说明塔已在战斗中，直接执行战斗");
+          startSuccess = true;
+          await waitCommandDelay();
         } else {
           console.log("开始按钮点击失败，但继续执行");
           await waitCommandDelay();
         }
+      }
+
+      if (!startSuccess) {
+        console.log("开始命令未成功，跳过战斗循环");
+        startClickCount++;
+        await waitCommandDelay();
+        continue;
       }
 
       console.log("开始连续点击战斗按钮，最多10次");
@@ -1558,27 +1606,38 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           console.log(`战斗按钮点击失败，检查错误类型`);
           const errorMsg = fightError.message || String(fightError);
           
-          if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
-            console.log(`爬塔没有开启 (7900019)，尝试执行 towers_start...`);
+          if (errorMsg.includes('操作过快') || errorMsg.includes('400340')) {
+            console.log(`操作过快，等待2分钟后重新执行`);
+            await new Promise(resolve => setTimeout(resolve, 120000));
             try {
               await logCommand(
                 'shidian',
-                '一键战斗 - 重新开启塔',
+                '一键战斗 - 战斗塔(重试)',
                 tokenId,
                 tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-                'towers_start',
+                'towers_fight',
                 { towerType: towerTypeValue },
-                tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+                tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
                 true,
                 '暑期活动'
               );
-              console.log(`爬塔已重新开启，继续执行战斗`);
-              await waitCommandDelay();
+              console.log(`战斗重试成功`);
+              fightAttempts++;
+              if (fightAttempts < maxFightAttempts) {
+                await waitCommandDelay();
+              }
               continue;
-            } catch (restartError) {
-              console.log(`重新开启爬塔失败:`, restartError);
+            } catch (retryError) {
+              console.log(`战斗重试失败:`, retryError);
               await waitCommandDelay();
+              break;
             }
+          }
+          
+          if (errorMsg.includes('7900019') || errorMsg.includes('爬塔没有开启')) {
+            console.log(`爬塔没有开启 (7900019)，跳出战斗循环`);
+            await waitCommandDelay();
+            break;
           }
           
           console.log(`战斗失败，跳转到执行开始按钮`);

@@ -125,6 +125,12 @@
               :disabled="tokenStore.gameTokens.length === 0 || isExportingTowerInfo" 
               @button-click="handleExportTowerInfo" 
             />
+            <CustomizedCard 
+              mode="button" 
+              :name="isExportingInactiveMembers ? '导出中...' : '导出未激活成员'" 
+              :disabled="tokenStore.gameTokens.length === 0 || isExportingInactiveMembers" 
+              @button-click="handleExportInactiveMembers" 
+            />
           </CustomizedCard>
         </div>
       </div>
@@ -133,7 +139,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="怪异塔"
-        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔', '批量开启爬塔', '批量导出爬塔信息', '批量领取免费钥匙']"
+        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔', '批量开启爬塔', '批量导出爬塔信息', '批量领取免费钥匙', '导出未激活成员']"
       />
     </template>
   </MyCard>
@@ -209,6 +215,7 @@ const isBatchPrivilegeRunning = ref(false)
 const isBatchQuickClimbing = ref(false)
 const isExportingTowerInfo = ref(false)
 const isBatchClaimingFreeKey = ref(false)
+const isExportingInactiveMembers = ref(false)
 
 // 计算属性：怪异塔信息
 const evoTowerInfo = computed(() => {
@@ -1992,6 +1999,95 @@ const handleExportTowerInfo = async () => {
     message.error('导出爬塔信息失败: ' + (error.message || '未知错误'))
   } finally {
     isExportingTowerInfo.value = false
+  }
+}
+
+const handleExportInactiveMembers = async () => {
+  if (!props.selectedTokenId) {
+    message.warning('请先选择一个Token')
+    return
+  }
+  
+  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
+  if (!token) {
+    message.warning('未找到选中的Token')
+    return
+  }
+  
+  try {
+    isExportingInactiveMembers.value = true
+    message.info('开始导出未激活成员...')
+    
+    const legionInfoRes = await tokenStore.sendLegionGetInfo(token.id, {})
+    console.log('legion_getinfo 返回数据:', legionInfoRes)
+    
+    const info = legionInfoRes?.info || legionInfoRes || {}
+    const members = info?.members || legionInfoRes?.members || {}
+    
+    console.log('members 数据:', members)
+    console.log('members 数量:', Object.keys(members).length)
+    
+    const evotowerMembersRes = await tokenStore.sendEvotowerGetLegionJoinMembers(token.id, {})
+    console.log('evotower_getlegionjoinmembers 返回数据:', evotowerMembersRes)
+    
+    const memberScores = evotowerMembersRes?.memberScores || {}
+    
+    console.log('memberScores 数据:', memberScores)
+    
+    const inactiveMembers = []
+    
+    for (const roleId of Object.keys(members)) {
+      const memberInfo = members[roleId]
+      const name = memberInfo?.name || '未知'
+      const score = memberScores[roleId]
+      
+      console.log(`成员 ${roleId} (${name}), 得分: ${score}`)
+      
+      if (!score || score === 0) {
+        inactiveMembers.push({
+          roleId: roleId,
+          name: name
+        })
+      }
+    }
+    
+    let txtContent = '怪异塔未激活成员列表\n'
+    txtContent += `导出时间：${new Date().toLocaleString()}\n`
+    txtContent += `军团成员总数：${Object.keys(members).length}\n`
+    txtContent += `未激活成员数：${inactiveMembers.length}\n`
+    txtContent += '\n序号\t角色ID\t昵称\n'
+    txtContent += '-'.repeat(40) + '\n'
+    
+    inactiveMembers.forEach((member, index) => {
+      txtContent += `${index + 1}\t${member.roleId}\t${member.name}\n`
+    })
+    
+    const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `怪异塔未激活成员_${new Date().toLocaleDateString()}.txt`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    message.success(`未激活成员导出完成，共${inactiveMembers.length}个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '怪异塔',
+      operation: '导出未激活成员',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `导出未激活成员完成，共${inactiveMembers.length}个`
+    })
+  } catch (error) {
+    console.error('导出未激活成员失败:', error)
+    message.error('导出未激活成员失败: ' + (error.message || '未知错误'))
+  } finally {
+    isExportingInactiveMembers.value = false
   }
 }
 

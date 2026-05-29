@@ -2514,6 +2514,23 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
 
+
+  /**
+   * 怪异塔参与成员
+   */
+  evotower_getlegionjoinmembers(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+                ...params
+      }),
+      cmd: "evotower_getlegionjoinmembers",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
   /**
    * 怪异塔特权
    */
