@@ -184,7 +184,7 @@ const getTokenStyle = (tokenId) => {
   const status = tokenStore.getWebSocketStatus(tokenId)
   if (status === 'connected') return 'success'
   if (status === 'connecting') return 'processing'
-  if (status === 'disconnected') return 'error'
+  if (status === 'disconnected') return 'danger'
   return 'warning'
 }
 
