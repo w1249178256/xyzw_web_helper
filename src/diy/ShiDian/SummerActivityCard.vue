@@ -3270,9 +3270,10 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
   }
 
   try {
-    // 1. 从presetteam_getinfo结果中提取battleTeam和weaponId
+    // 1. 从presetteam_getinfo结果中提取battleTeam、weaponId和petUId
     const battleTeam = {};
     let weaponId = 3; // 默认值
+    let petUId = ""; // 默认值
 
     if (presetTeamResponse && presetTeamResponse.presetTeamInfo) {
       const presetTeamInfo = presetTeamResponse.presetTeamInfo.presetTeamInfo || presetTeamResponse.presetTeamInfo;
@@ -3309,9 +3310,16 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
           }
         }
         
-        // 提取weaponId（如果有）
-        if (presetTeamResponse.weaponId !== undefined) {
-          weaponId = presetTeamResponse.weaponId;
+        // 从阵容信息中提取weaponId
+        if (targetTeamInfo.weapon && targetTeamInfo.weapon.weaponId !== undefined) {
+          weaponId = targetTeamInfo.weapon.weaponId;
+          console.log("从阵容信息中提取weaponId:", weaponId);
+        }
+        
+        // 从阵容信息中提取petUId
+        if (targetTeamInfo.petUId !== undefined) {
+          petUId = targetTeamInfo.petUId;
+          console.log("从阵容信息中提取petUId:", petUId);
         }
       }
     } else {
@@ -3362,11 +3370,24 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
             }
           }
         }
+        
+        // 从阵容信息中提取weaponId
+        if (targetTeamInfo.weapon && targetTeamInfo.weapon.weaponId !== undefined) {
+          weaponId = targetTeamInfo.weapon.weaponId;
+          console.log("从阵容信息中提取weaponId:", weaponId);
+        }
+        
+        // 从阵容信息中提取petUId
+        if (targetTeamInfo.petUId !== undefined) {
+          petUId = targetTeamInfo.petUId;
+          console.log("从阵容信息中提取petUId:", petUId);
+        }
       }
     }
 
     console.log("提取的 battleTeam:", battleTeam);
     console.log("提取的 weaponId:", weaponId);
+    console.log("提取的 petUId:", petUId);
 
     if (Object.keys(battleTeam).length === 0) {
       message.warning("当前阵容没有英雄，无法设置队伍");
@@ -3385,7 +3406,7 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
         teamType: 6,
         battleTeam: battleTeam,
         lordWeaponId: weaponId,
-        petUId: "",
+        petUId: petUId,
         cCMonsterId: 0
       },
       tokenStore.sendMessageWithPromise(
@@ -3395,7 +3416,7 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
           teamType: 6,
           battleTeam: battleTeam,
           lordWeaponId: weaponId,
-          petUId: "",
+          petUId: petUId,
           cCMonsterId: 0
         },
         5000
