@@ -231,7 +231,7 @@ const totalChargeItemId = ref(localStorage.getItem("summerActivity_totalChargeIt
 const cdkCode = ref(localStorage.getItem("summerActivity_cdkCode") || "");
 const executionRange = ref("");
 const bossSelect = ref(1);
-const battleCount = ref(10);
+const battleCount = ref(8);
 const battleCountOptions = [
   { label: "1", value: 1 },
   { label: "2", value: 2 },
