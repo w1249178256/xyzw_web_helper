@@ -1052,7 +1052,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
-   * 开始爬塔
+   * 开始推图
    */
   fight_startlevel(ack = 0, seq = 0, params = {}) {
     return {

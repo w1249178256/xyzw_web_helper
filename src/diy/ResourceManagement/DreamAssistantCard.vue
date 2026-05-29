@@ -1582,8 +1582,14 @@ const handleDreamSelect = async () => {
     return
   }
   
-  const tokenIndices = parseTokenRange(executionRange.value)
-  const targetTokens = getTargetTokens(tokenIndices)
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
   
   if (targetTokens.length === 0) {
     message.warning('执行范围内没有有效的Token')
@@ -1709,8 +1715,14 @@ const handleDreamFight = async () => {
     return
   }
   
-  const tokenIndices = parseTokenRange(executionRange.value)
-  const targetTokens = getTargetTokens(tokenIndices)
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
   
   if (targetTokens.length === 0) {
     message.warning('执行范围内没有有效的Token')
