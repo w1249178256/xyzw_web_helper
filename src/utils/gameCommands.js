@@ -1702,7 +1702,8 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       ack,
       body: this.g_utils.bon.encode({
         battleTeam: {},
-        lordWeaponId: 9,
+        lordWeaponId: params.lordWeaponId,
+        petUId: "",
         ...params
       }),
       cmd: "hero_calcpowerbyteam",
@@ -1875,6 +1876,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
         teamType: params.teamType !== undefined ? params.teamType : 11,
         battleTeam: params.battleTeam || {}, 
         lordWeaponId: params.lordWeaponId !== undefined ? params.lordWeaponId : 3,
+        petUId: "",
         cCMonsterId: params.cCMonsterId !== undefined ? params.cCMonsterId : 0,
         ...params
       }),

@@ -1,3 +1,16 @@
+{
+  "ack": 53,
+  "body": {
+    "battleNum": 1,
+    "isSkip": false,
+    "winNum": 1
+  },
+  "cmd": "evotower_fight",
+  "seq": 53,
+  "time": 1780035280179
+}
+
+
 时间: 2026/1/27 20:59:52
 服务: EvoTowerService
 方法: fight

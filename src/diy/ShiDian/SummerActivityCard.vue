@@ -100,6 +100,13 @@
           @button-click="batchBattle()"
         />
         <CustomizedCard
+          mode="name-select"
+          name="战斗次数"
+          :select-value="battleCount"
+          :select-options="battleCountOptions"
+          @update:select-value="battleCount = $event"
+        />
+        <CustomizedCard
           mode="button-placeholder"
           button-text="批量使用道具"
           :disabled="isRunning"
@@ -224,6 +231,19 @@ const totalChargeItemId = ref(localStorage.getItem("summerActivity_totalChargeIt
 const cdkCode = ref(localStorage.getItem("summerActivity_cdkCode") || "");
 const executionRange = ref("");
 const bossSelect = ref(1);
+const battleCount = ref(10);
+const battleCountOptions = [
+  { label: "1", value: 1 },
+  { label: "2", value: 2 },
+  { label: "3", value: 3 },
+  { label: "4", value: 4 },
+  { label: "5", value: 5 },
+  { label: "6", value: 6 },
+  { label: "7", value: 7 },
+  { label: "8", value: 8 },
+  { label: "9", value: 9 },
+  { label: "10", value: 10 }
+];
 
 const handleFreeGoodsIdChange = (value) => {
   freeGoodsId.value = value;
@@ -1248,7 +1268,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
 
     // 模拟点击设置队伍按钮，使用fight_startlevel获取的heroId
     console.log("正在设置队伍...");
-    await setTeam(tokenId);
+    await setTeam(tokenId, fightResult);
     await waitCommandDelay();
 
     // 遍历每个零胜场BOSS
@@ -1361,24 +1381,39 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     await switchToTeam2(tokenId);
     await waitCommandDelay();
 
-    // 2. 使用fight_startlevel获取当前阵容
+    // 2. 使用presetteam_getinfo获取当前阵容
     console.log("正在获取当前阵容信息...");
-    const fightResult = await logCommand(
+    const presetTeamResponse = await logCommand(
       'shidian',
-      '一键战斗-开始关卡',
+      '一键战斗-获取阵容信息',
       tokenId,
       tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-      'fight_startlevel',
+      'presetteam_getinfo',
       {},
-      tokenStore.sendFightStartLevel(tokenId, {}),
+      tokenStore.sendPresetteamGetInfo(tokenId),
       true,
       '暑期活动'
     );
     await waitCommandDelay();
 
+    // 检查presetTeamInfo中是否有阵容2
+    const presetTeamInfo = presetTeamResponse?.presetTeamInfo?.presetTeamInfo || presetTeamResponse?.presetTeamInfo || {};
+    const hasTeam1 = presetTeamInfo["1"] || presetTeamInfo[1];
+    const hasTeam2 = presetTeamInfo["2"] || presetTeamInfo[2];
+    const useTeamId = presetTeamResponse?.presetTeamInfo?.useTeamId || presetTeamResponse?.useTeamId || 1;
+
+    console.log(`阵容信息: 阵容1=${!!hasTeam1}, 阵容2=${!!hasTeam2}, 当前使用阵容=${useTeamId}`);
+
+    // 如果有1和2，检查useTeamId是否为2，如果不为2，切换到阵容2
+    if (hasTeam1 && hasTeam2 && useTeamId !== 2) {
+      console.log("当前不是阵容2，切换到阵容2...");
+      await switchToTeam2(tokenId);
+      await waitCommandDelay();
+    }
+
     // 3. 设置队伍
     console.log("正在设置队伍...");
-    await setTeam(tokenId);
+    await setTeam(tokenId, presetTeamResponse);
     await waitCommandDelay();
 
     // 4. 获取活动次数
@@ -1412,7 +1447,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
 
     // 6. 执行战斗逻辑
     let startClickCount = 0;
-    const maxStartClicks = 8;
+    const maxStartClicks = battleCount.value;
 
     while (startClickCount < maxStartClicks) {
       console.log(`执行开始... (点击次数: ${startClickCount + 1})`);
@@ -3221,7 +3256,7 @@ const switchToTeam2 = async (tokenId = null) => {
 };
 
 // 设置队伍（助）
-const setTeam = async (tokenId = null) => {
+const setTeam = async (tokenId = null, presetTeamResponse = null) => {
   const actualTokenId = tokenId || selectedTokenId.value;
   if (!actualTokenId) {
     message.warning("请先选择Token");
@@ -3235,93 +3270,110 @@ const setTeam = async (tokenId = null) => {
   }
 
   try {
-    // 1. 切换阵容2（如果失败，继续执行后续操作）
-    console.log("切换阵容2...");
-    try {
-      await logCommand(
-      'shidian',
-      '切换阵2',
-      actualTokenId,
-      tokenStore.gameTokens.find(t => t.id === actualTokenId)?.name || '',
-      'presetteam_saveteam',
-      { teamId: 2 },
-      tokenStore.sendPresetteamSaveTeam(actualTokenId, { teamId: 2 }),
-      true,
-      '暑期活动'
-    );
-      // 等待一下确保切换完成
-      await waitCommandDelay();
-      console.log("切换阵容2成功");
-    } catch (switchError) {
-      console.warn("切换阵容2失败，继续执行后续操作:", switchError);
-      // 切换失败时也等待一下，可能当前已经是阵容1
-      await waitCommandDelay();
-    }
-
-    // 2. 获取当前阵容信息
-    console.log("获取阵容信息...");
-    const teamInfoResponse = await logCommand(
-      'shidian',
-      '设置队伍-获取阵容信息',
-      actualTokenId,
-      tokenStore.gameTokens.find(t => t.id === actualTokenId)?.name || '',
-      'presetteam_getinfo',
-      {},
-      tokenStore.sendPresetteamGetInfo(actualTokenId),
-      true,
-      '暑期活动'
-    );
-    
-    if (!teamInfoResponse || !teamInfoResponse.presetTeamInfo) {
-      message.error("无法获取阵容信息");
-      return;
-    }
-
-    // 3. 提取当前阵容的 heroId（位置 0-5）
-    const presetTeamInfo = teamInfoResponse.presetTeamInfo.presetTeamInfo || teamInfoResponse.presetTeamInfo;
-    // 优先尝试获取阵容1，如果失败则尝试获取当前使用的阵容
-    let team1Info = presetTeamInfo["1"] || presetTeamInfo[1];
-    if (!team1Info) {
-      // 尝试获取当前使用的阵容
-      const useTeamId = teamInfoResponse.presetTeamInfo.useTeamId || teamInfoResponse.useTeamId || 1;
-      team1Info = presetTeamInfo[useTeamId.toString()] || presetTeamInfo[useTeamId];
-    }
-    
-    if (!team1Info) {
-      message.error("无法找到阵容信息");
-      return;
-    }
-
-    const teamInfo = team1Info.teamInfo || team1Info;
+    // 1. 从presetteam_getinfo结果中提取battleTeam和weaponId
     const battleTeam = {};
+    let weaponId = 3; // 默认值
 
-    // 从 teamInfo 中提取位置 0-4 的 heroId
-    // 位置键可能是 "0"-"4" 或 "1"-"5"，需要兼容处理
-    for (let i = 0; i < 5; i++) {
-      // 尝试 "0"-"4" 格式
-      let heroData = teamInfo[i.toString()];
-      if (!heroData) {
-        // 尝试 "1"-"5" 格式（位置偏移1）
-        heroData = teamInfo[(i + 1).toString()];
+    if (presetTeamResponse && presetTeamResponse.presetTeamInfo) {
+      const presetTeamInfo = presetTeamResponse.presetTeamInfo.presetTeamInfo || presetTeamResponse.presetTeamInfo;
+      
+      // 检查是否有阵容1和2
+      const hasTeam1 = presetTeamInfo["1"] || presetTeamInfo[1];
+      const hasTeam2 = presetTeamInfo["2"] || presetTeamInfo[2];
+      
+      // 如果有1和2，使用2；如果只有1，使用1
+      let targetTeamInfo = null;
+      if (hasTeam1 && hasTeam2) {
+        console.log("使用阵容2");
+        targetTeamInfo = hasTeam2;
+      } else if (hasTeam1) {
+        console.log("只有阵容1，使用阵容1");
+        targetTeamInfo = hasTeam1;
       }
       
-      if (heroData) {
-        // heroData 可能是对象（包含 heroId）或直接是 heroId
-        const heroId = heroData.heroId || heroData.id || heroData;
-        if (heroId && heroId !== 0) {
-          battleTeam[i.toString()] = Number(heroId);
+      if (targetTeamInfo) {
+        const teamInfo = targetTeamInfo.teamInfo || targetTeamInfo;
+        
+        // 从teamInfo中提取heroId
+        for (let i = 0; i < 5; i++) {
+          let heroData = teamInfo[i.toString()];
+          if (!heroData) {
+            heroData = teamInfo[(i + 1).toString()];
+          }
+          
+          if (heroData) {
+            const heroId = heroData.heroId || heroData.id || heroData;
+            if (heroId && heroId !== 0) {
+              battleTeam[i.toString()] = Number(heroId);
+            }
+          }
+        }
+        
+        // 提取weaponId（如果有）
+        if (presetTeamResponse.weaponId !== undefined) {
+          weaponId = presetTeamResponse.weaponId;
+        }
+      }
+    } else {
+      // 如果没有presetTeamResponse，执行presetteam_getinfo获取
+      console.log("获取阵容信息...");
+      const teamInfoResponse = await logCommand(
+        'shidian',
+        '设置队伍-获取阵容信息',
+        actualTokenId,
+        tokenStore.gameTokens.find(t => t.id === actualTokenId)?.name || '',
+        'presetteam_getinfo',
+        {},
+        tokenStore.sendPresetteamGetInfo(actualTokenId),
+        true,
+        '暑期活动'
+      );
+      
+      if (!teamInfoResponse || !teamInfoResponse.presetTeamInfo) {
+        message.error("无法获取阵容信息");
+        return;
+      }
+
+      const presetTeamInfo = teamInfoResponse.presetTeamInfo.presetTeamInfo || teamInfoResponse.presetTeamInfo;
+      const hasTeam1 = presetTeamInfo["1"] || presetTeamInfo[1];
+      const hasTeam2 = presetTeamInfo["2"] || presetTeamInfo[2];
+      
+      let targetTeamInfo = null;
+      if (hasTeam1 && hasTeam2) {
+        console.log("使用阵容2");
+        targetTeamInfo = hasTeam2;
+      } else if (hasTeam1) {
+        console.log("只有阵容1，使用阵容1");
+        targetTeamInfo = hasTeam1;
+      }
+      
+      if (targetTeamInfo) {
+        const teamInfo = targetTeamInfo.teamInfo || targetTeamInfo;
+        for (let i = 0; i < 5; i++) {
+          let heroData = teamInfo[i.toString()];
+          if (!heroData) {
+            heroData = teamInfo[(i + 1).toString()];
+          }
+          
+          if (heroData) {
+            const heroId = heroData.heroId || heroData.id || heroData;
+            if (heroId && heroId !== 0) {
+              battleTeam[i.toString()] = Number(heroId);
+            }
+          }
         }
       }
     }
 
     console.log("提取的 battleTeam:", battleTeam);
+    console.log("提取的 weaponId:", weaponId);
 
     if (Object.keys(battleTeam).length === 0) {
       message.warning("当前阵容没有英雄，无法设置队伍");
       return;
     }
 
-    // 4. 设置队伍
+    // 3. 设置队伍
     console.log("设置队伍...");
     const response = await logCommand(
       'shidian',
@@ -3330,18 +3382,20 @@ const setTeam = async (tokenId = null) => {
       tokenStore.gameTokens.find(t => t.id === actualTokenId)?.name || '',
       'team_setteam',
       {
-        teamType: 11,
+        teamType: 6,
         battleTeam: battleTeam,
-        lordWeaponId: 3,
+        lordWeaponId: weaponId,
+        petUId: "",
         cCMonsterId: 0
       },
       tokenStore.sendMessageWithPromise(
         actualTokenId,
         "team_setteam",
         {
-          teamType: 11,
+          teamType: 6,
           battleTeam: battleTeam,
-          lordWeaponId: 3,
+          lordWeaponId: weaponId,
+          petUId: "",
           cCMonsterId: 0
         },
         5000
