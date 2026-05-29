@@ -702,10 +702,7 @@ const batchClaimLegionPrivilege = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、军团特权领取完成，成功${successCount}次`,
-          details: {
-            successCount
-          }
+          message: `${tokenIndex}、${token.name || token.id}、军团特权领取完成，成功${successCount}次`
         })
         
         return { successCount }

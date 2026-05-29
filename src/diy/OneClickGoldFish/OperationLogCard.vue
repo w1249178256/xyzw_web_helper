@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="operation-log" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -41,9 +41,6 @@
               </span>
             </div>
             <div class="log-content">
-              <div v-if="log.tokenName" class="log-token">
-                Token: {{ log.tokenName }}
-              </div>
               <div class="log-message">{{ log.message }}</div>
               <div v-if="log.details" class="log-details">
                 <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>

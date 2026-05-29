@@ -1633,13 +1633,7 @@ const startTowerClimbForToken = async (token) => {
             const lastDigit = parseInt(towerIdStr.slice(-1))
             const chapter = parseInt(towerIdStr.slice(0, -1))
             
-            if (lastDigit === 0) {
-              // 最后一位是 0，表示第 10 层
-              actualFloor = `${chapter}-10`
-            } else {
-              // 正常情况
-              actualFloor = `${chapter}-${lastDigit}`
-            }
+            actualFloor = `${chapter}-${lastDigit}`
           } else if (typeof towerId === 'string' && towerId.includes('-')) {
             // 兼容字符串格式 "78-10"
             actualFloor = towerId
