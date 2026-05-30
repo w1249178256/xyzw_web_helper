@@ -1,4 +1,4 @@
-<template>
+﻿﻿<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -1290,20 +1290,47 @@ const handleBatchUpgradeHangup = async () => {
             }
 
             console.log('准备执行system_hangupupgrade，upgradeNum:', upgradeNum)
-            const response = await tokenStore.sendSystemHangupUpgrade(token.id, {
-              upgradeNum: upgradeNum
-            })
-            console.log('system_hangupupgrade 响应:', response)
+            
+            // 添加重试逻辑处理操作过快错误，一直等待直到成功
+            let upgradeSuccess = false
+            
+            while (!upgradeSuccess) {
+              try {
+                const response = await tokenStore.sendSystemHangupUpgrade(token.id, {
+                  upgradeNum: upgradeNum
+                })
+                console.log('system_hangupupgrade 响应:', response)
 
-            if (response && (response.code === 0 || response.code === undefined)) {
-              remainingCount -= upgradeNum
-              totalUpgradeCount += upgradeNum
-              console.log('升级成功，剩余数量:', remainingCount, '总使用数量:', totalUpgradeCount)
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升级挂机成功，使用${upgradeNum}个道具，剩余${remainingCount}个`)
-            } else {
-              const errorMsg = response?.msg || response?.message || '未知错误'
-              console.log('升级失败:', errorMsg)
-              throw new Error(errorMsg)
+                if (response && (response.code === 0 || response.code === undefined)) {
+                  remainingCount -= upgradeNum
+                  totalUpgradeCount += upgradeNum
+                  console.log('升级成功，剩余数量:', remainingCount, '总使用数量:', totalUpgradeCount)
+                  message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升级挂机成功，使用${upgradeNum}个道具，剩余${remainingCount}个`)
+                  upgradeSuccess = true
+                } else {
+                  const errorMsg = response?.msg || response?.message || '未知错误'
+                  console.log('升级失败:', errorMsg)
+                  throw new Error(errorMsg)
+                }
+              } catch (error) {
+                const errorMsg = String(error.message || '').toLowerCase()
+                
+                if (errorMsg.includes('操作过快')) {
+                  message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 操作过快，等待2分钟后重试...`)
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '升级挂机',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'warning',
+                    message: `${tokenIndex}、操作过快，等待2分钟后重试`
+                  })
+                  await new Promise(resolve => setTimeout(resolve, 120000)) // 等待2分钟
+                } else {
+                  throw error
+                }
+              }
             }
 
             await waitCommandDelay()

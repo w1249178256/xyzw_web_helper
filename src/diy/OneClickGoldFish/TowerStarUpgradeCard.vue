@@ -504,7 +504,7 @@ const startHeroUpgrade = async () => {
     
     // 英雄ID列表（101-120, 201-228, 301-314）
     const heroIds = [
-      ...Array.from({ length: 20 }, (_, i) => 101 + i),
+      ...Array.from({ length: 21 }, (_, i) => 101 + i),
       ...Array.from({ length: 28 }, (_, i) => 201 + i),
       ...Array.from({ length: 14 }, (_, i) => 301 + i),
     ]
@@ -633,7 +633,7 @@ const startBookUpgrade = async () => {
     })
     
     const heroIds = [
-      ...Array.from({ length: 20 }, (_, i) => 101 + i),
+      ...Array.from({ length: 21 }, (_, i) => 101 + i),
       ...Array.from({ length: 28 }, (_, i) => 201 + i),
       ...Array.from({ length: 14 }, (_, i) => 301 + i),
     ]
@@ -888,7 +888,7 @@ const connectTokenWithRetry = async (token, tokenIndex) => {
 // 执行英雄升星（单个token）
 const executeHeroUpgrade = async (token) => {
   const heroIds = [
-    ...Array.from({ length: 20 }, (_, i) => 101 + i),
+    ...Array.from({ length: 21 }, (_, i) => 101 + i),
     ...Array.from({ length: 28 }, (_, i) => 201 + i),
     ...Array.from({ length: 14 }, (_, i) => 301 + i),
   ]
@@ -916,7 +916,7 @@ const executeHeroUpgrade = async (token) => {
 // 执行图鉴升星（单个token）
 const executeBookUpgrade = async (token) => {
   const heroIds = [
-    ...Array.from({ length: 20 }, (_, i) => 101 + i),
+    ...Array.from({ length: 21 }, (_, i) => 101 + i),
     ...Array.from({ length: 28 }, (_, i) => 201 + i),
     ...Array.from({ length: 14 }, (_, i) => 301 + i),
   ]
