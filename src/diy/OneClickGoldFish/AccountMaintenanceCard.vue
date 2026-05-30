@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<template>
+<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -88,6 +88,13 @@
             @button-click="handleUseTorch"
             :disabled="isUsingTorch"
             :loading="isUsingTorch"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBuyingWrench ? '黑市购买扳手中...' : '黑市购买扳手'"
+            @button-click="handleBuyWrench"
+            :disabled="isBuyingWrench"
+            :loading="isBuyingWrench"
           />
           <CustomizedCard 
             mode="button"
@@ -411,6 +418,7 @@ const props = defineProps({
 
 // 操作状态
 const isUsingTorch = ref(false)
+const isBuyingWrench = ref(false)
 const isUpgradingCrystal = ref(false)
 const isUsingUniversalRed = ref(false)
 const isUpgradingLuBuStar = ref(false)
@@ -680,7 +688,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
+            message: `${tokenIndex}、使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
           })
 
           return { success: true, tokenId: token.id, successCount, failCount }
@@ -694,7 +702,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、使用火把失败: ${error.message}`
+            message: `${tokenIndex}、使用火把失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -732,6 +740,117 @@ const handleUseTorch = async () => {
     })
   } finally {
     isUsingTorch.value = false
+  }
+}
+
+// 黑市购买扳手
+const handleBuyWrench = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+  
+  try {
+    isBuyingWrench.value = true
+    
+    message.info(`开始黑市购买扳手（${rangeText}），共${targetTokens.length}个Token...`)
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始黑市购买扳手...`)
+          
+          let successCount = 0
+          
+          // 执行4次黑市购买扳手
+          for (let i = 0; i < 4; i++) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_buystoregoods',
+                { activityId: 9, goodsIndex: 9, buyNum: 1 },
+                5000
+              )
+              await waitCommandDelay()
+              successCount++
+            } catch (error) {
+              console.error(`第${i + 1}次黑市购买扳手失败:`, error)
+              // 如果购买失败，跳过剩余次数
+              if (error.message && error.message.includes('服务器错误')) {
+                message.warning(`${token.name} - 第${i + 1}次黑市购买扳手失败: ${error.message}，跳过剩余次数`)
+                break
+              }
+            }
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 黑市购买扳手完成：成功${successCount}次`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '黑市购买扳手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `${tokenIndex}、黑市购买扳手完成：成功${successCount}次`
+          })
+
+          return { success: true, tokenId: token.id, successCount }
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 黑市购买扳手失败:`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 黑市购买扳手失败: ${error.message}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '黑市购买扳手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `${globalIndex + 1}、黑市购买扳手失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+    
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+    
+    message.success(`黑市购买扳手完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '黑市购买扳手',
+      status: 'success',
+      message: `黑市购买扳手完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+    
+  } catch (error) {
+    console.error('黑市购买扳手失败:', error)
+    message.error(`黑市购买扳手失败: ${error.message}`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '黑市购买扳手',
+      status: 'error',
+      message: `黑市购买扳手失败: ${error.message}`
+    })
+  } finally {
+    isBuyingWrench.value = false
   }
 }
 
@@ -811,7 +930,7 @@ const handleUpgradeCrystal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、升级水晶完成：成功${successCount}次，失败${failCount}次（目标英雄: ${selectedHeroName}）`
+            message: `${tokenIndex}、升级水晶完成：成功${successCount}次，失败${failCount}次（目标英雄: ${selectedHeroName}）`
           })
           return { success: true, tokenId: token.id, successCount, failCount }
         } catch (error) {
@@ -825,7 +944,7 @@ const handleUpgradeCrystal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、升级水晶失败: ${error.message}`
+            message: `${tokenIndex}、升级水晶失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -902,7 +1021,7 @@ const handleBatchUpgradeEquipment = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、升级装备成功`
+              message: `${tokenIndex}、升级装备成功`
             })
             return { success: true, tokenId: token.id }
           } else {
@@ -920,7 +1039,7 @@ const handleBatchUpgradeEquipment = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、升级装备失败: ${error.message}`
+            message: `${tokenIndex}、升级装备失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1018,7 +1137,7 @@ const handleBatchAwakeSkill = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、觉醒成功 (index: ${index})`
+                message: `${tokenIndex}、觉醒成功 (index: ${index})`
               })
               successCount++
             } else {
@@ -1035,7 +1154,7 @@ const handleBatchAwakeSkill = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、觉醒失败 (index: ${index}): ${error.message}，继续执行`
+              message: `${tokenIndex}、觉醒失败 (index: ${index}): ${error.message}，继续执行`
             })
             failCount++
             // 失败也继续执行下一个 index
@@ -1055,7 +1174,7 @@ const handleBatchAwakeSkill = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`
+          message: `${tokenIndex}、觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`
         })
         
         return { success: true, tokenId: token.id, successCount, failCount }
@@ -1199,7 +1318,7 @@ const handleBatchUpgradeHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、升级挂机完成，共使用${totalUpgradeCount}个道具`
+            message: `${tokenIndex}、升级挂机完成，共使用${totalUpgradeCount}个道具`
           })
           return { success: true, tokenId: token.id, totalUpgradeCount }
         } catch (error) {
@@ -1213,7 +1332,7 @@ const handleBatchUpgradeHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、升级挂机失败: ${error.message}`
+            message: `${tokenIndex}、升级装备失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1291,7 +1410,7 @@ const handleBatchClaimHangupReward = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、领取推图层数奖励完成`
+            message: `${tokenIndex}、领取推图层数奖励完成`
           })
           return { success: true, tokenId: token.id }
         } catch (error) {
@@ -1305,7 +1424,7 @@ const handleBatchClaimHangupReward = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、领取推图层数奖励失败: ${error.message}`
+            message: `${tokenIndex}、领取推图层数奖励失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1424,7 +1543,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`
+            message: `${tokenIndex}、${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`
           })
         } else if (heroStar >= 30) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已30星，跳过使用万能红`)
@@ -1435,7 +1554,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、${selectedHeroName}已30星，跳过使用万能红`
+            message: `${tokenIndex}、${selectedHeroName}已30星，跳过使用万能红`
           })
         } else if (universalRedCount === 0) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 没有万能红，跳过`)
@@ -1446,7 +1565,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、没有万能红，跳过`
+            message: `${tokenIndex}、没有万能红，跳过`
           })
         } else {
           // 吕布/公孙瓒：使用现有逻辑（包括29星特殊处理）
@@ -1512,7 +1631,7 @@ const handleUseUniversalRed = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、29星循环完成，使用${totalUsed}万能红，升星${totalUpgrades}次（原${heroStar}星）`
+              message: `${tokenIndex}、29星循环完成，使用${totalUsed}万能红，升星${totalUpgrades}次（原${heroStar}星）`
             })
           } else {
             // 非29星：原有逻辑
@@ -1605,7 +1724,7 @@ const handleUseUniversalRed = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
+                message: `${tokenIndex}、使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
               })
             } else {
               // 添加操作日志
@@ -1616,7 +1735,7 @@ const handleUseUniversalRed = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
+                message: `${tokenIndex}、使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
               })
             }
           }
@@ -1632,7 +1751,7 @@ const handleUseUniversalRed = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、使用万能红失败: ${error.message || '未知错误'}`
+          message: `${tokenIndex}、使用万能红失败: ${error.message || '未知错误'}`
         })
       } finally {
         // 关闭WebSocket连接
@@ -1748,7 +1867,7 @@ const handleUpgradeLuBuStar = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、${selectedHeroName}已 30 星，跳过`
+            message: `${tokenIndex}、${selectedHeroName}已 30 星，跳过`
           })
         } else {
           // 开始升星，最多 10 次
@@ -1792,7 +1911,7 @@ const handleUpgradeLuBuStar = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、升星完成，共升星${upgradeCount}次（原${heroStar}星）`
+            message: `${tokenIndex}、升星完成，共升星${upgradeCount}次（原${heroStar}星）`
           })
         }
 
@@ -1806,7 +1925,7 @@ const handleUpgradeLuBuStar = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、升星失败：${error.message || '未知错误'}`
+          message: `${tokenIndex}、升星失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭 WebSocket 连接
@@ -1933,7 +2052,7 @@ const handleBatchHeroSynthetic = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、全部英雄合成完成`
+              message: `${tokenIndex}、全部英雄合成完成`
             })
             
             return { success: true }
@@ -1950,7 +2069,7 @@ const handleBatchHeroSynthetic = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、英雄合成成功`
+            message: `${tokenIndex}、英雄合成成功`
           })
           
           return { success: true }
@@ -1964,7 +2083,7 @@ const handleBatchHeroSynthetic = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、英雄合成失败：${error.message || error}`
+            message: `${globalIndex + 1}、英雄合成失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -2453,7 +2572,7 @@ const handleBatchTowerTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、上阵爬塔武将成功，${changeLog}，${skipLog}`
+            message: `${tokenIndex}、上阵爬塔武将成功，${changeLog}，${skipLog}`
           })
           
           return { success: true }
@@ -2467,7 +2586,7 @@ const handleBatchTowerTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、上阵爬塔武将失败：${error.message || error}`
+            message: `${globalIndex + 1}、上阵爬塔武将失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -2609,7 +2728,7 @@ const handleBatchStoryTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、上阵推图武将成功，${changeLog}，${skipLog}`
+            message: `${tokenIndex}、上阵推图武将成功，${changeLog}，${skipLog}`
           })
           
           return { success: true }
@@ -2623,7 +2742,7 @@ const handleBatchStoryTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、上阵推图武将失败：${error.message || error}`
+            message: `${globalIndex + 1}、上阵推图武将失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -2747,7 +2866,7 @@ const handleBatchMayDayExchange = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、五一万能兑换成功`
+            message: `${tokenIndex}、五一万能兑换成功`
           })
           
           return { success: true }
@@ -2761,7 +2880,7 @@ const handleBatchMayDayExchange = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、五一万能兑换失败：${error.message || error}`
+            message: `${globalIndex + 1}、五一万能兑换失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -2900,7 +3019,7 @@ const handleUpgradeChiYu = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、购买升级赤羽完成`
+          message: `${tokenIndex}、购买升级赤羽完成`
         })
 
       } catch (error) {
@@ -2913,7 +3032,7 @@ const handleUpgradeChiYu = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${tokenIndex}、${token.name || token.id}、购买升级赤羽失败：${error.message || '未知错误'}`
+          message: `${tokenIndex}、购买升级赤羽失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭 WebSocket 连接
@@ -4074,7 +4193,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、${token.name || token.id}、爬塔层数${towerFloor}层超过100层，跳过招募周操作`
+              message: `${tokenIndex}、爬塔层数${towerFloor}层超过100层，跳过招募周操作`
             })
             return { success: false, reason: 'tower_floor_exceeded', towerFloor }
           }
@@ -4101,7 +4220,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、${token.name || token.id}、已用招募令数量已达理论值，不再执行招募`
+              message: `${tokenIndex}、已用招募令数量已达理论值，不再执行招募`
             })
           }
           
@@ -4114,7 +4233,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、招募令数量不足，无法完成一轮招募周`
+              message: `${tokenIndex}、招募令数量不足，无法完成一轮招募周`
             })
             return { success: false, reason: 'insufficient_recruits' }
           }
@@ -4221,7 +4340,7 @@ const handleBatchRecruitWeek = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、${successMsg}`
+            message: `${tokenIndex}、${successMsg}`
           })
           
           return { 
@@ -4244,7 +4363,7 @@ const handleBatchRecruitWeek = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、招募周失败：${error.message}`
+            message: `${globalIndex + 1}、招募周失败：${error.message}`
           })
           
           return { success: false, error: error.message }
@@ -5976,7 +6095,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 开始获取阵容`
+            message: `${tokenIndex}、开始获取阵容`
           })
           
           // 执行fight_startlevel获取当前阵容
@@ -6040,7 +6159,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 阵容获取成功: ${heroSummary || '无英雄'}`
+            message: `${tokenIndex}、阵容获取成功: ${heroSummary || '无英雄'}`
           })
           
           return { success: true, token: token }
@@ -6057,7 +6176,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 阵容获取失败: ${error.message || '未知错误'}`
+            message: `${tokenIndex}、阵容获取失败: ${error.message || '未知错误'}`
           })
           
           teamDataList.push({
@@ -6276,7 +6395,7 @@ const handleBatchClaimBoxRewards = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、领取宝箱奖励成功`
+            message: `${tokenIndex}、领取宝箱奖励成功`
           })
           
           return { success: true }
@@ -6290,7 +6409,7 @@ const handleBatchClaimBoxRewards = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、领取宝箱奖励失败：${error.message || error}`
+            message: `${globalIndex + 1}、领取宝箱奖励失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -6394,7 +6513,7 @@ const handleBatchClaimEmails = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、领取邮件成功`
+            message: `${tokenIndex}、领取邮件成功`
           })
           
           return { success: true }
@@ -6408,7 +6527,7 @@ const handleBatchClaimEmails = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、领取邮件失败：${error.message || error}`
+            message: `${globalIndex + 1}、领取邮件失败：${error.message || error}`
           })
           return { success: false, error: error.message || error }
         }
@@ -7411,7 +7530,7 @@ const handleBatchUpgradeToys = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 开始升级玩具-${modeName}`
+            message: `${tokenIndex}、开始升级玩具-${modeName}`
           })
           
           if (upgradeMode === 'activate') {
@@ -7430,7 +7549,7 @@ const handleBatchUpgradeToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 激活玩具成功`
+              message: `${tokenIndex}、激活玩具成功`
             })
             message.success(`[序号${tokenIndex}] ${token.name || token.id} 激活玩具成功`)
           } else if (upgradeMode === 'active') {
@@ -7449,7 +7568,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次成功`
+                  message: `玩具主动升级第${i + 1}次成功`
                 })
                 
                 if (i < 59) {
@@ -7463,7 +7582,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
+                  message: `玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
                 })
                 break
               }
@@ -7477,7 +7596,7 @@ const handleBatchUpgradeToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级完成，共执行${upgradeCount}次`
+              message: `玩具主动升级完成，共执行${upgradeCount}次`
             })
           } else if (upgradeMode === 'passive1' || upgradeMode === 'passive2' || upgradeMode === 'passive3') {
             let skillId = 9
@@ -7506,7 +7625,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具${skillName}升级第${i + 1}次成功`
+                  message: `${tokenIndex}、玩具${skillName}升级第${i + 1}次成功`
                 })
                 
                 if (i < 59) {
@@ -7520,7 +7639,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具${skillName}升级第${i + 1}次失败：${error.message || '未知错误'}，停止升级`
+                  message: `${tokenIndex}、玩具${skillName}升级第${i + 1}次失败：${error.message || '未知错误'}，停止升级`
                 })
                 break
               }
@@ -7534,7 +7653,7 @@ const handleBatchUpgradeToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具${skillName}升级完成，共执行${upgradeCount}次`
+              message: `${tokenIndex}、玩具${skillName}升级完成，共执行${upgradeCount}次`
             })
           }
           
@@ -7660,7 +7779,7 @@ const handleBatchActivateToys = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 开始激活玩具`
+            message: `${tokenIndex}、开始激活玩具`
           })
           
           // 1. 获取角色信息，获取领主武器信息（lordWeapon就是玩具）
@@ -7689,7 +7808,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 武器 ID: ${weaponId} 已经激活，跳过解锁`
+              message: `${tokenIndex}、武器 ID: ${weaponId} 已经激活，跳过解锁`
             })
           } else {
             // 武器未激活，执行解锁命令
@@ -7801,7 +7920,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次成功`
+                  message: `玩具主动升级第${i + 1}次成功`
                 })
                 
                 // 每次执行间隔 300ms
@@ -7818,7 +7937,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
+                  message: `玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
                 })
                 
                 message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败，停止主动升级`)
@@ -7836,7 +7955,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级完成，共执行${activeUpgradeCount}次`
+                message: `玩具主动升级完成，共执行${activeUpgradeCount}次`
               })
             }
             
@@ -9433,12 +9552,12 @@ const upgradeLordOrder = async (token, tokenIndex) => {
       message: `主公升阶失败: ${error.message || '未知错误'}，继续执行升级`
     })
     
-    // 只有物品数量不足才停止执行
-    if (errorMsg.includes('物品数量不足')) {
-      throw new Error('主公升阶失败: 物品数量不足')
+    // 物品数量不足或未进阶，停止执行
+    if (errorMsg.includes('物品数量不足') || errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
+      throw new Error('主公升阶失败: ' + (errorMsg.includes('未进阶') || errorMsg.includes('400060') ? '未满足升阶条件' : '物品数量不足'))
     }
     
-    // 其他错误（如400060）不抛出，继续执行升级
+    // 其他错误不抛出，继续执行升级
   }
 }
 
@@ -9484,9 +9603,9 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
       message: `武将升阶失败: ${error.message || '未知错误'}，继续执行升级`
     })
     
-    // 只有物品数量不足才停止执行
-    if (errorMsg.includes('物品数量不足')) {
-      throw new Error('武将升阶失败: 物品数量不足')
+    // 物品数量不足或未进阶，停止执行
+    if (errorMsg.includes('物品数量不足') || errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
+      throw new Error('武将升阶失败: ' + (errorMsg.includes('未进阶') || errorMsg.includes('400060') ? '未满足升阶条件' : '物品数量不足'))
     }
     
     // 其他错误不抛出，继续执行升级

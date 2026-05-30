@@ -1038,6 +1038,76 @@ const handleBatchBlackMarket = async () => {
             })
           }
           
+          // 领取金砖
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_buystoregoods',
+              { activityId: 5, goodsIndex: 0, buyNum: 1 },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 领取金砖成功`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、领取金砖成功`
+            })
+          } catch (error) {
+            console.error(`领取金砖失败: ${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取金砖失败，继续执行`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、领取金砖失败，继续执行`
+            })
+          }
+          
+          // 领取黑市金砖
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_buystoregoods',
+              { activityId: 9, goodsIndex: 0, buyNum: 1 },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 领取黑市金砖成功`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `${tokenIndex}、${token.name || token.id}、领取黑市金砖成功`
+            })
+          } catch (error) {
+            console.error(`领取黑市金砖失败: ${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取黑市金砖失败，继续执行`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `${tokenIndex}、${token.name || token.id}、领取黑市金砖失败，继续执行`
+            })
+          }
+          
           try {
             await tokenStore.sendMessageWithPromise(
               token.id,

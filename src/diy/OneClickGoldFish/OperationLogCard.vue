@@ -41,7 +41,11 @@
               </span>
             </div>
             <div class="log-content">
-              <div class="log-message">{{ log.message }}</div>
+              <div class="log-message">
+                <span class="log-index">{{ extractIndex(log.message) }}</span>
+                <span v-if="log.tokenName" class="log-token">[{{ log.tokenName }}] </span>
+                {{ removeIndex(log.message) }}
+              </div>
               <div v-if="log.details" class="log-details">
                 <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>
               </div>
@@ -111,6 +115,20 @@ const getStatusText = (status) => {
     info: '信息'
   }
   return statusMap[status] || status
+}
+
+// 提取消息中的序号部分，例如"15、使用火把完成"返回"【序号15】"
+const extractIndex = (msg) => {
+  const match = msg.match(/^(\d+)、/)
+  if (match) {
+    return `【序号${match[1]}】`
+  }
+  return ''
+}
+
+// 移除消息中的序号部分
+const removeIndex = (msg) => {
+  return msg.replace(/^\d+、/, '')
 }
 
 const handleClearLogs = () => {
@@ -291,8 +309,14 @@ watch(filteredLogs, () => {
 }
 
 .log-token {
-  margin-bottom: 4px;
   font-weight: 500;
+  color: #2080f0;
+}
+
+.log-index {
+  font-weight: 600;
+  color: #f0a020;
+  margin-right: 4px;
 }
 
 .log-message {

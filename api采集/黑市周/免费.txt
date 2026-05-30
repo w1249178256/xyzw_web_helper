@@ -1,0 +1,134 @@
+
+
+记录 #2:
+----------------------------------------
+时间: 2026/5/29 21:06:05
+服务: ActivityService
+方法: buyStoreGoods
+参数: [{"activityId":9,"goodsIndex":9,"buyNum":1}]
+结果:
+{
+  "_raw": {
+    "seq": 47,
+    "ack": 0,
+    "time": 1780059967464,
+    "resp": 42,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 337487,
+        "buyDiamond": 0,
+        "freeDiamond": 337487,
+        "items": {
+          "1016": {
+            "quantity": 12295
+          },
+          "1026": {
+            "quantity": 3640
+          }
+        },
+        "statistics": {
+          "wa:diamond": 13275
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1016,
+          "value": 2000,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1026,
+          "value": 3000,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 136
+}
+异步: 是
+调用ID: call_1780059965590_jlzyktpub
+
+记录 #3:
+----------------------------------------
+时间: 2026/5/29 21:05:56
+服务: ActivityService
+方法: buyStoreGoods
+参数: [{"activityId":9,"goodsIndex":0,"buyNum":1}]
+结果:
+{
+  "_raw": {
+    "seq": 43,
+    "ack": 0,
+    "time": 1780059958007,
+    "resp": 41,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 345487,
+        "buyDiamond": 700
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 2,
+          "value": 500,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 133
+}
+异步: 是
+调用ID: call_1780059956147_ju5yvsa58
+
+
+记录 #5:
+----------------------------------------
+时间: 2026/5/29 21:05:42
+服务: ActivityService
+方法: buyStoreGoods
+参数: [{"activityId":5,"goodsIndex":0,"buyNum":1}]
+结果:
+{
+  "_raw": {
+    "seq": 40,
+    "ack": 0,
+    "time": 1780059944156,
+    "resp": 39,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 344987,
+        "buyDiamond": 200
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 2,
+          "value": 200,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 50
+}
+异步: 是
+调用ID: call_1780059942297_d7dw0gi7z
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================
