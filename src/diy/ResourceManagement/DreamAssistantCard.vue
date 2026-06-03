@@ -670,7 +670,7 @@ const heroUpgrade = async () => {
         tokenId: token.id,
         tokenName: token?.name,
         status: 'success',
-        message: `${tokenIndex}、${token?.name || token.id}、武将升级完成，共升级${upgradeCount}次`
+        message: `【序号${tokenIndex}】[${token?.name || token.id}]武将升级完成，共升级${upgradeCount}次`
       })
     } else {
       if (heroes.length > 0) {
@@ -702,7 +702,7 @@ const heroUpgrade = async () => {
         tokenId: token.id,
         tokenName: token?.name,
         status: 'error',
-        message: `${tokenIndex}、${token?.name || token.id}、武将升级失败: ${error.message || '未知错误'}`
+        message: `【序号${tokenIndex}】[${token?.name || token.id}]武将升级失败: ${error.message || '未知错误'}`
       })
     }
   }
@@ -1162,7 +1162,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、${token.name || token.id}、切换爬塔功能待实现`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换爬塔功能待实现`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1174,7 +1174,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、批量切换爬塔失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量切换爬塔失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1277,7 +1277,7 @@ const batchSwitchStory = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '切换推图功能待实现'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换推图功能待实现`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1289,7 +1289,7 @@ const batchSwitchStory = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量切换推图失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量切换推图失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1394,7 +1394,7 @@ const batchUpgradeOne = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '阵容1升级完成'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容1升级完成`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1406,7 +1406,7 @@ const batchUpgradeOne = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量升级阵容1失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量升级阵容1失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }

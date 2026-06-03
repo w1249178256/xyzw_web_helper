@@ -210,7 +210,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${tokenIndex}、${token.name || token.id}、开始爬塔...`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]开始爬塔...`
     })
     message.info('开始爬塔...')
     
@@ -233,7 +233,7 @@ const startTowerClimb = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、成功领取第${i}章通关奖励`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]成功领取第${i}章通关奖励`
               })
               message.success(`${token.name || token.id} 成功领取第${i}章通关奖励`)
             } catch (error) {
@@ -245,7 +245,7 @@ const startTowerClimb = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]领取第${i}章通关奖励失败: ${error.message || '未知错误'}`
               })
             }
           }
@@ -259,7 +259,7 @@ const startTowerClimb = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${token.name || token.id} 共领取了${claimedCount}个塔奖励`
+            message: `共领取了${claimedCount}个塔奖励`
           })
         }
       }
@@ -284,7 +284,7 @@ const startTowerClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、体力已耗尽`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]体力已耗尽`
         })
         break;
       }
@@ -305,7 +305,7 @@ const startTowerClimb = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${token.name || token.id} 第${climbCount}次爬塔命令已发送`
+        message: `第${climbCount}次爬塔命令已发送`
       })
       message.success(`第${climbCount}次爬塔命令已发送`);
       await new Promise((res) => setTimeout(res, 1000)); // 每次间隔 1 秒
@@ -319,7 +319,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name || token.id} 已自动爬塔${climbCount}次，体力已耗尽或达到上限`
+      message: `已自动爬塔${climbCount}次，体力已耗尽或达到上限`
     })
   } catch (error) {
     console.error('爬塔失败:', error)
@@ -332,7 +332,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${token.name || token.id} 爬塔失败: ${error.message || '未知错误'}`
+      message: `爬塔失败: ${error.message || '未知错误'}`
     })
   }
 
@@ -1019,7 +1019,7 @@ const handleBatchUpgrade = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex} ${token.name || token.id}`
+        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex}`
       })
       
       try {
@@ -1034,7 +1034,7 @@ const handleBatchUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`
+            message: `序号 ${tokenIndex} 连接失败，跳过`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1052,7 +1052,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`
+          message: `序号 ${tokenIndex} 开始英雄升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`)
         await executeHeroUpgrade(token)
@@ -1064,7 +1064,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 英雄升星完成`
+          message: `序号 ${tokenIndex} 英雄升星完成`
         })
         await new Promise(resolve => setTimeout(resolve, 500))
         
@@ -1076,7 +1076,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`
+          message: `序号 ${tokenIndex} 开始图鉴升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`)
         await executeBookUpgrade(token)
@@ -1088,7 +1088,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`
+          message: `序号 ${tokenIndex} 图鉴升星完成`
         })
         await new Promise(resolve => setTimeout(resolve, 500))
         
@@ -1100,7 +1100,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 开始领取图鉴奖励...`
+          message: `序号 ${tokenIndex} 开始领取图鉴奖励...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始领取图鉴奖励...`)
         await executeClaimBookReward(token)
@@ -1112,7 +1112,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 图鉴奖励领取完成`
+          message: `序号 ${tokenIndex} 图鉴奖励领取完成`
         })
         
         if (i < sortedTargetTokens.length - 1) {
@@ -1128,7 +1128,7 @@ const handleBatchUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 批量升星失败: ${error.message || '未知错误'}`
+          message: `序号 ${tokenIndex} 批量升星失败: ${error.message || '未知错误'}`
         })
         failedTokens.push({
           index: tokenIndex,
@@ -1280,7 +1280,7 @@ const handleBatchTower = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex} ${token.name || token.id}`
+        message: `正在处理 ${i + 1}/${sortedTargetTokens.length}: 序号 ${tokenIndex}`
       })
       
       try {
@@ -1295,7 +1295,7 @@ const handleBatchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `序号 ${tokenIndex} ${token.name || token.id} 连接失败，跳过`
+            message: `序号 ${tokenIndex} 连接失败，跳过`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1313,7 +1313,7 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 开始爬塔...`
+          message: `序号 ${tokenIndex} 开始爬塔...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始爬塔...`)
         
@@ -1330,7 +1330,7 @@ const handleBatchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`
+            message: `序号 ${tokenIndex} WebSocket 未连接，停止批量爬塔`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1349,7 +1349,7 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、爬塔完成`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔完成`
         })
         
         // 清空该 Token 的爬塔过程日志，只保留最终完成日志
@@ -1373,7 +1373,7 @@ const handleBatchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `序号 ${tokenIndex} ${token.name || token.id} WebSocket 未连接，停止批量爬塔`
+            message: `序号 ${tokenIndex} WebSocket 未连接，停止批量爬塔`
           })
           failedTokens.push({
             index: tokenIndex,
@@ -1394,7 +1394,7 @@ const handleBatchTower = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `序号 ${tokenIndex} ${token.name || token.id} 批量爬塔失败: ${error.message || '未知错误'}`
+          message: `序号 ${tokenIndex} 批量爬塔失败: ${error.message || '未知错误'}`
         })
         failedTokens.push({
           index: tokenIndex,
@@ -1537,7 +1537,7 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${tokenIndex}、${token.name || token.id}、当前层数：${currentFloor}层${towerId % 10}小层，鱼干数：${energy}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]当前层数：${currentFloor}层${towerId % 10}小层，鱼干数：${energy}`
     })
     message.info(`${token.name || token.id} 当前层数：${currentFloor}层${towerId % 10}小层，鱼干数：${energy}`)
     
@@ -1553,7 +1553,7 @@ const startTowerClimbForToken = async (token) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `${tokenIndex}、${token.name || token.id}、当前是 xx0 层，执行领取第${currentFloor}章奖励`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]当前是 xx0 层，执行领取第${currentFloor}章奖励`
       })
       message.info(`${token.name || token.id} 当前是 xx0 层，执行领取第${currentFloor}章奖励`)
       
@@ -1567,7 +1567,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、成功领取第${currentFloor}章通关奖励`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]成功领取第${currentFloor}章通关奖励`
         })
         message.success(`${token.name || token.id} 成功领取第${currentFloor}章通关奖励`)
         
@@ -1580,7 +1580,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、更新当前层数为：${currentFloor}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]更新当前层数为：${currentFloor}`
         })
       } catch (claimError) {
         logStore.addLog({
@@ -1590,7 +1590,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${tokenIndex}、${token.name || token.id}、领取第${currentFloor}章奖励失败：${claimError.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]领取第${currentFloor}章奖励失败：${claimError.message}`
         })
       }
     }
@@ -1609,7 +1609,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、批量爬塔已停止，当前爬塔次数：${climbCount}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]批量爬塔已停止，当前爬塔次数：${climbCount}`
         })
         message.info(`${token.name || token.id} 批量爬塔已停止`)
         break
@@ -1653,7 +1653,7 @@ const startTowerClimbForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、第${climbCount}次爬塔成功，当前层数：${actualFloor}层`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]第${climbCount}次爬塔成功，当前层数：${actualFloor}层`
         })
         message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${actualFloor}层`)
         
@@ -1672,7 +1672,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、操作过快 (400340)，等待 5 分钟后继续`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]操作过快 (400340)，等待 5 分钟后继续`
           })
           message.warning(`${token.name || token.id} 操作过快 (400340)，等待 5 分钟后继续`)
           
@@ -1686,7 +1686,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、${token.name || token.id}、等待完成，继续爬塔`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]等待完成，继续爬塔`
           })
           message.info(`${token.name || token.id} 等待完成，继续爬塔`)
           continue
@@ -1701,7 +1701,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、${token.name || token.id}、检测到当前层数奖励未领取，执行领取`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]检测到当前层数奖励未领取，执行领取`
           })
           message.info(`${token.name || token.id} 检测到当前层数奖励未领取，执行领取`)
           
@@ -1721,7 +1721,7 @@ const startTowerClimbForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、成功领取第${rId}章通关奖励`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]成功领取第${rId}章通关奖励`
               })
               message.success(`${token.name || token.id} 成功领取第${rId}章通关奖励`)
               rewardClaimed = true
@@ -1735,7 +1735,7 @@ const startTowerClimbForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${tokenIndex}、${token.name || token.id}、更新当前层数为：${currentFloor}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]更新当前层数为：${currentFloor}`
               })
               
               break
@@ -1749,7 +1749,7 @@ const startTowerClimbForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
-                message: `${tokenIndex}、${token.name || token.id}、第${rId}章奖励领取失败，继续尝试：${claimError.message}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]第${rId}章奖励领取失败，继续尝试：${claimError.message}`
               })
               
               // 领取失败后也等待 1000ms，避免操作过快
@@ -1769,7 +1769,7 @@ const startTowerClimbForToken = async (token) => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、无法领取奖励，继续爬塔`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]无法领取奖励，继续爬塔`
             })
             continue
           }
@@ -1782,7 +1782,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、${token.name || token.id}、错误提示能量不足，停止爬塔`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]错误提示能量不足，停止爬塔`
           })
           message.warning(`${token.name || token.id} 错误提示能量不足，停止爬塔`)
           break
@@ -1795,7 +1795,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、WebSocket 未连接，停止爬塔，不再重试`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]WebSocket 未连接，停止爬塔，不再重试`
           })
           message.warning(`${token.name || token.id} WebSocket 未连接，停止爬塔`)
           // 抛出错误，让上层捕获并停止批量爬塔
@@ -1810,7 +1810,7 @@ const startTowerClimbForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、爬塔失败：${errorMsg}，等待 1 秒后继续执行`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔失败：${errorMsg}，等待 1 秒后继续执行`
           })
           
           // 等待 1000ms 后继续，避免操作过快
@@ -1830,7 +1830,7 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共执行${climbCount}次，当前层数：${finalFloor}层`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔完成，共执行${climbCount}次，当前层数：${finalFloor}层`
     })
     
   } catch (error) {
@@ -1849,7 +1849,7 @@ const startTowerClimbForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、爬塔失败：${error.message}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔失败：${error.message}`
     })
     message.error(`${token.name || token.id} 爬塔失败：${error.message}`)
   }

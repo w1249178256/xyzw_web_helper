@@ -470,7 +470,7 @@ const handleBatchSetBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、黑市购买设置成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、黑市购买设置成功`
           })
         } else {
           failCount++
@@ -486,7 +486,7 @@ const handleBatchSetBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、黑市购买设置失败: ${errorMsg}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、黑市购买设置失败: ${errorMsg}`
           })
         }
         

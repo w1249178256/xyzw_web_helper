@@ -695,7 +695,7 @@ const heroUpgrade = async () => {
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'success',
-        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、武将升级完成，共升级${upgradeCount}次`
+        message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]武将升级完成，共升级${upgradeCount}次`
       })
     } else {
       // 检查是否有武将但未进行升级
@@ -736,7 +736,7 @@ const heroUpgrade = async () => {
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'error',
-        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、武将升级失败: ${error.message || '未知错误'}`
+        message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]武将升级失败: ${error.message || '未知错误'}`
       })
     }
   }
@@ -915,7 +915,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、${token.name || token.id}、切换爬塔功能待实现`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换爬塔功能待实现`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -927,7 +927,7 @@ const batchSwitchTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、批量切换爬塔失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量切换爬塔失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1044,7 +1044,7 @@ const batchSwitchStory = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '切换推图功能待实现'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换推图功能待实现`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1056,7 +1056,7 @@ const batchSwitchStory = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量切换推图失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量切换推图失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }

@@ -199,7 +199,7 @@ const handleBatchCollectPrivilege = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、收集特权成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]收集特权成功`
             })
           } catch (error) {
             console.error(`[序号${tokenIndex}] ${token.name || token.id} 收集特权失败:`, error)
@@ -208,7 +208,7 @@ const handleBatchCollectPrivilege = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、收集特权失败，继续执行赠送流程`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]收集特权失败，继续执行赠送流程`
             })
           }
           await waitCommandDelay()
@@ -229,7 +229,7 @@ const handleBatchCollectPrivilege = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、${token.name || token.id}、功法残卷数量(${legacyFragmentCount})小于100，跳过赠送`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]功法残卷数量(${legacyFragmentCount})小于100，跳过赠送`
             })
             return { collected: true, sentGift: false, fragmentCount: legacyFragmentCount }
           }
@@ -267,7 +267,7 @@ const handleBatchCollectPrivilege = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'error',
-                    message: `${tokenIndex}、${token.name || token.id}、赠送功法残卷失败: ${errorMsg}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]赠送功法残卷失败: ${errorMsg}`
                   })
                   break
                 } else {
@@ -292,7 +292,7 @@ const handleBatchCollectPrivilege = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'error',
-                  message: `${tokenIndex}、${token.name || token.id}、执行legacy_sendgift失败: ${error.message || error}`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]执行legacy_sendgift失败: ${error.message || error}`
                 })
                 break
               }
@@ -314,7 +314,7 @@ const handleBatchCollectPrivilege = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'error',
-                    message: `${tokenIndex}、${token.name || token.id}、赠送功法残卷失败: ${errorMsg}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]赠送功法残卷失败: ${errorMsg}`
                   })
                 } else {
                   totalSent += currentFragmentCount
@@ -327,7 +327,7 @@ const handleBatchCollectPrivilege = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'error',
-                  message: `${tokenIndex}、${token.name || token.id}、执行legacy_sendgift失败: ${error.message || error}`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]执行legacy_sendgift失败: ${error.message || error}`
                 })
               }
             }
@@ -338,7 +338,7 @@ const handleBatchCollectPrivilege = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、赠送功法残卷完成，共赠送 ${totalSent} 个`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]赠送功法残卷完成，共赠送 ${totalSent} 个`
               })
               return { collected: true, sentGift: true, fragmentCount: legacyFragmentCount, sendCount: totalSent }
             } else {
@@ -351,7 +351,7 @@ const handleBatchCollectPrivilege = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、${token.name || token.id}、功法残卷数量为0，跳过`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]功法残卷数量为0，跳过`
             })
             return { collected: true, sentGift: false, fragmentCount: 0 }
           }
@@ -362,7 +362,7 @@ const handleBatchCollectPrivilege = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${globalIndex + 1}、${token.name || token.id}、处理失败: ${error.message || error}`
+            message: `【序号${globalIndex + 1}】[${token.name || token.id}]处理失败: ${error.message || error}`
           })
           return { collected: false, sentGift: false, error: error.message || error }
         }
@@ -967,7 +967,7 @@ const joinLegion = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: resultStatus,
-            message: `${tokenIndex}、${token.name || token.id}、${successMsg.replace(`${token.name || token.id} `, '')}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${successMsg.replace(`${token.name || token.id} `, '')}`
           })
           
           return { 
@@ -987,7 +987,7 @@ const joinLegion = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、加入俱乐部失败：${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]加入俱乐部失败：${error.message || '未知错误'}`
           })
           
           return { success: false, error: error.message }
@@ -1185,7 +1185,7 @@ const handleLegacyHangup = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功: ${rewardInfo}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]功法挂机奖励领取成功: ${rewardInfo}`
       })
       } else if (res.role && res.role.items) {
         // 检查是否有物品更新
@@ -1199,7 +1199,7 @@ const handleLegacyHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功，功法残卷: ${item37007.quantity}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]功法挂机奖励领取成功，功法残卷: ${item37007.quantity}`
           })
         } else {
           console.log('功法挂机成功 - 但无奖励信息')
@@ -1210,7 +1210,7 @@ const handleLegacyHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]功法挂机奖励领取成功`
           })
         }
       } else {
@@ -1222,7 +1222,7 @@ const handleLegacyHangup = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、功法挂机奖励领取成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]功法挂机奖励领取成功`
         })
       }
       
@@ -1270,7 +1270,7 @@ const handleLegacyHangup = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'error',
-        message: `${tokenIndex}、${token.name || token.id}、功法挂机失败: ${errorMessage}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]功法挂机失败: ${errorMessage}`
       })
     } finally {
       isLegacyHangupRunning.value = false
@@ -1284,7 +1284,7 @@ const handleLegacyHangup = async () => {
       tokenId: token?.id,
       tokenName: token?.name,
       status: 'error',
-      message: `${tokenIndex}、${token?.name || '未知'}、功法挂机失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token?.name || '未知'}]功法挂机失败: ${error.message || '未知错误'}`
     })
     isLegacyHangupRunning.value = false
   }
@@ -1338,7 +1338,7 @@ const handleBatchLegacyHangup = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'error',
-              message: `${token.name || token.id}: ${errorMsg} (错误码: ${res.code})`
+              message: `${errorMsg} (错误码: ${res.code})`
             })
             return { success: false, error: errorMsg }
           }
@@ -1351,7 +1351,7 @@ const handleBatchLegacyHangup = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'error',
-              message: `${token.name || token.id}: 服务器未返回响应`
+              message: `服务器未返回响应`
             })
             return { success: false, error: '服务器未返回响应' }
           }
@@ -1420,7 +1420,7 @@ const handleBatchLegacyHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${token.name || token.id}: ${errorMessage}`
+            message: `${errorMessage}`
           })
           
           return { success: false, error: errorMessage }
@@ -1759,6 +1759,8 @@ const handleBatchLegacyClaimGift = async () => {
     const results = await connectionPool.batchOperate(
       legacyTokens,
       async (token, globalIndex) => {
+        const tokenIndex = getTokenIndex(token)
+        
         // 执行领取功法操作
         await tokenStore.sendLegacyClaimHangup(token.id, {})
         logOperation('shidian', '批量赠送功法', {
@@ -1766,7 +1768,7 @@ const handleBatchLegacyClaimGift = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: '收集功法成功'
+          message: `【序号${tokenIndex}】[${token.name || token.id}]收集功法成功`
         })
         await waitCommandDelay()
 
@@ -1786,7 +1788,7 @@ const handleBatchLegacyClaimGift = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `功法残卷数量(${legacyFragmentCount})小于100，跳过收集功法按钮`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]功法残卷数量(${legacyFragmentCount})小于100，跳过收集功法按钮`
           })
           return { collected: true, sentGift: false, fragmentCount: legacyFragmentCount }
         }
@@ -1822,7 +1824,7 @@ const handleBatchLegacyClaimGift = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `赠送功法残卷失败: ${errorMsg}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]赠送功法残卷失败: ${errorMsg}`
               })
               return { collected: true, sentGift: false, fragmentCount: legacyFragmentCount, error: errorMsg }
             } else {
@@ -1832,7 +1834,7 @@ const handleBatchLegacyClaimGift = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `模拟点击收集功法按钮完成，已赠送 ${sendCount} 个功法残卷`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]模拟点击收集功法按钮完成，已赠送 ${sendCount} 个功法残卷`
               })
               return { collected: true, sentGift: true, fragmentCount: legacyFragmentCount, sendCount: sendCount }
             }
@@ -1843,7 +1845,7 @@ const handleBatchLegacyClaimGift = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'error',
-              message: `执行legacy_sendgift失败: ${error.message || error}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]执行legacy_sendgift失败: ${error.message || error}`
             })
             return { collected: true, sentGift: false, fragmentCount: legacyFragmentCount, error: error.message || error }
           }
@@ -1854,7 +1856,7 @@ const handleBatchLegacyClaimGift = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '功法残卷数量为0，跳过'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]功法残卷数量为0，跳过`
           })
           return { collected: true, sentGift: false, fragmentCount: 0 }
         }

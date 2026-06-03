@@ -1,4 +1,4 @@
-﻿﻿<template>
+<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -81,6 +81,13 @@
             @button-click="handleBatchMayDayExchange"
             :disabled="isBatchMayDayExchange"
             :loading="isBatchMayDayExchange"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchClaimingCDK ? '批量兑换码中...' : '批量兑换码'"
+            @button-click="handleBatchClaimCDK"
+            :disabled="isBatchClaimingCDK"
+            :loading="isBatchClaimingCDK"
           />
           <CustomizedCard 
             mode="button"
@@ -189,6 +196,13 @@
             @button-click="handleBatchClaimHangupReward"
             :disabled="isBatchClaimingHangupReward"
             :loading="isBatchClaimingHangupReward"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchRenaming ? '批量重命名中...' : '批量重命名'"
+            @button-click="handleBatchRename"
+            :disabled="isBatchRenaming"
+            :loading="isBatchRenaming"
           />
           <CustomizedCard 
             mode="button"
@@ -427,6 +441,7 @@ const isBatchUpgradingEquipment = ref(false)
 const isBatchAwakingSkill = ref(false)
 const isBatchUpgradingHangup = ref(false)
 const isBatchClaimingHangupReward = ref(false)
+const isBatchRenaming = ref(false)
 const isBoxWeekRunning = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
@@ -499,6 +514,7 @@ const isBatchHeroBattle = ref(false)
 const isBatchHeroZhangFei = ref(false)
 const selectedBatchHero = ref('107')
 const isBatchMayDayExchange = ref(false)
+const isBatchClaimingCDK = ref(false)
 const selectedSingleHero = ref('107')
 
 // 执行范围
@@ -688,7 +704,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
           })
 
           return { success: true, tokenId: token.id, successCount, failCount }
@@ -702,7 +718,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、使用火把失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]使用火把失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -799,7 +815,7 @@ const handleBuyWrench = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、黑市购买扳手完成：成功${successCount}次`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]黑市购买扳手完成：成功${successCount}次`
           })
 
           return { success: true, tokenId: token.id, successCount }
@@ -930,7 +946,7 @@ const handleUpgradeCrystal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、升级水晶完成：成功${successCount}次，失败${failCount}次（目标英雄: ${selectedHeroName}）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级水晶完成：成功${successCount}次，失败${failCount}次（目标英雄: ${selectedHeroName}）`
           })
           return { success: true, tokenId: token.id, successCount, failCount }
         } catch (error) {
@@ -944,7 +960,7 @@ const handleUpgradeCrystal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、升级水晶失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级水晶失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1021,7 +1037,7 @@ const handleBatchUpgradeEquipment = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、升级装备成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]升级装备成功`
             })
             return { success: true, tokenId: token.id }
           } else {
@@ -1039,7 +1055,7 @@ const handleBatchUpgradeEquipment = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、升级装备失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级装备失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1137,7 +1153,7 @@ const handleBatchAwakeSkill = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、觉醒成功 (index: ${index})`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]觉醒成功 (index: ${index})`
               })
               successCount++
             } else {
@@ -1154,7 +1170,7 @@ const handleBatchAwakeSkill = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、觉醒失败 (index: ${index}): ${error.message}，继续执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]觉醒失败 (index: ${index}): ${error.message}，继续执行`
             })
             failCount++
             // 失败也继续执行下一个 index
@@ -1174,7 +1190,7 @@ const handleBatchAwakeSkill = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]觉醒完成 (成功：${successCount}/4, 失败：${failCount}/4)`
         })
         
         return { success: true, tokenId: token.id, successCount, failCount }
@@ -1324,7 +1340,7 @@ const handleBatchUpgradeHangup = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${tokenIndex}、操作过快，等待2分钟后重试`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]操作过快，等待2分钟后重试`
                   })
                   await new Promise(resolve => setTimeout(resolve, 120000)) // 等待2分钟
                 } else {
@@ -1345,7 +1361,7 @@ const handleBatchUpgradeHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、升级挂机完成，共使用${totalUpgradeCount}个道具`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级挂机完成，共使用${totalUpgradeCount}个道具`
           })
           return { success: true, tokenId: token.id, totalUpgradeCount }
         } catch (error) {
@@ -1359,7 +1375,7 @@ const handleBatchUpgradeHangup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、升级装备失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级装备失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1437,7 +1453,7 @@ const handleBatchClaimHangupReward = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、领取推图层数奖励完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取推图层数奖励完成`
           })
           return { success: true, tokenId: token.id }
         } catch (error) {
@@ -1451,7 +1467,7 @@ const handleBatchClaimHangupReward = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、领取推图层数奖励失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取推图层数奖励失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1490,6 +1506,134 @@ const handleBatchClaimHangupReward = async () => {
     })
   } finally {
     isBatchClaimingHangupReward.value = false
+  }
+}
+
+// 批量重命名
+const handleBatchRename = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+
+  try {
+    isBatchRenaming.value = true
+
+    message.info(`开始批量重命名（${rangeText}），共${targetTokens.length}个Token...`)
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始重命名...`)
+
+          // 获取角色信息
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
+          await waitCommandDelay()
+
+          const currentName = roleInfo?.role?.name || ''
+
+          // 解析token名称获取服和区
+          // 格式如: G8901服-0-721083389-相符 或 D-8901服-0-153241293-相符001
+          const tokenName = token.name || ''
+          const match = tokenName.match(/(\d+)服-(\d+)/)
+          
+          if (!match) {
+            throw new Error('无法解析Token名称中的服和区信息')
+          }
+
+          const serverNum = parseInt(match[1])
+          const areaNum = match[2]
+          
+          // 获取服的后两位
+          const serverLastTwo = String(serverNum).slice(-2).padStart(2, '0')
+          
+          // 构造期望的名称：相符+服后两位+区
+          const expectedName = `相符${serverLastTwo}-${areaNum}`
+
+          // 如果名称相同，跳过
+          if (currentName === expectedName) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 名称已是"${expectedName}"，无需修改`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量重命名',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]名称已是"${expectedName}"，无需修改`
+            })
+            return { success: true, tokenId: token.id, skipped: true }
+          }
+
+          // 执行重命名
+          await tokenStore.sendSystemEditName(token.id, { name: expectedName })
+          await waitCommandDelay()
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 重命名成功："${currentName}" -> "${expectedName}"`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量重命名',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]重命名成功："${currentName}" -> "${expectedName}"`
+          })
+          return { success: true, tokenId: token.id, oldName: currentName, newName: expectedName }
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 重命名失败:`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 重命名失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量重命名',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]重命名失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+
+    const successCount = results.filter(r => r.success && !r.skipped).length
+    const skippedCount = results.filter(r => r.skipped).length
+    const failureCount = results.filter(r => !r.success).length
+
+    message.success(`批量重命名完成：成功 ${successCount} 个，跳过 ${skippedCount} 个，失败 ${failureCount} 个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量重命名',
+      status: 'success',
+      message: `批量重命名完成，成功 ${successCount} 个，跳过 ${skippedCount} 个，失败 ${failureCount} 个`
+    })
+
+  } catch (error) {
+    console.error('批量重命名失败:', error)
+    message.error(`批量重命名失败: ${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量重命名',
+      status: 'error',
+      message: `批量重命名失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchRenaming.value = false
   }
 }
 
@@ -1570,7 +1714,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`
           })
         } else if (heroStar >= 30) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已30星，跳过使用万能红`)
@@ -1581,7 +1725,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${selectedHeroName}已30星，跳过使用万能红`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已30星，跳过使用万能红`
           })
         } else if (universalRedCount === 0) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 没有万能红，跳过`)
@@ -1592,7 +1736,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、没有万能红，跳过`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]没有万能红，跳过`
           })
         } else {
           // 吕布/公孙瓒：使用现有逻辑（包括29星特殊处理）
@@ -1658,7 +1802,7 @@ const handleUseUniversalRed = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、29星循环完成，使用${totalUsed}万能红，升星${totalUpgrades}次（原${heroStar}星）`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]29星循环完成，使用${totalUsed}万能红，升星${totalUpgrades}次（原${heroStar}星）`
             })
           } else {
             // 非29星：原有逻辑
@@ -1751,7 +1895,7 @@ const handleUseUniversalRed = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
               })
             } else {
               // 添加操作日志
@@ -1762,7 +1906,7 @@ const handleUseUniversalRed = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
               })
             }
           }
@@ -1778,7 +1922,7 @@ const handleUseUniversalRed = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、使用万能红失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红失败: ${error.message || '未知错误'}`
         })
       } finally {
         // 关闭WebSocket连接
@@ -1894,7 +2038,7 @@ const handleUpgradeLuBuStar = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${selectedHeroName}已 30 星，跳过`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已 30 星，跳过`
           })
         } else {
           // 开始升星，最多 10 次
@@ -1938,7 +2082,7 @@ const handleUpgradeLuBuStar = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、升星完成，共升星${upgradeCount}次（原${heroStar}星）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升星完成，共升星${upgradeCount}次（原${heroStar}星）`
           })
         }
 
@@ -1952,7 +2096,7 @@ const handleUpgradeLuBuStar = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、升星失败：${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]升星失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭 WebSocket 连接
@@ -2079,7 +2223,7 @@ const handleBatchHeroSynthetic = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、全部英雄合成完成`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]全部英雄合成完成`
             })
             
             return { success: true }
@@ -2096,7 +2240,7 @@ const handleBatchHeroSynthetic = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、英雄合成成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]英雄合成成功`
           })
           
           return { success: true }
@@ -2376,7 +2520,7 @@ const handleBatchHeroBattle = async () => {
                         tokenId: token.id,
                         tokenName: token.name,
                         status: 'success',
-                        message: `魏延升级成功: ${oldLevel} → ${currentLevel}`
+                        message: `【序号${tokenIndex}】[${token.name || token.id}]魏延升级成功: ${oldLevel} → ${currentLevel}`
                       })
                     } else {
                       break
@@ -2599,7 +2743,7 @@ const handleBatchTowerTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、上阵爬塔武将成功，${changeLog}，${skipLog}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]上阵爬塔武将成功，${changeLog}，${skipLog}`
           })
           
           return { success: true }
@@ -2755,7 +2899,7 @@ const handleBatchStoryTeamInternal = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、上阵推图武将成功，${changeLog}，${skipLog}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]上阵推图武将成功，${changeLog}，${skipLog}`
           })
           
           return { success: true }
@@ -2893,7 +3037,7 @@ const handleBatchMayDayExchange = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、五一万能兑换成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]五一万能兑换成功`
           })
           
           return { success: true }
@@ -2956,6 +3100,106 @@ const handleBatchMayDayExchange = async () => {
     })
   } finally {
     isBatchMayDayExchange.value = false
+  }
+}
+
+// 批量兑换码
+const handleBatchClaimCDK = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+  const cdkCodes = [
+    { key: 'happy666', platformType: 'h5' },
+    { key: 'HAPPY666', platformType: 'h5' }
+  ]
+
+  try {
+    isBatchClaimingCDK.value = true
+
+    message.info(`开始批量兑换码（${rangeText}），共${targetTokens.length}个Token...`)
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        const tokenIndex = getTokenIndex(token)
+        let successCount = 0
+        let failCount = 0
+
+        for (let i = 0; i < cdkCodes.length; i++) {
+          const cdk = cdkCodes[i]
+          try {
+            message.info(`【序号${tokenIndex}】${token.name || token.id} 正在兑换第${i + 1}个兑换码: ${cdk.key}...`)
+            
+            await tokenStore.sendSystemClaimCdkReward(token.id, { key: cdk.key, platformType: cdk.platformType })
+            
+            successCount++
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量兑换码',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]兑换码${cdk.key}领取成功`
+            })
+          } catch (error) {
+            failCount++
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量兑换码',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'error',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]兑换码${cdk.key}领取失败: ${error.message}`
+            })
+          }
+          
+          // 每个兑换码之间间隔
+          if (i < cdkCodes.length - 1) {
+            await waitCommandDelay()
+          }
+        }
+
+        return { success: successCount > 0, tokenId: token.id, successCount, failCount }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+
+    // 统计结果
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+
+    message.success(`批量兑换码完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量兑换码',
+      status: 'success',
+      message: `批量兑换码完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+
+  } catch (error) {
+    console.error('批量兑换码失败:', error)
+    message.error(`批量兑换码失败: ${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量兑换码',
+      status: 'error',
+      message: `批量兑换码失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchClaimingCDK.value = false
   }
 }
 
@@ -3046,7 +3290,7 @@ const handleUpgradeChiYu = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、购买升级赤羽完成`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]购买升级赤羽完成`
         })
 
       } catch (error) {
@@ -3059,7 +3303,7 @@ const handleUpgradeChiYu = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${tokenIndex}、购买升级赤羽失败：${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]购买升级赤羽失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭 WebSocket 连接
@@ -3478,7 +3722,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               shouldBreak = true
               break
@@ -3494,7 +3738,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               shouldBreak = true
               break
@@ -3579,7 +3823,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               shouldBreak = true
               break
@@ -3595,7 +3839,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               shouldBreak = true
               break
@@ -3680,7 +3924,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               break
             }
@@ -3695,7 +3939,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               break
             }
@@ -3779,7 +4023,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               break
             }
@@ -3794,7 +4038,7 @@ const executeBoxWeekForToken = async (token) => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               break
             }
@@ -3815,7 +4059,7 @@ const executeBoxWeekForToken = async (token) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${token.name} - 开宝箱阶段内领取宝箱奖励成功`,
+        message: `开宝箱阶段内领取宝箱奖励成功`,
         command: 'item_batchclaimboxpointreward'
       })
       await waitCommandDelay()
@@ -3832,7 +4076,7 @@ const executeBoxWeekForToken = async (token) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${token.name} - 开宝箱阶段内领取邮件成功`,
+        message: `开宝箱阶段内领取邮件成功`,
         command: 'mail_claimallattachment',
         commandParams: { category: 0 }
       })
@@ -3856,7 +4100,7 @@ const executeBoxWeekForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${token.name} - 开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
+          message: `开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
         })
       }
       await waitCommandDelay()
@@ -3897,7 +4141,7 @@ const executeBoxWeekForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+            message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
           })
           break
         }
@@ -3912,7 +4156,7 @@ const executeBoxWeekForToken = async (token) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+            message: `已用宝箱分Y ${Y} 超过最大限制 32000`
           })
           break
         }
@@ -3945,7 +4189,7 @@ const executeBoxWeekForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${token.name} - 已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
+          message: `已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
         })
         break
       }
@@ -3970,7 +4214,7 @@ const executeBoxWeekForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${token.name} - 第 ${i + 1} 次领取宝箱周奖励成功`,
+          message: `第 ${i + 1} 次领取宝箱周奖励成功`,
           command: 'activity_claimweekactreward'
         })
       } catch (error) {
@@ -3983,7 +4227,7 @@ const executeBoxWeekForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${token.name} - 第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}`,
+          message: `第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}`,
           command: 'activity_claimweekactreward'
         })
         // 继续执行下一次领取，不停止
@@ -4001,7 +4245,7 @@ const executeBoxWeekForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name} - 一键宝箱周完成，执行了 ${boxWeekRounds} 轮开箱`,
+      message: `一键宝箱周完成，执行了 ${boxWeekRounds} 轮开箱`,
       details: {
         boxWeekRounds: boxWeekRounds,
         successfulClaimCount: successfulClaimCount
@@ -4016,7 +4260,7 @@ const executeBoxWeekForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${token.name} - 执行开箱的token: ${token.name}，执行宝箱周轮次: ${boxWeekRounds}，成功领取宝箱周奖励次数: ${successfulClaimCount}`,
+      message: `执行开箱的token，执行宝箱周轮次: ${boxWeekRounds}，成功领取宝箱周奖励次数: ${successfulClaimCount}`,
       details: {
         tokenName: token.name,
         boxWeekRounds: boxWeekRounds,
@@ -4036,7 +4280,7 @@ const executeBoxWeekForToken = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${token.name} - 一键宝箱周失败: ${error.message || '未知错误'}`
+      message: `一键宝箱周失败: ${error.message || '未知错误'}`
     })
   } finally {
     // 断开Token连接
@@ -4220,7 +4464,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、爬塔层数${towerFloor}层超过100层，跳过招募周操作`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔层数${towerFloor}层超过100层，跳过招募周操作`
             })
             return { success: false, reason: 'tower_floor_exceeded', towerFloor }
           }
@@ -4247,7 +4491,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、已用招募令数量已达理论值，不再执行招募`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]已用招募令数量已达理论值，不再执行招募`
             })
           }
           
@@ -4260,7 +4504,7 @@ const handleBatchRecruitWeek = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、招募令数量不足，无法完成一轮招募周`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]招募令数量不足，无法完成一轮招募周`
             })
             return { success: false, reason: 'insufficient_recruits' }
           }
@@ -4367,7 +4611,7 @@ const handleBatchRecruitWeek = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${successMsg}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${successMsg}`
           })
           
           return { 
@@ -4742,7 +4986,7 @@ const handleBatchUpgrade900 = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${storyHero.name}当前等级${currentLevel}，已达到${maxLevel}级，跳过`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}当前等级${currentLevel}，已达到${maxLevel}级，跳过`
               })
               continue
             }
@@ -4769,7 +5013,7 @@ const handleBatchUpgrade900 = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `执行hero_heroupgradelevel命令: ${storyHero.name}，当前等级${level}，升级${upgradeNum}级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradelevel命令: ${storyHero.name}，当前等级${level}，升级${upgradeNum}级`
                 })
                 const upgradeRes = await tokenStore.sendMessageWithPromise(
                   token.id,
@@ -4792,7 +5036,7 @@ const handleBatchUpgrade900 = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${storyHero.name}升级失败: 未进阶，准备执行升阶命令`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}升级失败: 未进阶，准备执行升阶命令`
                   })
                   try {
                     logStore.addLog({
@@ -4802,7 +5046,7 @@ const handleBatchUpgrade900 = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'info',
-                      message: `执行hero_heroupgradeorder命令: ${storyHero.name}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradeorder命令: ${storyHero.name}`
                     })
                     await tokenStore.sendMessageWithPromise(
                       token.id,
@@ -4819,7 +5063,7 @@ const handleBatchUpgrade900 = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `${storyHero.name}升阶成功`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}升阶成功`
                     })
                     await waitCommandDelay()
                     continue
@@ -4833,7 +5077,7 @@ const handleBatchUpgrade900 = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'error',
-                      message: `${storyHero.name}升阶失败: ${orderError.message || '未知错误'}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}升阶失败: ${orderError.message || '未知错误'}`
                     })
                     if (orderErrorMsg.includes('物品数量不足')) {
                       break
@@ -4850,7 +5094,7 @@ const handleBatchUpgrade900 = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${storyHero.name}升级失败: 物品数量不足`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}升级失败: 物品数量不足`
                   })
                   break
                 }
@@ -4883,7 +5127,7 @@ const handleBatchUpgrade900 = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `${storyHero.name}升级成功: ${oldLevel} → ${level}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${storyHero.name}升级成功: ${oldLevel} → ${level}`
                     })
                   } else {
                     break
@@ -4960,7 +5204,7 @@ const handleBatchUpgrade900 = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `升级失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -5015,7 +5259,7 @@ const handleBatchUpgrade900 = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'error',
-      message: `批量升级失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]批量升级失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgrading900.value = false
@@ -5200,7 +5444,7 @@ const handleBatchUpgradeTower = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `${towerHero.name}升级成功: ${oldLevel} → ${level}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${towerHero.name}升级成功: ${oldLevel} → ${level}`
                     })
                   } else {
                     break
@@ -5265,7 +5509,7 @@ const handleBatchUpgradeTower = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `爬塔升级失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔升级失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -5404,7 +5648,7 @@ const handleBatchUpgradeSingleHero = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${heroName}当前等级${currentLevel}，已达到900级，跳过`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}当前等级${currentLevel}，已达到900级，跳过`
             })
             return { success: true, token: token }
           }
@@ -5431,7 +5675,7 @@ const handleBatchUpgradeSingleHero = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `执行hero_heroupgradelevel命令: ${heroName}，当前等级${level}，升级${upgradeNum}级`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradelevel命令: ${heroName}，当前等级${level}，升级${upgradeNum}级`
               })
               const upgradeRes = await tokenStore.sendMessageWithPromise(
                 token.id,
@@ -5454,7 +5698,7 @@ const handleBatchUpgradeSingleHero = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `${heroName}升级失败: 未进阶，准备执行升阶命令`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升级失败: 未进阶，准备执行升阶命令`
                 })
                 try {
                   await tokenStore.sendMessageWithPromise(
@@ -5472,7 +5716,7 @@ const handleBatchUpgradeSingleHero = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `${heroName}升阶成功`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升阶成功`
                   })
                   await waitCommandDelay()
                   continue
@@ -5485,7 +5729,7 @@ const handleBatchUpgradeSingleHero = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'error',
-                    message: `${heroName}升阶失败: ${orderError.message || '未知错误'}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升阶失败: ${orderError.message || '未知错误'}`
                   })
                   if (orderErrorMsg.includes('物品数量不足')) {
                     break
@@ -5502,7 +5746,7 @@ const handleBatchUpgradeSingleHero = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `${heroName}升级失败: 物品数量不足`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升级失败: 物品数量不足`
                 })
                 break
               }
@@ -5535,7 +5779,7 @@ const handleBatchUpgradeSingleHero = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `${heroName}升级成功: ${oldLevel} → ${level}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升级成功: ${oldLevel} → ${level}`
                   })
                   if (level > 750) {
                     logStore.addLog({
@@ -5557,7 +5801,7 @@ const handleBatchUpgradeSingleHero = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${heroName}等级没有变化，可能已达到上限`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}等级没有变化，可能已达到上限`
                   })
                   break
                 }
@@ -5772,7 +6016,7 @@ const handleBatchUpgradeQunxiong = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${qunxiongHero.name}当前等级${currentLevel}，已达到900级，跳过`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}当前等级${currentLevel}，已达到900级，跳过`
               })
               continue
             }
@@ -5799,7 +6043,7 @@ const handleBatchUpgradeQunxiong = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `执行hero_heroupgradelevel命令: ${qunxiongHero.name}，当前等级${level}，升级${upgradeNum}级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradelevel命令: ${qunxiongHero.name}，当前等级${level}，升级${upgradeNum}级`
                 })
                 const upgradeRes = await tokenStore.sendMessageWithPromise(
                   token.id,
@@ -5822,7 +6066,7 @@ const handleBatchUpgradeQunxiong = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${qunxiongHero.name}升级失败: 未进阶，准备执行升阶命令`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}升级失败: 未进阶，准备执行升阶命令`
                   })
                   try {
                     await tokenStore.sendMessageWithPromise(
@@ -5840,7 +6084,7 @@ const handleBatchUpgradeQunxiong = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `${qunxiongHero.name}升阶成功`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}升阶成功`
                     })
                     await waitCommandDelay()
                     continue
@@ -5853,7 +6097,7 @@ const handleBatchUpgradeQunxiong = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'error',
-                      message: `${qunxiongHero.name}升阶失败: ${orderError.message || '未知错误'}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}升阶失败: ${orderError.message || '未知错误'}`
                     })
                     if (orderErrorMsg.includes('物品数量不足')) {
                       break
@@ -5870,7 +6114,7 @@ const handleBatchUpgradeQunxiong = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `${qunxiongHero.name}升级失败: 物品数量不足`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}升级失败: 物品数量不足`
                   })
                   break
                 }
@@ -5903,7 +6147,7 @@ const handleBatchUpgradeQunxiong = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `${qunxiongHero.name}升级成功: ${oldLevel} → ${level}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}升级成功: ${oldLevel} → ${level}`
                     })
                     if (level > 750) {
                       logStore.addLog({
@@ -5925,7 +6169,7 @@ const handleBatchUpgradeQunxiong = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'warning',
-                      message: `${qunxiongHero.name}等级没有变化，可能已达到上限`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]${qunxiongHero.name}等级没有变化，可能已达到上限`
                     })
                     break
                   }
@@ -5997,7 +6241,7 @@ const handleBatchUpgradeQunxiong = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `群雄升级失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]群雄升级失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -6122,7 +6366,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、开始获取阵容`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始获取阵容`
           })
           
           // 执行fight_startlevel获取当前阵容
@@ -6186,7 +6430,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、阵容获取成功: ${heroSummary || '无英雄'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容获取成功: ${heroSummary || '无英雄'}`
           })
           
           return { success: true, token: token }
@@ -6203,7 +6447,7 @@ const handleExportTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、阵容获取失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容获取失败: ${error.message || '未知错误'}`
           })
           
           teamDataList.push({
@@ -6422,7 +6666,7 @@ const handleBatchClaimBoxRewards = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、领取宝箱奖励成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取宝箱奖励成功`
           })
           
           return { success: true }
@@ -6540,7 +6784,7 @@ const handleBatchClaimEmails = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、领取邮件成功`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取邮件成功`
           })
           
           return { success: true }
@@ -6850,7 +7094,7 @@ const handleOneClickBoxWeek = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${token.name} - 开始一键宝箱周...`
+      message: `开始一键宝箱周...`
     })
     
     // 1. 准备阶段
@@ -6973,7 +7217,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               shouldBreak = true
               break
@@ -6989,7 +7233,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               shouldBreak = true
               break
@@ -7065,7 +7309,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               shouldBreak = true
               break
@@ -7081,7 +7325,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               shouldBreak = true
               break
@@ -7157,7 +7401,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               shouldBreak = true
               break
@@ -7173,7 +7417,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               shouldBreak = true
               break
@@ -7249,7 +7493,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
               })
               break
             }
@@ -7264,7 +7508,7 @@ const handleOneClickBoxWeek = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
               })
               break
             }
@@ -7285,7 +7529,7 @@ const handleOneClickBoxWeek = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${token.name} - 开宝箱阶段内领取宝箱奖励成功`,
+        message: `开宝箱阶段内领取宝箱奖励成功`,
         command: 'item_batchclaimboxpointreward'
       })
       await waitCommandDelay()
@@ -7302,7 +7546,7 @@ const handleOneClickBoxWeek = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${token.name} - 开宝箱阶段内领取邮件成功`,
+        message: `开宝箱阶段内领取邮件成功`,
         command: 'mail_claimallattachment',
         commandParams: { category: 0 }
       })
@@ -7326,7 +7570,7 @@ const handleOneClickBoxWeek = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${token.name} - 开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
+          message: `开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
         })
       }
       await waitCommandDelay()
@@ -7367,7 +7611,7 @@ const handleOneClickBoxWeek = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
+            message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
           })
           break
         }
@@ -7382,7 +7626,7 @@ const handleOneClickBoxWeek = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000`
+            message: `已用宝箱分Y ${Y} 超过最大限制 32000`
           })
           break
         }
@@ -7415,7 +7659,7 @@ const handleOneClickBoxWeek = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${token.name} - 已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
+          message: `已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
         })
         break
       }
@@ -7439,7 +7683,7 @@ const handleOneClickBoxWeek = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${token.name} - 第 ${i + 1} 次领取宝箱周奖励成功`,
+          message: `第 ${i + 1} 次领取宝箱周奖励成功`,
           command: 'activity_claimweekactreward'
         })
       } catch (error) {
@@ -7452,7 +7696,7 @@ const handleOneClickBoxWeek = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${token.name} - 第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}`,
+          message: `第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}`,
           command: 'activity_claimweekactreward'
         })
         // 继续执行下一次领取，不停止
@@ -7557,7 +7801,7 @@ const handleBatchUpgradeToys = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、开始升级玩具-${modeName}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始升级玩具-${modeName}`
           })
           
           if (upgradeMode === 'activate') {
@@ -7576,7 +7820,7 @@ const handleBatchUpgradeToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、激活玩具成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]激活玩具成功`
             })
             message.success(`[序号${tokenIndex}] ${token.name || token.id} 激活玩具成功`)
           } else if (upgradeMode === 'active') {
@@ -7652,7 +7896,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `${tokenIndex}、玩具${skillName}升级第${i + 1}次成功`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]玩具${skillName}升级第${i + 1}次成功`
                 })
                 
                 if (i < 59) {
@@ -7666,7 +7910,7 @@ const handleBatchUpgradeToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `${tokenIndex}、玩具${skillName}升级第${i + 1}次失败：${error.message || '未知错误'}，停止升级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]玩具${skillName}升级第${i + 1}次失败：${error.message || '未知错误'}，停止升级`
                 })
                 break
               }
@@ -7680,7 +7924,7 @@ const handleBatchUpgradeToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、玩具${skillName}升级完成，共执行${upgradeCount}次`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]玩具${skillName}升级完成，共执行${upgradeCount}次`
             })
           }
           
@@ -7806,7 +8050,7 @@ const handleBatchActivateToys = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `${tokenIndex}、开始激活玩具`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始激活玩具`
           })
           
           // 1. 获取角色信息，获取领主武器信息（lordWeapon就是玩具）
@@ -7835,7 +8079,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `${tokenIndex}、武器 ID: ${weaponId} 已经激活，跳过解锁`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]武器 ID: ${weaponId} 已经激活，跳过解锁`
             })
           } else {
             // 武器未激活，执行解锁命令
@@ -7846,7 +8090,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 准备解锁武器 ID: ${weaponId}`
+              message: `[序号${tokenIndex}] 准备解锁武器 ID: ${weaponId}`
             })
             
             try {
@@ -7867,7 +8111,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `[序号${tokenIndex}] ${token.name || token.id} 解锁武器 ${weaponId} 成功`
+                message: `[序号${tokenIndex}] 解锁武器 ${weaponId} 成功`
               })
             } catch (error) {
               // 记录错误，设置激活失败标志
@@ -7878,7 +8122,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `[序号${tokenIndex}] ${token.name || token.id} 解锁武器 ${weaponId} 失败: ${error.message || '未知错误'}`
+                message: `[序号${tokenIndex}] 解锁武器 ${weaponId} 失败: ${error.message || '未知错误'}`
               })
               activateSuccess = false
             }
@@ -7893,7 +8137,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 武器激活完成，开始执行玩具升级`
+              message: `[序号${tokenIndex}] 武器激活完成，开始执行玩具升级`
             })
             
             // 执行 lordweapon_get 命令，获取玩具信息
@@ -7907,7 +8151,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行成功`
+                message: `[序号${tokenIndex}] - lordweapon_get 执行成功`
               })
               message.info(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行成功`)
             } catch (error) {
@@ -7919,7 +8163,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
-                message: `[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败：${error.message || '未知错误'}`
+                message: `[序号${tokenIndex}] - lordweapon_get 执行失败：${error.message || '未知错误'}`
               })
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败，继续执行升级`)
             }
@@ -8009,7 +8253,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次成功`
+                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 第${i + 1}次成功`
                 })
                 
                 // 每次执行间隔 300ms
@@ -8026,7 +8270,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:9 升级`
+                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:9 升级`
                 })
                 
                 message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败，停止 skillId:9 升级`)
@@ -8044,7 +8288,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`
+                message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`
               })
             }
             
@@ -8071,7 +8315,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次成功`
+                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 第${i + 1}次成功`
                 })
                 
                 // 每次执行间隔 300ms
@@ -8088,7 +8332,7 @@ const handleBatchActivateToys = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'warning',
-                  message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:10 升级`
+                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:10 升级`
                 })
                 
                 message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败，停止 skillId:10 升级`)
@@ -8106,7 +8350,7 @@ const handleBatchActivateToys = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`
+                message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`
               })
             }
             
@@ -8118,7 +8362,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 玩具激活和升级全部完成`
+              message: `[序号${tokenIndex}] 玩具激活和升级全部完成`
             })
             return { success: true, token: token }
           } else {
@@ -8130,7 +8374,7 @@ const handleBatchActivateToys = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'error',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 武器激活失败`
+              message: `[序号${tokenIndex}] 武器激活失败`
             })
             return { success: false, token: token, error: '武器激活失败' }
           }
@@ -8145,7 +8389,7 @@ const handleBatchActivateToys = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 武器激活失败: ${error.message || '未知错误'}`
+            message: `[序号${tokenIndex}] 武器激活失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -8280,7 +8524,7 @@ const handleBatchActivateToyTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 开始激活玩具阵容`
+            message: `[序号${tokenIndex}] 开始激活玩具阵容`
           })
           
           // 1. 使用 fight_startlevel 获取当前阵容
@@ -8315,7 +8559,7 @@ const handleBatchActivateToyTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 当前阵容武将：${JSON.stringify(currentTeamHeroes)}`
+            message: `[序号${tokenIndex}] 当前阵容武将：${JSON.stringify(currentTeamHeroes)}`
           })
           
           // 2. 对每个阵容执行 hero_exchange 命令
@@ -8330,7 +8574,7 @@ const handleBatchActivateToyTeam = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 切换阵容${config.team}：${currentHeroId} → ${config.heroName}(ID:${config.heroId})`
+              message: `[序号${tokenIndex}] 切换阵容${config.team}：${currentHeroId} → ${config.heroName}(ID:${config.heroId})`
             })
             
             await tokenStore.sendMessageWithPromise(
@@ -8351,7 +8595,7 @@ const handleBatchActivateToyTeam = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] ${token.name || token.id} 阵容${config.team}切换为${config.heroName}成功`
+              message: `[序号${tokenIndex}] 阵容${config.team}切换为${config.heroName}成功`
             })
           }
           
@@ -8363,7 +8607,7 @@ const handleBatchActivateToyTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活完成`
+            message: `[序号${tokenIndex}] 玩具阵容激活完成`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -8377,7 +8621,7 @@ const handleBatchActivateToyTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `[序号${tokenIndex}] ${token.name || token.id} 玩具阵容激活失败：${error.message || '未知错误'}`
+            message: `[序号${tokenIndex}] 玩具阵容激活失败：${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -8548,7 +8792,7 @@ const handleBatchUpgradeLord = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: '执行role_getroleinfo命令，获取主公和吕布等级'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]执行role_getroleinfo命令，获取主公和吕布等级`
           })
           
           const roleResult = await tokenStore.sendGetRoleInfo(token.id)
@@ -8632,7 +8876,7 @@ const handleBatchUpgradeLord = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `获取等级成功: 主公${lordLevel}级，吕布${luBuLevel}级`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]获取等级成功: 主公${lordLevel}级，吕布${luBuLevel}级`
           })
           
           // 4. 比较并升级，根据阶数决定升级顺序
@@ -8658,7 +8902,7 @@ const handleBatchUpgradeLord = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `主公阶数${currentLordOrder}高于吕布阶数${currentLuBuOrder}，升级吕布`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]主公阶数${currentLordOrder}高于吕布阶数${currentLuBuOrder}，升级吕布`
               })
               
               const nextLevel = getNextUpgradeLevel(currentLuBuLevel, upgradeLevels)
@@ -8670,7 +8914,7 @@ const handleBatchUpgradeLord = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `吕布已达到最高等级${currentLuBuLevel}，停止升级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]吕布已达到最高等级${currentLuBuLevel}，停止升级`
                 })
                 break
               }
@@ -8684,8 +8928,9 @@ const handleBatchUpgradeLord = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `吕布等级${currentLuBuLevel}已达到主公等级${currentLordLevel}，等待主公升级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]吕布等级${currentLuBuLevel}已达到主公等级${currentLordLevel}，等待主公升级`
                 })
+                upgradeCount++
                 continue
               }
               
@@ -8702,7 +8947,7 @@ const handleBatchUpgradeLord = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `吕布升级成功: 4000 → 4001`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级成功: 4000 → 4001`
                   })
                 } catch (error) {
                   const errorMsg = String(error.message || '').toLowerCase()
@@ -8718,7 +8963,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `吕布升阶后升级成功: 4000 → 4001`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升阶后升级成功: 4000 → 4001`
                     })
                   } else if (errorMsg.includes('物品数量不足')) {
                     logStore.addLog({
@@ -8728,7 +8973,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'warning',
-                      message: `吕布升级失败: 物品数量不足，停止执行`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级失败: 物品数量不足，停止执行`
                     })
                     throw new Error('吕布升级失败: 物品数量不足')
                   } else {
@@ -8750,7 +8995,7 @@ const handleBatchUpgradeLord = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'success',
-                  message: `吕布升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
                 })
                 
                 // 到达指定等级后，执行一次升阶命令
@@ -8775,7 +9020,7 @@ const handleBatchUpgradeLord = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `吕布升阶后升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升阶后升级成功: ${currentLuBuLevel - upgradeNum} → ${currentLuBuLevel}`
                   })
                   
                   // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
@@ -8791,7 +9036,7 @@ const handleBatchUpgradeLord = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'warning',
-                    message: `吕布升级失败: 物品数量不足，停止执行`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级失败: 物品数量不足，停止执行`
                   })
                   throw new Error('吕布升级失败: 物品数量不足')
                 } else {
@@ -8808,7 +9053,7 @@ const handleBatchUpgradeLord = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `主公和吕布同阶${currentLordOrder}，先升级主公到下一阶等级${nextLordLevel}级，再升级吕布。`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]主公和吕布同阶${currentLordOrder}，先升级主公到下一阶等级${nextLordLevel}级，再升级吕布。`
               })
               
               if (nextLordLevel === null) {
@@ -8819,7 +9064,7 @@ const handleBatchUpgradeLord = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `主公已达到最高等级${currentLordLevel}，停止升级`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]主公已达到最高等级${currentLordLevel}，停止升级`
                 })
                 break
               }
@@ -8842,7 +9087,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `主公升级成功: 4000 → 4001`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级成功: 4000 → 4001`
                     })
                   } catch (error) {
                     const errorMsg = String(error.message || '').toLowerCase()
@@ -8858,7 +9103,7 @@ const handleBatchUpgradeLord = async () => {
                         tokenId: token.id,
                         tokenName: token.name,
                         status: 'success',
-                        message: `主公升阶后升级成功: 4000 → 4001`
+                        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶后升级成功: 4000 → 4001`
                       })
                     } else if (errorMsg.includes('物品数量不足') || errorMsg.includes('金币数量不足')) {
                       logStore.addLog({
@@ -8868,7 +9113,7 @@ const handleBatchUpgradeLord = async () => {
                         tokenId: token.id,
                         tokenName: token.name,
                         status: 'warning',
-                        message: `主公升级失败: 物品数量不足，停止执行`
+                        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: 物品数量不足，停止执行`
                       })
                       throw new Error('主公升级失败: 物品数量不足')
                     } else {
@@ -8889,7 +9134,7 @@ const handleBatchUpgradeLord = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `主公升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
                   })
                   
                   // 到达指定等级后，执行一次升阶命令
@@ -8914,7 +9159,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `主公升阶后升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶后升级成功: ${currentLordLevel - upgradeNum} → ${currentLordLevel}`
                     })
                     
                     // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
@@ -8930,7 +9175,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'warning',
-                      message: `主公升级失败: 物品数量不足，停止执行`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: 物品数量不足，停止执行`
                     })
                     throw new Error('主公升级失败: 物品数量不足')
                   } else {
@@ -8947,7 +9192,7 @@ const handleBatchUpgradeLord = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `主公升级完成，现在升级吕布到与主公同等级${currentLordLevel}级`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级完成，现在升级吕布到与主公同等级${currentLordLevel}级`
               })
               
               // 循环升级，直到吕布达到主公等级
@@ -8968,7 +9213,7 @@ const handleBatchUpgradeLord = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `吕布升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
                   })
                   
                   // 到达指定等级后，执行一次升阶命令
@@ -8993,7 +9238,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'success',
-                      message: `吕布升阶后升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升阶后升级成功: ${currentLuBuLevel - actualUpgradeNum} → ${currentLuBuLevel}`
                     })
                     
                     // 升级后更新阶数（只在开始时获取一次，之后使用计算值）
@@ -9009,7 +9254,7 @@ const handleBatchUpgradeLord = async () => {
                       tokenId: token.id,
                       tokenName: token.name,
                       status: 'warning',
-                      message: `吕布升级失败: 物品数量不足，停止执行`
+                      message: `【序号${tokenIndex}】[${token.name || token.id}]吕布升级失败: 物品数量不足，停止执行`
                     })
                     throw new Error('吕布升级失败: 物品数量不足')
                   } else {
@@ -9036,7 +9281,7 @@ const handleBatchUpgradeLord = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `升级主公武将完成，共升级${upgradeCount}次，最终等级：主公${currentLordLevel}级，吕布${currentLuBuLevel}级`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级主公武将完成，共升级${upgradeCount}次，最终等级：主公${currentLordLevel}级，吕布${currentLuBuLevel}级`
           })
           
           return { success: true, token: token }
@@ -9051,7 +9296,7 @@ const handleBatchUpgradeLord = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `升级主公武将失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]升级主公武将失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -9093,7 +9338,7 @@ const handleBatchUpgradeLord = async () => {
       cardType: '养号',
       operation: '批量升级主公武将',
       status: 'success',
-      message: `批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
     })
     
     // 清空过程日志，只保留结果日志
@@ -9136,7 +9381,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行hero_lordupgradelevel命令: 升级${upgradeNum}级`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_lordupgradelevel命令: 升级${upgradeNum}级`
     })
     
     const upgradeRes = await tokenStore.sendHeroLordUpgradeLevel(
@@ -9159,7 +9404,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `主公升级失败: 需要升阶，准备执行升阶命令`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: 需要升阶，准备执行升阶命令`
       })
       
       // 执行升阶命令
@@ -9171,7 +9416,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `执行hero_lordupgradeorder命令进行升阶`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_lordupgradeorder命令进行升阶`
         })
         
         await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
@@ -9183,7 +9428,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `主公升阶成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶成功`
         })
         
         await waitCommandDelay()
@@ -9200,7 +9445,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `主公升阶失败: ${orderError.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶失败: ${orderError.message || '未知错误'}`
         })
         
         // 如果升阶失败是因为物品数量不足，停止升级
@@ -9221,7 +9466,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `主公升级失败: 物品数量不足`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: 物品数量不足`
       })
       throw new Error('主公升级失败: 物品数量不足')
     }
@@ -9239,7 +9484,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `主公升级失败: 需要升阶，准备执行升阶命令`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: 需要升阶，准备执行升阶命令`
       })
       
       // 执行升阶命令
@@ -9251,7 +9496,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `执行hero_lordupgradeorder命令进行升阶`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_lordupgradeorder命令进行升阶`
         })
         
         await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
@@ -9263,7 +9508,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `主公升阶成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶成功`
         })
         
         await waitCommandDelay()
@@ -9280,7 +9525,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `主公升阶失败: ${orderError.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶失败: ${orderError.message || '未知错误'}`
         })
         
         if (orderErrorMsg.includes('物品数量不足') || orderErrorMsg.includes('金币数量不足')) {
@@ -9298,7 +9543,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `主公升级失败: ${error.message || '物品数量不足'}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: ${error.message || '物品数量不足'}`
       })
       throw new Error(`主公升级失败: ${error.message || '物品数量不足'}`)
     } else {
@@ -9310,7 +9555,7 @@ const upgradeLord = async (token, tokenIndex, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'error',
-        message: `主公升级失败: ${error.message || '未知错误'}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公升级失败: ${error.message || '未知错误'}`
       })
       throw error
     }
@@ -9328,7 +9573,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行hero_heroupgradelevel命令: 武将ID${heroId}，升级${upgradeNum}级`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradelevel命令: 武将ID${heroId}，升级${upgradeNum}级`
     })
     
     const upgradeRes = await tokenStore.sendHeroUpgradeLevel(
@@ -9352,7 +9597,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `武将升级失败: 需要升阶，准备执行升阶命令`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级失败: 需要升阶，准备执行升阶命令`
       })
       
       // 执行升阶命令
@@ -9364,7 +9609,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `执行hero_heroupgradeorder命令进行升阶`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradeorder命令进行升阶`
         })
         
         await tokenStore.sendHeroUpgradeOrder(token.id, {
@@ -9378,7 +9623,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `武将升阶成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶成功`
         })
         
         await waitCommandDelay()
@@ -9395,7 +9640,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `武将升阶失败: ${orderError.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶失败: ${orderError.message || '未知错误'}`
         })
         
         // 如果升阶失败是因为物品数量不足，停止升级
@@ -9416,7 +9661,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `武将升级失败: 物品数量不足`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级失败: 物品数量不足`
       })
       throw new Error('武将升级失败: 物品数量不足')
     }
@@ -9434,7 +9679,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `武将升级失败: 需要升阶，准备执行升阶命令`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级失败: 需要升阶，准备执行升阶命令`
       })
       
       // 执行升阶命令
@@ -9446,7 +9691,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `执行hero_heroupgradeorder命令进行升阶`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradeorder命令进行升阶`
         })
         
         await tokenStore.sendHeroUpgradeOrder(token.id, {
@@ -9460,7 +9705,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `武将升阶成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶成功`
         })
         
         await waitCommandDelay()
@@ -9477,7 +9722,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `武将升阶失败: ${orderError.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶失败: ${orderError.message || '未知错误'}`
         })
         
         if (orderErrorMsg.includes('物品数量不足') || orderErrorMsg.includes('金币数量不足')) {
@@ -9495,7 +9740,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'warning',
-        message: `武将升级失败: ${error.message || '物品数量不足'}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级失败: ${error.message || '物品数量不足'}`
       })
       throw new Error(`武将升级失败: ${error.message || '物品数量不足'}`)
     } else {
@@ -9507,7 +9752,7 @@ const upgradeHero = async (token, tokenIndex, heroId, upgradeNum) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'error',
-        message: `武将升级失败: ${error.message || '未知错误'}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级失败: ${error.message || '未知错误'}`
       })
       throw error
     }
@@ -9528,7 +9773,7 @@ const checkAndUpgradeOrder = async (token, tokenIndex, type, level, heroId = nul
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${type === 'lord' ? '主公' : '吕布'}达到${level}级，准备执行升阶命令`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${type === 'lord' ? '主公' : '吕布'}达到${level}级，准备执行升阶命令`
     })
     
     if (type === 'lord') {
@@ -9549,7 +9794,7 @@ const upgradeLordOrder = async (token, tokenIndex) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行hero_lordupgradeorder命令进行升阶`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_lordupgradeorder命令进行升阶`
     })
     
     await tokenStore.sendHeroLordUpgradeOrder(token.id, {})
@@ -9561,13 +9806,28 @@ const upgradeLordOrder = async (token, tokenIndex) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `主公升阶成功`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶成功`
     })
     
     await waitCommandDelay()
   } catch (error) {
     console.error(`主公升阶失败:`, error)
     const errorMsg = String(error.message || '').toLowerCase()
+    
+    // 如果提示"未进阶"或错误码400060，说明已经进阶过了，不需要再次升阶
+    if (errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `【序号${tokenIndex}】[${token.name || token.id}]主公已进阶，跳过升阶，继续执行升级`
+      })
+      // 不抛出错误，继续执行升级
+      return
+    }
     
     logStore.addLog({
       page: 'fish-helper',
@@ -9576,12 +9836,12 @@ const upgradeLordOrder = async (token, tokenIndex) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'warning',
-      message: `主公升阶失败: ${error.message || '未知错误'}，继续执行升级`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]主公升阶失败: ${error.message || '未知错误'}`
     })
     
-    // 物品数量不足或未进阶，停止执行
-    if (errorMsg.includes('物品数量不足') || errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
-      throw new Error('主公升阶失败: ' + (errorMsg.includes('未进阶') || errorMsg.includes('400060') ? '未满足升阶条件' : '物品数量不足'))
+    // 物品数量不足，停止执行
+    if (errorMsg.includes('物品数量不足')) {
+      throw new Error('主公升阶失败: 物品数量不足')
     }
     
     // 其他错误不抛出，继续执行升级
@@ -9598,7 +9858,7 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `执行hero_heroupgradeorder命令进行升阶`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行hero_heroupgradeorder命令进行升阶`
     })
     
     await tokenStore.sendHeroUpgradeOrder(token.id, {
@@ -9612,13 +9872,28 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `武将升阶成功`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶成功`
     })
     
     await waitCommandDelay()
   } catch (error) {
     console.error(`武将升阶失败:`, error)
     const errorMsg = String(error.message || '').toLowerCase()
+    
+    // 如果提示"未进阶"或错误码400060，说明已经进阶过了，不需要再次升阶
+    if (errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升级主公武将',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `【序号${tokenIndex}】[${token.name || token.id}]武将已进阶，跳过升阶，继续执行升级`
+      })
+      // 不抛出错误，继续执行升级
+      return
+    }
     
     logStore.addLog({
       page: 'fish-helper',
@@ -9627,12 +9902,12 @@ const upgradeHeroOrder = async (token, tokenIndex, heroId) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'warning',
-      message: `武将升阶失败: ${error.message || '未知错误'}，继续执行升级`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]武将升阶失败: ${error.message || '未知错误'}`
     })
     
-    // 物品数量不足或未进阶，停止执行
-    if (errorMsg.includes('物品数量不足') || errorMsg.includes('未进阶') || errorMsg.includes('400060')) {
-      throw new Error('武将升阶失败: ' + (errorMsg.includes('未进阶') || errorMsg.includes('400060') ? '未满足升阶条件' : '物品数量不足'))
+    // 物品数量不足，停止执行
+    if (errorMsg.includes('物品数量不足')) {
+      throw new Error('武将升阶失败: 物品数量不足')
     }
     
     // 其他错误不抛出，继续执行升级

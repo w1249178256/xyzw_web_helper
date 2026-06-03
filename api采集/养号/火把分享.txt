@@ -1,0 +1,10 @@
+{
+  "ack": 0,
+  "body": {
+    "isSkipShareCard": false,
+    "type": 1
+  },
+  "cmd": "system_mysharecallback",
+  "seq": 4,
+  "time": 1780326670181
+}

@@ -2001,7 +2001,7 @@ export function createTasksItem(deps) {
         message: `${token.name} 俱乐部BOSS失败: ${error.message}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 
@@ -2074,7 +2074,7 @@ export function createTasksItem(deps) {
         message: `${token.name} 每日免费礼包异常: ${error.message}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 
@@ -2117,7 +2117,7 @@ export function createTasksItem(deps) {
         message: `${token.name} 咸王挑战失败: ${error.message}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 

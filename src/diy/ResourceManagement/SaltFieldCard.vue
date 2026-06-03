@@ -267,7 +267,7 @@ const handleSaltFieldSignup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} 连接失败`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 连接失败`
           })
           continue
         }
@@ -286,7 +286,7 @@ const handleSaltFieldSignup = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} WebSocket未连接`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} WebSocket未连接`
           })
           continue
         }
@@ -307,7 +307,7 @@ const handleSaltFieldSignup = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name} 盐场报名成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 盐场报名成功`
         })
         
         await connectionPool.release(token.id, true)
@@ -324,7 +324,7 @@ const handleSaltFieldSignup = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name} 盐场报名失败：${error.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 盐场报名失败：${error.message}`
         })
         
         try {
@@ -425,7 +425,7 @@ const handleSaltFieldFormation = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id} 盐场布阵成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id} 盐场布阵成功`
         })
       } catch (error) {
         console.error(`${token.name} 盐场布阵失败:`, error)
@@ -440,7 +440,7 @@ const handleSaltFieldFormation = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id} 盐场布阵失败：${error.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id} 盐场布阵失败：${error.message}`
         })
       }
       
@@ -531,7 +531,7 @@ const batchSwitchTeam1 = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} 连接失败`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 连接失败`
           })
           continue
         }
@@ -550,7 +550,7 @@ const batchSwitchTeam1 = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} WebSocket未连接`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} WebSocket未连接`
           })
           continue
         }
@@ -571,7 +571,7 @@ const batchSwitchTeam1 = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name} 已切换到阵1`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 已切换到阵1`
         })
         
         await connectionPool.release(token.id, true)
@@ -588,7 +588,7 @@ const batchSwitchTeam1 = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name} 切换阵1失败：${error.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 切换阵1失败：${error.message}`
         })
         try {
           await connectionPool.release(token.id, false)
@@ -685,7 +685,7 @@ const batchSwitchTeam2 = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} 连接失败`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 连接失败`
           })
           continue
         }
@@ -704,7 +704,7 @@ const batchSwitchTeam2 = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name} WebSocket未连接`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} WebSocket未连接`
           })
           continue
         }
@@ -725,7 +725,7 @@ const batchSwitchTeam2 = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name} 已切换到阵2`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 已切换到阵2`
         })
         
         await connectionPool.release(token.id, true)
@@ -742,7 +742,7 @@ const batchSwitchTeam2 = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name} 切换阵2失败：${error.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 切换阵2失败：${error.message}`
         })
         try {
           await connectionPool.release(token.id, false)

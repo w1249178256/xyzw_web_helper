@@ -1,4 +1,5 @@
 import { useOperationLogStore } from '@/stores/operationLogStore'
+import { useTokenStore } from '@/stores/tokenStore'
 
 /**
  * 操作日志记录辅助函数
@@ -62,6 +63,17 @@ export const logCommand = async (
 ) => {
   const logStore = useOperationLogStore()
   
+  // 获取token序号
+  const tokenStore = useTokenStore()
+  const gameTokens = [...tokenStore.gameTokens]
+  const sortedTokens = gameTokens.sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  const tokenIndex = sortedTokens.findIndex(t => t.id === tokenId) + 1
+  const tokenDisplayName = (tokenName && tokenName.trim()) || tokenId
+  
   try {
     const response = await promise
     
@@ -72,7 +84,7 @@ export const logCommand = async (
         tokenId,
         tokenName,
         status: 'success',
-        message: `${command} 执行成功`,
+        message: `【序号${tokenIndex}】[${tokenDisplayName}]${command} 执行成功`,
         command,
         commandParams: params,
         response,
@@ -89,7 +101,7 @@ export const logCommand = async (
         tokenId,
         tokenName,
         status: 'error',
-        message: `${command} 执行失败: ${error.message}`,
+        message: `【序号${tokenIndex}】[${tokenDisplayName}]${command} 执行失败: ${error.message}`,
         command,
         commandParams: params,
         response: error,

@@ -41,10 +41,7 @@
               </span>
             </div>
             <div class="log-content">
-              <div v-if="log.tokenName" class="log-token">
-                Token: {{ log.tokenName }}
-              </div>
-              <div class="log-message">{{ log.message }}</div>
+              <div class="log-message" v-html="formatLogMessage(log.message)"></div>
               <div v-if="log.details" class="log-details">
                 <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>
               </div>
@@ -109,6 +106,31 @@ const getStatusText = (status) => {
     info: '信息'
   }
   return statusMap[status] || status
+}
+
+// 格式化日志消息，提取序号和token并添加颜色样式
+const formatLogMessage = (msg) => {
+  if (!msg) return ''
+  
+  // 匹配【序号X】[token]消息内容 格式
+  const match = msg.match(/^【序号(\d+)】\[([^\]]+)\](.*)$/)
+  if (match) {
+    const index = match[1]
+    const token = match[2]
+    const content = match[3]
+    return `<span class="log-index">【序号${index}】</span><span class="log-token">[${token}]</span><span class="log-content-text">${content}</span>`
+  }
+  
+  // 兼容旧格式 X、消息内容
+  const oldMatch = msg.match(/^(\d+)、(.*)$/)
+  if (oldMatch) {
+    const index = oldMatch[1]
+    const content = oldMatch[2]
+    return `<span class="log-index">【序号${index}】</span><span class="log-content-text">${content}</span>`
+  }
+  
+  // 其他格式直接返回
+  return msg
 }
 
 const handleClearLogs = () => {
@@ -293,13 +315,23 @@ watch(filteredLogs, () => {
   color: #666;
 }
 
-.log-token {
-  margin-bottom: 4px;
-  font-weight: 500;
-}
-
 .log-message {
   margin-bottom: 4px;
+}
+
+.log-message :deep(.log-index) {
+  font-weight: 600;
+  color: #f59e0b !important;
+  margin-right: 4px;
+}
+
+.log-message :deep(.log-token) {
+  font-weight: 500;
+  color: #3b82f6 !important;
+}
+
+.log-message :deep(.log-content-text) {
+  color: #666;
 }
 
 .log-command {

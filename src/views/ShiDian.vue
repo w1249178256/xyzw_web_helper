@@ -1039,7 +1039,10 @@ const autoJoinShiDian = async () => {
         if (currentTeam !== null && currentTeam !== undefined) continue
         
         try {
-          await connectionPool.acquire(token.id)
+          const connected = await connectionPool.acquire(token.id)
+          if (!connected) {
+            continue
+          }
           
           const status = tokenStore.getWebSocketStatus(token.id)
           if (status !== 'connected') {
@@ -1736,7 +1739,7 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
             tokenId: token.id,
             tokenName: token.name,
             status: resultStatus,
-            message: `${tokenIndex}、${token.name || token.id}、${successMsg.replace(`${token.name || token.id} `, '')}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${successMsg.replace(`${token.name || token.id} `, '')}`
           })
           
           return { 
@@ -1755,7 +1758,7 @@ const handleJoinLegion = async (legionTokensStr, legionId) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、加入俱乐部失败: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]加入俱乐部失败: ${error.message || '未知错误'}`
           })
           
           return { success: false, error: errorMsg }

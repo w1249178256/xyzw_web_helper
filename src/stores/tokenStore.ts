@@ -995,6 +995,7 @@ export const useTokenStore = defineStore("tokens", () => {
     cmd: string,
     params = {},
     timeout = 5000,
+    retryCount = 0,
   ) => {
     const connection = wsConnections.value[tokenId];
     if (!connection || connection.status !== "connected") {
@@ -1041,6 +1042,23 @@ export const useTokenStore = defineStore("tokens", () => {
       if (cmd === "fight_starttower") {
         wsLogger.error(`🗼 [咸将塔] 爬塔请求失败 [${tokenId}]:`, error.message);
       }
+
+      // 检查是否为"操作过快"错误 (400340)
+      if (error.message && error.message.includes("400340")) {
+        const waitMinutes = 2;
+        const waitMs = waitMinutes * 60 * 1000;
+        
+        wsLogger.warn(
+          `⏰ [操作过快] 命令 [${cmd}] 触发400340错误，等待${waitMinutes}分钟后重试... (第${retryCount + 1}次重试)`,
+        );
+        
+        // 等待2分钟
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        
+        // 无限重试，不限制次数
+        return sendMessageWithPromise(tokenId, cmd, params, timeout, retryCount + 1);
+      }
+
       return Promise.reject(error);
     }
   };
@@ -1525,6 +1543,11 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送挂机升级
   const sendSystemHangupUpgrade = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "system_hangupupgrade", params);
+  };
+
+  // 发送重命名
+  const sendSystemEditName = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_editname", params);
   };
 
   // 发送武将升星
@@ -2267,6 +2290,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendEquipmentBatchUpgradeLevel,
     sendHeroSkillAwake,
     sendSystemHangupUpgrade,
+    sendSystemEditName,
     sendHeroUpgradeStar,
     sendHeroSynthetic,
     sendBookUpgrade,

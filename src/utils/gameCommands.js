@@ -102,7 +102,7 @@ export class GameCommands {
 
 
   /**
-   * 分享回调
+   * 分享火把
    */
   system_mysharecallback(ack = 0, seq = 0, params = {}) {
     return {
@@ -994,6 +994,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       	  battleTeam:{},
       	  genieId:params.genieId,
       	  lordWeaponId:3,
+      	  petUId: ""
         ...params
       }),
       cmd: "fight_startgenie",
@@ -1585,7 +1586,8 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       body: this.g_utils.bon.encode({
       	  battlefieldId:params.battlefieldId,
       	  battleTeam:{},
-      	  lordWeaponId:2,
+      	  lordWeaponId:params.lordWeaponId,
+      	  petUId: ""
                 ...params
       }),
       cmd: "war_setbattleteam",
@@ -2494,6 +2496,21 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
   
+            /**
+   * 重命名
+   */
+  system_editname(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  name:params.name,
+          ...params
+      }),
+      cmd: "system_editname",
+      seq,
+      time: Date.now()
+    }
+  }
   
         /**
    * 活动周奖励

@@ -301,7 +301,7 @@ const addLog = (type, tokenName, message, success = true, command = null, respon
     tokenId: token?.id,
     tokenName: tokenName,
     status: success ? 'success' : 'error',
-    message: `${tokenIndex}、${tokenName}、${logMessage}`,
+    message: `【序号${tokenIndex}】[${tokenName}]${logMessage}`,
     details: command ? { command: command.cmd, params: command.params } : undefined,
     command: command ? command.cmd : undefined,
     commandParams: command ? command.params : undefined,

@@ -78,7 +78,7 @@ export function createTasksBottle(deps) {
         message: `${token.name} 重置失败: ${error.message}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 
@@ -152,6 +152,7 @@ export function createTasksBottle(deps) {
           message: `${token.name} 重置失败: ${error.message}`,
           type: "error",
         });
+        // 不抛出异常，继续执行后续命令
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
@@ -206,7 +207,7 @@ export function createTasksBottle(deps) {
         message: `${token.name} 领取盐罐失败: ${error.message || "未知错误"}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 
@@ -255,6 +256,7 @@ export function createTasksBottle(deps) {
           message: `${token.name} 领取盐罐失败: ${error.message || "未知错误"}`,
           type: "error",
         });
+        // 不抛出异常，继续执行后续命令
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();

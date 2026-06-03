@@ -318,7 +318,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、领取挂机成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]领取挂机成功`
               })
             } catch (error) {
               console.error(`领取挂机失败: ${error.message}`, error)
@@ -329,7 +329,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、领取挂机失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]领取挂机失败`
               })
             }
           }
@@ -360,7 +360,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、重置罐子成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]重置罐子成功`
               })
             } catch (error) {
               console.error(`重置罐子失败: ${error.message}`, error)
@@ -371,7 +371,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、重置罐子失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]重置罐子失败`
               })
             }
           }
@@ -407,7 +407,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键灯神扫荡成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键灯神扫荡成功`
               })
             } catch (error) {
               console.error(`一键灯神扫荡失败: ${error.message}`, error)
@@ -418,7 +418,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键灯神扫荡失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键灯神扫荡失败`
               })
             }
           }
@@ -441,7 +441,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、领取罐子成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]领取罐子成功`
               })
             } catch (error) {
               console.error(`领取罐子失败: ${error.message}`, error)
@@ -452,7 +452,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、领取罐子失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]领取罐子失败`
               })
             }
           }
@@ -468,6 +468,15 @@ const handleExecuteScheduledTasks = async () => {
               )
               await new Promise(resolve => setTimeout(resolve, 500))
               
+              // 分享领取火把
+              await tokenStore.sendMessageWithPromise(
+                token.id,
+                'system_mysharecallback',
+                { isSkipShareCard: true, type: 1 },
+                5000
+              )
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '定时任务',
@@ -475,7 +484,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部签到成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键俱乐部签到成功`
               })
             } catch (error) {
               console.error(`一键俱乐部签到失败: ${error.message}`, error)
@@ -486,7 +495,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部签到失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键俱乐部签到失败`
               })
             }
           }
@@ -579,7 +588,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键竞技场成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键竞技场成功`
               })
             } catch (error) {
               console.error(`一键竞技场失败：${error.message}`, error)
@@ -590,7 +599,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键竞技场失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键竞技场失败`
               })
             }
           }
@@ -698,7 +707,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、黑市采购成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]黑市采购成功`
               })
             } catch (error) {
               console.error(`黑市采购失败: ${error.message}`, error)
@@ -709,7 +718,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、黑市采购失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]黑市采购失败`
               })
             }
           }
@@ -753,7 +762,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部 BOSS 成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键俱乐部 BOSS 成功`
               })
             } catch (error) {
               console.error(`一键俱乐部 BOSS 失败：${error.message}`, error)
@@ -764,7 +773,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键俱乐部 BOSS 失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键俱乐部 BOSS 失败`
               })
             }
           }
@@ -822,7 +831,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: status,
-                message: `${tokenIndex}、${token.name || token.id}、一键每日免费礼包完成（${signinMsg}；${discountMsg}）`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键每日免费礼包完成（${signinMsg}；${discountMsg}）`
               })
             } catch (error) {
               console.error(`一键每日免费礼包执行异常：${error.message}`, error)
@@ -833,7 +842,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键每日免费礼包执行异常：${error.message}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键每日免费礼包执行异常：${error.message}`
               })
             }
           }
@@ -862,7 +871,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、一键每日咸王成功（今日 BOSS: ${todayBossId}，挑战 3 次）`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键每日咸王成功（今日 BOSS: ${todayBossId}，挑战 3 次）`
               })
             } catch (error) {
               console.error(`一键每日咸王失败：${error.message}`, error)
@@ -873,7 +882,7 @@ const handleExecuteScheduledTasks = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、一键每日咸王失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键每日咸王失败`
               })
             }
           }
@@ -888,7 +897,7 @@ const handleExecuteScheduledTasks = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、定时任务执行完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]定时任务执行完成`
           })
           
           return { success: true, tokenId: token.id }
@@ -903,7 +912,7 @@ const handleExecuteScheduledTasks = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、定时任务执行失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]定时任务执行失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1019,7 +1028,7 @@ const handleBatchBlackMarket = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${tokenIndex}、${token.name || token.id}、获取角色信息成功（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]获取角色信息成功（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
               })
             }
           } catch (error) {
@@ -1034,7 +1043,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、获取角色信息失败，继续执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]获取角色信息失败，继续执行`
             })
           }
           
@@ -1056,7 +1065,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、领取金砖成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金砖成功`
             })
           } catch (error) {
             console.error(`领取金砖失败: ${error.message}`, error)
@@ -1069,7 +1078,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、领取金砖失败，继续执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金砖失败，继续执行`
             })
           }
           
@@ -1091,7 +1100,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、领取黑市金砖成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取黑市金砖成功`
             })
           } catch (error) {
             console.error(`领取黑市金砖失败: ${error.message}`, error)
@@ -1104,7 +1113,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、领取黑市金砖失败，继续执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取黑市金砖失败，继续执行`
             })
           }
           
@@ -1126,7 +1135,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、购买宝箱成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买宝箱成功`
             })
           } catch (error) {
             console.error(`购买宝箱失败: ${error.message}`, error)
@@ -1140,7 +1149,7 @@ const handleBatchBlackMarket = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、购买宝箱失败，继续执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买宝箱失败，继续执行`
             })
           }
           
@@ -1163,7 +1172,7 @@ const handleBatchBlackMarket = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、购买金竿成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿成功`
               })
             } catch (error) {
               console.error(`购买金竿失败: ${error.message}`, error)
@@ -1177,7 +1186,7 @@ const handleBatchBlackMarket = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
-                message: `${tokenIndex}、${token.name || token.id}、购买金竿失败，继续执行`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿失败，继续执行`
               })
             }
           }
@@ -1201,7 +1210,7 @@ const handleBatchBlackMarket = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、购买灵贝成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买灵贝成功`
               })
             } catch (error) {
               console.error(`购买灵贝失败: ${error.message}`, error)
@@ -1215,7 +1224,7 @@ const handleBatchBlackMarket = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
-                message: `${tokenIndex}、${token.name || token.id}、购买灵贝失败，继续执行`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、购买灵贝失败，继续执行`
               })
             }
           }
@@ -1228,7 +1237,7 @@ const handleBatchBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、批量黑市周执行完成（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、批量黑市周执行完成（金砖: ${diamondCount}, 金竿: ${goldenRodCount}）`
           })
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 批量黑市周执行完成`)
@@ -1244,7 +1253,7 @@ const handleBatchBlackMarket = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、批量黑市周执行失败: ${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、批量黑市周执行失败: ${error.message}`
           })
           return { success: false, tokenId: token.id, error: error.message }
         }
@@ -1365,7 +1374,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、${selectedHeroName}已 30 星，跳过使用万能红`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、${selectedHeroName}已 30 星，跳过使用万能红`
           })
         } else if (universalRedCount === 0) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 没有万能红，跳过`)
@@ -1376,7 +1385,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、没有万能红，跳过`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有万能红，跳过`
           })
         } else {
           // 计算最多可使用的万能红数量：400*(30-当前星级）
@@ -1432,7 +1441,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、使用万能红完成，共使用${totalUsed}个（${selectedHeroName}${heroStar}星）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、使用万能红完成，共使用${totalUsed}个（${selectedHeroName}${heroStar}星）`
           })
           
           // 3. 使用万能红后执行武将升星，最多执行 10 次
@@ -1468,7 +1477,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
                   tokenId: token.id,
                   tokenName: token.name,
                   status: 'info',
-                  message: `${tokenIndex}、${token.name || token.id}、物品数量不足，停止武将升星`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、物品数量不足，停止武将升星`
                 })
                 break
               } else {
@@ -1487,7 +1496,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${tokenIndex}、${token.name || token.id}、武将升星完成，共执行${upgradeCount}次`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、武将升星完成，共执行${upgradeCount}次`
           })
         }
         
@@ -1501,7 +1510,7 @@ const handleUseUniversalRedAndUpgrade = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、使用万能红失败：${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、使用万能红失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭 WebSocket 连接

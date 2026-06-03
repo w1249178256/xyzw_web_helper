@@ -162,6 +162,7 @@ export function registerDefaultCommands(reg) {
     .register("system_claimhangupreward")
     .register("system_claimhanguporder")
     .register("system_claimcdkreward")
+    .register("system_editname")
     .register("common_claimtotalreward")
     .register("activity_exchange")
     .register("system_signinreward")
@@ -1170,6 +1171,7 @@ export class XyzwWebSocketClient {
       system_claimhanguprewardresp: "system_claimhangupreward",
       system_claimhanguporderresp: "system_claimhanguporder",
       system_claimcdkrewardresp: "system_claimcdkreward",
+      system_editnameresp: "system_editname",
       common_claimtotalrewardresp: "common_claimtotalreward",
       activity_exchangeresp: "activity_exchange",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],

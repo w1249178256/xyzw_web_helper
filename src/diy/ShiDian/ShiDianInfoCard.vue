@@ -669,7 +669,7 @@ const getNightmareRoleInfo = async (token) => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `${tokenIndex}、${token.name || token.id}、十殿信息获取成功`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]十殿信息获取成功`
       })
       
       // 调试：输出层数和转盘次数
@@ -699,7 +699,7 @@ const getNightmareRoleInfo = async (token) => {
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'error',
-        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、获取十殿信息失败: ${error.message || error}`
+        message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]获取十殿信息失败: ${error.message || error}`
       })
     }
   }
@@ -908,7 +908,7 @@ const claimNightmareRewardsForCard = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、十殿奖励领取完成`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]十殿奖励领取完成`
     })
   } catch (error) {
     message.error(`领取十殿奖励失败: ${error.message}`)
@@ -919,7 +919,7 @@ const claimNightmareRewardsForCard = async (token) => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、领取十殿奖励失败: ${error.message}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]领取十殿奖励失败: ${error.message}`
     })
   } finally {
     connectingTokens.value.delete(token.id)
@@ -1009,7 +1009,7 @@ const batchClaimNightmareRewards = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${i + 1}、${token.name || token.id}、十殿奖励领取成功`
+          message: `【序号${i + 1}】[${token.name || token.id}]十殿奖励领取成功`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -1025,7 +1025,7 @@ const batchClaimNightmareRewards = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${i + 1}、${token.name || token.id}、十殿奖励领取失败: ${error.message}`
+          message: `【序号${i + 1}】[${token.name || token.id}]十殿奖励领取失败: ${error.message}`
         })
       } finally {
         // 释放连接
@@ -1225,7 +1225,7 @@ const nightmareRestore = async (token) => {
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'success',
-      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿恢复执行成功`
+      message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]十殿恢复执行成功`
     })
   } catch (error) {
     console.error('十殿恢复失败:', error)
@@ -1237,7 +1237,7 @@ const nightmareRestore = async (token) => {
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'error',
-      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿恢复失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]十殿恢复失败: ${error.message || error}`
     })
   }
 }
@@ -1261,7 +1261,7 @@ const resetPillowCount = async () => {
         tokenId: props.selectedTokenId,
         tokenName: token?.name,
         status: 'success',
-        message: `${tokenIndex}、${token?.name || props.selectedTokenId}、十殿枕头数量已重置`
+        message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]十殿枕头数量已重置`
       })
     }
   } catch (error) {
@@ -1274,7 +1274,7 @@ const resetPillowCount = async () => {
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'error',
-      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、重置枕头失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]重置枕头失败: ${error.message || error}`
     })
   }
 }
@@ -2165,7 +2165,7 @@ const nightmareDismiss = async (token) => {
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'success',
-      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、解散十殿执行成功`
+      message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]解散十殿执行成功`
     })
   } catch (error) {
     console.error('解散十殿失败:', error)
@@ -2177,7 +2177,7 @@ const nightmareDismiss = async (token) => {
       tokenId: props.selectedTokenId,
       tokenName: token?.name,
       status: 'error',
-      message: `${tokenIndex}、${token?.name || props.selectedTokenId}、解散十殿失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token?.name || props.selectedTokenId}]解散十殿失败: ${error.message || error}`
     })
   }
 }
@@ -2232,7 +2232,7 @@ const executeFighter = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、出战人员设置成功`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]出战人员设置成功`
     })
   } catch (error) {
     console.error('执行出战人员失败:', error)
@@ -2243,7 +2243,7 @@ const executeFighter = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、执行出战人员失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行出战人员失败: ${error.message || error}`
     })
   }
 }
@@ -2394,7 +2394,7 @@ const executeTransfer = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、转让房主成功`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]转让房主成功`
     })
   } catch (error) {
     console.error('执行转让房主失败:', error)
@@ -2405,7 +2405,7 @@ const executeTransfer = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、执行转让房主失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行转让房主失败: ${error.message || error}`
     })
   }
 }
@@ -2459,7 +2459,7 @@ const executeRestore = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name} 十殿恢复成功`
+      message: `十殿恢复成功`
     })
   } catch (error) {
     console.error('执行十殿恢复失败:', error)
@@ -3369,7 +3369,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -3405,7 +3405,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]资源获取失败: ${error.message || '未知错误'}`
         })
       }
 

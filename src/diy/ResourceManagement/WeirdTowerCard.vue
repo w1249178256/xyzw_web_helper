@@ -520,7 +520,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}`,
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${finalDisplayFloor}，剩余能量${finalEnergy}`,
       details: {
         climbCount,
         currentFloor: finalDisplayFloor,
@@ -541,7 +541,7 @@ const startTowerClimb = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
     })
   }
 
@@ -702,7 +702,7 @@ const batchClaimLegionPrivilege = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、军团特权领取完成，成功${successCount}次`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、军团特权领取完成，成功${successCount}次`
         })
         
         return { successCount }
@@ -718,7 +718,7 @@ const batchClaimLegionPrivilege = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、特权领取失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、特权领取失败: ${error.message || '未知错误'}`
         })
         
         throw error
@@ -884,7 +884,7 @@ const claimTaskReward = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、领取任务奖励完成`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取任务奖励完成`
     })
     
     // 刷新信息
@@ -902,7 +902,7 @@ const claimTaskReward = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、领取任务奖励失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取任务奖励失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -1072,7 +1072,7 @@ const startUseItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、已使用道具 ${processedCount} 次`,
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、已使用道具 ${processedCount} 次`,
       details: {
         processedCount,
         remainingItems: lotteryLeftCnt
@@ -1094,7 +1094,7 @@ const startUseItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、使用道具失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、使用道具失败: ${error.message || '未知错误'}`
     })
   } finally {
     if (itemTimeout.value) {
@@ -1271,7 +1271,7 @@ const autoMergeItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、一键合成操作完成`,
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、一键合成操作完成`,
       details: {
         loopCount
       }
@@ -1292,7 +1292,7 @@ const autoMergeItems = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、一键合成失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、一键合成失败: ${error.message || '未知错误'}`
     })
   } finally {
     if (mergeTimeout.value) {
@@ -1389,7 +1389,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、开始爬塔`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、开始爬塔`
         })
         
         // 获取怪异塔信息（直接从响应获取）
@@ -1419,7 +1419,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
         })
         
         // 执行爬塔逻辑（模拟点击开始爬塔按钮）
@@ -1437,7 +1437,7 @@ const handleBatchClimb = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、能量不足，跳过爬塔`,
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、能量不足，跳过爬塔`,
             details: {
               remainingEnergy: 0
             }
@@ -1527,7 +1527,7 @@ const handleBatchClimb = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
             })
           }
 
@@ -1549,7 +1549,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
           details: {
             climbCount,
             currentFloor: displayFloor,
@@ -1571,7 +1571,7 @@ const handleBatchClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
         })
         
         throw error
@@ -1661,7 +1661,7 @@ const handleBatchQuickClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、开始爬塔`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、开始爬塔`
         })
         
         const towerInfoRes = await tokenStore.sendMessageWithPromise(
@@ -1687,7 +1687,7 @@ const handleBatchQuickClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `${tokenIndex}、${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、初始层数：${initDisplayFloor}，能量：${currentEnergy}`
         })
         
         let climbCount = 0
@@ -1703,7 +1703,7 @@ const handleBatchQuickClimb = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `${tokenIndex}、${token.name || token.id}、能量不足，跳过爬塔`,
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、能量不足，跳过爬塔`,
             details: {
               remainingEnergy: 0
             }
@@ -1786,7 +1786,7 @@ const handleBatchQuickClimb = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取通关奖励，当前层数：${currentChapter}`
             })
           }
 
@@ -1806,7 +1806,7 @@ const handleBatchQuickClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔完成，共${climbCount}次，当前层数${displayFloor}，剩余能量${currentEnergy}`,
           details: {
             climbCount,
             currentFloor: displayFloor,
@@ -1827,7 +1827,7 @@ const handleBatchQuickClimb = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、爬塔失败: ${error.message || '未知错误'}`
         })
         
         throw error
@@ -2147,7 +2147,7 @@ const handleBatchClaimFreeKey = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、领取免费钥匙成功`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取免费钥匙成功`
         })
         
         await waitCommandDelay()
@@ -2166,7 +2166,7 @@ const handleBatchClaimFreeKey = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `${tokenIndex}、${token.name || token.id}、领取免费钥匙失败: ${error.message}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取免费钥匙失败: ${error.message}`
         })
         
         await waitCommandDelay()

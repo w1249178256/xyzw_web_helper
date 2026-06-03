@@ -1,0 +1,24 @@
+{
+  "ack": 49,
+  "body": {
+    "info": {
+      "battlefieldId": "FLAG-260530:1785",
+      "battlefieldNumber": 1785,
+      "canEnterWar": true,
+      "domainName": "wss://xxz-xyzw-new.hortorgames.com/agent",
+      "endTime": 1780146000,
+      "legionWarMapType": 2,
+      "phase": "FLAG-260530",
+      "readyTime": 1780142100,
+      "sid": "x2iOOx_NyyoZeJ29MrhY4u70RzZJLgN5aLhT3KiMlGwMFVRe55mvITfzk9posxM9",
+      "signupEndTime": 1780135200,
+      "signupStartTime": 1780099200,
+      "startTime": 1780142400,
+      "type": 6
+    },
+    "isInWeekWar": true
+  },
+  "cmd": "Legion_GetBattlefieldResp",
+  "resp": 49,
+  "seq": 49,
+  "time": 1780143139512

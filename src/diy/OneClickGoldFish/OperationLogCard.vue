@@ -41,11 +41,7 @@
               </span>
             </div>
             <div class="log-content">
-              <div class="log-message">
-                <span class="log-index">{{ extractIndex(log.message) }}</span>
-                <span v-if="log.tokenName" class="log-token">[{{ log.tokenName }}] </span>
-                {{ removeIndex(log.message) }}
-              </div>
+              <div class="log-message" v-html="formatLogMessage(log.message)"></div>
               <div v-if="log.details" class="log-details">
                 <pre>{{ JSON.stringify(log.details, null, 2) }}</pre>
               </div>
@@ -117,18 +113,29 @@ const getStatusText = (status) => {
   return statusMap[status] || status
 }
 
-// 提取消息中的序号部分，例如"15、使用火把完成"返回"【序号15】"
-const extractIndex = (msg) => {
-  const match = msg.match(/^(\d+)、/)
+// 格式化日志消息，提取序号和token并添加颜色样式
+const formatLogMessage = (msg) => {
+  if (!msg) return ''
+  
+  // 匹配【序号X】[token]消息内容 格式
+  const match = msg.match(/^【序号(\d+)】\[([^\]]+)\](.*)$/)
   if (match) {
-    return `【序号${match[1]}】`
+    const index = match[1]
+    const token = match[2]
+    const content = match[3]
+    return `<span class="log-index">【序号${index}】</span><span class="log-token">[${token}]</span><span class="log-content-text">${content}</span>`
   }
-  return ''
-}
-
-// 移除消息中的序号部分
-const removeIndex = (msg) => {
-  return msg.replace(/^\d+、/, '')
+  
+  // 兼容旧格式 X、消息内容
+  const oldMatch = msg.match(/^(\d+)、(.*)$/)
+  if (oldMatch) {
+    const index = oldMatch[1]
+    const content = oldMatch[2]
+    return `<span class="log-index">【序号${index}】</span><span class="log-content-text">${content}</span>`
+  }
+  
+  // 其他格式直接返回
+  return msg
 }
 
 const handleClearLogs = () => {
@@ -308,19 +315,23 @@ watch(filteredLogs, () => {
   color: #666;
 }
 
-.log-token {
-  font-weight: 500;
-  color: #2080f0;
+.log-message {
+  margin-bottom: 4px;
 }
 
-.log-index {
+.log-message :deep(.log-index) {
   font-weight: 600;
-  color: #f0a020;
+  color: #f59e0b !important;
   margin-right: 4px;
 }
 
-.log-message {
-  margin-bottom: 4px;
+.log-message :deep(.log-token) {
+  font-weight: 500;
+  color: #3b82f6 !important;
+}
+
+.log-message :deep(.log-content-text) {
+  color: #666;
 }
 
 .log-details {

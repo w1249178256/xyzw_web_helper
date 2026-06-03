@@ -126,7 +126,8 @@ export class ConnectionPoolManager {
             const currentStatus = this.tokenStore.getWebSocketStatus(tokenId);
             if (currentStatus !== "connected") {
                 console.log(`[ConnectionPool] 等待槽位期间连接断开：${tokenId}，重新尝试连接`);
-                // 递归调用，重新连接
+                // 先释放当前占用的槽位，再递归调用
+                this.releaseConnectionSlot();
                 return await this.ensureConnection(tokenId, maxRetries);
             }
             
@@ -141,10 +142,14 @@ export class ConnectionPoolManager {
                     const afterHeartbeatStatus = this.tokenStore.getWebSocketStatus(tokenId);
                     if (afterHeartbeatStatus !== "connected") {
                         console.log(`[ConnectionPool] 心跳验证失败，连接已断开：${tokenId}`);
+                        // 先释放当前占用的槽位，再递归调用
+                        this.releaseConnectionSlot();
                         return await this.ensureConnection(tokenId, maxRetries);
                     }
                 } catch (error) {
                     console.log(`[ConnectionPool] 心跳发送失败，连接可能已断开：${tokenId}`);
+                    // 先释放当前占用的槽位，再递归调用
+                    this.releaseConnectionSlot();
                     return await this.ensureConnection(tokenId, maxRetries);
                 }
             }
@@ -508,7 +513,27 @@ export class ConnectionPoolManager {
                     }
 
                     // 获取连接
-                    await this.acquire(token.id);
+                    const connected = await this.acquire(token.id);
+                    if (!connected) {
+                        // acquire 返回 false 表示连接失败，槽位已在 ensureConnection 内部释放
+                        if (onProgress) {
+                            onProgress({
+                                type: 'token-error',
+                                globalIndex: globalIndex + 1,
+                                tokenId: token.id,
+                                tokenName: token.name || token.id,
+                                message: '连接失败，跳过',
+                                status: 'warning'
+                            });
+                        }
+                        results.push({
+                            token: token,
+                            index: globalIndex,
+                            success: false,
+                            error: '连接失败'
+                        });
+                        continue;
+                    }
                     acquired = true;
 
                     const status = this.tokenStore.getWebSocketStatus(token.id);
@@ -524,6 +549,12 @@ export class ConnectionPoolManager {
                                 status: 'warning'
                             });
                         }
+                        results.push({
+                            token: token,
+                            index: globalIndex,
+                            success: false,
+                            error: '连接失败'
+                        });
                         continue;
                     }
 
@@ -588,12 +619,15 @@ export class ConnectionPoolManager {
         }
 
         // 如果保持连接，最后统一断开所有连接
+        // 注意：每个 token 的槽位已在 finally 块中释放，这里只需断开 WebSocket，不要再释放槽位
         if (keepConnections) {
             for (const token of tokens) {
                 try {
                     const status = this.tokenStore.getWebSocketStatus(token.id);
                     if (status === 'connected') {
-                        await this.release(token.id, true);
+                        // 只断开连接，不释放槽位（槽位已在 finally 中释放）
+                        this.tokenStore.closeWebSocketConnection(token.id);
+                        console.log(`[ConnectionPool] 最终清理：WebSocket已断开: ${token.id}`);
                     }
                 } catch (error) {
                     console.error(`最终释放连接失败:`, error);

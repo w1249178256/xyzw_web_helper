@@ -136,7 +136,7 @@ export function createTasksArena(deps) {
         message: `${token.name} 竞技场战斗失败: ${error.message || "未知错误"}`,
         type: "error",
       });
-      throw error;
+      // 不抛出异常，继续执行后续命令
     }
   };
 

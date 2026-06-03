@@ -11,22 +11,14 @@
       <h3>暑期活动</h3>
     </template>
     <template #default>
-      <!-- 塔数据表格 - 参照武将信息表格格式 -->
-      <div class="team-table-container">
-        <table class="team-table">
-          <thead>
-            <tr>
-              <th>BOSS</th>
-              <th v-for="n in 6" :key="n">{{ n }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>活动次数</td>
-              <td v-for="n in 6" :key="n">{{ towerData[n] }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- BOSS数据信息 - 参照灯神表格格式 -->
+      <div class="boss-data-container">
+        <div class="boss-data-grid">
+          <div class="boss-item" v-for="n in 6" :key="n">
+            <div class="boss-value">{{ towerData[n] || 0 }}</div>
+            <div class="boss-label">BOSS {{ n }}</div>
+          </div>
+        </div>
       </div>
 
       <!-- 暑期活动功能 - 使用一个CustomizedCard容器容纳所有内容 -->
@@ -1111,7 +1103,7 @@ const oneKeyActivity = async () => {
         tokenId: selectedTokenId.value,
         tokenName: token?.name,
         status: 'success',
-        message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动完成`
+        message: `【序号${tokenIndex}】[${token?.name || selectedTokenId.value}]一键活动完成`
       });
     } else {
       message.warning("一键活动部分完成（连续失败4次）");
@@ -1122,7 +1114,7 @@ const oneKeyActivity = async () => {
         tokenId: selectedTokenId.value,
         tokenName: token?.name,
         status: 'warning',
-        message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动部分完成（连续失败4次）`
+        message: `【序号${tokenIndex}】[${token?.name || selectedTokenId.value}]一键活动部分完成（连续失败4次）`
       });
     }
   } catch (error) {
@@ -1135,7 +1127,7 @@ const oneKeyActivity = async () => {
       tokenId: selectedTokenId.value,
       tokenName: token?.name,
       status: 'error',
-      message: `${tokenIndex}、${token?.name || selectedTokenId.value}、一键活动失败: ${error.message || error}`
+      message: `【序号${tokenIndex}】[${token?.name || selectedTokenId.value}]一键活动失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -1770,7 +1762,7 @@ const batchUseItem = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
-                message: `${tokenIndex}、${token.name || token.id}、第${iteration}次使用道具成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]第${iteration}次使用道具成功`
               });
             } catch (error) {
               console.error(`Token ${token.name} 第 ${iteration} 次使用道具失败:`, error);
@@ -1802,7 +1794,7 @@ const batchUseItem = async () => {
                     tokenId: token.id,
                     tokenName: token.name,
                     status: 'success',
-                    message: `${tokenIndex}、${token.name || token.id}、第${iteration}次第${consecutiveClaimAttempts}次领取赠送道具成功`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]第${iteration}次第${consecutiveClaimAttempts}次领取赠送道具成功`
                   });
                 } catch (claimError) {
                   console.error(`Token ${token.name} 第 ${iteration} 次第 ${consecutiveClaimAttempts} 次领取赠送道具失败:`, claimError);
@@ -1822,7 +1814,7 @@ const batchUseItem = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'error',
-                message: `${tokenIndex}、${token.name || token.id}、第${iteration}次使用道具和领取赠送道具都失败，停止执行`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]第${iteration}次使用道具和领取赠送道具都失败，停止执行`
               });
               
               // 记录成功次数
@@ -1831,7 +1823,7 @@ const batchUseItem = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `${tokenIndex}、${token.name || token.id}、使用道具成功${useItemSuccessCount}次，领取赠送成功${claimGiftSuccessCount}次`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]使用道具成功${useItemSuccessCount}次，领取赠送成功${claimGiftSuccessCount}次`
               });
               
               return { 
@@ -1853,7 +1845,7 @@ const batchUseItem = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、批量使用道具失败：${error.message || error}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量使用道具失败：${error.message || error}`
           });
           return { success: false, token: token, error: error.message || error };
         }
@@ -1980,7 +1972,7 @@ const batchActivity = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `${tokenIndex}、${token.name || token.id}、一键战斗完成`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]一键战斗完成`
             });
             return { success: true, token: token };
           } else {
@@ -1990,7 +1982,7 @@ const batchActivity = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${tokenIndex}、${token.name || token.id}、一键战斗部分失败`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]一键战斗部分失败`
             });
             return { success: false, token: token, error: '一键战斗部分失败' };
           }
@@ -2001,7 +1993,7 @@ const batchActivity = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${tokenIndex}、${token.name || token.id}、一键战斗失败: ${error.message || error}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]一键战斗失败: ${error.message || error}`
           });
           return { success: false, token: token, error: error.message || error };
         }
@@ -2580,9 +2572,9 @@ const oneKeyBattle = async () => {
           }
         }
         
-        // 检查哪些BOSS的层数为0
+        // 检查哪些BOSS的层数小于6
         for (let i = 1; i <= 6; i++) {
-          if (bossLevels[i] === 0) {
+          if (bossLevels[i] < 6) {
             x++;
             zeroWinBosses.push(i);
           }
@@ -2590,7 +2582,7 @@ const oneKeyBattle = async () => {
       }
       
       if (x === 0) {
-        message.warning("没有活动次数为0的BOSS，跳过执行");
+        message.warning("没有活动次数小于6的BOSS，跳过执行");
         return;
       }
 
@@ -3036,7 +3028,7 @@ const batchBattle = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: '一键战斗完成'
+              message: `【序号${tokenIndex}】[${token.name || token.id}]一键战斗完成`
             });
             return { success: true, token: token };
           } else {
@@ -3047,7 +3039,7 @@ const batchBattle = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: '没有活动次数为0的BOSS，跳过执行'
+              message: `【序号${tokenIndex}】[${token.name || token.id}]没有活动次数为0的BOSS，跳过执行`
             });
             return { success: false, token: token, error: '没有活动次数为0的BOSS，跳过执行' };
           }
@@ -3058,7 +3050,7 @@ const batchBattle = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `一键战斗失败: ${error.message || error}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]一键战斗失败: ${error.message || error}`
           });
           return { success: false, token: token, error: error.message || error };
         }
@@ -3236,7 +3228,7 @@ const batchExportItemCount = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、道具数量: ${itemCount}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]道具数量: ${itemCount}`
         });
 
       } catch (error) {
@@ -3247,7 +3239,7 @@ const batchExportItemCount = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、获取失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]获取失败: ${error.message || '未知错误'}`
         });
         results.push({
           tokenName: token.name || token.id,
@@ -4230,32 +4222,39 @@ const batchClaimTotalCharge = async () => {
   /* 可以添加一些自定义样式 */
 }
 
-.team-table-container {
+.boss-data-container {
   margin-bottom: 16px;
   width: 100%;
 }
 
-.team-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
+.boss-data-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
 
-.team-table th,
-.team-table td {
-  border: 1px solid #e0e0e0;
+.boss-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   padding: 8px;
-  text-align: center;
-}
-
-.team-table th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.team-table td {
   background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.boss-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.boss-label {
+  font-size: 12px;
+  color: #666;
 }
 </style>

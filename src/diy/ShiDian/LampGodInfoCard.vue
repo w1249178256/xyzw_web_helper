@@ -404,7 +404,7 @@ const refreshTeamInfo = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${tokenIndex}、${token.name || token.id}、执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: fight_startlevel, 获取阵容: ${heroNames.join(', ') || '无'}`
     })
     await waitCommandDelay()
     
@@ -581,7 +581,7 @@ const switchToTeam1 = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `${tokenIndex}、${token.name || token.id}、执行命令: presetteam_saveTeam, 保存/切换预设阵容1`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: presetteam_saveTeam, 保存/切换预设阵容1`
     })
     currentUseTeamId.value = 1
     
@@ -594,7 +594,7 @@ const switchToTeam1 = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${tokenIndex}、${token.name || token.id}、已切换到阵容1`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]已切换到阵容1`
     })
   } catch (error) {
     console.error('切换阵容1失败:', error)
@@ -605,7 +605,7 @@ const switchToTeam1 = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${tokenIndex}、${token.name || token.id}、切换阵容1失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]切换阵容1失败: ${error.message || '未知错误'}`
     })
     // 失败后不返回，继续执行后续操作
   }
@@ -713,7 +713,7 @@ const switchTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `执行命令: hero_exchange, 位置${i+1}: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: hero_exchange, 位置${i+1}: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`
           })
           message.success(`位置${i+1}英雄更换成功: ${getHeroName(currentHero.heroId)} → ${getHeroName(targetHeroId)}`)
           
@@ -780,7 +780,7 @@ const switchTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `执行命令: hero_exchange, 位置${i+1}: 空位 → ${getHeroName(targetHeroId)}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: hero_exchange, 位置${i+1}: 空位 → ${getHeroName(targetHeroId)}`
           })
           message.success(`位置${i+1}英雄添加成功: ${getHeroName(targetHeroId)}`)
           
@@ -844,7 +844,7 @@ const switchTeam = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `已切换到${selectedType}阵容`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]已切换到${selectedType}阵容`
     })
   } catch (error) {
     console.error('切换阵容失败:', error)
@@ -854,7 +854,7 @@ const switchTeam = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `切换阵容失败: ${error.message || '未知错误'}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]切换阵容失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -952,7 +952,7 @@ const changeTech = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)} - 资源不足，停止执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)} - 资源不足，停止执行`
             })
             return
           }
@@ -965,7 +965,7 @@ const changeTech = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]执行命令: legion_resetresearch, 参数: ${JSON.stringify(resetParams)}`
           })
           
           // 每次执行间隔
@@ -982,7 +982,7 @@ const changeTech = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `军团重置研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]军团重置研究收到资源不足提示，停止执行: ${error.message || '未知错误'}`
             })
             return
           }
@@ -992,7 +992,7 @@ const changeTech = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `军团重置研究失败: type=${type}, advanced=false, 错误: ${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]军团重置研究失败: type=${type}, advanced=false, 错误: ${error.message || '未知错误'}`
           })
         }
       }
@@ -1043,7 +1043,7 @@ const changeTech = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `获取当前科技信息，初始状态: ${initialTechState.map(t => `${t.name}:${t.points}`).join(', ')}, 总点数: ${initialTotalPoints}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}]获取当前科技信息，初始状态: ${initialTechState.map(t => `${t.name}:${t.points}`).join(', ')}, 总点数: ${initialTotalPoints}`
       })
       
       // 执行 legion_research 命令：legion_research参数researchId:params.researchId, isMax:true

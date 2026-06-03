@@ -27,12 +27,6 @@
         />
         <CustomizedCard 
           mode="button-placeholder"
-          button-text="全部清除"
-          :disabled="!teamIds?.some(id => id)"
-          @button-click="clearAllTeamIds"
-        />
-        <CustomizedCard 
-          mode="button-placeholder"
           button-text="自动加入十殿"
           :disabled="!teamIds?.some(id => id) || isAutoJoinRunning"
           @button-click="autoJoinShiDian"
@@ -411,7 +405,7 @@ const addMembersToTeams = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `${token.name} 已加入十殿${dianLabels[teamIdx]}，队伍号：${currentTeamId}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]已加入十殿${dianLabels[teamIdx]}，队伍号：${currentTeamId}`
           })
           
           connectingTokens.value.delete(token.id)
@@ -428,7 +422,7 @@ const addMembersToTeams = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `${token.name} 加入失败：${error.message}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]加入失败：${error.message}`
           })
         }
       }
@@ -597,7 +591,7 @@ const executeNightmare8 = async () => {
       tokenId: dian87Token.id,
       tokenName: dian87Token.name,
       status: 'success',
-      message: `${tokenIndex}、${dian87Token.name || dian87Token.id}、十殿 8 执行完成，队伍号：${teamIdForDian8.value}`
+      message: `【序号${tokenIndex}】[${dian87Token.name || dian87Token.id}]十殿 8 执行完成，队伍号：${teamIdForDian8.value}`
     })
     
   } catch (error) {
@@ -761,20 +755,22 @@ const claimNightmareRewardsForCard = async (token) => {
       }
     }
     
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: `${token.name || token.id} 十殿奖励领取完成`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]十殿奖励领取完成`
     })
   } catch (error) {
+    const tokenIndex = getTokenIndex(token)
     logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
       tokenId: token.id,
       tokenName: token.name,
       status: 'error',
-      message: `${token.name || token.id} 领取十殿奖励失败: ${error.message}`
+      message: `【序号${tokenIndex}】[${token.name || token.id}]领取十殿奖励失败: ${error.message}`
     })
     throw error
   }
@@ -969,7 +965,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]资源获取成功: 白玉${whiteJade}, 彩玉${colorJade}, 灵贝${spiritShell}, 金砖${goldBrick}, 金竿${goldenRod}, 宝箱总分数${chestScoreDisplay}, 招募令${recruitOrder}`
         })
       } catch (error) {
         console.error(`Token ${token.name || token.id} 处理失败:`, error)
@@ -995,7 +991,7 @@ const exportResources = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'error',
-          message: `${tokenIndex}、${token.name || token.id}、资源获取失败: ${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]资源获取失败: ${error.message || '未知错误'}`
         })
       }
 
