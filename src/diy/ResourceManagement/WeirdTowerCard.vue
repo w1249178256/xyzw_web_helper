@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -85,12 +85,6 @@
             />
             <CustomizedCard 
               mode="button" 
-              name="领取任务奖励" 
-              :disabled="!selectedTokenId || isRunning"
-              @button-click="claimTaskReward" 
-            />
-            <CustomizedCard 
-              mode="button" 
               name="批量特权领取" 
               :disabled="isBatchPrivilegeRunning"
               @button-click="batchClaimLegionPrivilege" 
@@ -103,8 +97,8 @@
             />
             <CustomizedCard 
               mode="button" 
-              name="批量怪异塔" 
-              :disabled="!selectedTokenId || isRunning"
+              :name="isBatchRunning ? '批量怪异塔中...' : '批量怪异塔'" 
+              :disabled="tokenStore.gameTokens.length === 0 || isBatchRunning"
               @button-click="batchWeirdTower" 
             />
             <CustomizedCard 
@@ -139,7 +133,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="怪异塔"
-        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '领取任务奖励', '批量特权领取', '批量怪异塔', '批量爬塔', '批量开启爬塔', '批量导出爬塔信息', '批量领取免费钥匙', '导出未激活成员']"
+        :filter-operations="['开始爬塔', '停止爬塔', '刷新信息', '一键使用道具', '一键合成', '批量特权领取', '批量怪异塔', '批量爬塔', '批量开启爬塔', '批量导出爬塔信息', '批量领取免费钥匙', '导出未激活成员']"
       />
     </template>
   </MyCard>
@@ -851,62 +845,6 @@ const claimCostProgress = async () => {
   }
 }
 
-// 领取任务奖励
-const claimTaskReward = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
-    return
-  }
-  
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
-  
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接游戏')
-    return
-  }
-  
-  try {
-    message.info('正在领取任务奖励...')
-    await tokenStore.sendEvotowerClaimTask(token.id, {})
-    message.success('领取任务奖励完成')
-    
-    // 添加操作日志
-    const tokenIndex = getTokenIndex(token)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '怪异塔',
-      operation: '领取任务奖励',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'success',
-      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取任务奖励完成`
-    })
-    
-    // 刷新信息
-    await getTowerInfo(token.id)
-  } catch (error) {
-    console.error('领取任务奖励失败:', error)
-    message.error('领取任务奖励失败: ' + (error.message || '未知错误'))
-    
-    // 添加错误日志
-    const tokenIndex = getTokenIndex(token)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '怪异塔',
-      operation: '领取任务奖励',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'error',
-      message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、领取任务奖励失败: ${error.message || '未知错误'}`
-    })
-  }
-}
-
 // 领取合成进度奖励
 const claimMergeProgress = async () => {
   if (!props.selectedTokenId) {
@@ -1303,32 +1241,442 @@ const autoMergeItems = async () => {
   }
 }
 
-// 批量怪异塔（暂时空白）
+// 批量怪异塔
 const batchWeirdTower = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
     return
   }
   
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
+  const tokenIndices = parseTokenRange(batchTokens.value)
+  let targetTokens = []
+  
+  if (tokenIndices === null || tokenIndices.length === 0) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices
+      .map(index => {
+        const arrayIndex = index - 1
+        const token = sortedTokensList[arrayIndex]
+        return token ? { token, index } : null
+      })
+      .filter(item => item !== null)
+      .sort((a, b) => a.index - b.index)
+      .map(item => item.token)
   }
   
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接游戏')
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
     return
   }
   
   try {
-    message.info('批量怪异塔功能待实现...')
-    // TODO: 实现批量怪异塔逻辑
-    message.warning('批量怪异塔功能暂未实现')
+    isBatchRunning.value = true
+    const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
+    message.info(`开始批量怪异塔（${rangeText}），共${targetTokens.length}个Token，循环执行使用道具→合成→领取奖励`)
+    
+    // 为每个token维护状态
+    const tokenStates = new Map()
+    targetTokens.forEach(token => {
+      tokenStates.set(token.id, { token, completed: false })
+    })
+    
+    let roundCount = 0
+    const MAX_ROUNDS = 100 // 最大循环次数，防止无限循环
+    
+    while (roundCount < MAX_ROUNDS) {
+      // 检查是否所有token都完成了
+      let allCompleted = true
+      for (const [tokenId, state] of tokenStates) {
+        if (!state.completed) {
+          allCompleted = false
+          break
+        }
+      }
+      
+      if (allCompleted) {
+        message.info(`所有Token已完成，共执行${roundCount}轮`)
+        break
+      }
+      
+      roundCount++
+      message.info(`开始第${roundCount}轮循环...`)
+      
+      // 获取未完成的token列表
+      const activeTokens = Array.from(tokenStates.values())
+        .filter(state => !state.completed)
+        .map(state => state.token)
+      
+      // 使用连接池执行一轮操作
+      const results = await connectionPool.batchOperate(
+        activeTokens,
+        async (token, globalIndex) => {
+          const tokenIndex = globalIndex + 1
+          const tokenId = token.id
+          const state = tokenStates.get(tokenId)
+          
+          try {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '怪异塔',
+              operation: '批量怪异塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、第${roundCount}轮开始`
+            })
+            
+            // 步骤1: 使用道具
+            const useItemsResult = await executeUseItemsForToken(tokenId)
+            
+            if (useItemsResult === 'no_items') {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '怪异塔',
+                operation: '批量怪异塔',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有道具可使用，标记为完成`
+              })
+              state.completed = true
+              return { success: true, token, completed: true }
+            }
+            
+            // 如果提示"没有空格子了"，记录日志但继续执行合成
+            if (useItemsResult === 'no_space') {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '怪异塔',
+                operation: '批量怪异塔',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有空格子了，继续执行合成`
+              })
+            }
+            
+            // 如果提示"物品数量不足"，跳转到合成步骤
+            if (useItemsResult === 'insufficient_items') {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '怪异塔',
+                operation: '批量怪异塔',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、物品数量不足，跳转到合成`
+              })
+            }
+            
+            await waitCommandDelay()
+            
+            // 步骤2: 合成
+            await executeMergeForToken(tokenId)
+            
+            await waitCommandDelay()
+            
+            // 步骤3: 领取使用奖励
+            const claimResult = await executeClaimCostProgressForToken(tokenId)
+            
+            if (claimResult === 'no_reward') {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '怪异塔',
+                operation: '批量怪异塔',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有可领取的奖励，标记为完成`
+              })
+              state.completed = true
+              return { success: true, token, completed: true }
+            }
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '怪异塔',
+              operation: '批量怪异塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、第${roundCount}轮完成`
+            })
+            
+            return { success: true, token, completed: false }
+          } catch (error) {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '怪异塔',
+              operation: '批量怪异塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'error',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、第${roundCount}轮失败: ${error.message || '未知错误'}`
+            })
+            
+            // 出错也标记为完成，避免阻塞其他token
+            state.completed = true
+            return { success: false, token, error, completed: true }
+          }
+        },
+        {
+          batchSize: 20,
+          delayBetween: parseInt(commandDelay.value) || 1000,
+          keepConnections: false,
+          onProgress: (progress) => {
+            if (progress.type === 'token-complete') {
+              const completed = progress.success ? '成功' : '失败'
+              message.info(`序号 ${progress.globalIndex + 1} ${progress.tokenName || progress.tokenId} 第${roundCount}轮${completed}`)
+            }
+          }
+        }
+      )
+      
+      // 检查本轮结果
+      const completedCount = results.filter(r => r.completed).length
+      const successCount = results.filter(r => r.success).length
+      const failCount = results.length - successCount
+      
+      if (failCount > 0) {
+        message.warning(`第${roundCount}轮完成，${completedCount}个token标记为完成，${failCount}个token失败`)
+      } else {
+        message.info(`第${roundCount}轮完成，${completedCount}个token标记为完成`)
+      }
+    }
+    
+    if (roundCount >= MAX_ROUNDS) {
+      message.warning(`达到最大循环次数${MAX_ROUNDS}，停止执行`)
+    }
+    
+    // 统计最终结果
+    const completedTokens = Array.from(tokenStates.values()).filter(s => s.completed).length
+    message.success(`批量怪异塔完成，共执行${roundCount}轮，${completedTokens}/${targetTokens.length}个token完成`)
+    
   } catch (error) {
     console.error('批量怪异塔失败:', error)
     message.error('批量怪异塔失败: ' + (error.message || '未知错误'))
+  } finally {
+    isBatchRunning.value = false
+  }
+}
+
+// 为单个token执行使用道具逻辑
+const executeUseItemsForToken = async (tokenId) => {
+  const infoRes = await tokenStore.sendMessageWithPromise(
+    tokenId,
+    "mergebox_getinfo",
+    { actType: 1 },
+    5000
+  )
+
+  const towerInfoRes = await tokenStore.sendMessageWithPromise(
+    tokenId,
+    "evotower_getinfo",
+    {},
+    5000
+  )
+
+  if (!infoRes || !infoRes.mergeBox) {
+    throw new Error("获取活动信息失败")
+  }
+
+  let costTotalCnt = infoRes.mergeBox.costTotalCnt || 0
+  let lotteryLeftCnt = towerInfoRes?.evoTower?.lotteryLeftCnt || 0
+
+  if (lotteryLeftCnt <= 0) {
+    return 'no_items'
+  }
+
+  while (lotteryLeftCnt > 0) {
+    let pos = {}
+    if (costTotalCnt < 2) {
+      pos = { gridX: 4, gridY: 5 }
+    } else if (costTotalCnt < 102) {
+      pos = { gridX: 7, gridY: 3 }
+    } else {
+      pos = { gridX: 6, gridY: 3 }
+    }
+
+    try {
+      const openBoxResult = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "mergebox_openbox",
+        {
+          actType: 1,
+          pos: pos
+        },
+        5000
+      )
+      
+      // 检查返回结果是否提示"没有空格子了"
+      if (openBoxResult && openBoxResult.message && openBoxResult.message.includes('没有空格子了')) {
+        return 'no_space'
+      }
+      
+      // 检查返回结果是否提示"物品数量不足"
+      if (openBoxResult && openBoxResult.message && openBoxResult.message.includes('物品数量不足')) {
+        return 'insufficient_items'
+      }
+    } catch (error) {
+      // 如果报错包含"没有空格子了"，返回no_space
+      if (error.message && error.message.includes('没有空格子了')) {
+        return 'no_space'
+      }
+      // 如果报错包含"物品数量不足"，返回insufficient_items
+      if (error.message && error.message.includes('物品数量不足')) {
+        return 'insufficient_items'
+      }
+      throw error
+    }
+
+    costTotalCnt++
+    lotteryLeftCnt--
+
+    await waitCommandDelay()
+  }
+
+  return 'success'
+}
+
+// 为单个token执行合成逻辑
+const executeMergeForToken = async (tokenId) => {
+  let loopCount = 0
+  const MAX_LOOPS = 20
+
+  while (loopCount < MAX_LOOPS) {
+    loopCount++
+
+    const infoRes = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "mergebox_getinfo",
+      { actType: 1 },
+      5000
+    )
+
+    if (!infoRes || !infoRes.mergeBox) {
+      throw new Error("返回数据缺少 mergeBox")
+    }
+
+    if (infoRes.mergeBox.taskMap) {
+      const taskMap = infoRes.mergeBox.taskMap
+      const taskClaimMap = infoRes.mergeBox.taskClaimMap || {}
+
+      for (const taskId in taskMap) {
+        if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "mergebox_claimmergeprogress",
+            { actType: 1, taskId: parseInt(taskId) },
+            2000
+          ).catch(() => {})
+          await waitCommandDelay()
+        }
+      }
+    }
+
+    const gridMap = infoRes.mergeBox.gridMap || {}
+    const items = []
+
+    for (const xStr in gridMap) {
+      for (const yStr in gridMap[xStr]) {
+        const item = gridMap[xStr][yStr]
+        if (item.gridConfId == 0 && item.gridItemId > 0 && !item.isLock) {
+          items.push({
+            x: parseInt(xStr),
+            y: parseInt(yStr),
+            id: item.gridItemId
+          })
+        }
+      }
+    }
+
+    const groupedItems = {}
+    items.forEach(item => {
+      if (!groupedItems[item.id]) {
+        groupedItems[item.id] = []
+      }
+      groupedItems[item.id].push(item)
+    })
+
+    let hasPotentialMerge = false
+    for (const id in groupedItems) {
+      if (groupedItems[id].length >= 2) {
+        hasPotentialMerge = true
+        break
+      }
+    }
+
+    if (!hasPotentialMerge) {
+      break
+    }
+
+    const isLevel8OrAbove = infoRes.mergeBox.taskMap && infoRes.mergeBox.taskMap["251212208"] && infoRes.mergeBox.taskMap["251212208"] !== 0
+
+    if (isLevel8OrAbove) {
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "mergebox_automergeitem",
+        { actType: 1 },
+        10000 
+      )
+      await waitCommandDelay()
+    } else {
+      for (const id in groupedItems) {
+        const group = groupedItems[id]
+        while (group.length >= 2) {
+          const source = group.shift()
+          const target = group.shift()
+
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "mergebox_mergeitem",
+            {
+              actType: 1,
+              sourcePos: { gridX: source.x, gridY: source.y },
+              targetPos: { gridX: target.x, gridY: target.y }
+            },
+            1000
+          ).catch(() => {})
+          await waitCommandDelay()
+        }
+      }
+    }
+    
+    await waitCommandDelay()
+  }
+
+  await getTowerInfo(tokenId)
+}
+
+// 为单个token执行领取使用奖励逻辑
+const executeClaimCostProgressForToken = async (tokenId) => {
+  try {
+    const result = await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "mergebox_claimcostprogress",
+      { actType: 1 },
+      5000
+    )
+    
+    // 检查返回结果，如果提示"没有可领取的奖励"则返回no_reward
+    if (result && result.message && result.message.includes('没有可领取的奖励')) {
+      return 'no_reward'
+    }
+    
+    return 'success'
+  } catch (error) {
+    // 如果报错包含"没有可领取的奖励"，也返回no_reward
+    if (error.message && error.message.includes('没有可领取的奖励')) {
+      return 'no_reward'
+    }
+    throw error
   }
 }
 

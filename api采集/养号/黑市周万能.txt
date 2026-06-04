@@ -1,0 +1,46 @@
+
+----------------------------------------
+时间: 2026/6/3 20:38:53
+服务: ActivityService
+方法: claimWeekActReward
+参数: [{"typ":12,"selectRewardsMap":{}}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 0,
+    "time": 1780490336835,
+    "resp": 42,
+    "cmd": "activity_claimweekactrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "3201": {
+            "quantity": 262
+          }
+        },
+        "statistics": {
+          "week:act:cr:cnt:12": 1
+        },
+        "statisticsTime": {
+          "week:act:cr:cnt:12": 1780027200
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 150,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 35
+}
+异步: 是
+调用ID: call_1780490333920_d0x1wisdk
+
+

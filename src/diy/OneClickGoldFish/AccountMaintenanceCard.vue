@@ -442,7 +442,6 @@ const isBatchAwakingSkill = ref(false)
 const isBatchUpgradingHangup = ref(false)
 const isBatchClaimingHangupReward = ref(false)
 const isBatchRenaming = ref(false)
-const isBoxWeekRunning = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
 const isBatchBoxWeekRunning = ref(false)
@@ -497,7 +496,6 @@ const isBatchClaimingBoxRewards = ref(false)
 const isBatchClaimingEmails = ref(false)
 const isCalculatingBoxScore = ref(false)
 const isCalculatingUsedBoxScore = ref(false)
-const isClaimingBoxWeekReward = ref(false)
 const baseBoxScore = ref('')
 const boxTotalScore = ref('0')
 const usedBoxScore = ref('0')
@@ -520,8 +518,6 @@ const selectedSingleHero = ref('107')
 // 执行范围
 const executionTokens = ref('')
 const commandDelay = ref(localStorage.getItem('accountMaintenanceCommandDelay') || '600')
-const legacyTargetId = ref('111582820')
-const legacyPassword = ref('946215')
 
 // 按token昵称排序的token列表
 const sortedTokens = [...tokenStore.gameTokens].sort((a, b) => {
@@ -543,16 +539,6 @@ const handleCommandDelayInput = (value) => {
 
 // 辅助函数：等待执行间隔
 const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, parseInt(commandDelay.value) || 600))
-
-// 处理赠送目标ID输入
-const handleLegacyTargetIdInput = (value) => {
-  legacyTargetId.value = value
-}
-
-// 处理安全密码输入
-const handleLegacyPasswordInput = (value) => {
-  legacyPassword.value = value
-}
 
 // 解析执行范围
 const parseExecutionRange = (rangeStr) => {
@@ -3343,39 +3329,6 @@ const handleUpgradeChiYu = async () => {
   }
 }
 
-// 一键招募周
-const handleOneClickRecruitWeek = async () => {
-  try {
-    isRecruitWeekRunning.value = true
-    
-    // TODO: 实现一键招募周功能
-    message.info('一键招募周功能开发中...')
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '一键招募周',
-      status: 'info',
-      message: '功能开发中，敬请期待'
-    })
-  } catch (error) {
-    console.error('一键招募周失败:', error)
-    message.error(`一键招募周失败: ${error.message || '未知错误'}`)
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '一键招募周',
-      status: 'error',
-      message: `一键招募周失败: ${error.message || '未知错误'}`
-    })
-  } finally {
-    isRecruitWeekRunning.value = false
-  }
-}
-
 // 导出详情
 const handleExportDetails = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
@@ -3617,7 +3570,7 @@ const executeBoxWeekForToken = async (token) => {
     }
     
     // 2. 计算阶段
-    // 计算宝箱总分Z
+    // 计算宝箱总分Z（新积分规则：铂金50分/个，黄金20分/个，青铜10分/个，木质1分/个）
     const Z = (M + Q * 10 + H * 20 + B * 50) + Y * 0.43
     
     // 获取基准宝箱分J
@@ -3633,540 +3586,276 @@ const executeBoxWeekForToken = async (token) => {
     
     boxWeekRounds = l
     
-    message.info(`${token.name} - 宝箱总分: ${Z}, 基准宝箱分: ${J}, 已用宝箱分: ${Y}, 开箱轮数: ${l}`)
+    // 计算目标分数ZY
+    const ZY = 8000 * l
+    
+    message.info(`${token.name} - 宝箱总分: ${Z}, 基准宝箱分: ${J}, 已用宝箱分: ${Y}, 开箱轮数: ${l}, 目标分数ZY: ${ZY}`)
+    
+    // 辅助函数：计算已用宝箱分YY（新积分规则）
+    const calculateYY = () => {
+      return Y + MK * 100 + QK * 10 + HK * 20 + BK * 50
+    }
+    
+    // 辅助函数：获取服务器真实Y值
+    const fetchRealY = async () => {
+      try {
+        const actInfo = await tokenStore.sendActivityGet(token.id)
+        if (actInfo && actInfo.activity && actInfo.activity.myTotalInfo && actInfo.activity.myTotalInfo['2']) {
+          const info = actInfo.activity.myTotalInfo['2']
+          const rounds = info.rounds || 1
+          const num = info.num || 0
+          Y = (rounds - 1) * 8000 + num
+          message.info(`${token.name} - 已用宝箱分Y=${Y} (轮数:${rounds}, 当前轮分数:${num})`)
+          return Y
+        }
+      } catch (error) {
+        console.error('获取Y值失败:', error)
+      }
+      return Y
+    }
+    
+    // 辅助函数：计算铂金宝箱开箱数量（根据宝箱数量和ZY-Y差值）
+    const calculatePlatinumOpenCount = (boxCount, diff) => {
+      // ZY-Y<1000时，固定开10个
+      if (diff < 1000) {
+        return Math.min(10, boxCount)
+      }
+      
+      // 铂金宝箱规则
+      if (boxCount >= 100) {
+        if (diff > 5000) {
+          return 100
+        } else if (diff > 2500) {
+          return 50
+        } else {
+          return 10
+        }
+      } else if (boxCount >= 50) {
+        if (diff > 2500) {
+          return 50
+        } else {
+          return 10
+        }
+      } else {
+        return Math.min(10, boxCount)
+      }
+    }
+    
+    // 辅助函数：计算青铜/黄金宝箱开箱数量（根据宝箱数量和ZY-Y差值）
+    const calculateNormalOpenCount = (boxCount, diff) => {
+      // ZY-Y<1000时，固定开10个
+      if (diff < 1000) {
+        return Math.min(10, boxCount)
+      }
+      
+      // 青铜/黄金宝箱规则
+      if (boxCount >= 100) {
+        if (diff > 2000) {
+          return 100
+        } else if (diff > 1000) {
+          return 50
+        } else {
+          return 10
+        }
+      } else if (boxCount >= 50) {
+        if (diff > 1000) {
+          return 50
+        } else {
+          return 10
+        }
+      } else {
+        return Math.min(10, boxCount)
+      }
+    }
+    
+    // 辅助函数：开箱并检查分数
+    const openBoxAndCheck = async (itemId, count, boxTypeName) => {
+      await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, count })
+      
+      // 计算YY
+      const YY = calculateYY()
+      const diff = ZY - YY
+      
+      const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱积分YY: ${YY}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
+      message.info(openBoxLog)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '开箱操作',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: openBoxLog
+      })
+      await waitCommandDelay()
+      
+      // ZY-YY<1000时，不再检查YY，直接检查Y
+      if (diff < 1000) {
+        await fetchRealY()
+        if (Y >= ZY || Y > 32000) {
+          message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '跳出循环',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `已用宝箱分Y ${Y} ${Y > 32000 ? '超过最大限制32000' : '达到目标' + ZY}`
+          })
+          return 'break'
+        }
+        // Y小于ZY，宝箱分数不够了，领取宝箱奖励后继续开箱
+        message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '领取宝箱奖励',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`
+        })
+        await tokenStore.sendBatchClaimBoxPointReward(token.id)
+        await waitCommandDelay()
+        return 'continue'
+      }
+      
+      // YY超过目标时，获取Y验证
+      if (YY > ZY) {
+        await fetchRealY()
+        if (Y >= ZY || Y > 32000) {
+          message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '跳出循环',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `已用宝箱分Y ${Y} ${Y > 32000 ? '超过最大限制32000' : '达到目标' + ZY}`
+          })
+          return 'break'
+        }
+      }
+      
+      return 'continue'
+    }
     
     // 3. 开宝箱阶段
     let roundCount = 0
     let shouldBreak = false
-    while (true) {
+    
+    // 初始化开箱数量
+    let MK = 0 // 木质开箱数量
+    let QK = 0 // 青铜开箱数量
+    let HK = 0 // 黄金开箱数量
+    let BK = 0 // 铂金开箱数量
+    
+    while (!shouldBreak) {
       roundCount++
       message.info(`${token.name} - 执行第 ${roundCount} 轮开宝箱`)
       
-      // 初始化开箱次数
-      let MK = 0 // 木质开箱次数
-      let QK = 0 // 青铜开箱次数
-      let HK = 0 // 黄金开箱次数
-      let BK = 0 // 铂金开箱次数
-      
-      // 铂金宝箱，每次10个（开箱顺序：铂金、黄金、青铜、木质）
-      const platinumTimes = Math.floor(B / 10)
-      for (let i = 0; i < platinumTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2004, count: 10 })
-        B -= 10
-        BK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开铂金宝箱: ${BK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
+      // 铂金宝箱开箱（itemId: 2004，50分/个）
+      while (B >= 10) {
+        const diff = ZY - calculateYY()
+        const count = calculatePlatinumOpenCount(B, diff)
+        if (count === 0) break
         
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num,
-                calculatedYY: YY,
-                MK: MK,
-                QK: QK,
-                HK: HK,
-                BK: BK,
-                remainingM: remainingM,
-                remainingQ: remainingQ,
-                remainingH: remainingH,
-                remainingB: remainingB
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              shouldBreak = true
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              shouldBreak = true
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 黄金宝箱，每次10个
-      const goldTimes = Math.floor(H / 10)
-      for (let i = 0; i < goldTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2003, count: 10 })
-        H -= 10
-        HK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开黄金宝箱: ${HK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num,
-                calculatedYY: YY,
-                MK: MK,
-                QK: QK,
-                HK: HK,
-                BK: BK,
-                remainingM: remainingM,
-                remainingQ: remainingQ,
-                remainingH: remainingH,
-                remainingB: remainingB
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              shouldBreak = true
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              shouldBreak = true
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 青铜宝箱，每次10个
-      const bronzeTimes = Math.floor(Q / 10)
-      for (let i = 0; i < bronzeTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2002, count: 10 })
-        Q -= 10
-        QK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开青铜宝箱: ${QK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num,
-                calculatedYY: YY,
-                MK: MK,
-                QK: QK,
-                HK: HK,
-                BK: BK,
-                remainingM: remainingM,
-                remainingQ: remainingQ,
-                remainingH: remainingH,
-                remainingB: remainingB
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 木质宝箱，每次100个
-      const woodTimes = Math.floor(M / 100)
-      for (let i = 0; i < woodTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 100 })
-        M -= 100
-        MK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 100
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 100 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开木质宝箱: ${MK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num,
-                calculatedYY: YY,
-                MK: MK,
-                QK: QK,
-                HK: HK,
-                BK: BK,
-                remainingM: remainingM,
-                remainingQ: remainingQ,
-                remainingH: remainingH,
-                remainingB: remainingB
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              break
-            }
-          }
-        }
-      }
-      
-      // 4. 领取奖励阶段（开宝箱阶段内）
-      // 开宝箱阶段内领取宝箱奖励
-      message.info(`${token.name} - 开宝箱阶段内领取宝箱奖励`)
-      await tokenStore.sendBatchClaimBoxPointReward(token.id)
-      message.info(`${token.name} - 开宝箱阶段内领取宝箱奖励成功`)
-      // 添加操作日志
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '开宝箱阶段领取宝箱奖励',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'success',
-        message: `开宝箱阶段内领取宝箱奖励成功`,
-        command: 'item_batchclaimboxpointreward'
-      })
-      await waitCommandDelay()
-      
-      // 开宝箱阶段内领取邮件
-      message.info(`${token.name} - 开宝箱阶段内领取邮件`)
-      await tokenStore.sendMailClaimAllAttachment(token.id, { category: 0 })
-      message.info(`${token.name} - 开宝箱阶段内领取邮件成功`)
-      // 添加操作日志
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '开宝箱阶段领取邮件',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'success',
-        message: `开宝箱阶段内领取邮件成功`,
-        command: 'mail_claimallattachment',
-        commandParams: { category: 0 }
-      })
-      await waitCommandDelay()
-      
-      // 领取邮件后，重新获取宝箱数量
-      message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量`)
-      const boxRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
-      if (boxRoleInfo && boxRoleInfo.role && boxRoleInfo.role.items) {
-        const boxItems = boxRoleInfo.role.items
-        M = boxItems['2001']?.quantity || 0
-        Q = boxItems['2002']?.quantity || 0
-        H = boxItems['2003']?.quantity || 0
-        B = boxItems['2004']?.quantity || 0
-        message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量成功：木质${M}，青铜${Q}，黄金${H}，铂金${B}`)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开宝箱阶段重新获取宝箱数量',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'success',
-          message: `开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
-        })
-      }
-      await waitCommandDelay()
-      
-      // 5. 检查阶段
-      const activityInfoCheck = await tokenStore.sendActivityGet(token.id)
-      if (activityInfoCheck && activityInfoCheck.activity && activityInfoCheck.activity.myTotalInfo && activityInfoCheck.activity.myTotalInfo['2']) {
-        const info = activityInfoCheck.activity.myTotalInfo['2']
-        const rounds = info.rounds || 1
-        const num = info.num || 0
-        Y = (rounds - 1) * 8000 + num
-        
-        const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-        message.info(scoreLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '分数获取',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: scoreLog,
-          details: {
-            Y: Y,
-            rounds: rounds,
-            num: num
-          }
-        })
-        
-        if (Y > l * 8000) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-          // 添加跳出循环日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-          })
-          break
-        }
-        // 额外检查：如果已用宝箱分已经很高，及时停止
-        if (Y > 8000 * 4) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-          // 添加跳出循环日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-          })
+        const result = await openBoxAndCheck(2004, count, '铂金')
+        B -= count
+        BK += count
+        if (result === 'break') {
+          shouldBreak = true
           break
         }
       }
+      if (shouldBreak) break
       
-      // 检查阶段重置MK/QK/HK/BK为0
-      MK = 0
-      QK = 0
-      HK = 0
-      BK = 0
+      // 黄金宝箱开箱（itemId: 2003，20分/个）
+      while (H >= 10) {
+        const diff = ZY - calculateYY()
+        const count = calculateNormalOpenCount(H, diff)
+        if (count === 0) break
+        
+        const result = await openBoxAndCheck(2003, count, '黄金')
+        H -= count
+        HK += count
+        if (result === 'break') {
+          shouldBreak = true
+          break
+        }
+      }
+      if (shouldBreak) break
+      
+      // 青铜宝箱开箱（itemId: 2002，10分/个）
+      while (Q >= 10) {
+        const diff = ZY - calculateYY()
+        const count = calculateNormalOpenCount(Q, diff)
+        if (count === 0) break
+        
+        const result = await openBoxAndCheck(2002, count, '青铜')
+        Q -= count
+        QK += count
+        if (result === 'break') {
+          shouldBreak = true
+          break
+        }
+      }
+      if (shouldBreak) break
+      
+      // 木质宝箱开箱（itemId: 2001，1分/个）
+      while (M >= 100) {
+        const diff = ZY - calculateYY()
+        const count = diff < 1000 ? 10 : (diff > 5000 ? 100 : (diff > 2500 ? 50 : 10))
+        const actualCount = Math.min(count * 10, M)
+        if (actualCount < 10) break
+        
+        const result = await openBoxAndCheck(2001, actualCount, '木质')
+        M -= actualCount
+        MK += actualCount
+        if (result === 'break') {
+          shouldBreak = true
+          break
+        }
+      }
+      if (shouldBreak) break
+      
+      // 检查是否还需要继续开箱
+      const currentYY = calculateYY()
+      if (currentYY >= ZY) {
+        // 获取服务器真实Y值
+        await fetchRealY()
+        if (Y < ZY) {
+          // Y小于ZY，宝箱分数不够了，领取宝箱奖励后继续开箱
+          message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '领取宝箱奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`
+          })
+          await tokenStore.sendBatchClaimBoxPointReward(token.id)
+          await waitCommandDelay()
+          // 继续下一轮开箱
+          continue
+        }
+        
+        message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标 ${ZY}，进入最终阶段`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '跳出循环',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `已用宝箱分Y ${Y} 达到目标 ${ZY}`
+        })
+        break
+      }
       
       // 重新获取宝箱数量
       const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -4178,27 +3867,97 @@ const executeBoxWeekForToken = async (token) => {
         B = newItems['2004']?.quantity || 0
       }
       
-      // 判断是否继续下一轮开箱：基于YY计算值
-      const currentYY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-      if (currentYY >= l * 8000) {
-        message.info(`${token.name} - 已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}，进入最终阶段`)
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '跳出循环',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: `已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
-        })
+      // 如果没有宝箱了，退出循环
+      if (M < 100 && Q < 10 && H < 10 && B < 10) {
+        message.info(`${token.name} - 宝箱数量不足，进入最终阶段`)
         break
       }
     }
     
-    // 6. 最终阶段
-    // 领取邮件
-    await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
+    // 4. 领取奖励阶段
+    // 领取宝箱奖励
+    message.info(`${token.name} - 领取宝箱奖励`)
+    await tokenStore.sendBatchClaimBoxPointReward(token.id)
+    message.info(`${token.name} - 领取宝箱奖励成功`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '领取宝箱奖励',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `领取宝箱奖励成功`,
+      command: 'item_batchclaimboxpointreward'
+    })
     await waitCommandDelay()
+    
+    // 领取邮件
+    message.info(`${token.name} - 领取邮件`)
+    await tokenStore.sendMailClaimAllAttachment(token.id, { category: 0 })
+    message.info(`${token.name} - 领取邮件成功`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '领取邮件',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `领取邮件成功`,
+      command: 'mail_claimallattachment',
+      commandParams: { category: 0 }
+    })
+    await waitCommandDelay()
+    
+    // 5. 开钻石宝箱阶段（领取宝箱周奖励前）
+    message.info(`${token.name} - 开始开钻石宝箱`)
+    const diamondRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
+    if (diamondRoleInfo && diamondRoleInfo.role && diamondRoleInfo.role.items) {
+      const diamondItems = diamondRoleInfo.role.items
+      let D = diamondItems['2005']?.quantity || 0 // 钻石宝箱
+      
+      message.info(`${token.name} - 钻石宝箱数量: ${D}`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '钻石宝箱数量',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `钻石宝箱数量: ${D}`
+      })
+      
+      // 每次开10个，开到不足10个为止
+      let diamondOpenCount = 0
+      while (D >= 10) {
+        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, count: 10 })
+        D -= 10
+        diamondOpenCount++
+        message.info(`${token.name} - 开钻石宝箱第${diamondOpenCount}次，10个，剩余${D}个`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '开钻石宝箱',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `开钻石宝箱第${diamondOpenCount}次，10个，剩余${D}个`
+        })
+        await waitCommandDelay()
+      }
+      
+      message.info(`${token.name} - 钻石宝箱开启完成，共开启${diamondOpenCount}次`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '钻石宝箱完成',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `钻石宝箱开启完成，共开启${diamondOpenCount}次`
+      })
+    }
+    
+    // 6. 领取宝箱周奖励
     
     // 领取宝箱周奖励
     for (let i = 0; i < l + 1; i++) {
@@ -4522,35 +4281,33 @@ const handleBatchRecruitWeek = async () => {
             for (let round = 0; round < maxRounds; round++) {
               message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始第 ${round + 1} 轮招募周`)
               
-              for (let recruit = 0; recruit < 400; recruit += 10) {
+              for (let recruit = 0; recruit < 400; recruit += 100) {
                 try {
                   await tokenStore.sendMessageWithPromise(
                     token.id,
                     'hero_recruit',
                     {
                       byClub: false,
-                      recruitNumber: 10,
+                      recruitNumber: 100,
                       recruitType: 1
                     },
                     5000
                   )
                   
-                  totalRecruits += 10
-                  remainingRecruits -= 10
+                  totalRecruits += 100
+                  remainingRecruits -= 100
                   
-                  if (totalRecruits % 100 === 0) {
-                    try {
-                      await tokenStore.sendMessageWithPromise(
-                        token.id,
-                        'mail_claimallattachment',
-                        {},
-                        5000
-                      )
-                      mailClaimCount++
-                      message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取邮件附件成功（第${mailClaimCount}次）`)
-                    } catch (mailError) {
-                      console.error(`领取邮件失败：${mailError.message}`, mailError)
-                    }
+                  try {
+                    await tokenStore.sendMessageWithPromise(
+                      token.id,
+                      'mail_claimallattachment',
+                      {},
+                      5000
+                    )
+                    mailClaimCount++
+                    message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取邮件附件成功（第${mailClaimCount}次）`)
+                  } catch (mailError) {
+                    console.error(`领取邮件失败：${mailError.message}`, mailError)
                   }
                   
                   await waitCommandDelay()
@@ -7006,735 +6763,6 @@ const handleCalculateUsedBoxScore = async () => {
   }
 }
 
-// 领取宝箱周奖励
-const handleClaimBoxWeekReward = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
-    return
-  }
-  
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
-  
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接Token')
-    return
-  }
-  
-  try {
-    isClaimingBoxWeekReward.value = true
-    
-    const result = await tokenStore.sendActivityClaimWeekActReward(token.id)
-    
-    message.success('领取宝箱周奖励成功')
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '领取宝箱周奖励',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'success',
-      message: '领取宝箱周奖励成功'
-    })
-  } catch (error) {
-    console.error('领取宝箱周奖励失败:', error)
-    message.error(`领取宝箱周奖励失败: ${error.message || '未知错误'}`)
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '领取宝箱周奖励',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'error',
-      message: `领取宝箱周奖励失败: ${error.message || '未知错误'}`
-    })
-  } finally {
-    isClaimingBoxWeekReward.value = false
-  }
-}
-
-// 一键宝箱周
-const handleOneClickBoxWeek = async () => {
-  if (!props.selectedTokenId) {
-    message.warning('请先选择Token')
-    return
-  }
-  
-  const token = tokenStore.gameTokens.find(t => t.id === props.selectedTokenId)
-  if (!token) {
-    message.error('Token不存在')
-    return
-  }
-  
-  const status = tokenStore.getWebSocketStatus(token.id)
-  if (status !== 'connected') {
-    message.error('WebSocket未连接，请先连接Token')
-    return
-  }
-  
-  let boxWeekRounds = 0
-  
-  try {
-    isBoxWeekRunning.value = true
-    
-    message.info(`${token.name} - 开始一键宝箱周...`)
-    
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '一键宝箱周',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'info',
-      message: `开始一键宝箱周...`
-    })
-    
-    // 1. 准备阶段
-    // 获取角色信息，获取宝箱数量
-    const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-    if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
-      throw new Error('获取角色信息失败')
-    }
-    
-    const items = roleInfo.role.items
-    let M = items['2001']?.quantity || 0 // 木质宝箱
-    let Q = items['2002']?.quantity || 0 // 青铜宝箱
-    let H = items['2003']?.quantity || 0 // 黄金宝箱
-    let B = items['2004']?.quantity || 0 // 铂金宝箱
-    
-    // 获取已用宝箱分Y
-    let Y = 0
-    const activityInfo = await tokenStore.sendActivityGet(token.id)
-    if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-      const info = activityInfo.activity.myTotalInfo['2']
-      const rounds = info.rounds || 1
-      const num = info.num || 0
-      Y = (rounds - 1) * 8000 + num
-    }
-    
-    // 2. 计算阶段
-    // 计算宝箱总分Z
-    const Z = (M + Q * 10 + H * 20 + B * 50) + Y * 0.43
-    
-    // 获取基准宝箱分J
-    const J = parseInt(baseBoxScore.value) || 0
-    
-    // 计算开箱轮数l
-    let l = 0
-    if (Z - J > 4200) {
-      l = 1 + Math.floor((Z - J - 4200) / 3500)
-    }
-    if (l > 4) l = 4
-    if (l < 0) l = 0
-    
-    boxWeekRounds = l
-    
-    message.info(`${token.name} - 宝箱总分: ${Z}, 基准宝箱分: ${J}, 已用宝箱分: ${Y}, 开箱轮数: ${l}`)
-    
-    // 3. 开宝箱阶段
-    let roundCount = 0
-    let shouldBreak = false
-    while (true) {
-      roundCount++
-      message.info(`${token.name} - 执行第 ${roundCount} 轮开宝箱`)
-      
-      // 初始化开箱次数
-      let MK = 0 // 木质开箱次数
-      let QK = 0 // 青铜开箱次数
-      let HK = 0 // 黄金开箱次数
-      let BK = 0 // 铂金开箱次数
-      
-      // 铂金宝箱，每次10个（开箱顺序：铂金、黄金、青铜、木质）
-      const platinumTimes = Math.floor(B / 10)
-      for (let i = 0; i < platinumTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2004, count: 10 })
-        B -= 10
-        BK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开铂金宝箱: ${BK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              shouldBreak = true
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              shouldBreak = true
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 黄金宝箱，每次10个
-      const goldTimes = Math.floor(H / 10)
-      for (let i = 0; i < goldTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2003, count: 10 })
-        H -= 10
-        HK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开黄金宝箱: ${HK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              shouldBreak = true
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              shouldBreak = true
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 青铜宝箱，每次10个
-      const bronzeTimes = Math.floor(Q / 10)
-      for (let i = 0; i < bronzeTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2002, count: 10 })
-        Q -= 10
-        QK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 10
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开青铜宝箱: ${QK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              shouldBreak = true
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              shouldBreak = true
-              break
-            }
-          }
-        }
-      }
-      
-      if (shouldBreak) break
-      
-      // 木质宝箱，每次100个
-      const woodTimes = Math.floor(M / 100)
-      for (let i = 0; i < woodTimes; i++) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, count: 100 })
-        M -= 100
-        MK++
-        // 计算剩余宝箱数量
-        const remainingM = M - MK * 100
-        const remainingQ = Q - QK * 10
-        const remainingH = H - HK * 10
-        const remainingB = B - BK * 10
-        // 计算已用宝箱分YY
-        const YY = Y + MK * 100 + QK * 100 + HK * 200 + BK * 500
-        const openBoxLog = `${token.name} - 已用宝箱积分YY: ${YY}，已开木质宝箱: ${MK}次，累计开箱：木质${MK}次，青铜${QK}次，黄金${HK}次，铂金${BK}次。剩余木质${remainingM}个，青铜${remainingQ}个，黄金${remainingH}个，铂金${remainingB}个`
-        message.info(openBoxLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开箱操作',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: openBoxLog
-        })
-        await waitCommandDelay()
-        
-        // 检查YY是否超过目标，如果超过则获取Y进行验证
-        if (YY > l * 8000) {
-          // 直接获取已用宝箱分Y
-          const activityInfo = await tokenStore.sendActivityGet(token.id)
-          if (activityInfo && activityInfo.activity && activityInfo.activity.myTotalInfo && activityInfo.activity.myTotalInfo['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-            
-            const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-            message.info(scoreLog)
-            // 添加操作日志
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '分数获取',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: scoreLog,
-              details: {
-                Y: Y,
-                rounds: rounds,
-                num: num
-              }
-            })
-            
-            if (Y > l * 8000) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-              })
-              break
-            }
-            // 额外检查：如果已用宝箱分已经很高，及时停止
-            if (Y > 8000 * 4) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-              // 添加跳出循环日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '跳出循环',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-              })
-              break
-            }
-          }
-        }
-      }
-      
-      // 4. 领取奖励阶段（开宝箱阶段内）
-      // 开宝箱阶段内领取宝箱奖励
-      message.info(`${token.name} - 开宝箱阶段内领取宝箱奖励`)
-      await tokenStore.sendBatchClaimBoxPointReward(token.id)
-      message.info(`${token.name} - 开宝箱阶段内领取宝箱奖励成功`)
-      // 添加操作日志
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '开宝箱阶段领取宝箱奖励',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'success',
-        message: `开宝箱阶段内领取宝箱奖励成功`,
-        command: 'item_batchclaimboxpointreward'
-      })
-      await waitCommandDelay()
-      
-      // 开宝箱阶段内领取邮件
-      message.info(`${token.name} - 开宝箱阶段内领取邮件`)
-      await tokenStore.sendMailClaimAllAttachment(token.id, { category: 0 })
-      message.info(`${token.name} - 开宝箱阶段内领取邮件成功`)
-      // 添加操作日志
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '开宝箱阶段领取邮件',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'success',
-        message: `开宝箱阶段内领取邮件成功`,
-        command: 'mail_claimallattachment',
-        commandParams: { category: 0 }
-      })
-      await waitCommandDelay()
-      
-      // 领取邮件后，重新获取宝箱数量
-      message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量`)
-      const boxRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
-      if (boxRoleInfo && boxRoleInfo.role && boxRoleInfo.role.items) {
-        const boxItems = boxRoleInfo.role.items
-        M = boxItems['2001']?.quantity || 0
-        Q = boxItems['2002']?.quantity || 0
-        H = boxItems['2003']?.quantity || 0
-        B = boxItems['2004']?.quantity || 0
-        message.info(`${token.name} - 开宝箱阶段内重新获取宝箱数量成功：木质${M}，青铜${Q}，黄金${H}，铂金${B}`)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '开宝箱阶段重新获取宝箱数量',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'success',
-          message: `开宝箱阶段内重新获取宝箱数量：木质${M}，青铜${Q}，黄金${H}，铂金${B}`
-        })
-      }
-      await waitCommandDelay()
-      
-      // 5. 检查阶段
-      const activityInfoCheck = await tokenStore.sendActivityGet(token.id)
-      if (activityInfoCheck && activityInfoCheck.activity && activityInfoCheck.activity.myTotalInfo && activityInfoCheck.activity.myTotalInfo['2']) {
-        const info = activityInfoCheck.activity.myTotalInfo['2']
-        const rounds = info.rounds || 1
-        const num = info.num || 0
-        Y = (rounds - 1) * 8000 + num
-        
-        const scoreLog = `${token.name} - 已用宝箱分：Y=${Y}`
-        message.info(scoreLog)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '分数获取',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: scoreLog,
-          details: {
-            Y: Y,
-            rounds: rounds,
-            num: num
-          }
-        })
-        
-        if (Y > l * 8000) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 超过目标 ${l * 8000}，进入最终阶段`)
-          // 添加跳出循环日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} 超过目标 ${l * 8000}`
-          })
-          break
-        }
-        // 额外检查：如果已用宝箱分已经很高，及时停止
-        if (Y > 8000 * 4) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 超过最大限制 32000，进入最终阶段`)
-          // 添加跳出循环日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} 超过最大限制 32000`
-          })
-          break
-        }
-      }
-      
-      // 检查阶段重置MK/QK/HK/BK为0
-      MK = 0
-      QK = 0
-      HK = 0
-      BK = 0
-      
-      // 重新获取宝箱数量
-      const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
-      if (newRoleInfo && newRoleInfo.role && newRoleInfo.role.items) {
-        const newItems = newRoleInfo.role.items
-        M = newItems['2001']?.quantity || 0
-        Q = newItems['2002']?.quantity || 0
-        H = newItems['2003']?.quantity || 0
-        B = newItems['2004']?.quantity || 0
-      }
-      
-      // 判断是否继续下一轮开箱：基于YY计算值
-      const currentYY = Y + MK * 10 + QK * 100 + HK * 200 + BK * 500
-      if (currentYY >= l * 8000) {
-        message.info(`${token.name} - 已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}，进入最终阶段`)
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '跳出循环',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: `已用宝箱分YY ${currentYY} 达到目标 ${l * 8000}`
-        })
-        break
-      }
-    }
-    
-    // 6. 最终阶段
-    // 领取邮件
-    await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
-    await waitCommandDelay()
-    
-    // 领取宝箱周奖励
-    for (let i = 0; i < l + 1; i++) {
-      try {
-        await tokenStore.sendActivityClaimWeekActReward(token.id)
-        message.info(`${token.name} - 第 ${i + 1} 次领取宝箱周奖励成功`)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '领取宝箱周奖励',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'success',
-          message: `第 ${i + 1} 次领取宝箱周奖励成功`,
-          command: 'activity_claimweekactreward'
-        })
-      } catch (error) {
-        message.warning(`${token.name} - 第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}，继续执行下一次领取`)
-        // 添加操作日志
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '领取宝箱周奖励',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'warning',
-          message: `第 ${i + 1} 次领取宝箱周奖励失败: ${error.message || '未知错误'}`,
-          command: 'activity_claimweekactreward'
-        })
-        // 继续执行下一次领取，不停止
-      }
-      await waitCommandDelay()
-    }
-    
-    message.success('一键宝箱周完成')
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '一键宝箱周',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'success',
-      message: `一键宝箱周完成，执行了 ${l} 轮开箱`
-    })
-  } catch (error) {
-    console.error('一键宝箱周失败:', error)
-    message.error(`一键宝箱周失败: ${error.message || '未知错误'}`)
-    
-    // 添加操作日志
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '一键宝箱周',
-      tokenId: token.id,
-      tokenName: token.name,
-      status: 'error',
-      message: `一键宝箱周失败: ${error.message || '未知错误'}`
-    })
-  } finally {
-    isBoxWeekRunning.value = false
-  }
-}
-
 // 批量升级玩具
 const isBatchUpgradingToys = ref(false)
 const selectedToyUpgradeMode = ref('activate')
@@ -7988,468 +7016,6 @@ const handleBatchUpgradeToys = async () => {
     })
   } finally {
     isBatchUpgradingToys.value = false
-  }
-}
-
-// 批量激活玩具
-const isBatchActivatingToys = ref(false)
-
-const handleBatchActivateToys = async () => {
-  // 按token昵称排序的token列表
-  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
-    const nameA = (a.name || '未命名').toLowerCase()
-    const nameB = (b.name || '未命名').toLowerCase()
-    return nameA.localeCompare(nameB)
-  })
-  
-  if (sortedTokensList.length === 0) {
-    message.warning('没有可用的Token')
-    return
-  }
-  
-  // 解析执行范围
-  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
-  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
-  
-  if (targetTokens.length === 0) {
-    message.warning('执行范围内没有有效的Token')
-    return
-  }
-  
-  // 获取每个token在sortedTokens中的序号
-  const getTokenIndex = (token) => {
-    const index = sortedTokensList.findIndex(t => t.id === token.id)
-    return index + 1
-  }
-  
-  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量激活玩具（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logStore.addLog({
-    page: 'fish-helper',
-    cardType: '养号',
-    operation: '批量激活玩具',
-    status: 'info',
-    message: `开始批量激活玩具，${rangeText}，共${targetTokens.length}个Token`
-  })
-  
-  try {
-    isBatchActivatingToys.value = true
-    
-    // 使用连接池执行批量操作
-    const results = await connectionPool.batchOperate(
-      targetTokens,
-      async (token, globalIndex) => {
-        try {
-          const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在激活玩具...`)
-          
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '批量激活玩具',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]开始激活玩具`
-          })
-          
-          // 1. 获取角色信息，获取领主武器信息（lordWeapon就是玩具）
-          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-          await waitCommandDelay()
-          
-          if (!roleInfo || !roleInfo.role) {
-            throw new Error('获取角色信息失败')
-          }
-          
-          // 只查找lordWeapon字段，lordWeapon就是玩具
-          const lordWeapon = roleInfo.role.lordWeapon || {}
-          const weaponId = '3' // 只激活武器ID为3的武器
-          
-          // 检查lordWeapon中是否包含武器ID为3的武器
-          const hasWeapon3 = lordWeapon && (lordWeapon[weaponId] || lordWeapon.weaponId === parseInt(weaponId))
-          
-          let activateSuccess = true
-          
-          if (hasWeapon3) {
-            // 武器已经激活，跳过解锁命令
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量激活玩具',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]武器 ID: ${weaponId} 已经激活，跳过解锁`
-            })
-          } else {
-            // 武器未激活，执行解锁命令
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量激活玩具',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: `[序号${tokenIndex}] 准备解锁武器 ID: ${weaponId}`
-            })
-            
-            try {
-              await tokenStore.sendMessageWithPromise(
-                token.id,
-                'lordweapon_unlock',
-                {
-                  weaponId: weaponId
-                },
-                5000
-              )
-              await waitCommandDelay()
-              
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `[序号${tokenIndex}] 解锁武器 ${weaponId} 成功`
-              })
-            } catch (error) {
-              // 记录错误，设置激活失败标志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'error',
-                message: `[序号${tokenIndex}] 解锁武器 ${weaponId} 失败: ${error.message || '未知错误'}`
-              })
-              activateSuccess = false
-            }
-          }
-          
-          if (activateSuccess) {
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} 武器激活完成，开始执行玩具升级`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量激活玩具',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: `[序号${tokenIndex}] 武器激活完成，开始执行玩具升级`
-            })
-            
-            // 执行 lordweapon_get 命令，获取玩具信息
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 执行 lordweapon_get 获取玩具信息`)
-            try {
-              const lordWeaponInfo = await tokenStore.sendLordWeaponGet(token.id, {})
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `[序号${tokenIndex}] - lordweapon_get 执行成功`
-              })
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行成功`)
-            } catch (error) {
-              console.warn(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败:`, error.message)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'warning',
-                message: `[序号${tokenIndex}] - lordweapon_get 执行失败：${error.message || '未知错误'}`
-              })
-              message.warning(`[序号${tokenIndex}] ${token.name || token.id} - lordweapon_get 执行失败，继续执行升级`)
-            }
-            
-            // 执行玩具主动升级，最多 60 次
-            const weaponId = 3
-            let activeUpgradeCount = 0
-            let activeUpgradeSuccess = true
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具主动升级 (weaponId:${weaponId})，最多 60 次`)
-            
-            for (let i = 0; i < 60; i++) {
-              try {
-                await tokenStore.sendLordWeaponUpgradeActiveSkillLevel(token.id, {
-                  weaponId: weaponId
-                })
-                
-                activeUpgradeCount++
-                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次成功`)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'success',
-                  message: `玩具主动升级第${i + 1}次成功`
-                })
-                
-                // 每次执行间隔 300ms
-                if (i < 59) {
-                  await waitCommandDelay()
-                }
-              } catch (error) {
-                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败:`, error.message)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `玩具主动升级第${i + 1}次失败：${error.message || '未知错误'}，停止主动升级`
-                })
-                
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级第${i + 1}次失败，停止主动升级`)
-                activeUpgradeSuccess = false
-                break
-              }
-            }
-            
-            if (activeUpgradeSuccess) {
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具主动升级完成，共执行${activeUpgradeCount}次`)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `玩具主动升级完成，共执行${activeUpgradeCount}次`
-              })
-            }
-            
-            // 执行玩具被动升级 skillId 9，最多 60 次
-            let passiveSkill9UpgradeCount = 0
-            let passiveSkill9UpgradeSuccess = true
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具被动升级 (weaponId:${weaponId}, skillId:9)，最多 60 次`)
-            
-            for (let i = 0; i < 60; i++) {
-              try {
-                await tokenStore.sendLordWeaponUpgradePassiveSkillLevel(token.id, {
-                  weaponId: weaponId,
-                  skillId: 9
-                })
-                
-                passiveSkill9UpgradeCount++
-                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次成功`)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'success',
-                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 第${i + 1}次成功`
-                })
-                
-                // 每次执行间隔 300ms
-                if (i < 59) {
-                  await waitCommandDelay()
-                }
-              } catch (error) {
-                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败:`, error.message)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:9 升级`
-                })
-                
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 第${i + 1}次失败，停止 skillId:9 升级`)
-                passiveSkill9UpgradeSuccess = false
-                break
-              }
-            }
-            
-            if (passiveSkill9UpgradeSuccess) {
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `[序号${tokenIndex}] - 玩具被动升级 skillId:9 完成，共执行${passiveSkill9UpgradeCount}次`
-              })
-            }
-            
-            // 执行玩具被动升级 skillId 10，最多 60 次
-            let passiveSkill10UpgradeCount = 0
-            let passiveSkill10UpgradeSuccess = true
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行玩具被动升级 (weaponId:${weaponId}, skillId:10)，最多 60 次`)
-            
-            for (let i = 0; i < 60; i++) {
-              try {
-                await tokenStore.sendLordWeaponUpgradePassiveSkillLevel(token.id, {
-                  weaponId: weaponId,
-                  skillId: 10
-                })
-                
-                passiveSkill10UpgradeCount++
-                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次成功`)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'success',
-                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 第${i + 1}次成功`
-                })
-                
-                // 每次执行间隔 300ms
-                if (i < 59) {
-                  await waitCommandDelay()
-                }
-              } catch (error) {
-                console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败:`, error.message)
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量激活玩具',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 第${i + 1}次失败：${error.message || '未知错误'}，停止 skillId:10 升级`
-                })
-                
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 第${i + 1}次失败，停止 skillId:10 升级`)
-                passiveSkill10UpgradeSuccess = false
-                break
-              }
-            }
-            
-            if (passiveSkill10UpgradeSuccess) {
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '批量激活玩具',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `[序号${tokenIndex}] - 玩具被动升级 skillId:10 完成，共执行${passiveSkill10UpgradeCount}次`
-              })
-            }
-            
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} 玩具激活和升级全部完成`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量激活玩具',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'success',
-              message: `[序号${tokenIndex}] 玩具激活和升级全部完成`
-            })
-            return { success: true, token: token }
-          } else {
-            message.error(`[序号${tokenIndex}] ${token.name || token.id} 武器激活失败`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量激活玩具',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'error',
-              message: `[序号${tokenIndex}] 武器激活失败`
-            })
-            return { success: false, token: token, error: '武器激活失败' }
-          }
-        } catch (error) {
-          const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 武器激活失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 武器激活失败: ${error.message || '未知错误'}`)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '批量激活玩具',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'error',
-            message: `[序号${tokenIndex}] 武器激活失败: ${error.message || '未知错误'}`
-          })
-          return { success: false, token: token, error: error.message || '未知错误' }
-        }
-      },
-      {
-        batchSize: 20,
-        delayBetween: 300,
-        onProgress: (progress) => {
-          if (progress.type === 'batch-start') {
-            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
-          } else if (progress.type === 'token-start') {
-            const token = sortedTokensList.find(t => t.id === progress.tokenId)
-            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.info(`[序号${tokenIndex}] ${progress.tokenName} 正在获取连接...`)
-          } else if (progress.type === 'token-success') {
-            const token = sortedTokensList.find(t => t.id === progress.tokenId)
-            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            message.success(`[序号${tokenIndex}] ${progress.tokenName} 连接成功`)
-          } else if (progress.type === 'token-error') {
-            const token = sortedTokensList.find(t => t.id === progress.tokenId)
-            const tokenIndex = token ? getTokenIndex(token) : progress.globalIndex + 1
-            if (progress.status === 'warning') {
-              message.warning(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
-            } else {
-              message.error(`[序号${tokenIndex}] ${progress.tokenName} ${progress.message}`)
-            }
-          }
-        }
-      }
-    )
-    
-    // 统计结果
-    const successCount = results.filter(r => r.success).length
-    const failCount = results.filter(r => !r.success).length
-    
-    message.success(`批量激活玩具完成：成功${successCount}个，失败${failCount}个`)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '批量激活玩具',
-      status: 'success',
-      message: `批量激活玩具完成：成功${successCount}个，失败${failCount}个`
-    })
-    
-    // 清空过程日志，只保留结果日志
-    results.forEach(r => {
-      logStore.clearLogsByToken(r.tokenId, '批量激活玩具')
-    })
-  } catch (error) {
-    console.error('批量激活玩具失败:', error)
-    message.error(`批量激活玩具失败: ${error.message || '未知错误'}`)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '批量激活玩具',
-      status: 'error',
-      message: `批量激活玩具失败: ${error.message || '未知错误'}`
-    })
-  } finally {
-    isBatchActivatingToys.value = false
   }
 }
 

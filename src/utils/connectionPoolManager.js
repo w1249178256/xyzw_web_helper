@@ -112,7 +112,12 @@ export class ConnectionPoolManager {
 
             if (!connected) {
                 console.error(`[ConnectionPool] 连接失败 (重试后仍超时): ${tokenId}`);
-                // 连接失败，释放槽位
+                // 连接失败，先关闭WebSocket连接，再释放槽位
+                try {
+                    this.tokenStore.closeWebSocketConnection(tokenId);
+                } catch (e) {
+                    // 忽略关闭失败
+                }
                 this.releaseConnectionSlot();
                 return false;
             }
@@ -235,14 +240,21 @@ export class ConnectionPoolManager {
                         }
                     } else {
                         console.error(`[ConnectionPool] 重连失败：${tokenId}`);
+                        // 重连失败，释放槽位
+                        this.releaseConnectionSlot();
+                        return false;
                     }
                 } else {
                     console.error(`[ConnectionPool] Token 刷新失败，需要手动重新导入：${tokenId}`);
+                    // Token刷新失败，释放槽位
+                    this.releaseConnectionSlot();
+                    return false;
                 }
             }
         }
 
         // 连接成功，槽位保持占用，直到任务完成后手动释放
+        // 注意：这里不释放槽位，由调用方在使用完毕后调用 release() 方法释放
         return true;
     }
 
@@ -471,7 +483,7 @@ export class ConnectionPoolManager {
         const {
             batchSize = 20,
             delayBetween = 1000,  // 操作之间的延迟（1 秒）
-            keepConnections = true,  // 保持连接，不频繁断开
+            keepConnections = false,  // 默认不保持连接，每个token操作完成后断开，避免连接混乱
             onProgress = null    // 进度回调函数
         } = options;
 
@@ -539,6 +551,12 @@ export class ConnectionPoolManager {
                     const status = this.tokenStore.getWebSocketStatus(token.id);
 
                     if (status !== 'connected') {
+                        // 连接状态异常，先关闭WebSocket连接
+                        try {
+                            this.tokenStore.closeWebSocketConnection(token.id);
+                        } catch (e) {
+                            // 忽略关闭失败
+                        }
                         if (onProgress) {
                             onProgress({
                                 type: 'token-error',

@@ -96,6 +96,13 @@
             :disabled="isBatchBlackMarketRunning"
             :loading="isBatchBlackMarketRunning"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchBlackMarketRewardRunning ? '批量黑市奖励中...' : '批量黑市奖励'"
+            @button-click="handleBatchBlackMarketReward"
+            :disabled="isBatchBlackMarketRewardRunning"
+            :loading="isBatchBlackMarketRewardRunning"
+          />
         </CustomizedCard>
       </div>
       
@@ -146,6 +153,7 @@ const RECRUIT_WEEK_ACTIVITY_ID = 2603132
 // 定时任务相关
 const isExecutingScheduledTasks = ref(false)
 const isBatchBlackMarketRunning = ref(false)
+const isBatchBlackMarketRewardRunning = ref(false)
 const scheduledExecutionTokens = ref(localStorage.getItem('scheduledExecutionTokens') || '')
 const scheduledTasks = ref({
   claimHangUp: false,
@@ -1289,6 +1297,147 @@ const handleBatchBlackMarket = async () => {
     })
   } finally {
     isBatchBlackMarketRunning.value = false
+  }
+}
+
+// 批量黑市奖励
+const handleBatchBlackMarketReward = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(scheduledExecutionTokens.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = scheduledExecutionTokens.value ? `范围${scheduledExecutionTokens.value}` : "全部"
+  message.info(`开始批量黑市奖励（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  
+  isBatchBlackMarketRewardRunning.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始批量黑市奖励...`)
+          
+          try {
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_claimweekactreward',
+              {
+                selectRewardsMap: {
+                  0: 1
+                },
+                typ: 12
+              },
+              5000
+            )
+            await new Promise(resolve => setTimeout(resolve, 500))
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 领取黑市奖励成功`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市奖励',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取黑市奖励成功`
+            })
+          } catch (error) {
+            console.error(`领取黑市奖励失败: ${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 领取黑市奖励失败，继续执行`)
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量黑市奖励',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取黑市奖励失败，继续执行`
+            })
+          }
+          
+          // 添加批量黑市奖励完成日志
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量黑市奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量黑市奖励执行完成`
+          })
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 批量黑市奖励执行完成`)
+          return { success: true, tokenId: token.id }
+        } catch (error) {
+          console.error(`批量黑市奖励失败: ${error.message}`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 批量黑市奖励执行失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '定时任务',
+            operation: '批量黑市奖励',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]批量黑市奖励执行失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+    
+    message.success(`批量黑市奖励执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量黑市奖励',
+      status: 'success',
+      message: `批量黑市奖励执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+  } catch (error) {
+    console.error('批量黑市奖励失败:', error)
+    message.error(`批量黑市奖励失败: ${error.message}`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '定时任务',
+      operation: '批量黑市奖励',
+      status: 'error',
+      message: `批量黑市奖励失败: ${error.message}`
+    })
+  } finally {
+    isBatchBlackMarketRewardRunning.value = false
   }
 }
 

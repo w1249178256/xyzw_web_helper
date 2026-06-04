@@ -1355,6 +1355,9 @@ const handleBatchTower = async () => {
         // 清空该 Token 的爬塔过程日志，只保留最终完成日志
         logStore.clearLogsByToken(token.id, '开始爬塔')
         
+        // 爬塔完成后关闭WebSocket连接，释放连接资源
+        tokenStore.closeWebSocketConnection(token.id)
+        
         // 在每个 token 之间添加 500ms 间隔
         if (i < sortedTargetTokens.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 500))
@@ -1598,6 +1601,8 @@ const startTowerClimbForToken = async (token) => {
     // 步骤 3：循环执行 fight_starttower，最多 600 次
     let climbCount = 0
     const maxClimb = 600
+    let previousFloor = ''
+    let sameFloorCount = 0
     
     while (climbCount < maxClimb) {
       // 检查是否被停止（批量爬塔时）
@@ -1646,16 +1651,48 @@ const startTowerClimbForToken = async (token) => {
           actualFloor = `${currentFloor + climbCount}`
         }
         
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '爬塔升星',
-          operation: '开始爬塔',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'success',
-          message: `【序号${tokenIndex}】[${token.name || token.id}]第${climbCount}次爬塔成功，当前层数：${actualFloor}层`
-        })
-        message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${actualFloor}层`)
+        // 检查是否在同一层连续爬塔
+        if (actualFloor === previousFloor) {
+          sameFloorCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'warning',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]第${climbCount}次爬塔成功，当前层数：${actualFloor}层（连续${sameFloorCount}次在同一层）`
+          })
+          message.warning(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${actualFloor}层（连续${sameFloorCount}次在同一层）`)
+          
+          // 连续10次在同一层，停止爬塔
+          if (sameFloorCount >= 10) {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '爬塔升星',
+              operation: '开始爬塔',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]连续10次在同一层（${actualFloor}），停止爬塔`
+            })
+            message.warning(`${token.name || token.id} 连续10次在同一层（${actualFloor}），停止爬塔`)
+            break
+          }
+        } else {
+          sameFloorCount = 0
+          previousFloor = actualFloor
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '爬塔升星',
+            operation: '开始爬塔',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]第${climbCount}次爬塔成功，当前层数：${actualFloor}层`
+          })
+          message.success(`${token.name || token.id} 第${climbCount}次爬塔成功，当前层数：${actualFloor}层`)
+        }
         
         // 每次爬塔后等待 1000ms，避免操作过快
         await new Promise(resolve => setTimeout(resolve, 1000))
