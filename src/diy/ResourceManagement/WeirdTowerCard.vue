@@ -1335,6 +1335,7 @@ const batchWeirdTower = async () => {
             // 步骤1: 使用道具
             const useItemsResult = await executeUseItemsForToken(tokenId)
             
+            // 如果提示"没有道具可使用"，记录日志但继续执行合成
             if (useItemsResult === 'no_items') {
               logStore.addLog({
                 page: 'fish-helper',
@@ -1342,11 +1343,9 @@ const batchWeirdTower = async () => {
                 operation: '批量怪异塔',
                 tokenId: token.id,
                 tokenName: token.name,
-                status: 'info',
-                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有道具可使用，标记为完成`
+                status: 'warning',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id}、没有道具可使用，继续执行合成`
               })
-              state.completed = true
-              return { success: true, token, completed: true }
             }
             
             // 如果提示"没有空格子了"，记录日志但继续执行合成

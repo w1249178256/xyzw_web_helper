@@ -4792,7 +4792,40 @@ const executeScheduledTask = async (task) => {
 
       try {
         // 连接Token
-        await scheduledTaskPool.acquire(tokenId);
+        const connected = await scheduledTaskPool.acquire(tokenId);
+        
+        if (!connected) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `Token ${token.name || token.id} 连接失败，跳过`,
+            type: "error",
+          });
+          continue;
+        }
+
+        // 验证连接状态（关键！防止acquire返回true但实际已断开）
+        const status = tokenStore.getWebSocketStatus(tokenId);
+        if (status !== 'connected') {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `Token ${token.name || token.id} 连接状态异常 (${status})，尝试重新连接`,
+            type: "warning",
+          });
+          // 释放失败的连接
+          try {
+            await scheduledTaskPool.release(tokenId, true);
+          } catch (e) {}
+          // 重新连接
+          const reconnected = await scheduledTaskPool.acquire(tokenId);
+          if (!reconnected) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `Token ${token.name || token.id} 重新连接失败，跳过`,
+              type: "error",
+            });
+            continue;
+          }
+        }
 
         // 等待游戏数据初始化完成（关键步骤！）
         await new Promise((resolve) => setTimeout(resolve, 500));
@@ -4800,6 +4833,32 @@ const executeScheduledTask = async (task) => {
         // 执行所有选中的任务
         for (const taskName of validTasks) {
           if (shouldStop.value) break;
+
+          // 每次执行任务前检查连接状态
+          const currentStatus = tokenStore.getWebSocketStatus(tokenId);
+          if (currentStatus !== 'connected') {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `Token ${token.name || token.id} 连接已断开 (${currentStatus})，尝试重新连接`,
+              type: "warning",
+            });
+            // 尝试重新连接
+            try {
+              await scheduledTaskPool.release(tokenId, true);
+            } catch (e) {}
+            
+            const reconnected = await scheduledTaskPool.acquire(tokenId);
+            if (!reconnected) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `Token ${token.name || token.id} 重新连接失败，跳过剩余任务`,
+                type: "error",
+              });
+              break;
+            }
+            // 等待初始化
+            await new Promise((resolve) => setTimeout(resolve, 500));
+          }
 
           addLog({
             time: new Date().toLocaleTimeString(),
@@ -4856,24 +4915,21 @@ const executeScheduledTask = async (task) => {
           message: `Token ${token.name || token.id} 执行失败: ${error.message}`,
           type: "error",
         });
-      }
-      // 不断开连接，保持到所有任务完成
-    }
-
-    // 所有Token任务完成后，统一断开所有连接（参照金鱼页面）
-    addLog({
-      time: new Date().toLocaleTimeString(),
-      message: `=== 所有任务执行完成，正在断开所有连接 ===`,
-      type: "info",
-    });
-    for (const tokenId of availableTokenIds) {
-      try {
-        const status = tokenStore.getWebSocketStatus(tokenId);
-        if (status === 'connected') {
-          await scheduledTaskPool.release(tokenId, true);
+      } finally {
+        // 每个token完成后立即断开连接并释放槽位（参照批量日常页面）
+        try {
+          const status = tokenStore.getWebSocketStatus(tokenId);
+          if (status === 'connected') {
+            await scheduledTaskPool.release(tokenId, true);
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name || token.id} 连接已关闭`,
+              type: "info",
+            });
+          }
+        } catch (error) {
+          console.error(`断开连接失败:`, error);
         }
-      } catch (error) {
-        console.error(`断开连接失败:`, error);
       }
     }
 

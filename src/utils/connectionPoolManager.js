@@ -158,6 +158,9 @@ export class ConnectionPoolManager {
                     return await this.ensureConnection(tokenId, maxRetries);
                 }
             }
+            
+            // 连接验证通过，但需要重新初始化游戏数据（因为可能是复用的连接）
+            // 继续执行下面的初始化代码
         }
 
         // 连接成功，初始化游戏数据（关键步骤，如战斗版本和会话）
@@ -282,6 +285,9 @@ export class ConnectionPoolManager {
     releaseConnectionSlot() {
         if (this.connectionSlots.active > 0) {
             this.connectionSlots.active--;
+            console.log(`[ConnectionPool] 槽位已释放 (当前: ${this.connectionSlots.active}/${this.maxActive})`);
+        } else {
+            console.warn(`[ConnectionPool] 槽位已为0，无法继续释放`);
         }
     }
 
@@ -483,7 +489,6 @@ export class ConnectionPoolManager {
         const {
             batchSize = 20,
             delayBetween = 1000,  // 操作之间的延迟（1 秒）
-            keepConnections = false,  // 默认不保持连接，每个token操作完成后断开，避免连接混乱
             onProgress = null    // 进度回调函数
         } = options;
 
@@ -624,31 +629,14 @@ export class ConnectionPoolManager {
                         });
                     }
                 } finally {
-                    // 释放连接（如果keepConnections为true，则不断开连接）
+                    // 每个token完成后立即断开连接并释放槽位（参照批量日常页面）
                     if (acquired) {
                         try {
-                            await this.release(token.id, !keepConnections);
+                            await this.release(token.id, true);
                         } catch (releaseError) {
                             console.error(`释放连接失败:`, releaseError);
                         }
                     }
-                }
-            }
-        }
-
-        // 如果保持连接，最后统一断开所有连接
-        // 注意：每个 token 的槽位已在 finally 块中释放，这里只需断开 WebSocket，不要再释放槽位
-        if (keepConnections) {
-            for (const token of tokens) {
-                try {
-                    const status = this.tokenStore.getWebSocketStatus(token.id);
-                    if (status === 'connected') {
-                        // 只断开连接，不释放槽位（槽位已在 finally 中释放）
-                        this.tokenStore.closeWebSocketConnection(token.id);
-                        console.log(`[ConnectionPool] 最终清理：WebSocket已断开: ${token.id}`);
-                    }
-                } catch (error) {
-                    console.error(`最终释放连接失败:`, error);
                 }
             }
         }
