@@ -1525,6 +1525,22 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       time: Date.now()
     }
   }
+  
+    /**
+   * 进入盐场
+   */
+  war_enterbattlefield(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  battlefieldId:params.battlefieldId,
+      	  useGzip: true
+      }),
+      cmd: "war_enterbattlefield",
+      seq,
+      time: Date.now()
+    }
+  }
 
   /**
    * 俱乐部-更换科技
@@ -1591,6 +1607,25 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
                 ...params
       }),
       cmd: "war_setbattleteam",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 盐场队伍入场
+   */
+  war_teamsetbattleteam(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  battlefieldId:params.battlefieldId,
+      	  battleTeam:{},
+      	  lordWeaponId:params.lordWeaponId,
+      	  petUId: ""
+                ...params
+      }),
+      cmd: "war_teamsetbattleteam",
       seq,
       time: Date.now()
     }

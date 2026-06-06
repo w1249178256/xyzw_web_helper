@@ -220,6 +220,7 @@ export function registerDefaultCommands(reg) {
     .register("legionwar_getgoldmonthwarrank")
     .register("legion_getopponent")
     .register("legion_getbattlefield")
+    .register("war_enterbattlefield")
     .register("legion_claimpayloadtask")
     .register("legion_claimpayloadtaskprogress")
     .register("saltroad_getwartype")
@@ -480,6 +481,7 @@ export function registerDefaultCommands(reg) {
     .register("fight_startgenie")
     .register("legion_applyjoin")
     .register("war_setbattleteam")
+    .register("war_teamsetbattleteam")
     .register("activity_buystoregoods")
     .register("autumn_useitem")
     .register("lordweapon_upgradeactiveskilllevel")
@@ -1217,6 +1219,10 @@ export class XyzwWebSocketClient {
       league_getbattlefieldresp: "league_getbattlefield",
       league_getgroupopponentresp: "league_getgroupopponent",
       legion_signupresp: "legion_signup",
+      legion_getbattlefieldresp: "legion_getbattlefield",
+      war_enterbattlefieldresp: "war_enterbattlefield",
+      war_setbattleteamresp: "war_setbattleteam",
+      war_teamsetbattleteamresp: "war_teamsetbattleteam",
       legion_payloadsignupresp: "legion_payloadsignup",
       legion_researchresp: "legion_research",
       legion_resetresearchresp: "legion_resetresearch",

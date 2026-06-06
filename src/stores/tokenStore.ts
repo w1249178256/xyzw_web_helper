@@ -1232,8 +1232,18 @@ export const useTokenStore = defineStore("tokens", () => {
   };
 
   // 发送盐场入场
+  const sendWarEnterBattlefield = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "war_enterbattlefield", params);
+  };
+
+  // 发送盐场布阵
   const sendWarSetBattleTeam = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "war_setbattleteam", params);
+  };
+
+  // 发送盐场队伍入场
+  const sendWarTeamSetBattleTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "war_teamsetbattleteam", params);
   };
 
   // 发送获取噩梦信息
@@ -2227,7 +2237,9 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegionGetInfobyid,
     sendLegionGetBattlefield,
     sendLegionSignup,
+    sendWarEnterBattlefield,
     sendWarSetBattleTeam,
+    sendWarTeamSetBattleTeam,
     sendNightmareGetRoleInfo,
     sendNightmareClickTurntable,
     sendNightmareClaimTurnRewardTimes,

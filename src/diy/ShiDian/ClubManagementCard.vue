@@ -112,6 +112,7 @@
           />
           <CustomizedCard mode="button" :name="isBatchCollectPrivilegeRunning ? '批量收集特权中...' : '批量收集特权'" :disabled="isBatchCollectPrivilegeRunning" @button-click="handleBatchCollectPrivilege" />
           <CustomizedCard mode="button" :name="isQuickAcceptGiftRunning ? '一键接受礼物中...' : '一键接受礼物'" :disabled="isQuickAcceptGiftRunning" @button-click="handleQuickAcceptGift" />
+          <CustomizedCard mode="button" :name="isBatchPetEggRunning ? '批量宠物蛋中...' : '批量宠物蛋'" :disabled="isBatchPetEggRunning" @button-click="handleBatchPetEgg" />
         </CustomizedCard>
       </div>
       
@@ -119,7 +120,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物']"
+        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物', '批量宠物蛋']"
       />
     </template>
   </MyCard>
@@ -411,6 +412,152 @@ const handleBatchCollectPrivilege = async () => {
   }
 }
 
+// 批量宠物蛋
+const handleBatchPetEgg = async () => {
+  try {
+    isBatchPetEggRunning.value = true
+    message.info('开始批量宠物蛋...')
+    logOperation('shidian', '批量宠物蛋', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: '开始批量宠物蛋...'
+    })
+
+    const tokenIndices = connectionPool.parseTokenRange(legionTokens.value)
+    const targetTokens = connectionPool.getTargetTokens(sortedTokens.value, tokenIndices)
+
+    if (targetTokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到Token`)
+      logOperation('shidian', '批量宠物蛋', {
+        cardType: '俱乐部管理',
+        status: 'warning',
+        message: `执行范围${rangeText}内没有找到Token`
+      })
+      return
+    }
+
+    for (const token of targetTokens) {
+      if (!isBatchPetEggRunning.value) break
+
+      const tokenIndex = getTokenIndex(token)
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在购买宠物蛋...`)
+      logOperation('shidian', '批量宠物蛋', {
+        cardType: '俱乐部管理',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `开始购买宠物蛋`
+      })
+
+      // 获取连接
+      const connectionAcquired = await connectionPool.acquire(token.id)
+      if (!connectionAcquired) {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败`)
+        logOperation('shidian', '批量宠物蛋', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'warning',
+          message: '连接失败，跳过'
+        })
+        failCount++
+        continue
+      }
+
+      if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} WebSocket未连接`)
+        await connectionPool.release(token.id, false)
+        logOperation('shidian', '批量宠物蛋', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'warning',
+          message: 'WebSocket未连接，跳过'
+        })
+        failCount++
+        continue
+      }
+
+      try {
+        // 执行4次购买
+        for (let i = 0; i < 4; i++) {
+          try {
+            await tokenStore.sendLegionStoreBuyGoods(token.id, { id: 205 })
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} 第 ${i + 1}/4 次购买宠物蛋成功`)
+            logOperation('shidian', '批量宠物蛋', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `第 ${i + 1}/4 次购买成功`
+            })
+          } catch (buyError) {
+            const errorMsg = buyError?.message || buyError || ''
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} 第 ${i + 1}/4 次购买失败:`, buyError)
+            logOperation('shidian', '批量宠物蛋', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `第 ${i + 1}/4 次购买失败: ${errorMsg}`
+            })
+            // 如果是"物品不存在"错误，跳过其余次数
+            if (errorMsg.includes('物品不存在')) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 物品不存在，跳过其余次数`)
+              logOperation('shidian', '批量宠物蛋', {
+                cardType: '俱乐部管理',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'warning',
+                message: '物品不存在，跳过其余次数'
+              })
+              break
+            }
+          }
+          await waitCommandDelay()
+        }
+
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 宠物蛋完成`)
+        logOperation('shidian', '批量宠物蛋', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: '宠物蛋完成'
+        })
+        connectionPool.release(token.id, true)
+      } catch (error) {
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} 宠物蛋失败: ${error.message || error}`)
+        logOperation('shidian', '批量宠物蛋', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `宠物蛋失败: ${error.message || error}`
+        })
+        connectionPool.release(token.id, false)
+      }
+    }
+
+    message.success('批量宠物蛋完成')
+    logOperation('shidian', '批量宠物蛋', {
+      cardType: '俱乐部管理',
+      status: 'success',
+      message: '批量宠物蛋完成'
+    })
+  } catch (error) {
+    message.error(`批量宠物蛋失败: ${error.message || error}`)
+    logOperation('shidian', '批量宠物蛋', {
+      cardType: '俱乐部管理',
+      status: 'error',
+      message: `批量宠物蛋失败: ${error.message || error}`
+    })
+  } finally {
+    isBatchPetEggRunning.value = false
+  }
+}
+
 // 一键领取的 Token 序号，默认 13
 const isLegacyHangupRunning = ref(false)
 const isLegacyCollectRunning = ref(false)
@@ -431,6 +578,7 @@ const isQuickAcceptGiftRunning = ref(false)
 const isGetFragmentCountRunning = ref(false)
 const currentFragmentCount = ref(null)
 const isBatchCollectPrivilegeRunning = ref(false)
+const isBatchPetEggRunning = ref(false)
 const legacyBookInfo = ref({
   books: {},
   storage: {}

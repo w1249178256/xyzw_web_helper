@@ -404,16 +404,92 @@ const handleSaltFieldFormation = async () => {
     let successCount = 0
     let failCount = 0
     
+    // 使用连接池逐个执行
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       if (!token || !token.id) continue
       
       try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} 连接失败`)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '盐场布阵',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 连接失败`
+          })
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '盐场布阵',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} WebSocket未连接`
+          })
+          continue
+        }
+        
         const tokenIndex = getTokenIndex(token)
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在盐场布阵...`)
         
-        await tokenStore.sendWarSetBattleTeam(token.id, {})
+        // 步骤0: 使用fight_startlevel获取 battleTeam 和 lordWeaponId
+        const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+        let battleTeam = {}
+        let lordWeaponId = 0
+        
+        if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
+          battleTeam = fightResult.battleData.leftTeam.team
+          lordWeaponId = fightResult.battleData.leftTeam.lordWeaponId || 0
+        } else if (fightResult && fightResult.leftTeam && fightResult.leftTeam.team) {
+          battleTeam = fightResult.leftTeam.team
+          lordWeaponId = fightResult.leftTeam.lordWeaponId || 0
+        }
+        
         await waitCommandDelay()
+        
+        // 步骤1: 获取盐场信息，获取 battlefieldId
+        const battlefieldInfo = await tokenStore.sendLegionGetBattlefield(token.id, {})
+        const battlefieldId = battlefieldInfo?.info?.battlefieldId
+        
+        if (!battlefieldId) {
+          throw new Error('未获取到盐场ID')
+        }
+        
+        // 步骤2: 进入盐场（失败也继续执行）
+        try {
+          await tokenStore.sendWarEnterBattlefield(token.id, { battlefieldId })
+        } catch (enterError) {
+          console.warn(`${token.name} 进入盐场失败，继续执行:`, enterError)
+        }
+        await waitCommandDelay()
+        
+        // 步骤3: 设置布阵
+        await tokenStore.sendWarSetBattleTeam(token.id, { battlefieldId, battleTeam, lordWeaponId })
+        await waitCommandDelay()
+        
+        // 步骤4: 队伍入场
+        await tokenStore.sendWarTeamSetBattleTeam(token.id, { battlefieldId, battleTeam, lordWeaponId })
+        await waitCommandDelay()
+        
+        await connectionPool.release(token.id, true)
         
         message.success(`${tokenIndex}、${token.name || token.id} 盐场布阵成功`)
         successCount++
@@ -442,6 +518,11 @@ const handleSaltFieldFormation = async () => {
           status: 'error',
           message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id} 盐场布阵失败：${error.message}`
         })
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
       }
       
       if (i < targetTokens.length - 1) {
