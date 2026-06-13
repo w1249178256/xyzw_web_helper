@@ -82,7 +82,7 @@ import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { Shield } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
-import { HERO_DICT, FishMap, PearlMap } from '@/utils/HeroList.js'
+import { HERO_DICT, FishMap, PearlMap, weapon } from '@/utils/HeroList.js'
 
 const tokenStore = useTokenStore()
 const logStore = useOperationLogStore()
@@ -317,7 +317,7 @@ const handleSaltFieldSignup = async () => {
           message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 盐场报名成功`
         })
         
-        await connectionPool.release(token.id, true)
+        await connectionPool.release(token.id, false)
       } catch (error) {
         console.error(`${token.name} 盐场报名失败:`, error)
         const tokenIndex = getTokenIndex(token)
@@ -496,7 +496,7 @@ const handleSaltFieldFormation = async () => {
         await tokenStore.sendWarTeamSetBattleTeam(token.id, { battlefieldId, battleTeam, lordWeaponId })
         await waitCommandDelay()
         
-        await connectionPool.release(token.id, true)
+        await connectionPool.release(token.id, false)
         
         message.success(`${tokenIndex}、${token.name || token.id} 盐场布阵成功`)
         successCount++
@@ -662,7 +662,7 @@ const batchSwitchTeam1 = async () => {
           message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 已切换到阵1`
         })
         
-        await connectionPool.release(token.id, true)
+        await connectionPool.release(token.id, false)
         
       } catch (error) {
         console.error(`${token.name} 切换阵1失败:`, error)
@@ -816,7 +816,7 @@ const batchSwitchTeam2 = async () => {
           message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 已切换到阵2`
         })
         
-        await connectionPool.release(token.id, true)
+        await connectionPool.release(token.id, false)
         
       } catch (error) {
         console.error(`${token.name} 切换阵2失败:`, error)
@@ -907,8 +907,9 @@ const exportTeamFormation = async () => {
     })
     
     // CSV数据收集
+    // 格式：账号, 英雄1(英雄 鱼灵 鱼珠), 英雄2(英雄 鱼灵 鱼珠), 英雄3(英雄 鱼灵 鱼珠), 英雄4(英雄 鱼灵 鱼珠), 英雄5(英雄 鱼灵 鱼珠), 玩具
     const csvRows = []
-    csvRows.push('账号,英雄,鱼灵,鱼珠技能')
+    csvRows.push('账号,英雄1,英雄2,英雄3,英雄4,英雄5,玩具')
     
     let successCount = 0
     let failCount = 0
@@ -966,7 +967,17 @@ const exportTeamFormation = async () => {
         }
         
         const battleTeam = fightResult.battleData.leftTeam.team
-        const heroes = battleTeam.heroes || []
+        // team是对象 {0: {id: 120, ...}, 1: {id: 113, ...}, ...}，需要提取英雄ID
+        const teamHeroes = Object.values(battleTeam)
+        const heroes = teamHeroes.map(h => h.id)
+        
+        // 获取玩具信息（weaponId）
+        const weaponId = fightResult.battleData.leftTeam.weaponId
+        const weaponName = weaponId ? (weapon[weaponId] || `玩具${weaponId}`) : ''
+        
+        if (heroes.length === 0) {
+          throw new Error('阵容中没有英雄')
+        }
         
         await waitCommandDelay()
         
@@ -979,48 +990,48 @@ const exportTeamFormation = async () => {
         
         const roleHeroes = roleInfo.role.heroes
         
-        // 构建阵容数据
-        const teamData = []
+        // 构建阵容数据（5个英雄位，每个英雄：英雄 鱼灵 鱼珠 用空格隔开）
+        const heroColumns = ['', '', '', '', '']
         
-        for (const heroId of heroes) {
+        for (let i = 0; i < Math.min(heroes.length, 5); i++) {
+          const heroId = heroes[i]
           const heroInfo = roleHeroes[heroId]
           if (!heroInfo) continue
           
           const heroName = HERO_DICT[heroId]?.name || `英雄${heroId}`
           
-          // 获取鱼灵和鱼珠技能
+          // 获取鱼灵
           let fishName = ''
-          let pearlSkillName = ''
-          
           if (heroInfo.artifactId) {
-            // artifactId前4位是鱼灵ID
             const fishId = parseInt((heroInfo.artifactId + '').substring(0, 4))
             fishName = FishMap[fishId]?.name || ''
-            
-            // 获取鱼珠技能
-            if (heroInfo.appendSkill && Array.isArray(heroInfo.appendSkill)) {
-              for (const skill of heroInfo.appendSkill) {
-                if (skill.skillId && PearlMap[skill.skillId]) {
-                  pearlSkillName = PearlMap[skill.skillId].name
-                  break
-                }
+          }
+          
+          // 获取鱼珠技能
+          let pearlName = ''
+          if (heroInfo.appendSkill && Array.isArray(heroInfo.appendSkill)) {
+            for (const skill of heroInfo.appendSkill) {
+              if (skill.skillId && PearlMap[skill.skillId]) {
+                pearlName = PearlMap[skill.skillId].name
+                break
               }
             }
           }
           
-          teamData.push({
-            heroName,
-            fishName,
-            pearlSkillName
-          })
+          // 用空格隔开：英雄 鱼灵 鱼珠
+          const parts = [heroName, fishName, pearlName].filter(p => p)
+          heroColumns[i] = parts.join(' ')
         }
         
-        // 添加到CSV行
-        for (const data of teamData) {
-          csvRows.push(`${token.name || token.id},${data.heroName},${data.fishName},${data.pearlSkillName}`)
-        }
+        // 添加到CSV行：账号,英雄1,英雄2,英雄3,英雄4,英雄5,玩具
+        const csvRow = [
+          token.name || token.id,
+          ...heroColumns,
+          weaponName
+        ].join(',')
+        csvRows.push(csvRow)
         
-        await connectionPool.release(token.id, true)
+        await connectionPool.release(token.id, false)
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 阵容导出成功`)
         successCount++
