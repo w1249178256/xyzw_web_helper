@@ -466,15 +466,30 @@ const refreshTeamInfo = async () => {
       const presetTeamInfo = teamInfoRes.presetTeamInfo.presetTeamInfo || teamInfoRes.presetTeamInfo
       console.log('presetTeamInfo 结构:', presetTeamInfo)
       
-      // 获取当前使用的阵容ID
-      if (presetTeamInfo.useTeamId !== undefined) {
-        currentUseTeamId.value = presetTeamInfo.useTeamId
-        message.info(`当前使用阵容ID: ${presetTeamInfo.useTeamId}`)
+      // 获取当前使用的阵容ID - 从多个位置尝试获取
+      let activeTeamId = null
+      
+      // 优先从 gameData 获取（服务器推送的实时数据）
+      if (tokenStore.gameData?.presetTeam?.teamId) {
+        activeTeamId = tokenStore.gameData.presetTeam.teamId
+      }
+      // 其次从响应中获取
+      else if (teamInfoRes._data?.presetTeam?.teamId) {
+        activeTeamId = teamInfoRes._data.presetTeam.teamId
+      }
+      // 兼容旧字段
+      else if (presetTeamInfo.useTeamId !== undefined) {
+        activeTeamId = presetTeamInfo.useTeamId
+      }
+      
+      if (activeTeamId !== null) {
+        currentUseTeamId.value = activeTeamId
+        message.info(`当前使用阵容ID: ${activeTeamId}`)
         
         // 根据useTeamId高亮显示对应的阵容
-        if (presetTeamInfo.useTeamId === 1) {
+        if (activeTeamId === 1) {
           message.success('当前使用阵容1，已高亮显示')
-        } else if (presetTeamInfo.useTeamId === 2) {
+        } else if (activeTeamId === 2) {
           message.success('当前使用阵容2，已高亮显示')
         }
       } else {
@@ -619,6 +634,8 @@ const switchTeam = async () => {
     message.warning('请先选择Token')
     return
   }
+  
+  const tokenIndex = getTokenIndex(token)
   
   if (!token) {
     message.error('Token不存在')
@@ -878,7 +895,7 @@ const updateCurrentPresetTeam = () => {
 }
 
 // 更换科技
-const changeTech = async () => {
+const changeTech = async (tokenIndex = null) => {
   // 使用当前选中的token，而不是props.selectedTokenId
   const token = tokenStore.selectedToken
   if (!token || !token.id) {
@@ -2116,7 +2133,7 @@ const batchChangeTech = async () => {
             console.error(`序号 ${tokenIndex} ${token.name || token.id} 切换阵容1失败:`, error)
           }
           
-          await changeTech()
+          await changeTech(tokenIndex)
           
           tokenStore.selectedTokenId = originalSelectedTokenId
           

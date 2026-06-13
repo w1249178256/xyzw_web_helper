@@ -52,6 +52,12 @@
               :disabled="isRunning || !tokenStore.hasTokens"
               @button-click="batchSwitchTeam2"
             />
+            <CustomizedCard 
+              mode="button"
+              name="导出阵容"
+              :disabled="isRunning || !tokenStore.hasTokens"
+              @button-click="exportTeamFormation"
+            />
           </CustomizedCard>
         </div>
       </div>
@@ -76,6 +82,7 @@ import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { Shield } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
+import { HERO_DICT, FishMap, PearlMap } from '@/utils/HeroList.js'
 
 const tokenStore = useTokenStore()
 const logStore = useOperationLogStore()
@@ -854,6 +861,236 @@ const batchSwitchTeam2 = async () => {
       operation: '批量切换阵2',
       status: 'error',
       message: `批量切换阵2失败：${error.message}`
+    })
+  } finally {
+    isRunning.value = false
+  }
+}
+
+// 导出阵容
+const exportTeamFormation = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  isRunning.value = true
+  
+  try {
+    const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+      const nameA = (a.name || '未命名').toLowerCase()
+      const nameB = (b.name || '未命名').toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+    
+    if (sortedTokensList.length === 0) {
+      message.warning('没有可用的Token')
+      return
+    }
+    
+    const tokenIndices = parseTokenRange(executionRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
+    
+    if (targetTokens.length === 0) {
+      message.warning('执行范围内没有有效的Token')
+      return
+    }
+    
+    const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+    message.info(`开始导出阵容（${rangeText}），共${targetTokens.length}个Token...`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '导出阵容',
+      status: 'info',
+      message: `开始导出阵容，${rangeText}，共${targetTokens.length}个Token`
+    })
+    
+    // CSV数据收集
+    const csvRows = []
+    csvRows.push('账号,英雄,鱼灵,鱼珠技能')
+    
+    let successCount = 0
+    let failCount = 0
+    
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
+      if (!token || !token.id) continue
+      
+      try {
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} 连接失败`)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '导出阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 连接失败`
+          })
+          continue
+        }
+        
+        await waitCommandDelay()
+        
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          const tokenIndex = getTokenIndex(token)
+          message.warning(`${tokenIndex}、${token.name} WebSocket未连接`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '盐场',
+            operation: '导出阵容',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} WebSocket未连接`
+          })
+          continue
+        }
+        
+        const tokenIndex = getTokenIndex(token)
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取阵容信息...`)
+        
+        // 步骤1: 使用fight_startlevel获取当前阵容
+        const fightResult = await tokenStore.sendMessageWithPromise(token.id, 'fight_startlevel', {}, 10000)
+        
+        if (!fightResult || !fightResult.battleData || !fightResult.battleData.leftTeam || !fightResult.battleData.leftTeam.team) {
+          throw new Error('获取阵容信息失败')
+        }
+        
+        const battleTeam = fightResult.battleData.leftTeam.team
+        const heroes = battleTeam.heroes || []
+        
+        await waitCommandDelay()
+        
+        // 步骤2: 使用role_getroleinfo获取鱼灵和鱼珠技能
+        const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+        
+        if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
+          throw new Error('获取角色信息失败')
+        }
+        
+        const roleHeroes = roleInfo.role.heroes
+        
+        // 构建阵容数据
+        const teamData = []
+        
+        for (const heroId of heroes) {
+          const heroInfo = roleHeroes[heroId]
+          if (!heroInfo) continue
+          
+          const heroName = HERO_DICT[heroId]?.name || `英雄${heroId}`
+          
+          // 获取鱼灵和鱼珠技能
+          let fishName = ''
+          let pearlSkillName = ''
+          
+          if (heroInfo.artifactId) {
+            // artifactId前4位是鱼灵ID
+            const fishId = parseInt((heroInfo.artifactId + '').substring(0, 4))
+            fishName = FishMap[fishId]?.name || ''
+            
+            // 获取鱼珠技能
+            if (heroInfo.appendSkill && Array.isArray(heroInfo.appendSkill)) {
+              for (const skill of heroInfo.appendSkill) {
+                if (skill.skillId && PearlMap[skill.skillId]) {
+                  pearlSkillName = PearlMap[skill.skillId].name
+                  break
+                }
+              }
+            }
+          }
+          
+          teamData.push({
+            heroName,
+            fishName,
+            pearlSkillName
+          })
+        }
+        
+        // 添加到CSV行
+        for (const data of teamData) {
+          csvRows.push(`${token.name || token.id},${data.heroName},${data.fishName},${data.pearlSkillName}`)
+        }
+        
+        await connectionPool.release(token.id, true)
+        
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 阵容导出成功`)
+        successCount++
+        
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '导出阵容',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name || token.id} 阵容导出成功`
+        })
+      } catch (error) {
+        console.error(`${token.name} 导出阵容失败:`, error)
+        const tokenIndex = getTokenIndex(token)
+        message.error(`${tokenIndex}、${token.name} 导出阵容失败：${error.message}`)
+        failCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '盐场',
+          operation: '导出阵容',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${token.name} 导出阵容失败：${error.message}`
+        })
+        try {
+          await connectionPool.release(token.id, false)
+        } catch (releaseError) {
+          console.error('释放连接失败:', releaseError)
+        }
+      }
+      
+      if (i < targetTokens.length - 1) {
+        await waitCommandDelay()
+      }
+    }
+    
+    // 生成CSV文件并下载
+    if (csvRows.length > 1) {
+      const csvContent = csvRows.join('\n')
+      const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `盐场阵容_${new Date().toLocaleDateString()}.csv`
+      link.click()
+      URL.revokeObjectURL(url)
+      
+      message.success(`阵容导出完成！成功: ${successCount}，失败: ${failCount}，已下载CSV文件`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '盐场',
+        operation: '导出阵容',
+        status: 'success',
+        message: `阵容导出完成（${rangeText}），成功: ${successCount}，失败: ${failCount}，已下载CSV文件`
+      })
+    } else {
+      message.warning('没有可导出的阵容数据')
+    }
+  } catch (error) {
+    console.error('导出阵容失败:', error)
+    message.error(`导出阵容失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '盐场',
+      operation: '导出阵容',
+      status: 'error',
+      message: `导出阵容失败：${error.message}`
     })
   } finally {
     isRunning.value = false

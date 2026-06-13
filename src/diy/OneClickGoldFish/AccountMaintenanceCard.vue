@@ -76,6 +76,22 @@
             :loading="isBatchHeroBattle"
           />
           <CustomizedCard 
+            mode="button-with-select"
+            :button-text="isBatchUnloadingHeroes ? '批量下阵中...' : '批量下阵'"
+            :select-value="selectedUnloadHero"
+            @update:select-value="(val) => selectedUnloadHero = val"
+            :select-options="[
+              { label: '全部', value: 'all' },
+              { label: '吕布', value: '107' },
+              { label: '张飞', value: '204' },
+              { label: '魏延', value: '217' }
+            ]"
+            placeholder="选择武将"
+            @button-click="handleBatchUnloadHeroes"
+            :disabled="isBatchUnloadingHeroes"
+            :loading="isBatchUnloadingHeroes"
+          />
+          <CustomizedCard 
             mode="button"
             :name="isBatchMayDayExchange ? '批量五一万能兑换中...' : '批量五一万能兑换'"
             @button-click="handleBatchMayDayExchange"
@@ -213,10 +229,17 @@
           />
           <CustomizedCard 
             mode="button"
-            :name="isBatchBoxWeekRunning ? '批量宝箱周中...' : '批量宝箱周'"
+            name="批量宝箱周"
             @button-click="handleBatchBoxWeek"
-            :disabled="isBatchBoxWeekRunning"
+            :disabled="isAnyOperationRunning"
             :loading="isBatchBoxWeekRunning"
+          />
+          <CustomizedCard 
+            mode="button"
+            name="停止宝箱周"
+            @button-click="stopBatchBoxWeek"
+            :disabled="!isBatchBoxWeekRunning"
+            :loading="false"
           />
           <CustomizedCard 
             mode="button-switch"
@@ -227,13 +250,7 @@
             :disabled="isBatchRecruitWeekRunning"
             :loading="isBatchRecruitWeekRunning"
           />
-          <CustomizedCard 
-            mode="button"
-            :name="isBatchUnloadingHeroes ? '批量下阵武将中...' : '批量下阵武将'"
-            @button-click="handleBatchUnloadHeroes"
-            :disabled="isBatchUnloadingHeroes"
-            :loading="isBatchUnloadingHeroes"
-          />
+          
           <CustomizedCard 
             mode="button-with-select"
             :button-text="isBatchUpgrading900 ? '批量升级中...' : '批量升级'"
@@ -445,8 +462,20 @@ const isBatchRenaming = ref(false)
 const isRecruitWeekRunning = ref(false)
 const isExportingDetails = ref(false)
 const isBatchBoxWeekRunning = ref(false)
+const isBatchBoxWeekCancelled = ref(false)
 const isBatchRecruitWeekRunning = ref(false)
 const enableRecruitWeek = ref(false)
+
+// 计算是否有任何操作正在运行
+const isAnyOperationRunning = computed(() => {
+  return isUpgradingCrystal.value || isUsingUniversalRed.value || isUpgradingLuBuStar.value || 
+         isBatchHeroSynthetic.value || isBatchHeroBattle.value || isBatchMayDayExchange.value || 
+         isBatchClaimingCDK.value || isUsingTorch.value || isBuyingWrench.value || 
+         isUpgradingChiYu.value || isBatchBoxWeekRunning.value || isBatchRecruitWeekRunning.value ||
+         isBatchUpgradingEquipment.value || isBatchAwakingSkill.value || isBatchUpgradingHangup.value ||
+         isBatchClaimingHangupReward.value || isBatchRenaming.value || isRecruitWeekRunning.value ||
+         isExportingDetails.value
+})
 
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
@@ -479,8 +508,25 @@ const heroOptions = computed(() => {
     { label: '陆绩', value: 309 }
   ]
   
-  return [...redHeroes, ...toyTeamHeroes]
+  // 被动紫将（关平到陆绩10个紫将）
+  const passiveHeroOption = { label: '被动', value: 'passive' }
+  
+  return [passiveHeroOption, ...redHeroes, ...toyTeamHeroes]
 })
+
+// 被动紫将列表（关平到陆绩10个紫将）
+const passiveHeroes = [
+  { id: 306, name: '关平' },
+  { id: 302, name: '许攸' },
+  { id: 311, name: '潘凤' },
+  { id: 301, name: '周泰' },
+  { id: 312, name: '邢道荣' },
+  { id: 307, name: '程普' },
+  { id: 215, name: '许褚' },
+  { id: 303, name: '于禁' },
+  { id: 308, name: '张昭' },
+  { id: 309, name: '陆绩' }
+]
 
 // 英雄合成下拉选项
 const syntheticHeroOptions = computed(() => {
@@ -511,6 +557,7 @@ const isBatchHeroSynthetic = ref(false)
 const isBatchHeroBattle = ref(false)
 const isBatchHeroZhangFei = ref(false)
 const selectedBatchHero = ref('107')
+const selectedUnloadHero = ref('all')
 const isBatchMayDayExchange = ref(false)
 const isBatchClaimingCDK = ref(false)
 const selectedSingleHero = ref('107')
@@ -663,25 +710,48 @@ const handleUseTorch = async () => {
           
           let successCount = 0
           let failCount = 0
+          let torchQuantity = 0
           
-          // 执行100次 item_consume 命令
-          for (let i = 0; i < 100; i++) {
+          // 先获取火把数量
+          try {
+            const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+            torchQuantity = roleInfo?.role?.items?.[1008]?.quantity || 0
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前火把数量: ${torchQuantity}`)
+          } catch (error) {
+            console.error(`获取火把数量失败:`, error)
+          }
+          
+          // 根据火把数量决定每次使用的数量
+          const getUseQuantity = (remaining) => {
+            if (remaining >= 50) return 50
+            if (remaining >= 10) return 10
+            return remaining // 不足10个，使用剩余全部
+          }
+          
+          // 执行使用火把命令
+          while (torchQuantity > 0) {
+            const quantity = getUseQuantity(torchQuantity)
+            if (quantity <= 0) break
+            
             try {
-              await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity: 50 })
+              await tokenStore.sendItemConsume(token.id, { itemId: 1008, quantity })
               await waitCommandDelay()
               successCount++
+              torchQuantity -= quantity
             } catch (error) {
-              console.error(`第${i + 1}次使用火把失败:`, error)
+              console.error(`使用火把失败:`, error)
               failCount++
               // 如果服务器错误，跳过执行剩余次数
               if (error.message && error.message.includes('服务器错误')) {
-                message.warning(`${token.name} - 第${i + 1}次使用火把失败: ${error.message}，跳过剩余次数`)
+                message.warning(`${token.name} - 使用火把失败: ${error.message}，跳过剩余次数`)
                 break
               }
+              // 其他错误也继续尝试
+              torchQuantity -= quantity
             }
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`)
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用火把完成：成功${successCount}次，失败${failCount}次`)
 
           logStore.addLog({
             page: 'fish-helper',
@@ -690,7 +760,7 @@ const handleUseTorch = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]使用火把完成：成功${successCount}次，失败${failCount}次（每次使用50个）`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]使用火把完成：成功${successCount}次，失败${failCount}次`
           })
 
           return { success: true, tokenId: token.id, successCount, failCount }
@@ -1948,6 +2018,101 @@ const handleUseUniversalRed = async () => {
   }
 }
 
+// 单个英雄升星
+const upgradeSingleHero = async (token, tokenIndex, heroId, heroName) => {
+  try {
+    // 获取角色信息，获取目标英雄星级
+    const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+    if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
+      throw new Error('获取角色信息失败')
+    }
+
+    // 获取目标英雄星级
+    let heroStar = 0
+    const heroIdStr = String(heroId)
+    if (roleInfo.role.heroes[heroIdStr]) {
+      heroStar = roleInfo.role.heroes[heroIdStr].star || 0
+    }
+
+    message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}星级：${heroStar}`)
+
+    // 等待 1 秒后开始升星
+    message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}等待 1 秒后开始升星...`)
+    await waitCommandDelay()
+
+    // 如果目标英雄 30 星，跳过
+    if (heroStar >= 30) {
+      message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}已 30 星，跳过`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升星',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'warning',
+        message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}已 30 星，跳过`
+      })
+      return
+    }
+
+    // 开始升星，最多 10 次
+    let upgradeCount = 0
+    for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
+      try {
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}第${upgradeAttempt}次升星...`)
+        
+        await tokenStore.sendMessageWithPromise(
+          token.id,
+          'hero_heroupgradestar',
+          { heroId: heroId },
+          8000
+        )
+
+        upgradeCount++
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}第${upgradeAttempt}次升星成功`)
+
+        // 升星后等待 1 秒
+        await waitCommandDelay()
+      } catch (error) {
+        const errorMsg = error.message || String(error)
+        // 检查是否是物品数量不足的错误
+        if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}万能红碎片不足，停止升星`)
+          break
+        }
+        // 其他错误也停止
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}第${upgradeAttempt}次升星失败：${errorMsg}`)
+        break
+      }
+    }
+
+    message.success(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}升星完成，共升星${upgradeCount}次`)
+
+    // 添加操作日志
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'success',
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升星完成，共升星${upgradeCount}次（原${heroStar}星）`
+    })
+  } catch (error) {
+    console.error(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}升星失败:`, error)
+    message.error(`[序号${tokenIndex}] ${token.name || token.id} - ${heroName}升星失败：${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量升星',
+      tokenId: token.id,
+      tokenName: token.name,
+      status: 'error',
+      message: `【序号${tokenIndex}】[${token.name || token.id}]${heroName}升星失败：${error.message || '未知错误'}`
+    })
+  }
+}
+
 // 批量升星（只升星，不使用万能红）
 const handleUpgradeLuBuStar = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
@@ -1963,19 +2128,31 @@ const handleUpgradeLuBuStar = async () => {
     return
   }
 
-  const selectedHeroName = HERO_DICT[selectedUpgradeStarHero.value]?.name || '未知英雄'
   const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
 
   try {
     isUpgradingLuBuStar.value = true
 
-    message.info(`开始批量升星（${rangeText}），目标英雄: ${selectedHeroName}，共${targetTokens.length}个 Token...`)
+    // 判断是否选择了被动紫将
+    const isPassive = selectedUpgradeStarHero.value === 'passive'
+    
+    if (isPassive) {
+      message.info(`开始批量升星被动紫将（${rangeText}），共${targetTokens.length}个 Token...`)
+    } else {
+      const selectedHeroName = HERO_DICT[selectedUpgradeStarHero.value]?.name || '未知英雄'
+      message.info(`开始批量升星（${rangeText}），目标英雄: ${selectedHeroName}，共${targetTokens.length}个 Token...`)
+    }
 
     // 逐个处理 Token
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       const tokenIndex = getTokenIndex(token)
-      message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始升星...`)
+      
+      if (isPassive) {
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始被动紫将升星...`)
+      } else {
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始升星...`)
+      }
 
       try {
         // 连接 Token
@@ -1994,82 +2171,16 @@ const handleUpgradeLuBuStar = async () => {
           }
         }
 
-        // 获取角色信息，获取目标英雄星级
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在获取角色信息...`)
-        const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-        if (!roleInfo || !roleInfo.role || !roleInfo.role.heroes) {
-          throw new Error('获取角色信息失败')
-        }
-
-        // 获取目标英雄星级
-        let heroStar = 0
-        const heroIdStr = String(selectedUpgradeStarHero.value)
-        if (roleInfo.role.heroes[heroIdStr]) {
-          heroStar = roleInfo.role.heroes[heroIdStr].star || 0
-        }
-
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}星级：${heroStar}`)
-
-        // 等待 1 秒后开始升星
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 等待 1 秒后开始升星...`)
-        await waitCommandDelay()
-
-        // 如果目标英雄 30 星，跳过
-        if (heroStar >= 30) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已 30 星，跳过`)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '批量升星',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'warning',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已 30 星，跳过`
-          })
-        } else {
-          // 开始升星，最多 10 次
-          let upgradeCount = 0
-          for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
-            try {
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星...`)
-              
-              await tokenStore.sendMessageWithPromise(
-                token.id,
-                'hero_heroupgradestar',
-                { heroId: selectedUpgradeStarHero.value },
-                8000
-              )
-
-              upgradeCount++
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星成功`)
-
-              // 升星后等待 1 秒
-              await waitCommandDelay()
-            } catch (error) {
-              const errorMsg = error.message || String(error)
-              // 检查是否是物品数量不足的错误
-              if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红碎片不足，停止升星`)
-                break
-              }
-              // 其他错误也停止
-              message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星失败：${errorMsg}`)
-              break
-            }
+        if (isPassive) {
+          // 对10个被动紫将依次升星
+          for (const hero of passiveHeroes) {
+            await upgradeSingleHero(token, tokenIndex, hero.id, hero.name)
+            // 每个英雄升星后等待1秒
+            await waitCommandDelay()
           }
-
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升星完成，共升星${upgradeCount}次`)
-
-          // 添加操作日志
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '批量升星',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'success',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]升星完成，共升星${upgradeCount}次（原${heroStar}星）`
-          })
+        } else {
+          const selectedHeroName = HERO_DICT[selectedUpgradeStarHero.value]?.name || '未知英雄'
+          await upgradeSingleHero(token, tokenIndex, selectedUpgradeStarHero.value, selectedHeroName)
         }
 
       } catch (error) {
@@ -2098,25 +2209,49 @@ const handleUpgradeLuBuStar = async () => {
       }
     }
 
-    message.success(`批量升星完成，共处理${targetTokens.length}个 Token`)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '批量升星吕布',
-      status: 'success',
-      message: `批量升星吕布完成，共处理${targetTokens.length}个 Token`
-    })
+    if (isPassive) {
+      message.success(`批量升星被动紫将完成，共处理${targetTokens.length}个 Token`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升星',
+        status: 'success',
+        message: `批量升星被动紫将完成，共处理${targetTokens.length}个 Token`
+      })
+    } else {
+      const selectedHeroName = HERO_DICT[selectedUpgradeStarHero.value]?.name || '未知英雄'
+      message.success(`批量升星完成，共处理${targetTokens.length}个 Token`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升星',
+        status: 'success',
+        message: `批量升星${selectedHeroName}完成，共处理${targetTokens.length}个 Token`
+      })
+    }
 
   } catch (error) {
-    console.error('批量升星吕布失败:', error)
-    message.error(`批量升星吕布失败：${error.message || '未知错误'}`)
-    logStore.addLog({
-      page: 'fish-helper',
-      cardType: '养号',
-      operation: '批量升星吕布',
-      status: 'error',
-      message: `批量升星吕布失败：${error.message || '未知错误'}`
-    })
+    if (isPassive) {
+      console.error('批量升星被动紫将失败:', error)
+      message.error(`批量升星被动紫将失败：${error.message || '未知错误'}`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升星',
+        status: 'error',
+        message: `批量升星被动紫将失败：${error.message || '未知错误'}`
+      })
+    } else {
+      console.error('批量升星失败:', error)
+      message.error(`批量升星失败：${error.message || '未知错误'}`)
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '养号',
+        operation: '批量升星',
+        status: 'error',
+        message: `批量升星失败：${error.message || '未知错误'}`
+      })
+    }
   } finally {
     isUpgradingLuBuStar.value = false
   }
@@ -3357,31 +3492,49 @@ const handleExportDetails = async () => {
 
       try {
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
-        tokenStore.selectToken(token.id, true)
-
-        let retryCount = 0
-        const maxRetries = 5
-        let status = tokenStore.getWebSocketStatus(token.id)
-
-        while (status !== 'connected' && retryCount < maxRetries) {
-          await waitCommandDelay()
-          status = tokenStore.getWebSocketStatus(token.id)
-          retryCount++
-
-          if (status !== 'connected' && retryCount < maxRetries) {
-            message.info(`[序号${tokenIndex}] 连接尝试 ${retryCount}/${maxRetries}...`)
-            tokenStore.selectToken(token.id, true)
-          }
-        }
-
-        if (status !== 'connected') {
+        
+        // 使用连接池获取连接
+        const connectionAcquired = await connectionPool.acquire(token.id)
+        
+        if (!connectionAcquired) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
           failCount++
           failedTokens.push(token.name || token.id)
           continue
         }
+        
+        // 检查 WebSocket 连接状态
+        if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} WebSocket未连接，跳过`)
+          await connectionPool.release(token.id, false)
+          failCount++
+          failedTokens.push(token.name || token.id)
+          continue
+        }
 
-        const result = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {})
+        // 发送命令，遇到"操作过快"错误时等待2秒后重试
+        let result = null
+        let retryCount = 0
+        const maxRetries = 5
+        while (retryCount < maxRetries) {
+          try {
+            result = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {})
+            break
+          } catch (error) {
+            const errorMsg = error?.message || error || ''
+            if (errorMsg.includes('400340') || errorMsg.includes('操作过快')) {
+              retryCount++
+              if (retryCount < maxRetries) {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} 操作过快，等待2秒后重试 (${retryCount}/${maxRetries})...`)
+                await new Promise(resolve => setTimeout(resolve, 2000))
+              } else {
+                throw new Error('操作过快，重试次数已达上限')
+              }
+            } else {
+              throw error
+            }
+          }
+        }
 
         if (result && result.role) {
           const role = result.role
@@ -3421,7 +3574,28 @@ const handleExportDetails = async () => {
           let boxWeekRounds = '获取失败'
           try {
             await waitCommandDelay()
-            const activityResult = await tokenStore.sendActivityGet(token.id)
+            // 发送命令，遇到"操作过快"错误时等待2秒后重试
+            let activityResult = null
+            let activityRetryCount = 0
+            const activityMaxRetries = 5
+            while (activityRetryCount < activityMaxRetries) {
+              try {
+                activityResult = await tokenStore.sendActivityGet(token.id)
+                break
+              } catch (error) {
+                const errorMsg = error?.message || error || ''
+                if (errorMsg.includes('400340') || errorMsg.includes('操作过快')) {
+                  activityRetryCount++
+                  if (activityRetryCount < activityMaxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, 2000))
+                  } else {
+                    throw new Error('操作过快，重试次数已达上限')
+                  }
+                } else {
+                  throw error
+                }
+              }
+            }
             if (activityResult && activityResult.activity && activityResult.activity.myTotalInfo && activityResult.activity.myTotalInfo['2']) {
               const info = activityResult.activity.myTotalInfo['2']
               const rounds = info.rounds || 1
@@ -3449,10 +3623,12 @@ const handleExportDetails = async () => {
 
           successCount++
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 获取成功`)
+          connectionPool.release(token.id, true)
         } else {
           failCount++
           failedTokens.push(token.name || token.id)
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取数据失败`)
+          connectionPool.release(token.id, false)
         }
 
         if (i < targetTokens.length - 1) {
@@ -3463,6 +3639,7 @@ const handleExportDetails = async () => {
         failCount++
         failedTokens.push(token.name || token.id)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 获取失败`)
+        connectionPool.release(token.id, false)
       }
     }
 
@@ -3591,11 +3768,6 @@ const executeBoxWeekForToken = async (token) => {
     
     message.info(`${token.name} - 宝箱总分: ${Z}, 基准宝箱分: ${J}, 已用宝箱分: ${Y}, 开箱轮数: ${l}, 目标分数ZY: ${ZY}`)
     
-    // 辅助函数：计算已用宝箱分YY（新积分规则）
-    const calculateYY = () => {
-      return Y + MK * 100 + QK * 10 + HK * 20 + BK * 50
-    }
-    
     // 辅助函数：获取服务器真实Y值
     const fetchRealY = async () => {
       try {
@@ -3614,69 +3786,49 @@ const executeBoxWeekForToken = async (token) => {
       return Y
     }
     
-    // 辅助函数：计算铂金宝箱开箱数量（根据宝箱数量和ZY-Y差值）
+    // 辅助函数：计算铂金宝箱开箱数量（10的倍数，最多100个）
     const calculatePlatinumOpenCount = (boxCount, diff) => {
-      // ZY-Y<1000时，固定开10个
-      if (diff < 1000) {
-        return Math.min(10, boxCount)
-      }
+      if (diff <= 0) return 0
+      const maxCount = Math.min(Math.floor(boxCount / 10) * 10, 100)
+      if (maxCount === 0) return 0
       
-      // 铂金宝箱规则
-      if (boxCount >= 100) {
-        if (diff > 5000) {
-          return 100
-        } else if (diff > 2500) {
-          return 50
-        } else {
-          return 10
-        }
-      } else if (boxCount >= 50) {
-        if (diff > 2500) {
-          return 50
-        } else {
-          return 10
-        }
-      } else {
-        return Math.min(10, boxCount)
-      }
+      const needBoxes = Math.ceil(diff / 50)
+      const needBoxesRounded = Math.ceil(needBoxes / 10) * 10
+      
+      const count = Math.min(needBoxesRounded, maxCount)
+      return count >= 10 ? count : 0
     }
     
-    // 辅助函数：计算青铜/黄金宝箱开箱数量（根据宝箱数量和ZY-Y差值）
-    const calculateNormalOpenCount = (boxCount, diff) => {
-      // ZY-Y<1000时，固定开10个
-      if (diff < 1000) {
-        return Math.min(10, boxCount)
-      }
+    // 辅助函数：计算青铜/黄金宝箱开箱数量（10的倍数，最多100个）
+    const calculateNormalOpenCount = (boxCount, diff, scorePerBox = 10) => {
+      if (diff <= 0) return 0
+      const maxCount = Math.min(Math.floor(boxCount / 10) * 10, 100)
+      if (maxCount === 0) return 0
       
-      // 青铜/黄金宝箱规则
-      if (boxCount >= 100) {
-        if (diff > 2000) {
-          return 100
-        } else if (diff > 1000) {
-          return 50
-        } else {
-          return 10
-        }
-      } else if (boxCount >= 50) {
-        if (diff > 1000) {
-          return 50
-        } else {
-          return 10
-        }
-      } else {
-        return Math.min(10, boxCount)
-      }
+      const needBoxes = Math.ceil(diff / scorePerBox)
+      const needBoxesRounded = Math.ceil(needBoxes / 10) * 10
+      
+      const count = Math.min(needBoxesRounded, maxCount)
+      return count >= 10 ? count : 0
     }
     
     // 辅助函数：开箱并检查分数
     const openBoxAndCheck = async (itemId, count, boxTypeName) => {
-      await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, count })
+      // 记录开箱前的Y值
+      const yBefore = Y
       
-      // 计算YY
-      const YY = calculateYY()
-      const diff = ZY - YY
+      await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, number: count })
       
-      const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱积分YY: ${YY}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
+      // 每次开箱后获取真实的Y值
+      await fetchRealY()
+      
+      // 计算实际增加的分数
+      const actualIncrease = Y - yBefore
+      
+      const diff = ZY - Y
+      
+      const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱分Y: ${Y}，实际增加: +${actualIncrease}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
+      
       message.info(openBoxLog)
       logStore.addLog({
         page: 'fish-helper',
@@ -3687,58 +3839,25 @@ const executeBoxWeekForToken = async (token) => {
         status: 'info',
         message: openBoxLog
       })
+      
       await waitCommandDelay()
       
-      // ZY-YY<1000时，不再检查YY，直接检查Y
-      if (diff < 1000) {
-        await fetchRealY()
-        if (Y >= ZY || Y > 32000) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} ${Y > 32000 ? '超过最大限制32000' : '达到目标' + ZY}`
-          })
-          return 'break'
-        }
-        // Y小于ZY，宝箱分数不够了，领取宝箱奖励后继续开箱
-        message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
+      // 检查是否达到目标
+      if (Y >= ZY || Y > 32000) {
+        message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '养号',
-          operation: '领取宝箱奖励',
+          operation: '跳出循环',
           tokenId: token.id,
           tokenName: token.name,
           status: 'info',
-          message: `已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`
+          message: `已用宝箱分Y ${Y} ${Y > 32000 ? '超过最大限制32000' : '达到目标' + ZY}`
         })
-        await tokenStore.sendBatchClaimBoxPointReward(token.id)
-        await waitCommandDelay()
-        return 'continue'
+        return 'break'
       }
       
-      // YY超过目标时，获取Y验证
-      if (YY > ZY) {
-        await fetchRealY()
-        if (Y >= ZY || Y > 32000) {
-          message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
-          logStore.addLog({
-            page: 'fish-helper',
-            cardType: '养号',
-            operation: '跳出循环',
-            tokenId: token.id,
-            tokenName: token.name,
-            status: 'info',
-            message: `已用宝箱分Y ${Y} ${Y > 32000 ? '超过最大限制32000' : '达到目标' + ZY}`
-          })
-          return 'break'
-        }
-      }
-      
+      // Y小于ZY，继续开箱
       return 'continue'
     }
     
@@ -3756,64 +3875,206 @@ const executeBoxWeekForToken = async (token) => {
       roundCount++
       message.info(`${token.name} - 执行第 ${roundCount} 轮开宝箱`)
       
-      // 铂金宝箱开箱（itemId: 2004，50分/个）
-      while (B >= 10) {
-        const diff = ZY - calculateYY()
-        const count = calculatePlatinumOpenCount(B, diff)
-        if (count === 0) break
-        
-        const result = await openBoxAndCheck(2004, count, '铂金')
-        B -= count
-        BK += count
-        if (result === 'break') {
-          shouldBreak = true
-          break
-        }
-      }
-      if (shouldBreak) break
+      const currentDiff = ZY - Y
       
-      // 黄金宝箱开箱（itemId: 2003，20分/个）
-      while (H >= 10) {
-        const diff = ZY - calculateYY()
-        const count = calculateNormalOpenCount(H, diff)
-        if (count === 0) break
+      // 当差值 < 500 时，优先检查青铜和黄金
+      if (currentDiff < 500) {
+        // 计算青铜和黄金可开的分数（只能开10的倍数）
+        const bronzeCount = Q >= 10 ? Math.floor(Q / 10) * 10 : 0
+        const goldCount = H >= 10 ? Math.floor(H / 10) * 10 : 0
+        const bronzeScore = bronzeCount * 10
+        const goldScore = goldCount * 20
+        const totalBronzeGoldScore = bronzeScore + goldScore
         
-        const result = await openBoxAndCheck(2003, count, '黄金')
-        H -= count
-        HK += count
-        if (result === 'break') {
-          shouldBreak = true
-          break
+        // 如果青铜+黄金分数 > 500，只开青铜和黄金宝箱
+        if (totalBronzeGoldScore > 500) {
+          // 黄金宝箱开箱（itemId: 2003，20分/个）
+          while (H >= 10 && !shouldBreak) {
+            const diff = ZY - Y
+            if (diff <= 0) {
+              message.info(`${token.name} - 已超过目标分数，停止开箱`)
+              shouldBreak = true
+              break
+            }
+            const count = calculateNormalOpenCount(H, diff, 20)
+            if (count === 0) break
+            
+            const result = await openBoxAndCheck(2003, count, '黄金')
+            H -= count
+            HK += count
+            if (result === 'break') {
+              shouldBreak = true
+              break
+            }
+          }
+          if (shouldBreak) break
+          
+          // 青铜宝箱开箱（itemId: 2002，10分/个）
+          while (Q >= 10 && !shouldBreak) {
+            const diff = ZY - Y
+            if (diff <= 0) {
+              message.info(`${token.name} - 已超过目标分数，停止开箱`)
+              shouldBreak = true
+              break
+            }
+            const count = calculateNormalOpenCount(Q, diff, 10)
+            if (count === 0) break
+            
+            const result = await openBoxAndCheck(2002, count, '青铜')
+            Q -= count
+            QK += count
+            if (result === 'break') {
+              shouldBreak = true
+              break
+            }
+          }
+          if (shouldBreak) break
+        } else {
+          // 青铜+黄金分数 <= 500，按正常顺序开箱（铂金→黄金→青铜）
+          // 铂金宝箱开箱（itemId: 2004，50分/个）
+          while (B >= 10 && !shouldBreak) {
+            const diff = ZY - Y
+            if (diff <= 0) {
+              message.info(`${token.name} - 已超过目标分数，停止开箱`)
+              shouldBreak = true
+              break
+            }
+            const count = calculatePlatinumOpenCount(B, diff)
+            if (count === 0) break
+            
+            const result = await openBoxAndCheck(2004, count, '铂金')
+            B -= count
+            BK += count
+            if (result === 'break') {
+              shouldBreak = true
+              break
+            }
+          }
+          if (shouldBreak) break
+          
+          // 黄金宝箱开箱（itemId: 2003，20分/个）
+          while (H >= 10 && !shouldBreak) {
+            const diff = ZY - Y
+            if (diff <= 0) {
+              message.info(`${token.name} - 已超过目标分数，停止开箱`)
+              shouldBreak = true
+              break
+            }
+            const count = calculateNormalOpenCount(H, diff, 20)
+            if (count === 0) break
+            
+            const result = await openBoxAndCheck(2003, count, '黄金')
+            H -= count
+            HK += count
+            if (result === 'break') {
+              shouldBreak = true
+              break
+            }
+          }
+          if (shouldBreak) break
+          
+          // 青铜宝箱开箱（itemId: 2002，10分/个）
+          while (Q >= 10 && !shouldBreak) {
+            const diff = ZY - Y
+            if (diff <= 0) {
+              message.info(`${token.name} - 已超过目标分数，停止开箱`)
+              shouldBreak = true
+              break
+            }
+            const count = calculateNormalOpenCount(Q, diff, 10)
+            if (count === 0) break
+            
+            const result = await openBoxAndCheck(2002, count, '青铜')
+            Q -= count
+            QK += count
+            if (result === 'break') {
+              shouldBreak = true
+              break
+            }
+          }
+          if (shouldBreak) break
         }
-      }
-      if (shouldBreak) break
-      
-      // 青铜宝箱开箱（itemId: 2002，10分/个）
-      while (Q >= 10) {
-        const diff = ZY - calculateYY()
-        const count = calculateNormalOpenCount(Q, diff)
-        if (count === 0) break
+      } else {
+        // 差值 >= 500，按正常顺序开箱（铂金→黄金→青铜）
         
-        const result = await openBoxAndCheck(2002, count, '青铜')
-        Q -= count
-        QK += count
-        if (result === 'break') {
-          shouldBreak = true
-          break
+        // 铂金宝箱开箱（itemId: 2004，50分/个）
+        while (B >= 10) {
+          const diff = ZY - Y
+          if (diff <= 0) {
+            message.info(`${token.name} - 已超过目标分数，停止开箱`)
+            shouldBreak = true
+            break
+          }
+          const count = calculatePlatinumOpenCount(B, diff)
+          if (count === 0) break
+          
+          const result = await openBoxAndCheck(2004, count, '铂金')
+          B -= count
+          BK += count
+          if (result === 'break') {
+            shouldBreak = true
+            break
+          }
         }
+        if (shouldBreak) break
+        
+        // 黄金宝箱开箱（itemId: 2003，20分/个）
+        while (H >= 10) {
+          const diff = ZY - Y
+          if (diff <= 0) {
+            message.info(`${token.name} - 已超过目标分数，停止开箱`)
+            shouldBreak = true
+            break
+          }
+          const count = calculateNormalOpenCount(H, diff, 20)
+          if (count === 0) break
+          
+          const result = await openBoxAndCheck(2003, count, '黄金')
+          H -= count
+          HK += count
+          if (result === 'break') {
+            shouldBreak = true
+            break
+          }
+        }
+        if (shouldBreak) break
+        
+        // 青铜宝箱开箱（itemId: 2002，10分/个）
+        while (Q >= 10) {
+          const diff = ZY - Y
+          if (diff <= 0) {
+            message.info(`${token.name} - 已超过目标分数，停止开箱`)
+            shouldBreak = true
+            break
+          }
+          const count = calculateNormalOpenCount(Q, diff, 10)
+          if (count === 0) break
+          
+          const result = await openBoxAndCheck(2002, count, '青铜')
+          Q -= count
+          QK += count
+          if (result === 'break') {
+            shouldBreak = true
+            break
+          }
+        }
+        if (shouldBreak) break
       }
-      if (shouldBreak) break
       
       // 木质宝箱开箱（itemId: 2001，1分/个）
-      while (M >= 100) {
-        const diff = ZY - calculateYY()
-        const count = diff < 1000 ? 10 : (diff > 5000 ? 100 : (diff > 2500 ? 50 : 10))
-        const actualCount = Math.min(count * 10, M)
-        if (actualCount < 10) break
+      while (M >= 10) {
+        const diff = ZY - Y
+        if (diff <= 0) {
+          message.info(`${token.name} - 已超过目标分数，停止开箱`)
+          shouldBreak = true
+          break
+        }
+        const count = calculateNormalOpenCount(M, diff, 1)
+        if (count === 0) break
         
-        const result = await openBoxAndCheck(2001, actualCount, '木质')
-        M -= actualCount
-        MK += actualCount
+        const result = await openBoxAndCheck(2001, count, '木质')
+        M -= count
+        MK += count
         if (result === 'break') {
           shouldBreak = true
           break
@@ -3822,8 +4083,7 @@ const executeBoxWeekForToken = async (token) => {
       if (shouldBreak) break
       
       // 检查是否还需要继续开箱
-      const currentYY = calculateYY()
-      if (currentYY >= ZY) {
+      if (Y >= ZY) {
         // 获取服务器真实Y值
         await fetchRealY()
         if (Y < ZY) {
@@ -3867,8 +4127,76 @@ const executeBoxWeekForToken = async (token) => {
         B = newItems['2004']?.quantity || 0
       }
       
-      // 如果没有宝箱了，退出循环
-      if (M < 100 && Q < 10 && H < 10 && B < 10) {
+      // 如果没有宝箱了，但Y还没达到ZY，循环领取宝箱奖励和邮件直到有宝箱或Y达到目标
+      if (M < 10 && Q < 10 && H < 10 && B < 10) {
+        if (Y < ZY) {
+          let claimAttempt = 0
+          const maxClaimAttempts = 5 // 最多尝试领取5次
+          
+          while (Y < ZY && claimAttempt < maxClaimAttempts) {
+            claimAttempt++
+            message.info(`${token.name} - 宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '领取宝箱奖励',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`
+            })
+            
+            // 领取宝箱奖励
+            await tokenStore.sendBatchClaimBoxPointReward(token.id)
+            await waitCommandDelay()
+            
+            // 领取邮件
+            message.info(`${token.name} - 领取邮件`)
+            await tokenStore.sendMailClaimAllAttachment(token.id, { category: 0 })
+            await waitCommandDelay()
+            
+            // 重新获取Y值
+            await fetchRealY()
+            
+            // 检查Y是否达到目标
+            if (Y >= ZY) {
+              message.info(`${token.name} - 领取奖励后Y(${Y})达到目标ZY(${ZY})，进入最终阶段`)
+              break
+            }
+            
+            // 重新获取宝箱数量
+            const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
+            if (newRoleInfo && newRoleInfo.role && newRoleInfo.role.items) {
+              const newItems = newRoleInfo.role.items
+              M = newItems['2001']?.quantity || 0
+              Q = newItems['2002']?.quantity || 0
+              H = newItems['2003']?.quantity || 0
+              B = newItems['2004']?.quantity || 0
+            }
+            
+            // 如果有宝箱了，退出领取循环，继续开箱
+            if (M >= 10 || Q >= 10 || H >= 10 || B >= 10) {
+              message.info(`${token.name} - 领取奖励后获得宝箱，继续开箱`)
+              break
+            }
+            
+            // 如果达到最大尝试次数，退出循环
+            if (claimAttempt >= maxClaimAttempts) {
+              message.info(`${token.name} - 已尝试${maxClaimAttempts}次领取奖励，仍无宝箱可开，进入最终阶段`)
+              break
+            }
+            
+            message.info(`${token.name} - 领取后仍无宝箱且Y(${Y})<ZY(${ZY})，继续领取...`)
+          }
+          
+          // 如果有宝箱，继续下一轮开箱
+          if (M >= 10 || Q >= 10 || H >= 10 || B >= 10) {
+            continue
+          }
+          // 否则进入最终阶段
+          message.info(`${token.name} - 宝箱数量不足，进入最终阶段`)
+          break
+        }
         message.info(`${token.name} - 宝箱数量不足，进入最终阶段`)
         break
       }
@@ -3926,13 +4254,17 @@ const executeBoxWeekForToken = async (token) => {
         message: `钻石宝箱数量: ${D}`
       })
       
-      // 每次开10个，开到不足10个为止
+      // 每次开10的倍数，最多100个
       let diamondOpenCount = 0
       while (D >= 10) {
-        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, count: 10 })
-        D -= 10
+        // 计算每次开箱数量：10的倍数，最多100个
+        const openCount = Math.min(Math.floor(D / 10) * 10, 100)
+        if (openCount < 10) break
+        
+        await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, number: openCount })
+        D -= openCount
         diamondOpenCount++
-        message.info(`${token.name} - 开钻石宝箱第${diamondOpenCount}次，10个，剩余${D}个`)
+        message.info(`${token.name} - 开钻石宝箱第${diamondOpenCount}次，${openCount}个，剩余${D}个`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '养号',
@@ -3940,7 +4272,7 @@ const executeBoxWeekForToken = async (token) => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `开钻石宝箱第${diamondOpenCount}次，10个，剩余${D}个`
+          message: `开钻石宝箱第${diamondOpenCount}次，${openCount}个，剩余${D}个`
         })
         await waitCommandDelay()
       }
@@ -4050,6 +4382,12 @@ const executeBoxWeekForToken = async (token) => {
   return { boxWeekRounds, successfulClaimCount }
 }
 
+// 停止批量宝箱周
+const stopBatchBoxWeek = () => {
+  isBatchBoxWeekCancelled.value = true
+  message.info('已停止批量宝箱周')
+}
+
 // 批量宝箱周
 const handleBatchBoxWeek = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
@@ -4064,6 +4402,7 @@ const handleBatchBoxWeek = async () => {
   
   try {
     isBatchBoxWeekRunning.value = true
+    isBatchBoxWeekCancelled.value = false
     
     message.info(`开始批量宝箱周（${rangeText}），共${targetTokens.length}个Token...`)
     
@@ -4077,6 +4416,12 @@ const handleBatchBoxWeek = async () => {
     
     // 逐个处理Token
     for (let i = 0; i < targetTokens.length; i++) {
+      // 检查是否已取消
+      if (isBatchBoxWeekCancelled.value) {
+        message.info('批量宝箱周已停止')
+        break
+      }
+      
       const token = targetTokens[i]
       message.info(`处理第 ${i + 1}/${targetTokens.length} 个Token: ${token.name}`)
       
@@ -4610,13 +4955,21 @@ const handleBatchUnloadHeroes = async () => {
   }
   
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量下阵武将（${rangeText}），共${targetTokens.length}个 Token，下阵位置：2-4 号位`)
+  const selectedValue = selectedUnloadHero.value
+  const heroMap = {
+    'all': '全部',
+    '107': '吕布',
+    '204': '张飞',
+    '217': '魏延'
+  }
+  const heroText = heroMap[selectedValue] || '全部'
+  message.info(`开始批量下阵（${rangeText}），共${targetTokens.length}个 Token，下阵武将：${heroText}`)
   logStore.addLog({
     page: 'fish-helper',
     cardType: '养号',
-    operation: '批量下阵武将',
+    operation: '批量下阵',
     status: 'info',
-    message: `开始批量下阵武将，${rangeText}，共${targetTokens.length}个 Token`
+    message: `开始批量下阵，${rangeText}，共${targetTokens.length}个 Token，下阵武将：${heroText}`
   })
   
   try {
@@ -4650,7 +5003,7 @@ const handleBatchUnloadHeroes = async () => {
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '养号',
-                operation: '批量下阵武将',
+                operation: '批量下阵',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'success',
@@ -4661,7 +5014,7 @@ const handleBatchUnloadHeroes = async () => {
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '养号',
-                operation: '批量下阵武将',
+                operation: '批量下阵',
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'warning',
@@ -4674,11 +5027,11 @@ const handleBatchUnloadHeroes = async () => {
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
-            operation: '批量下阵武将',
+            operation: '批量下阵',
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '下阵武将完成'
+            message: '下阵完成'
           })
           
         } catch (error) {
@@ -4695,18 +5048,18 @@ const handleBatchUnloadHeroes = async () => {
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '批量下阵武将',
+      operation: '批量下阵',
       status: 'success',
       message: `批量下阵完成，成功：${successCount}，失败：${failCount}`
     })
     
   } catch (error) {
-    console.error('批量下阵武将失败:', error)
-    message.error('批量下阵武将失败')
+    console.error('批量下阵失败:', error)
+    message.error('批量下阵失败')
     logStore.addLog({
       page: 'fish-helper',
       cardType: '养号',
-      operation: '批量下阵武将',
+      operation: '批量下阵',
       status: 'error',
       message: `批量下阵失败：${error.message}`
     })

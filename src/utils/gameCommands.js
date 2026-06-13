@@ -806,7 +806,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     return {
       ack,
       body: this.g_utils.bon.encode({
-      	  id:2
+      	  id: 2,
         ...params
       }),
       cmd: "legacy_claimchargereward",
@@ -994,7 +994,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       	  battleTeam:{},
       	  genieId:params.genieId,
       	  lordWeaponId:3,
-      	  petUId: ""
+      	  petUId: "",
         ...params
       }),
       cmd: "fight_startgenie",
@@ -1603,7 +1603,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       	  battlefieldId:params.battlefieldId,
       	  battleTeam:{},
       	  lordWeaponId:params.lordWeaponId,
-      	  petUId: ""
+      	  petUId: "",
                 ...params
       }),
       cmd: "war_setbattleteam",
@@ -1622,7 +1622,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       	  battlefieldId:params.battlefieldId,
       	  battleTeam:{},
       	  lordWeaponId:params.lordWeaponId,
-      	  petUId: ""
+      	  petUId: "",
                 ...params
       }),
       cmd: "war_teamsetbattleteam",
