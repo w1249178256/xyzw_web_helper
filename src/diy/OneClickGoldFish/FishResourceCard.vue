@@ -983,7 +983,7 @@ const batchStartFishing = async () => {
           const currentGoldRod = getResourceCount('goldRod')
           
           // 计算执行次数：min((1600-已用)/10, 现有金竿/10)
-          const needCount = Math.floor((targetFishing - usedFishing) / 10)
+          const needCount = Math.ceil((targetFishing - usedFishing) / 10)
           const rodCount = Math.floor(currentGoldRod / 10)
           const executeCount = Math.min(needCount, rodCount)
           
@@ -1409,8 +1409,16 @@ const batchBoxWeek = async () => {
             await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, number: count }, 10000)
             await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             
-            // 每次开箱后获取真实的Y值
-            await fetchRealY()
+            // 每次开箱后调用activity_get获取已用宝箱分Y
+            try {
+              const actInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              if (actInfo?.activity?.commonActivityInfo?.['2606191']?.task?.['2']) {
+                Y = actInfo.activity.commonActivityInfo['2606191'].task['2']
+              }
+            } catch (e) {
+              // 获取失败也继续
+            }
             
             const diff = ZY - Y
             
@@ -1424,8 +1432,6 @@ const batchBoxWeek = async () => {
               status: 'info',
               message: openBoxLog
             })
-            
-            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             
             // 检查是否达到目标
             if (Y >= ZY || Y > 100000) {
@@ -1443,6 +1449,18 @@ const batchBoxWeek = async () => {
             
             // Y小于ZY，继续开箱
             return 'continue'
+          }
+          
+          // 辅助函数：执行领取宝箱奖励3次（执行错误也继续）
+          const claimBoxReward3Times = async () => {
+            for (let i = 0; i < 3; i++) {
+              try {
+                await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
+              } catch (e) {
+                // 执行错误也继续
+              }
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
           }
           
           // 开宝箱阶段
@@ -1476,9 +1494,8 @@ const batchBoxWeek = async () => {
                     message: `宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`
                   })
                   
-                  // 领取宝箱奖励
-                  await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
-                  await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+                  // 领取宝箱奖励（执行3次）
+                  await claimBoxReward3Times()
                   
                   // 领取邮件
                   message.info(`${token.name} - 领取邮件`)
@@ -1775,8 +1792,7 @@ const batchBoxWeek = async () => {
                 status: 'info',
                 message: `已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`
               })
-              await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
-              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              await claimBoxReward3Times()
               
               // 重新获取宝箱数量
               const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
@@ -1812,9 +1828,8 @@ const batchBoxWeek = async () => {
           }
           } // end if (!skipBoxOpening)
           
-          // 领取宝箱奖励
-          await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
-          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          // 领取宝箱奖励（执行3次）
+          await claimBoxReward3Times()
           
           logStore.addLog({
             page: 'fish-helper',
@@ -2061,7 +2076,7 @@ const batchRecruitWeek = async () => {
           const currentRecruitCount = items['1001']?.quantity || 0
           
           // 计算执行次数：min((4000-已用)/10, 现有招募令/10)
-          const needCount = Math.floor((targetRecruit - usedRecruitCount) / 10)
+          const needCount = Math.ceil((targetRecruit - usedRecruitCount) / 10)
           const recruitCount = Math.floor(currentRecruitCount / 10)
           const executeCount = Math.min(needCount, recruitCount)
           
