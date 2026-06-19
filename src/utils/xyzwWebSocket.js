@@ -1144,9 +1144,19 @@ export class XyzwWebSocketClient {
         const errorDesc =
           errorCodeMap[packet.code] || packet.hint || "未知错误";
 
-        promiseData.reject(
-          new Error(`服务器错误: ${packet.code} - ${errorDesc}`),
-        );
+        // 特殊错误码处理
+        if (packet.code === 400122) {
+          // 宝箱数量已发生变化，返回特殊错误对象供调用方处理
+          promiseData.reject({
+            code: 400122,
+            message: `服务器错误: ${packet.code} - ${errorDesc}`,
+            isBoxCountChanged: true
+          });
+        } else {
+          promiseData.reject(
+            new Error(`服务器错误: ${packet.code} - ${errorDesc}`)
+          );
+        }
       }
       return;
     }

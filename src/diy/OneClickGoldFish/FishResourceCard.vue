@@ -1451,13 +1451,25 @@ const batchBoxWeek = async () => {
             return 'continue'
           }
           
-          // 辅助函数：执行领取宝箱奖励3次（执行错误也继续）
+          // 辅助函数：执行领取宝箱奖励3次（执行错误也继续，400122错误停止领取但继续后续命令）
           const claimBoxReward3Times = async () => {
             for (let i = 0; i < 3; i++) {
               try {
                 await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
               } catch (e) {
-                // 执行错误也继续
+                // 400122错误：宝箱数量已发生变化，停止领取但继续后续命令
+                if (e && e.code === 400122) {
+                  message.info(`${token.name} - 宝箱数量已发生变化(400122)，停止领取宝箱奖励，继续后续命令`)
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '金鱼资源',
+                    operation: '批量宝箱',
+                    status: 'warn',
+                    message: `${token.name} - 宝箱数量已发生变化(400122)，停止领取宝箱奖励`
+                  })
+                  break
+                }
+                // 其他错误也继续
               }
               await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             }
