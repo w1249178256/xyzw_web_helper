@@ -64,7 +64,8 @@
             :select-value="selectedBatchHero"
             @update:select-value="(val) => selectedBatchHero = val"
             :select-options="[
-              { label: '吕布', value: '107' },
+              { label: '2吕布', value: '107_slot2' },
+              { label: '0吕布', value: '107_slot0' },
               { label: '张飞', value: '204' },
               { label: '魏延', value: '217' },
               { label: '推图', value: 'story' },
@@ -81,7 +82,7 @@
             :select-value="selectedUnloadHero"
             @update:select-value="(val) => selectedUnloadHero = val"
             :select-options="[
-              { label: '全部', value: 'all' },
+              { label: '后排', value: 'back' },
               { label: '吕布', value: '107' },
               { label: '张飞', value: '204' },
               { label: '魏延', value: '217' }
@@ -2427,6 +2428,249 @@ const handleBatchHeroSynthetic = async () => {
   }
 }
 
+// 批量上阵吕布（2吕布/0吕布）
+const handleBatchLuBuBattle = async (slotType) => {
+  const slot = slotType === '107_slot2' ? 2 : 0
+  const slotText = slotType === '107_slot2' ? '2号位' : '0号位'
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = allTokens
+  } else {
+    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量上阵吕布（${slotText}，${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '养号',
+    operation: '批量上阵',
+    status: 'info',
+    message: `开始批量上阵吕布（${slotText}，${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchHeroBattle.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在上阵吕布（${slotText}）...`)
+          
+          // 步骤1: 获取当前上阵阵容
+          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          await waitCommandDelay()
+          
+          let currentTeam = {}
+          if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
+            currentTeam = fightResult.battleData.leftTeam.team
+          } else if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
+            currentTeam = fightResult.body.battleData.leftTeam.team
+          }
+          
+          // 步骤2: 获取角色信息，找到等级最高的英雄
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          await waitCommandDelay()
+          
+          let heroes = null
+          if (roleInfo && roleInfo.role && roleInfo.role.heroes) {
+            heroes = roleInfo.role.heroes
+          } else if (roleInfo && roleInfo._raw && roleInfo._raw.body && roleInfo._raw.body.role && roleInfo._raw.body.role.heroes) {
+            heroes = roleInfo._raw.body.role.heroes
+          } else if (roleInfo && roleInfo.body && roleInfo.body.role && roleInfo.body.role.heroes) {
+            heroes = roleInfo.body.role.heroes
+          }
+          
+          if (!heroes) {
+            throw new Error('无法获取英雄信息')
+          }
+          
+          // 找到等级最高的英雄
+          let maxLevel = 0
+          let maxLevelHeroId = null
+          
+          for (const [heroId, heroInfo] of Object.entries(heroes)) {
+            const level = heroInfo.level || 0
+            if (level > maxLevel) {
+              maxLevel = level
+              maxLevelHeroId = parseInt(heroId)
+            }
+          }
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]等级最高英雄: ${HERO_DICT[maxLevelHeroId]?.name || maxLevelHeroId} (等级${maxLevel})`
+          })
+          
+          // 步骤3: 如果等级最高不是吕布，执行替换
+          if (maxLevelHeroId !== 107) {
+            message.info(`[${tokenIndex}] ${token.name || token.id} 正在替换吕布...`)
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_exchange',
+              {
+                heroId: maxLevelHeroId,
+                targetHeroId: 107
+              },
+              10000
+            )
+            await waitCommandDelay()
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量上阵',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]替换吕布成功: ${HERO_DICT[maxLevelHeroId]?.name || maxLevelHeroId} → 吕布`
+            })
+          } else {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量上阵',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]等级最高已是吕布，无需替换`
+            })
+          }
+          
+          // 步骤4: 检查目标位置是否已有吕布
+          const targetSlotHero = currentTeam[String(slot)] || currentTeam[slot]
+          const targetSlotHeroId = targetSlotHero && targetSlotHero.id ? targetSlotHero.id : 0
+          
+          if (targetSlotHeroId === 107) {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量上阵',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${slotText}已有吕布，无需上阵`
+            })
+          } else {
+            // 步骤5: 上阵吕布到指定位置
+            await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 107, slot })
+            await waitCommandDelay()
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量上阵',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]上阵吕布成功（${slotText}）`
+            })
+          }
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 上阵吕布成功（${slotText}）`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]上阵吕布成功（${slotText}）`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          console.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵吕布失败:`, error)
+          message.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵吕布失败：${error.message || error}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量上阵',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `上阵吕布失败（${slotText}）：${error.message || error}`
+          })
+          return { success: false, error: error.message || error }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个 Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    const failedTokens = results
+      .filter(r => !r.success)
+      .map(r => r.token?.name || r.token?.id || '未知')
+    
+    let summaryMsg = `批量上阵吕布（${slotText}）完成，成功${successCount}个，失败${failCount}个`
+    if (failedTokens.length > 0) {
+      summaryMsg += `，失败账号：${failedTokens.join('、')}`
+    }
+    
+    message.success(summaryMsg)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵',
+      status: 'success',
+      message: summaryMsg
+    })
+  } catch (error) {
+    console.error('批量上阵吕布出错:', error)
+    message.error(`批量上阵吕布出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量上阵',
+      status: 'error',
+      message: `批量上阵吕布出错：${error.message || error}`
+    })
+  } finally {
+    isBatchHeroBattle.value = false
+  }
+}
+
 // 批量上阵（吕布/张飞/魏延）
 const handleBatchHeroBattle = async () => {
   const selectedValue = selectedBatchHero.value
@@ -2438,6 +2682,11 @@ const handleBatchHeroBattle = async () => {
   
   if (selectedValue === 'tower') {
     return await handleBatchTowerTeamInternal()
+  }
+  
+  // 处理2吕布和0吕布
+  if (selectedValue === '107_slot2' || selectedValue === '107_slot0') {
+    return await handleBatchLuBuBattle(selectedValue)
   }
   
   heroId = parseInt(selectedValue)
@@ -4957,7 +5206,7 @@ const handleBatchUnloadHeroes = async () => {
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
   const selectedValue = selectedUnloadHero.value
   const heroMap = {
-    'all': '全部',
+    'back': '后排',
     '107': '吕布',
     '204': '张飞',
     '217': '魏延'

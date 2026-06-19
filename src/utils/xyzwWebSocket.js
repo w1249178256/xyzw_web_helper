@@ -435,7 +435,7 @@ export function registerDefaultCommands(reg) {
     .register("matchteam_getteaminfo")
 
     // 活动相关（新增）
-    .register("activity_claimtaskreward", { activityId: 2510031, missionid: 0 })
+    .register("activity_claimtaskreward", { activityId: 2606191, missionId: 0 })
     .register("activity_getactegameinfo")
     .register("activity_actegamestageclaim")
     .register("activity_startegame")

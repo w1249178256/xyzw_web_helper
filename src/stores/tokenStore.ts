@@ -1043,13 +1043,20 @@ export const useTokenStore = defineStore("tokens", () => {
         wsLogger.error(`🗼 [咸将塔] 爬塔请求失败 [${tokenId}]:`, error.message);
       }
 
-      // 检查是否为"操作过快"错误 (400340)
-      if (error.message && error.message.includes("400340")) {
+      // 检查是否为"操作过快"错误 (400340 或包含"操作太快"/"请稍后再试")
+      const errorMsg = error.message || error.hint || error.detail || "";
+      const isRateLimitError = 
+        errorMsg.includes("400340") || 
+        errorMsg.includes("操作太快") || 
+        errorMsg.includes("请稍后再试") ||
+        errorMsg.includes("200400");
+
+      if (isRateLimitError) {
         const waitMinutes = 2;
         const waitMs = waitMinutes * 60 * 1000;
         
         wsLogger.warn(
-          `⏰ [操作过快] 命令 [${cmd}] 触发400340错误，等待${waitMinutes}分钟后重试... (第${retryCount + 1}次重试)`,
+          `⏰ [操作过快] 命令 [${cmd}] 触发限流错误，等待${waitMinutes}分钟后重试... (第${retryCount + 1}次重试)`,
         );
         
         // 等待2分钟

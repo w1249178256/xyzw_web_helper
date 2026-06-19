@@ -451,6 +451,17 @@
                 </n-button>
                 <n-button
                   size="small"
+                  @click="batchClaimCars"
+                  :disabled="
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isCarActivityOpen
+                  "
+                >
+                  一键收车
+                </n-button>
+                <n-button
+                  size="small"
                   @click="batchSmartSendCar"
                   :disabled="
                     isRunning ||
@@ -462,14 +473,14 @@
                 </n-button>
                 <n-button
                   size="small"
-                  @click="batchClaimCars"
+                  @click="handleSmartSendCar"
                   :disabled="
                     isRunning ||
                     selectedTokens.length === 0 ||
                     !isCarActivityOpen
                   "
                 >
-                  一键收车
+                  智能收发车
                 </n-button>
                 <n-button
                   size="small"
@@ -3678,6 +3689,7 @@ const taskGroupDefinitions = [
       "batcharenafight",
       "batchSmartSendCar",
       "batchClaimCars",
+      "handleSmartSendCar",
       "store_purchase",
       "collection_claimfreereward",
       "batchGenieSweep",
@@ -4716,7 +4728,7 @@ const executeScheduledTask = async (task) => {
       }
 
       if (
-        ["batchSmartSendCar", "batchClaimCars"].includes(taskName) &&
+        ["batchSmartSendCar", "batchClaimCars", "handleSmartSendCar"].includes(taskName) &&
         !isCarActivityOpen.value
       ) {
         addLog({
@@ -6066,7 +6078,7 @@ const {
 } = tasksTower;
 
 const tasksCar = createTasksCar(createTaskDeps());
-const { batchSmartSendCar, batchClaimCars } = tasksCar;
+const { batchSmartSendCar, batchClaimCars, handleSmartSendCar } = tasksCar;
 
 const tasksItem = createTasksItem(createTaskDeps());
 const {
@@ -6141,6 +6153,7 @@ const taskFunctionMap = {
   // Car
   batchSmartSendCar,
   batchClaimCars,
+  handleSmartSendCar,
   // Item
   batchOpenBox,
   batchOpenBoxByPoints,

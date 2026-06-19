@@ -48,13 +48,6 @@
             v-model:inputValue="goldenRodDiscount"
             placeholder="0-10"
           />
-          
-          <CustomizedCard 
-            mode="name-input"
-            name="扳手"
-            v-model:inputValue="wrenchDiscount"
-            placeholder="0-10"
-          />
         </CustomizedCard>
         
         <!-- 按钮区域 - 使用CustomizedCard容器模式 -->
@@ -140,7 +133,6 @@ const bronzeBoxDiscount = ref('0')
 const goldenBoxDiscount = ref('0')
 const platinumBoxDiscount = ref('0')
 const goldenRodDiscount = ref('0')
-const wrenchDiscount = ref('0')
 
 // 操作状态
 const isSetting = ref(false)
@@ -195,8 +187,7 @@ const saveSettings = async () => {
       bronzeBoxDiscount: Number(bronzeBoxDiscount.value) || 0,
       goldenBoxDiscount: Number(goldenBoxDiscount.value) || 0,
       platinumBoxDiscount: Number(platinumBoxDiscount.value) || 0,
-      goldenRodDiscount: Number(goldenRodDiscount.value) || 0,
-      wrenchDiscount: Number(wrenchDiscount.value) || 0
+      goldenRodDiscount: Number(goldenRodDiscount.value) || 0
     }
   })
 }
@@ -210,7 +201,6 @@ const loadSettings = async () => {
     goldenBoxDiscount.value = String(data.blackMarketSettings.goldenBoxDiscount ?? 0)
     platinumBoxDiscount.value = String(data.blackMarketSettings.platinumBoxDiscount ?? 0)
     goldenRodDiscount.value = String(data.blackMarketSettings.goldenRodDiscount ?? 0)
-    wrenchDiscount.value = String(data.blackMarketSettings.wrenchDiscount ?? 0)
   }
 }
 
@@ -246,7 +236,6 @@ const handleSetBlackMarket = async () => {
   const goldenBoxDiscountNum = Number(goldenBoxDiscount.value)
   const platinumBoxDiscountNum = Number(platinumBoxDiscount.value)
   const goldenRodDiscountNum = Number(goldenRodDiscount.value)
-  const wrenchDiscountNum = Number(wrenchDiscount.value)
   
   if (isNaN(purchaseCountNum) || purchaseCountNum < 0 || purchaseCountNum > 999) {
     message.error('购买次数必须在0-999之间')
@@ -256,16 +245,13 @@ const handleSetBlackMarket = async () => {
   if (isNaN(bronzeBoxDiscountNum) || bronzeBoxDiscountNum < 0 || bronzeBoxDiscountNum > 10 ||
       isNaN(goldenBoxDiscountNum) || goldenBoxDiscountNum < 0 || goldenBoxDiscountNum > 10 ||
       isNaN(platinumBoxDiscountNum) || platinumBoxDiscountNum < 0 || platinumBoxDiscountNum > 10 ||
-      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10 ||
-      isNaN(wrenchDiscountNum) || wrenchDiscountNum < 0 || wrenchDiscountNum > 10) {
+      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10) {
     message.error('折扣值必须在0-10之间')
     return
   }
   
   try {
     isSetting.value = true
-    
-
     
     // 构建购买清单
     const purchaseItemList = [
@@ -330,7 +316,6 @@ const handleBatchSetBlackMarket = async () => {
   const goldenBoxDiscountNum = Number(goldenBoxDiscount.value)
   const platinumBoxDiscountNum = Number(platinumBoxDiscount.value)
   const goldenRodDiscountNum = Number(goldenRodDiscount.value)
-  const wrenchDiscountNum = Number(wrenchDiscount.value)
   
   if (isNaN(purchaseCountNum) || purchaseCountNum < 0 || purchaseCountNum > 999) {
     message.error('购买次数必须在0-999之间')
@@ -340,8 +325,7 @@ const handleBatchSetBlackMarket = async () => {
   if (isNaN(bronzeBoxDiscountNum) || bronzeBoxDiscountNum < 0 || bronzeBoxDiscountNum > 10 ||
       isNaN(goldenBoxDiscountNum) || goldenBoxDiscountNum < 0 || goldenBoxDiscountNum > 10 ||
       isNaN(platinumBoxDiscountNum) || platinumBoxDiscountNum < 0 || platinumBoxDiscountNum > 10 ||
-      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10 ||
-      isNaN(wrenchDiscountNum) || wrenchDiscountNum < 0 || wrenchDiscountNum > 10) {
+      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10) {
     message.error('折扣值必须在0-10之间')
     return
   }
@@ -410,8 +394,7 @@ const handleBatchSetBlackMarket = async () => {
       { discount: bronzeBoxDiscountNum, itemId: 2002 },
       { discount: goldenBoxDiscountNum, itemId: 2003 },
       { discount: platinumBoxDiscountNum, itemId: 2004 },
-      { discount: goldenRodDiscountNum, itemId: 1012 },
-      { discount: wrenchDiscountNum, itemId: 1026 }
+      { discount: goldenRodDiscountNum, itemId: 1012 }
     ]
     
     for (let i = 0; i < targetTokens.length; i++) {
@@ -511,7 +494,8 @@ const handleBatchSetBlackMarket = async () => {
       })
     }
     
-    message.success(`批量设置完成: 成功 ${successCount} 个, 失败 ${failCount} 个`)
+    const summaryMsg = `批量设置完成: 成功 ${successCount} 个, 失败 ${failCount} 个${failedTokens.length > 0 ? '，失败Token: ' + failedTokens.join(', ') : ''}`
+    message.success(summaryMsg)
     await saveSettings()
   } catch (error) {
     console.error('批量设置失败:', error)

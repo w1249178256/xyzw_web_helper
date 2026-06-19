@@ -107,6 +107,7 @@ import { defineProps, ref, computed } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useOperationLogStore } from '@/stores/operationLogStore'
 import { useMessage } from 'naive-ui'
+import { HERO_DICT, STAR_DICT } from '@/utils/HeroList'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
@@ -885,26 +886,67 @@ const connectTokenWithRetry = async (token, tokenIndex) => {
   return true
 }
 
-// 执行英雄升星（单个token）
+// 执行英雄升星（单个token），返回可升星武将列表
 const executeHeroUpgrade = async (token) => {
-  const heroIds = [
-    ...Array.from({ length: 21 }, (_, i) => 101 + i),
-    ...Array.from({ length: 28 }, (_, i) => 201 + i),
-    ...Array.from({ length: 14 }, (_, i) => 301 + i),
-  ]
-  
+  // 获取角色信息
+  const roleInfoRes = await tokenStore.sendMessageWithPromise(
+    token.id,
+    'role_getroleinfo',
+    {},
+    10000
+  )
+  const role = roleInfoRes?.role || roleInfoRes?.data?.role || {}
+  const heroes = role.heroes || {}
+  const items = role.items || {}
+
+  // 筛选碎片足够升下一星级的武将
+  const upgradableHeroes = []
+  for (const [heroIdStr, heroData] of Object.entries(heroes)) {
+    const heroId = Number(heroIdStr)
+    const currentStar = heroData.star || 0
+    if (currentStar >= 30) continue // 已满级
+
+    const starInfo = STAR_DICT[currentStar]
+    if (!starInfo || starInfo.cost === 0) continue
+
+    const fragmentCost = starInfo.cost
+    // 碎片itemId与heroId相同
+    const fragmentItem = items[heroId]
+    const fragmentCount = fragmentItem?.quantity || 0
+
+    if (fragmentCount >= fragmentCost) {
+      upgradableHeroes.push({
+        heroId,
+        currentStar,
+        fragmentCount,
+        fragmentCost,
+      })
+      console.log(`${token.name || token.id} 可升星武将: ${HERO_DICT[heroId]?.name || heroId}, 当前星级${currentStar}, 碎片${fragmentCount}, 需要${fragmentCost}`)
+    }
+  }
+
+  console.log(`${token.name || token.id} 共${upgradableHeroes.length}个武将可升星`)
+
+  if (upgradableHeroes.length === 0) {
+    console.log(`${token.name || token.id} 没有武将碎片足够升星`)
+    return
+  }
+
   let redHeroFailCount = 0 // 红将连续失败计数（包括物品数量不足）
-  
-  for (const heroId of heroIds) {
+
+  for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
     // 检查红将连续失败次数（包括物品数量不足）
     if (redHeroFailCount >= 3) {
       message.info(`${token.name || token.id} 红将连续失败3个，跳过该token`)
       throw new Error('红将连续失败3个，跳过该token')
     }
-    
+
     let heroUpgradeSuccess = false
-    
-    for (let i = 1; i <= 10; i++) {
+
+    // 计算最多可升次数
+    const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost))
+
+    for (let i = 1; i <= maxUpgrades; i++) {
       try {
         const result = await tokenStore.sendMessageWithPromise(
           token.id,
@@ -912,7 +954,7 @@ const executeHeroUpgrade = async (token) => {
           { heroId },
           8000
         )
-        
+
         // 检查是否是物品数量不足的错误
         if (result && result.code && result.code !== 0) {
           const errorMsg = result.hint || result.message || ''
@@ -926,7 +968,7 @@ const executeHeroUpgrade = async (token) => {
             break
           }
         }
-        
+
         heroUpgradeSuccess = true
         // 如果是红将且升星成功，重置失败计数
         if (heroId >= 301 && heroId <= 314) {
@@ -935,7 +977,7 @@ const executeHeroUpgrade = async (token) => {
       } catch (err) {
         // 失败后也执行延迟
         await new Promise(resolve => setTimeout(resolve, 500))
-        
+
         // 检查是否是物品数量不足的错误
         const errorMsg = err.message || ''
         if (errorMsg.includes('物品数量不足') || errorMsg.includes('数量不足')) {
@@ -956,25 +998,29 @@ const executeHeroUpgrade = async (token) => {
       // 每次升星后延迟
       await new Promise(resolve => setTimeout(resolve, 500))
     }
-    
+
     // 如果是红将且本轮没有成功升星，检查是否需要跳过
     if (heroId >= 301 && heroId <= 314 && !heroUpgradeSuccess && redHeroFailCount >= 3) {
       message.info(`${token.name || token.id} 红将连续失败3个（${heroId}及之前），跳过该token`)
       throw new Error('红将连续失败3个，跳过该token')
     }
   }
+
+  return upgradableHeroes
 }
 
-// 执行图鉴升星（单个token）
-const executeBookUpgrade = async (token) => {
-  const heroIds = [
-    ...Array.from({ length: 21 }, (_, i) => 101 + i),
-    ...Array.from({ length: 28 }, (_, i) => 201 + i),
-    ...Array.from({ length: 14 }, (_, i) => 301 + i),
-  ]
-  
-  for (const heroId of heroIds) {
-    for (let i = 1; i <= 10; i++) {
+// 执行图鉴升星（单个token），使用英雄升星获取的可升星武将列表
+const executeBookUpgrade = async (token, upgradableHeroes) => {
+  if (!upgradableHeroes || upgradableHeroes.length === 0) {
+    console.log(`${token.name || token.id} 没有武将碎片足够升图鉴`)
+    return
+  }
+
+  for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
+    // 计算最多可升次数
+    const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost))
+
+    for (let i = 1; i <= maxUpgrades; i++) {
       try {
         await tokenStore.sendMessageWithPromise(
           token.id,
@@ -982,13 +1028,13 @@ const executeBookUpgrade = async (token) => {
           { heroId },
           8000
         )
-        } catch (err) {
-          // 失败后也执行延迟1秒
-          await new Promise(resolve => setTimeout(resolve, 500))
-          break
-        }
-        // 每次升星后延迟1秒（无论成功还是失败）
+      } catch (err) {
+        // 失败后也执行延迟1秒
         await new Promise(resolve => setTimeout(resolve, 500))
+        break
+      }
+      // 每次升星后延迟1秒（无论成功还是失败）
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
   }
 }
@@ -1107,8 +1153,9 @@ const handleBatchUpgrade = async () => {
           message: `序号 ${tokenIndex} 开始英雄升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`)
+        let upgradableHeroes = []
         try {
-          await executeHeroUpgrade(token)
+          upgradableHeroes = await executeHeroUpgrade(token)
         } catch (heroUpgradeError) {
           // 如果是红将连续失败3个（包括物品数量不足），跳过该token的后续操作
           if (heroUpgradeError.message === '红将连续失败3个，跳过该token') {
@@ -1138,7 +1185,7 @@ const handleBatchUpgrade = async () => {
         })
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        // 3. 执行图鉴升星
+        // 3. 执行图鉴升星（使用英雄升星获取的可升星武将列表）
         logStore.addLog({
           page: 'fish-helper',
           cardType: '爬塔升星',
@@ -1149,7 +1196,7 @@ const handleBatchUpgrade = async () => {
           message: `序号 ${tokenIndex} 开始图鉴升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`)
-        await executeBookUpgrade(token)
+        await executeBookUpgrade(token, upgradableHeroes)
         message.success(`序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`)
         logStore.addLog({
           page: 'fish-helper',

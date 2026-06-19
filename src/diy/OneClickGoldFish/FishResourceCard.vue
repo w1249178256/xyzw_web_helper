@@ -16,36 +16,7 @@
         <!-- 资源信息显示 - 使用CustomizedCard容器模式，按指定行分组 -->
         <CustomizedCard mode="container">
           
-          <!-- 第一行：金砖、招募 -->
-          <CustomizedCard 
-            mode="name-count"
-            name="金砖"
-            :count="getResourceCount('diamond')"
-          />
-          <CustomizedCard 
-            mode="name-count"
-            name="招募"
-            :count="recruitDataList[0]?.count || 0"
-          />
-          
-          <!-- 第二行：宝箱、金竿 -->
-          <CustomizedCard 
-            mode="name-count"
-            name="宝箱"
-            :count="boxPoints"
-          />
-          <CustomizedCard 
-            mode="name-count"
-            name="金竿"
-            :count="getResourceCount('goldRod')"
-          />
-          
-          <!-- 第三行：助威道具（数量+输入框） -->
-          <CustomizedCard 
-            mode="name-count"
-            name="助威道具"
-            :count="getItemCountById(1021)"
-          />
+          <!-- 第一行：助威道具（输入框） -->
           <CustomizedCard 
             mode="name-input"
             name="助威道具"
@@ -53,12 +24,7 @@
             placeholder="输入itemid"
           />
           
-          <!-- 第四行：任务道具（数量+输入框） -->
-          <CustomizedCard 
-            mode="name-count"
-            name="任务道具"
-            :count="taskItemId ? getItemCountById(Number(taskItemId)) : 0"
-          />
+          <!-- 第二行：任务道具（输入框） -->
           <CustomizedCard 
             mode="name-input"
             name="任务道具"
@@ -66,12 +32,7 @@
             placeholder="输入itemid"
           />
           
-          <!-- 第五行：金鱼道具（数量+输入框） -->
-          <CustomizedCard 
-            mode="name-count"
-            name="金鱼道具"
-            :count="fishItemId ? getItemCountById(Number(fishItemId)) : 0"
-          />
+          <!-- 第三行：金鱼道具（输入框） -->
           <CustomizedCard 
             mode="name-input"
             name="金鱼道具"
@@ -79,7 +40,7 @@
             placeholder="输入itemid"
           />
           
-          <!-- 第六行：任务名称（输入框） -->
+          <!-- 第四行：任务名称（输入框） -->
           <CustomizedCard 
             mode="name-input"
             name="任务名称"
@@ -99,11 +60,17 @@
             placeholder="请输入执行范围，如：1-20 或 3,4,5"
           />
           <CustomizedCard
-            :mode="boxWeekRunning ? 'button' : 'button-placeholder'"
-            :name="boxWeekRunning ? '停止宝箱周' : ''"
-            :button-text="boxWeekRunning ? '' : '批量宝箱'"
-            :disabled="!boxWeekRunning && isAnyOperationRunning"
-            @button-click="boxWeekRunning ? stopBatchBoxWeek : batchBoxWeek"
+            mode="button"
+            name="批量宝箱"
+            @button-click="batchBoxWeek"
+            :disabled="isAnyOperationRunning"
+            :loading="boxWeekRunning"
+          />
+          <CustomizedCard
+            mode="button"
+            name="停止批量宝箱"
+            @button-click="stopBatchBoxWeek"
+            :disabled="!boxWeekRunning"
           />
           <CustomizedCard
             mode="button-placeholder"
@@ -119,35 +86,46 @@
           />
           <CustomizedCard
             mode="button-placeholder"
+            button-text="批量盐罐"
+            :disabled="isAnyOperationRunning"
+            @button-click="batchSaltJar"
+          />
+          <CustomizedCard
+            mode="button-placeholder"
+            button-text="批量金砖"
+            :disabled="isAnyOperationRunning"
+            @button-click="batchGoldBrick"
+          />
+          <CustomizedCard
+            mode="button-placeholder"
+            button-text="批量使用道具"
+            :disabled="isAnyOperationRunning"
+            @button-click="batchUseItem"
+          />
+          <CustomizedCard
+            mode="button-placeholder"
             button-text="批量助威"
             :disabled="isAnyOperationRunning"
             @button-click="batchCheer"
           />
           <CustomizedCard
             mode="button-placeholder"
-            button-text="批量金鱼"
+            button-text="批量购买金竿"
             :disabled="isAnyOperationRunning"
-            @button-click="batchQuickFishing"
+            @button-click="batchBuyGoldRod"
+          />
+          <CustomizedCard
+            mode="button-placeholder"
+            button-text="批量导出"
+            :disabled="isAnyOperationRunning"
+            @button-click="batchExportItems"
           />
         </CustomizedCard>
-        
-        <!-- 停止操作按钮 -->
-        <div class="stop-section">
-          <n-button 
-            type="warning" 
-            size="small" 
-            @click="stopAllOperations"
-            :disabled="!isAnyOperationRunning"
-            block
-          >
-            停止所有操作
-          </n-button>
-        </div>
         
         <!-- 操作日志 -->
         <OperationLogCard 
           page="fish-helper" 
-          :filter-operations="['一键金鱼']"
+          :filter-operations="['一键金鱼', '批量宝箱', '批量金竿', '批量招募', '批量助威', '批量盐罐', '批量金砖', '批量购买金竿', '批量使用道具', '批量导出', '批量一键宝箱']"
         />
     </template>
   </MyCard>
@@ -159,6 +137,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
+import { useOperationLogStore } from '@/stores/operationLogStore'
 import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
@@ -168,6 +147,7 @@ import ConnectionPoolManager from '@/utils/connectionPoolManager'
 
 const tokenStore = useTokenStore()
 const message = useMessage()
+const logStore = useOperationLogStore()
 
 // 初始化连接池管理器
 const connectionPool = new ConnectionPoolManager(tokenStore, {
@@ -176,6 +156,9 @@ const connectionPool = new ConnectionPoolManager(tokenStore, {
   reconnectDelay: 1000,
   maxRetries: 3
 })
+
+// 命令执行间隔（毫秒）
+const COMMAND_DELAY = 800
 
 const props = defineProps({
   selectedTokenId: {
@@ -201,11 +184,12 @@ const fishResourceLogs = ref([])
 const isRefreshing = ref(false)
 
 // 输入框状态
-const taskItemId = ref('')
-const fishItemId = ref('')
-const cheerItemId = ref('')
-const taskName = ref('')
+const taskItemId = ref('5279')
+const fishItemId = ref('5280')
+const cheerItemId = ref('5278')
+const taskName = ref('202606191')
 const executionRange = ref('') // 执行范围
+const goldRodBuyCount = ref('100') // 购买金竿数量
 
 // 保存输入框状态到本地存储
 const saveInputSettings = async () => {
@@ -213,24 +197,24 @@ const saveInputSettings = async () => {
     taskItemId: taskItemId.value,
     fishItemId: fishItemId.value,
     cheerItemId: cheerItemId.value,
-    taskName: taskName.value
+    taskName: taskName.value,
+    goldRodBuyCount: goldRodBuyCount.value
   })
 }
 
 // 从本地存储加载输入框状态
 const loadInputSettings = async () => {
   const data = await loadPageTokenCards('fish-helper-inputs')
-  if (data) {
-    taskItemId.value = data.taskItemId ?? ''
-    fishItemId.value = data.fishItemId ?? ''
-    cheerItemId.value = data.cheerItemId ?? ''
-    taskName.value = data.taskName ?? ''
-  }
+  taskItemId.value = data?.taskItemId || '5279'
+  fishItemId.value = data?.fishItemId || '5280'
+  cheerItemId.value = data?.cheerItemId || '5278'
+  taskName.value = data?.taskName || '202606191'
+  goldRodBuyCount.value = data?.goldRodBuyCount || '100'
 }
 
 // 监听输入框状态变化，自动保存（防抖）
 let inputSaveTimer = null
-watch([taskItemId, fishItemId, cheerItemId, taskName], () => {
+watch([taskItemId, fishItemId, cheerItemId, taskName, goldRodBuyCount], () => {
   if (inputSaveTimer) {
     clearTimeout(inputSaveTimer)
   }
@@ -766,17 +750,6 @@ const quickFishing = async () => {
   }
 }
 
-const stopAllOperations = () => {
-  boxOpening.value = false
-  fishingRunning.value = false
-  recruitRunning.value = false
-  cheerRunning.value = false
-  quickFishingRunning.value = false
-  boxWeekRunning.value = false
-  recruitWeekRunning.value = false
-  message.info('已停止所有操作')
-}
-
 // 批量一键宝箱
 const batchOpenAllBoxes = async () => {
   // 按token昵称排序的token列表（与页面显示顺序一致）
@@ -957,7 +930,15 @@ const batchStartFishing = async () => {
   }
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
-  message.info(`开始批量一键金竿（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  message.info(`开始批量金竿（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '金鱼资源',
+    operation: '批量金竿',
+    status: 'info',
+    message: `开始批量金竿，${rangeText}，共${targetTokens.length}个Token`
+  })
   
   try {
     // 使用连接池执行批量操作
@@ -966,23 +947,76 @@ const batchStartFishing = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行一键金竿...`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行金竿...`)
+          
+          // 获取活动信息
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          if (!activityInfo || !activityInfo.activity || !activityInfo.activity.commonActivityInfo) {
+            return { success: false, token, error: '获取活动信息失败' }
+          }
+          
+          const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const records = commonInfo.record || {}
+          
+          // 获取已用金竿数量（task['3']）
+          const usedFishing = tasks['3'] || 0
+          
+          // 查找起始任务ID（41-60中哪个有时间戳，哪个就已完成）
+          let startMissionId = 40 // 默认40，currentMissionId从41开始
+          for (let i = 41; i <= 60; i++) {
+            if (records[i]) {
+              startMissionId = i
+              console.log(`${token.name || token.id} 起始任务ID: ${i} (已完成，时间戳: ${records[i]})`)
+            }
+          }
+          
+          // 从下一位开始执行
+          let currentMissionId = startMissionId + 1
+          
+          // 金竿目标1600
+          const targetFishing = 1600
           
           // 获取现有金竿数量
           const currentGoldRod = getResourceCount('goldRod')
-          if (currentGoldRod < 10) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金竿数量不足10，无法执行`)
-            return { success: false, token: token, error: '金竿数量不足10' }
+          
+          // 计算执行次数：min((1600-已用)/10, 现有金竿/10)
+          const needCount = Math.floor((targetFishing - usedFishing) / 10)
+          const rodCount = Math.floor(currentGoldRod / 10)
+          const executeCount = Math.min(needCount, rodCount)
+          
+          console.log(`${token.name || token.id} 已用金竿: ${usedFishing}, 起始任务ID: ${startMissionId}, 现有金竿: ${currentGoldRod}, 需要次数: ${needCount}, 金竿可执行: ${rodCount}, 执行次数: ${executeCount}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已用金竿: ${usedFishing}, 起始任务ID: ${startMissionId}, 执行次数: ${executeCount}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量金竿',
+            status: 'info',
+            message: `${token.name} - 已用金竿: ${usedFishing}, 起始任务ID: ${startMissionId}, 现有金竿: ${currentGoldRod}, 需要次数: ${needCount}, 金竿可执行: ${rodCount}, 执行次数: ${executeCount}`
+          })
+          
+          // 已用金竿大于等于1600，跳转到领取奖励阶段
+          let skipFishing = false
+          if (usedFishing >= 1600) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用金竿${usedFishing}已达到目标1600，跳过金竿，直接领取奖励`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量金竿',
+              status: 'info',
+              message: `${token.name} - 已用金竿${usedFishing}已达到目标1600，跳过金竿，直接领取奖励`
+            })
+            skipFishing = true
           }
           
-          // 执行钓鱼（每次10竿）
-          const executeCount = Math.floor(currentGoldRod / 10)
-          
-          if (executeCount <= 0) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金竿数量不足`)
-            return { success: false, token: token, error: '金竿数量不足' }
+          if (executeCount <= 0 && !skipFishing) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金竿数量不足或已达到目标`)
+            return { success: false, token, error: '金竿数量不足或已达到目标' }
           }
           
+          // 循环执行金竿
+          if (!skipFishing) {
           for (let i = 0; i < executeCount; i++) {
             try {
               const result = await tokenStore.sendMessageWithPromise(
@@ -994,30 +1028,109 @@ const batchStartFishing = async () => {
               
               if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
                 const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
-                console.warn(`[序号${tokenIndex}] 一键金竿执行失败: ${errorMsg}`)
-                break // 如果失败，停止执行
+                console.warn(`[序号${tokenIndex}] 金竿执行失败: ${errorMsg}`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量金竿',
+                  status: 'error',
+                  message: `${token.name} - artifact_lottery 失败: ${errorMsg}`
+                })
+                break
+              }
+              
+              // 每执行10次在操作日志显示一次
+              if ((i + 1) % 10 === 0 || i === executeCount - 1) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量金竿',
+                  status: 'success',
+                  message: `${token.name} - artifact_lottery { type: 2, lotteryNumber: 10, newFree: true } 成功 (第${i + 1}/${executeCount}次)`
+                })
               }
             } catch (error) {
-              console.error(`[序号${tokenIndex}] 一键金竿执行异常:`, error)
-              break // 如果异常，停止执行
+              console.error(`[序号${tokenIndex}] 金竿执行异常:`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量金竿',
+                status: 'error',
+                message: `${token.name} - artifact_lottery 异常: ${error.message}`
+              })
+              break
             }
             
-            // 每次间隔0.5s（最后一次不需要等待）
             if (i < executeCount - 1) {
-              await new Promise(resolve => setTimeout(resolve, 500))
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             }
+          }
+          } // end if (!skipFishing)
+          
+          // 执行活动奖励领取（从currentMissionId开始，直到60或出错）
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取任务奖励，起始任务ID: ${currentMissionId}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量金竿',
+            status: 'info',
+            message: `${token.name} - 开始领取任务奖励，起始任务ID: ${currentMissionId}`
+          })
+          
+          for (let missionId = currentMissionId; missionId <= 60; missionId++) {
+            try {
+              const rewardResult = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimtaskreward',
+                { activityId: Number(taskName.value) || 2606191, missionId: missionId },
+                10000
+              )
+              
+              if (!(rewardResult && (rewardResult.code === 0 || rewardResult.code === undefined || rewardResult.success === true))) {
+                console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取完成或出错，停止`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量金竿',
+                  status: 'info',
+                  message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
+                })
+                break
+              }
+              
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取成功`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量金竿',
+                status: 'success',
+                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 成功`
+              })
+            } catch (error) {
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量金竿',
+                status: 'error',
+                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}`
+              })
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           }
           
           // 刷新角色信息
           await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 一键金竿执行完成`)
-          return { success: true, token: token }
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 金竿执行完成，执行${executeCount}次`)
+          return { success: true, token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 一键金竿执行失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 一键金竿执行失败: ${error.message || '未知错误'}`)
-          return { success: false, token: token, error: error.message || '未知错误' }
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 金竿执行失败:`, error)
+          return { success: false, token, error: error.message || '未知错误' }
         }
       },
       {
@@ -1051,10 +1164,10 @@ const batchStartFishing = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     
-    message.success(`批量一键金竿完成：成功${successCount}个，失败${failCount}个`)
+    message.success(`批量金竿完成：成功${successCount}个，失败${failCount}个`)
   } catch (error) {
-    console.error('批量一键金竿失败:', error)
-    message.error(`批量一键金竿失败: ${error.message || '未知错误'}`)
+    console.error('批量金竿失败:', error)
+    message.error(`批量金竿失败: ${error.message || '未知错误'}`)
   }
 }
 
@@ -1066,21 +1179,34 @@ const stopBatchBoxWeek = () => {
 
 // 批量宝箱周
 const batchBoxWeek = async () => {
+  console.log('[批量宝箱] 函数被调用')
+  console.log('[批量宝箱] 当前Token列表:', tokenStore.gameTokens)
+  console.log('[批量宝箱] 执行范围:', executionRange.value)
+  console.log('[批量宝箱] boxWeekRunning:', boxWeekRunning.value)
+  console.log('[批量宝箱] isAnyOperationRunning:', isAnyOperationRunning.value)
+  
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase()
     const nameB = (b.name || '未命名').toLowerCase()
     return nameA.localeCompare(nameB)
   })
   
+  console.log('[批量宝箱] 排序后Token数量:', sortedTokensList.length)
+  
   if (sortedTokensList.length === 0) {
+    console.warn('[批量宝箱] 没有可用的Token')
     message.warning('没有可用的Token')
     return
   }
   
   const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  console.log('[批量宝箱] 解析后的索引:', tokenIndices)
+  
   const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  console.log('[批量宝箱] 目标Token数量:', targetTokens.length)
   
   if (targetTokens.length === 0) {
+    console.warn('[批量宝箱] 执行范围内没有有效的Token')
     message.warning('执行范围内没有有效的Token')
     return
   }
@@ -1092,6 +1218,14 @@ const batchBoxWeek = async () => {
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
   message.info(`开始批量宝箱周（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '金鱼资源',
+    operation: '批量宝箱',
+    status: 'info',
+    message: `开始批量宝箱，${rangeText}，共${targetTokens.length}个Token`
+  })
   
   boxWeekRunning.value = true
   boxWeekCancelled.value = false
@@ -1110,8 +1244,37 @@ const batchBoxWeek = async () => {
           const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行宝箱周...`)
           
+          // 命令执行间隔（毫秒）
+          const COMMAND_DELAY = 800
+          
+          // 获取活动信息
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          if (!activityInfo || !activityInfo.activity || !activityInfo.activity.commonActivityInfo) {
+            return { success: false, token, error: '获取活动信息失败' }
+          }
+          
+          const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const records = commonInfo.record || {}
+          
+          // 获取已用宝箱分Y（task['2']）
+          let Y = tasks['2'] || 0
+          
+          // 查找起始任务ID（21-40中哪个有时间戳，哪个就已完成）
+          let startMissionId = 20 // 默认20，currentMissionId从21开始
+          for (let i = 21; i <= 40; i++) {
+            if (records[i]) {
+              startMissionId = i
+              console.log(`${token.name || token.id} 起始任务ID: ${i} (已完成，时间戳: ${records[i]})`)
+            }
+          }
+          
+          // 从下一位开始执行
+          let currentMissionId = startMissionId + 1
+          
           // 获取角色信息
-          const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
           if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
             return { success: false, token, error: '获取角色信息失败' }
           }
@@ -1122,34 +1285,28 @@ const batchBoxWeek = async () => {
           let H = items['2003']?.quantity || 0 // 黄金宝箱
           let B = items['2004']?.quantity || 0 // 铂金宝箱
           
-          // 获取已用宝箱分Y
-          let Y = 0
-          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
-          if (activityInfo?.activity?.myTotalInfo?.['2']) {
-            const info = activityInfo.activity.myTotalInfo['2']
-            const rounds = info.rounds || 1
-            const num = info.num || 0
-            Y = (rounds - 1) * 8000 + num
-          }
+          console.log(`[批量宝箱] ${token.name || token.id} 获取宝箱数量: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
           
           // 计算宝箱总分Z
           const Z = (M + Q * 10 + H * 20 + B * 50) + Y * 0.43
-          const J = 0 // 基准宝箱分
           
-          // 计算开箱轮数l
-          let l = 0
-          if (Z - J > 4200) {
-            l = 1 + Math.floor((Z - J - 4200) / 3500)
-          }
-          if (l > 4) l = 4
-          if (l < 0) l = 0
+          // 目标分数固定为100000
+          const ZY = 100000
+          console.log(`${token.name || token.id} 已用宝箱分: ${Y}, 起始任务ID: ${startMissionId}, 现有宝箱: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
+          message.info(`[序号${tokenIndex}] ${token.name} - 已用宝箱分: ${Y}, 起始任务ID: ${startMissionId}, 目标分数ZY: ${ZY}`)
           
-          const ZY = 8000 * l
-          message.info(`[序号${tokenIndex}] ${token.name} - 开箱轮数: ${l}, 目标分数ZY: ${ZY}`)
-          
-          if (l === 0) {
-            message.warning(`[序号${tokenIndex}] ${token.name} 不需要开箱`)
-            return { success: true, token, rounds: 0 }
+          // 已用宝箱分大于等于100000，跳转到领取奖励阶段
+          let skipBoxOpening = false
+          if (Y >= 100000) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用宝箱分${Y}已达到目标100000，跳过开箱，直接领取奖励`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量宝箱',
+              status: 'info',
+              message: `${token.name} - 已用宝箱分${Y}已达到目标100000，跳过开箱，直接领取奖励`
+            })
+            skipBoxOpening = true
           }
           
           // 初始化开箱数量
@@ -1206,12 +1363,10 @@ const batchBoxWeek = async () => {
           const fetchRealY = async () => {
             try {
               const actInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
-              if (actInfo && actInfo.activity && actInfo.activity.myTotalInfo && actInfo.activity.myTotalInfo['2']) {
-                const info = actInfo.activity.myTotalInfo['2']
-                const rounds = info.rounds || 1
-                const num = info.num || 0
-                Y = (rounds - 1) * 8000 + num
-                message.info(`${token.name} - 已用宝箱分Y=${Y} (轮数:${rounds}, 当前轮分数:${num})`)
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              if (actInfo?.activity?.commonActivityInfo?.['2606191']?.task?.['2']) {
+                Y = actInfo.activity.commonActivityInfo['2606191'].task['2']
+                message.info(`${token.name} - 已用宝箱分Y=${Y}`)
               }
             } catch (error) {
               console.error('获取Y值失败:', error)
@@ -1249,51 +1404,125 @@ const batchBoxWeek = async () => {
           
           // 辅助函数：开箱并检查分数
           const openBoxAndCheck = async (itemId, count, boxTypeName) => {
-            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, number: count })
+            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId, number: count }, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             
-            const YY = calculateYY()
-            const diff = ZY - YY
+            // 每次开箱后获取真实的Y值
+            await fetchRealY()
             
-            const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱积分YY: ${YY}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
+            const diff = ZY - Y
+            
+            const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱分Y: ${Y}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
             message.info(openBoxLog)
             
-            await new Promise(resolve => setTimeout(resolve, 500))
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量宝箱',
+              status: 'info',
+              message: openBoxLog
+            })
             
-            // ZY-YY<1000时，检查服务器真实Y值
-            if (diff < 1000) {
-              await fetchRealY()
-              if (Y >= ZY || Y > 32000) {
-                message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
-                return 'break'
-              }
-              // Y小于ZY，领取宝箱奖励后继续开箱
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
-              await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {})
-              await new Promise(resolve => setTimeout(resolve, 500))
-              return 'continue'
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            
+            // 检查是否达到目标
+            if (Y >= ZY || Y > 100000) {
+              const stopLog = `${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 100000 ? '或超过最大限制' : ''}，停止开箱`
+              message.info(stopLog)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'success',
+                message: stopLog
+              })
+              return 'break'
             }
             
-            // YY超过目标时，获取Y验证
-            if (YY > ZY) {
-              await fetchRealY()
-              if (Y >= ZY || Y > 32000) {
-                message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 32000 ? '或超过最大限制' : ''}，停止开箱`)
-                return 'break'
-              }
-            }
-            
+            // Y小于ZY，继续开箱
             return 'continue'
           }
           
           // 开宝箱阶段
           let shouldBreak = false
           
+          if (!skipBoxOpening) {
           while (!shouldBreak) {
+            console.log(`[批量宝箱] ${token.name || token.id} 主循环开头: Y=${Y}, ZY=${ZY}, M=${M}, Q=${Q}, H=${H}, B=${B}`)
+            
             // 检查是否已经超过目标分数
-            const currentYY = calculateYY()
-            if (currentYY >= ZY) {
+            if (Y >= ZY) {
               message.info(`${token.name} - 已达到目标分数 ${ZY}`)
+              console.log(`[批量宝箱] ${token.name || token.id} Y>=ZY，退出开箱循环`)
               break
+            }
+            
+            // 如果没有宝箱了，但Y还没达到ZY，循环领取宝箱奖励和邮件直到有宝箱或Y达到目标
+            if (M < 10 && Q < 10 && H < 10 && B < 10) {
+              if (Y < ZY) {
+                let claimAttempt = 0
+                const maxClaimAttempts = 5 // 最多尝试领取5次
+                
+                while (Y < ZY && claimAttempt < maxClaimAttempts) {
+                  claimAttempt++
+                  message.info(`${token.name} - 宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`)
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '金鱼资源',
+                    operation: '批量宝箱',
+                    status: 'info',
+                    message: `宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`
+                  })
+                  
+                  // 领取宝箱奖励
+                  await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
+                  await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+                  
+                  // 领取邮件
+                  message.info(`${token.name} - 领取邮件`)
+                  await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 }, 10000)
+                  await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+                  
+                  // 重新获取Y值
+                  await fetchRealY()
+                  
+                  // 检查Y是否达到目标
+                  if (Y >= ZY) {
+                    message.info(`${token.name} - 领取奖励后Y(${Y})达到目标ZY(${ZY})，进入最终阶段`)
+                    break
+                  }
+                  
+                  // 重新获取宝箱数量
+                  const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
+                  M = newRoleInfo?.role?.items?.['2001']?.quantity || 0
+                  Q = newRoleInfo?.role?.items?.['2002']?.quantity || 0
+                  H = newRoleInfo?.role?.items?.['2003']?.quantity || 0
+                  B = newRoleInfo?.role?.items?.['2004']?.quantity || 0
+                  console.log(`[批量宝箱] ${token.name || token.id} 领取奖励后重新获取宝箱数量: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
+                  
+                  // 如果有宝箱了，退出领取循环，继续开箱
+                  if (M >= 10 || Q >= 10 || H >= 10 || B >= 10) {
+                    message.info(`${token.name} - 领取奖励后获得宝箱，继续开箱`)
+                    break
+                  }
+                  
+                  // 如果达到最大尝试次数，退出循环
+                  if (claimAttempt >= maxClaimAttempts) {
+                    message.info(`${token.name} - 已尝试${maxClaimAttempts}次领取奖励，仍无宝箱可开，进入最终阶段`)
+                    break
+                  }
+                  
+                  message.info(`${token.name} - 领取后仍无宝箱且Y(${Y})<ZY(${ZY})，继续领取...`)
+                }
+                
+                // 如果有宝箱，继续下一轮开箱
+                if (M >= 10 || Q >= 10 || H >= 10 || B >= 10) {
+                  continue
+                }
+                // 否则进入最终阶段
+                message.info(`${token.name} - 宝箱数量不足，进入最终阶段`)
+                break
+              }
             }
             
             // 动态计算本轮需要开的宝箱数量
@@ -1307,133 +1536,399 @@ const batchBoxWeek = async () => {
               break
             }
             
-            // 铂金宝箱开箱（itemId: 2004，50分/个）
-            while (BK < targetCount.BK && B >= 10) {
-              const diff = ZY - calculateYY()
-              if (diff <= 0) {
-                message.info(`${token.name} - 已超过目标分数，停止开箱`)
-                shouldBreak = true
-                break
-              }
-              const count = calculatePlatinumOpenCount(B, diff)
-              if (count === 0) break
-              
-              const result = await openBoxAndCheck(2004, count, '铂金')
-              B -= count
-              BK += count
-              if (result === 'break') {
-                shouldBreak = true
-                break
-              }
-            }
-            if (shouldBreak) break
+            const currentDiff = ZY - Y
             
-            // 黄金宝箱开箱（itemId: 2003，20分/个）
-            while (HK < targetCount.HK && H >= 10) {
-              const diff = ZY - calculateYY()
-              if (diff <= 0) {
-                message.info(`${token.name} - 已超过目标分数，停止开箱`)
-                shouldBreak = true
-                break
-              }
-              const count = calculateNormalOpenCount(H, diff, 20)
-              if (count === 0) break
+            // 当差值 <= 500 时，优先检查青铜和黄金，避免铂金超分
+            if (currentDiff <= 500) {
+              // 计算青铜和黄金可开的分数（只能开10的倍数）
+              const bronzeCount = Q >= 10 ? Math.floor(Q / 10) * 10 : 0
+              const goldCount = H >= 10 ? Math.floor(H / 10) * 10 : 0
+              const bronzeScore = bronzeCount * 10
+              const goldScore = goldCount * 20
+              const totalBronzeGoldScore = bronzeScore + goldScore
               
-              const result = await openBoxAndCheck(2003, count, '黄金')
-              H -= count
-              HK += count
-              if (result === 'break') {
-                shouldBreak = true
-                break
+              // 如果青铜+黄金分数 > 500，只开青铜和黄金宝箱，每次固定10个
+              if (totalBronzeGoldScore > 500) {
+                // 黄金宝箱开箱（itemId: 2003，20分/个），每次固定10个
+                while (H >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2003, count, '黄金')
+                  H -= count
+                  HK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
+                
+                // 青铜宝箱开箱（itemId: 2002，10分/个），每次固定10个
+                while (Q >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2002, count, '青铜')
+                  Q -= count
+                  QK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
+              } else {
+                // 青铜+黄金分数 <= 500，按正常顺序开箱（铂金→黄金→青铜→木质），每次固定10个
+                // 铂金宝箱开箱（itemId: 2004，50分/个），每次固定10个
+                while (B >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2004, count, '铂金')
+                  B -= count
+                  BK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
+                
+                // 黄金宝箱开箱（itemId: 2003，20分/个），每次固定10个
+                while (H >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2003, count, '黄金')
+                  H -= count
+                  HK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
+                
+                // 青铜宝箱开箱（itemId: 2002，10分/个），每次固定10个
+                while (Q >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2002, count, '青铜')
+                  Q -= count
+                  QK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
+                
+                // 木质宝箱开箱（itemId: 2001，1分/个），每次固定10个
+                while (M >= 10) {
+                  const diff = ZY - Y
+                  if (diff <= 0) {
+                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    shouldBreak = true
+                    break
+                  }
+                  const count = 10 // 固定10个
+                  
+                  const result = await openBoxAndCheck(2001, count, '木质')
+                  M -= count
+                  MK += count
+                  if (result === 'break') {
+                    shouldBreak = true
+                    break
+                  }
+                }
+                if (shouldBreak) break
               }
-            }
-            if (shouldBreak) break
-            
-            // 青铜宝箱开箱（itemId: 2002，10分/个）
-            while (QK < targetCount.QK && Q >= 10) {
-              const diff = ZY - calculateYY()
-              if (diff <= 0) {
-                message.info(`${token.name} - 已超过目标分数，停止开箱`)
-                shouldBreak = true
-                break
+            } else {
+              // 差值 > 1000，按正常顺序开箱（铂金→黄金→青铜→木质）
+              // 铂金宝箱开箱（itemId: 2004，50分/个）
+              while (B >= 10) {
+                const diff = ZY - Y
+                if (diff <= 0) {
+                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  shouldBreak = true
+                  break
+                }
+                const count = calculatePlatinumOpenCount(B, diff)
+                if (count === 0) break
+                
+                const result = await openBoxAndCheck(2004, count, '铂金')
+                B -= count
+                BK += count
+                if (result === 'break') {
+                  shouldBreak = true
+                  break
+                }
               }
-              const count = calculateNormalOpenCount(Q, diff, 10)
-              if (count === 0) break
+              if (shouldBreak) break
               
-              const result = await openBoxAndCheck(2002, count, '青铜')
-              Q -= count
-              QK += count
-              if (result === 'break') {
-                shouldBreak = true
-                break
+              // 黄金宝箱开箱（itemId: 2003，20分/个）
+              while (H >= 10) {
+                const diff = ZY - Y
+                if (diff <= 0) {
+                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  shouldBreak = true
+                  break
+                }
+                const count = calculateNormalOpenCount(H, diff, 20)
+                if (count === 0) break
+                
+                const result = await openBoxAndCheck(2003, count, '黄金')
+                H -= count
+                HK += count
+                if (result === 'break') {
+                  shouldBreak = true
+                  break
+                }
               }
-            }
-            if (shouldBreak) break
-            
-            // 木质宝箱开箱（itemId: 2001，1分/个）
-            while (MK < targetCount.MK && M >= 10) {
-              const diff = ZY - calculateYY()
-              if (diff <= 0) {
-                message.info(`${token.name} - 已超过目标分数，停止开箱`)
-                shouldBreak = true
-                break
-              }
-              const count = calculateNormalOpenCount(M, diff, 1)
-              if (count === 0) break
+              if (shouldBreak) break
               
-              const result = await openBoxAndCheck(2001, count, '木质')
-              M -= count
-              MK += count
-              if (result === 'break') {
-                shouldBreak = true
-                break
+              // 青铜宝箱开箱（itemId: 2002，10分/个）
+              while (Q >= 10) {
+                const diff = ZY - Y
+                if (diff <= 0) {
+                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  shouldBreak = true
+                  break
+                }
+                const count = calculateNormalOpenCount(Q, diff, 10)
+                if (count === 0) break
+                
+                const result = await openBoxAndCheck(2002, count, '青铜')
+                Q -= count
+                QK += count
+                if (result === 'break') {
+                  shouldBreak = true
+                  break
+                }
               }
+              if (shouldBreak) break
+              
+              // 木质宝箱开箱（itemId: 2001，1分/个）
+              while (M >= 10) {
+                const diff = ZY - Y
+                if (diff <= 0) {
+                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  shouldBreak = true
+                  break
+                }
+                const count = calculateNormalOpenCount(M, diff, 1)
+                if (count === 0) break
+                
+                const result = await openBoxAndCheck(2001, count, '木质')
+                M -= count
+                MK += count
+                if (result === 'break') {
+                  shouldBreak = true
+                  break
+                }
+              }
+              if (shouldBreak) break
             }
             
-            // 领取宝箱奖励后继续计算
-            await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {})
-            await new Promise(resolve => setTimeout(resolve, 500))
+            // 检查是否还需要继续开箱
+            if (Y >= ZY) {
+              message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标 ${ZY}，进入最终阶段`)
+              break
+            }
+            
+            // Y小于ZY，宝箱分数不够了，领取宝箱奖励后继续开箱
+            if (Y < ZY) {
+              message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'info',
+                message: `已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`
+              })
+              await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              
+              // 重新获取宝箱数量
+              const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
+              M = newRoleInfo?.role?.items?.['2001']?.quantity || 0
+              Q = newRoleInfo?.role?.items?.['2002']?.quantity || 0
+              H = newRoleInfo?.role?.items?.['2003']?.quantity || 0
+              B = newRoleInfo?.role?.items?.['2004']?.quantity || 0
+              console.log(`[批量宝箱] ${token.name || token.id} 开箱后重新获取宝箱数量: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
+              
+              // 重新获取Y值
+              await fetchRealY()
+              
+              // 如果仍然没有宝箱可开，进入领取循环
+              if (M < 10 && Q < 10 && H < 10 && B < 10) {
+                message.info(`${token.name} - 领取奖励后仍无宝箱可开，进入领取循环`)
+                continue // 回到主循环开头，会进入领取循环逻辑
+              }
+              
+              // 继续下一轮开箱
+              continue
+            }
             
             // 重新获取宝箱数量
-            const newRoleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+            const newRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
             M = newRoleInfo?.role?.items?.['2001']?.quantity || 0
             Q = newRoleInfo?.role?.items?.['2002']?.quantity || 0
             H = newRoleInfo?.role?.items?.['2003']?.quantity || 0
             B = newRoleInfo?.role?.items?.['2004']?.quantity || 0
+            console.log(`[批量宝箱] ${token.name || token.id} 主循环末尾重新获取宝箱数量: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
             
             // 重新获取Y值
             await fetchRealY()
           }
+          } // end if (!skipBoxOpening)
           
           // 领取宝箱奖励
-          await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await tokenStore.sendMessageWithPromise(token.id, 'item_batchclaimboxpointreward', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量宝箱',
+            status: 'info',
+            message: `${token.name} - 领取宝箱奖励完成`
+          })
           
           // 领取邮件
-          await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
-          await new Promise(resolve => setTimeout(resolve, 500))
+          await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 }, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量宝箱',
+            status: 'info',
+            message: `${token.name} - 领取邮件完成`
+          })
+          
+          // 执行活动奖励领取（从currentMissionId开始，直到40或出错）
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取任务奖励，起始任务ID: ${currentMissionId}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量宝箱',
+            status: 'info',
+            message: `${token.name} - 开始领取任务奖励，起始任务ID: ${currentMissionId}`
+          })
+          
+          for (let missionId = currentMissionId; missionId <= 40; missionId++) {
+            try {
+              const rewardResult = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimtaskreward',
+                { activityId: Number(taskName.value) || 2606191, missionId: missionId },
+                10000
+              )
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              
+              if (!(rewardResult && (rewardResult.code === 0 || rewardResult.code === undefined || rewardResult.success === true))) {
+                console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取完成或出错，停止`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量宝箱',
+                  status: 'info',
+                  message: `${token.name} - 任务ID ${missionId} 奖励领取完成或出错，停止`
+                })
+                break
+              }
+              
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取成功`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'success',
+                message: `${token.name} - 任务ID ${missionId} 奖励领取成功`
+              })
+            } catch (error) {
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'error',
+                message: `${token.name} - 任务ID ${missionId} 奖励领取出错，停止`
+              })
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          }
           
           // 开钻石宝箱
           const diamondRoleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           let D = diamondRoleInfo?.role?.items?.['2005']?.quantity || 0
+          let diamondOpenCount = 0
           while (D >= 10) {
-            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, count: 10 })
+            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, number: 10 }, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             D -= 10
-            await new Promise(resolve => setTimeout(resolve, 500))
+            diamondOpenCount += 10
+          }
+          
+          if (diamondOpenCount > 0) {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量宝箱',
+              status: 'info',
+              message: `${token.name} - 开钻石宝箱${diamondOpenCount}个`
+            })
           }
           
           // 领取宝箱周奖励
-          for (let i = 0; i < l + 1; i++) {
-            try {
-              await tokenStore.sendMessageWithPromise(token.id, 'activity_claimweekactreward', {})
-              await new Promise(resolve => setTimeout(resolve, 500))
-            } catch (e) {
-              // 继续执行
-            }
+          try {
+            await tokenStore.sendMessageWithPromise(token.id, 'activity_claimweekactreward', {}, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量宝箱',
+              status: 'success',
+              message: `${token.name} - 领取宝箱周奖励完成`
+            })
+          } catch (e) {
+            // 继续执行
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name} 宝箱周完成，执行${l}轮`)
-          return { success: true, token, rounds: l }
+          message.success(`[序号${tokenIndex}] ${token.name} 宝箱周完成`)
+          return { success: true, token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
           console.error(`[序号${tokenIndex}] ${token.name} 宝箱周失败:`, error)
@@ -1454,6 +1949,14 @@ const batchBoxWeek = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     message.success(`批量宝箱周完成：成功${successCount}个，失败${failCount}个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '金鱼资源',
+      operation: '批量宝箱',
+      status: successCount > 0 ? 'success' : 'error',
+      message: `批量宝箱完成：成功${successCount}个，失败${failCount}个`
+    })
   } catch (error) {
     console.error('批量宝箱周失败:', error)
     message.error(`批量宝箱周失败: ${error.message || '未知错误'}`)
@@ -1491,6 +1994,14 @@ const batchRecruitWeek = async () => {
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
   message.info(`开始批量招募周（${rangeText}），共${targetTokens.length}个Token...`)
   
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '金鱼资源',
+    operation: '批量招募',
+    status: 'info',
+    message: `开始批量招募，${rangeText}，共${targetTokens.length}个Token`
+  })
+  
   recruitWeekRunning.value = true
   
   try {
@@ -1501,65 +2012,188 @@ const batchRecruitWeek = async () => {
           const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行招募周...`)
           
-          // 获取已用招募令
-          let usedRecruitCount = 0
-          try {
-            const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
-            if (activityInfo?.activity?.myTotalInfo?.['1']?.num !== undefined) {
-              usedRecruitCount = activityInfo.activity.myTotalInfo['1'].num
-            }
-          } catch (e) {}
+          // 获取活动信息
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          if (!activityInfo || !activityInfo.activity || !activityInfo.activity.commonActivityInfo) {
+            return { success: false, token, error: '获取活动信息失败' }
+          }
           
-          // 获取角色信息
+          const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const records = commonInfo.record || {}
+          
+          // 获取已用招募令数量（task['1']）
+          const usedRecruitCount = tasks['1'] || 0
+          
+          // 查找起始任务ID（1-20中哪个有时间戳，哪个就已完成）
+          let startMissionId = 0 // 默认0，currentMissionId从1开始
+          for (let i = 1; i <= 20; i++) {
+            if (records[i]) {
+              startMissionId = i
+              console.log(`${token.name || token.id} 起始任务ID: ${i} (已完成，时间戳: ${records[i]})`)
+            }
+          }
+          
+          // 从下一位开始执行
+          let currentMissionId = startMissionId + 1
+          
+          // 招募目标4000
+          const targetRecruit = 4000
+          
+          // 使用role_getroleinfo获取现有招募令数量
           const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           const items = roleInfo?.role?.items || {}
           const currentRecruitCount = items['1001']?.quantity || 0
           
-          // 获取爬塔层数
-          const tower = roleInfo?.role?.tower
-          const towerFloor = tower && tower.id ? Math.floor(tower.id / 10) : 0
+          // 计算执行次数：min((4000-已用)/10, 现有招募令/10)
+          const needCount = Math.floor((targetRecruit - usedRecruitCount) / 10)
+          const recruitCount = Math.floor(currentRecruitCount / 10)
+          const executeCount = Math.min(needCount, recruitCount)
           
-          if (towerFloor > 100) {
-            message.info(`[序号${tokenIndex}] ${token.name} 爬塔层数${towerFloor}超过100层，跳过`)
-            return { success: false, token, reason: 'tower_floor_exceeded' }
+          console.log(`${token.name || token.id} 已用招募: ${usedRecruitCount}, 起始任务ID: ${startMissionId}, 现有招募令: ${currentRecruitCount}, 需要次数: ${needCount}, 招募令可执行: ${recruitCount}, 执行次数: ${executeCount}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已用招募: ${usedRecruitCount}, 起始任务ID: ${startMissionId}, 执行次数: ${executeCount}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量招募',
+            status: 'info',
+            message: `${token.name} - 已用招募: ${usedRecruitCount}, 起始任务ID: ${startMissionId}, 现有招募令: ${currentRecruitCount}, 需要次数: ${needCount}, 招募令可执行: ${recruitCount}, 执行次数: ${executeCount}`
+          })
+          
+          // 已用招募令大于等于4000，跳转到领取奖励阶段
+          let skipRecruit = false
+          if (usedRecruitCount >= 4000) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令${usedRecruitCount}已达到目标4000，跳过招募，直接领取奖励`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量招募',
+              status: 'info',
+              message: `${token.name} - 已用招募令${usedRecruitCount}已达到目标4000，跳过招募，直接领取奖励`
+            })
+            skipRecruit = true
           }
           
-          const totalRecruitCount = Math.floor(usedRecruitCount * 0.8 + currentRecruitCount)
-          const maxRounds = Math.floor(totalRecruitCount / 400)
-          
-          if (maxRounds === 0) {
-            message.warning(`[序号${tokenIndex}] ${token.name} 招募令不足`)
-            return { success: false, token, reason: 'insufficient_recruits' }
+          if (executeCount <= 0 && !skipRecruit) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募令不足或已达到目标`)
+            return { success: false, token, error: '招募令不足或已达到目标' }
           }
           
-          const SY = maxRounds * 400
-          message.info(`[序号${tokenIndex}] ${token.name} 计划执行${maxRounds}轮，目标已用${SY}`)
-          
-          // 执行招募
-          let currentUsedCount = usedRecruitCount
-          while (currentUsedCount < SY) {
-            const diff = SY - currentUsedCount
-            const recruitCount = Math.min(40 * maxRounds, Math.max(10, Math.floor(diff / 10) + 1))
-            
-            await tokenStore.sendMessageWithPromise(token.id, 'hero_recruit', { recruitType: 1, recruitNumber: recruitCount }, 10000)
-            currentUsedCount += recruitCount
-            message.info(`[序号${tokenIndex}] 招募${recruitCount}个，已用${currentUsedCount}/${SY}`)
-            await new Promise(resolve => setTimeout(resolve, 500))
-          }
-          
-          // 领取奖励
-          for (let i = 0; i < maxRounds; i++) {
+          // 循环执行招募
+          if (!skipRecruit) {
+          for (let i = 0; i < executeCount; i++) {
             try {
-              await tokenStore.sendMessageWithPromise(token.id, 'activity_claimweekactreward', {})
-              await new Promise(resolve => setTimeout(resolve, 500))
-            } catch (e) {}
+              const result = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'hero_recruit',
+                { recruitType: 1, recruitNumber: 10 },
+                10000
+              )
+              
+              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
+                console.warn(`[序号${tokenIndex}] 招募执行失败: ${errorMsg}`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量招募',
+                  status: 'error',
+                  message: `${token.name} - hero_recruit { recruitType: 1, recruitNumber: 10 } 失败: ${errorMsg}`
+                })
+                break
+              }
+              
+              // 每执行10次在操作日志显示一次
+              if ((i + 1) % 10 === 0 || i === executeCount - 1) {
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量招募',
+                  status: 'success',
+                  message: `${token.name} - hero_recruit { recruitType: 1, recruitNumber: 10 } 成功 (第${i + 1}/${executeCount}次)`
+                })
+              }
+            } catch (error) {
+              console.error(`[序号${tokenIndex}] 招募执行异常:`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量招募',
+                status: 'error',
+                message: `${token.name} - hero_recruit 异常: ${error.message}`
+              })
+              break
+            }
+            
+            if (i < executeCount - 1) {
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
+          }
+          } // end if (!skipRecruit)
+          
+          // 执行活动奖励领取（从currentMissionId开始，直到20或出错）
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取任务奖励，起始任务ID: ${currentMissionId}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量招募',
+            status: 'info',
+            message: `${token.name} - 开始领取任务奖励，起始任务ID: ${currentMissionId}`
+          })
+          
+          for (let missionId = currentMissionId; missionId <= 20; missionId++) {
+            try {
+              const rewardResult = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimtaskreward',
+                { activityId: Number(taskName.value) || 2606191, missionId: missionId },
+                10000
+              )
+              
+              if (!(rewardResult && (rewardResult.code === 0 || rewardResult.code === undefined || rewardResult.success === true))) {
+                console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取完成或出错，停止`)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '金鱼资源',
+                  operation: '批量招募',
+                  status: 'info',
+                  message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
+                })
+                break
+              }
+              
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取成功`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量招募',
+                status: 'success',
+                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 成功`
+              })
+            } catch (error) {
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量招募',
+                status: 'error',
+                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}`
+              })
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           }
           
-          // 领取邮件
-          await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 })
+          // 刷新角色信息
+          await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
           
-          message.success(`[序号${tokenIndex}] ${token.name} 招募周完成，执行${maxRounds}轮`)
-          return { success: true, token, rounds: maxRounds }
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 招募周完成，执行${executeCount}次`)
+          return { success: true, token, rounds: executeCount }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
           console.error(`[序号${tokenIndex}] ${token.name} 招募周失败:`, error)
@@ -1580,6 +2214,14 @@ const batchRecruitWeek = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     message.success(`批量招募周完成：成功${successCount}个，失败${failCount}个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '金鱼资源',
+      operation: '批量招募',
+      status: successCount > 0 ? 'success' : 'error',
+      message: `批量招募完成：成功${successCount}个，失败${failCount}个`
+    })
   } catch (error) {
     console.error('批量招募周失败:', error)
     message.error(`批量招募周失败: ${error.message || '未知错误'}`)
@@ -1675,8 +2317,8 @@ const batchCheer = async () => {
   }
 }
 
-// 批量金鱼
-const batchQuickFishing = async () => {
+// 批量盐罐
+const batchSaltJar = async () => {
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase()
     const nameB = (b.name || '未命名').toLowerCase()
@@ -1685,12 +2327,6 @@ const batchQuickFishing = async () => {
   
   if (sortedTokensList.length === 0) {
     message.warning('没有可用的Token')
-    return
-  }
-  
-  const fishId = Number(fishItemId.value)
-  if (!fishId) {
-    message.warning('请先输入金鱼道具ID')
     return
   }
   
@@ -1708,9 +2344,7 @@ const batchQuickFishing = async () => {
   }
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
-  message.info(`开始批量金鱼（${rangeText}），共${targetTokens.length}个Token...`)
-  
-  quickFishingRunning.value = true
+  message.info(`开始批量盐罐（${rangeText}），共${targetTokens.length}个Token...`)
   
   try {
     const results = await connectionPool.batchOperate(
@@ -1718,26 +2352,113 @@ const batchQuickFishing = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          const fishCount = getItemCountById(fishId)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行盐罐...`)
           
-          if (fishCount <= 0) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金鱼道具数量不足`)
-            return { success: false, token: token, error: '金鱼道具数量不足' }
+          // 获取活动信息
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          if (!activityInfo || !activityInfo.activity || !activityInfo.activity.commonActivityInfo) {
+            return { success: false, token, error: '获取活动信息失败' }
           }
           
-          await tokenStore.sendMessageWithPromise(
-            token.id,
-            'item_consume',
-            { itemId: fishId, quantity: fishCount },
-            10000
-          )
+          const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const records = commonInfo.record || {}
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 金鱼完成，使用道具${fishId} x${fishCount}`)
-          return { success: true, token: token }
+          // 获取已用盐罐数量（task['2']）
+          const usedSaltJar = tasks['2'] || 0
+          
+          // 查找起始任务ID（61-80中哪个有时间戳，哪个就已完成）
+          let startMissionId = 61
+          for (let i = 61; i <= 80; i++) {
+            if (records[i]) {
+              startMissionId = i
+              console.log(`${token.name || token.id} 起始任务ID: ${i} (已完成，时间戳: ${records[i]})`)
+            }
+          }
+          
+          // 从下一位开始执行
+          let currentMissionId = startMissionId + 1
+          
+          // 盐罐目标6000
+          const targetSaltJar = 6000
+          
+          // 获取现有盐罐数量（从items中获取，itemId 5278）
+          const items = activityInfo?.activity?.role?.items || {}
+          const currentSaltJarCount = items['5278']?.quantity || 0
+          
+          // 计算执行次数：min((6000-已用)/10, 现有盐罐/10)
+          const needCount = Math.floor((targetSaltJar - usedSaltJar) / 10)
+          const jarCount = Math.floor(currentSaltJarCount / 10)
+          const executeCount = Math.min(needCount, jarCount)
+          
+          console.log(`${token.name || token.id} 已用盐罐: ${usedSaltJar}, 起始任务ID: ${startMissionId}, 现有盐罐: ${currentSaltJarCount}, 需要次数: ${needCount}, 盐罐可执行: ${jarCount}, 执行次数: ${executeCount}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已用盐罐: ${usedSaltJar}, 起始任务ID: ${startMissionId}, 执行次数: ${executeCount}`)
+          
+          if (executeCount <= 0) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 盐罐数量不足或已达到目标`)
+            return { success: false, token, error: '盐罐数量不足或已达到目标' }
+          }
+          
+          // 循环执行盐罐
+          for (let i = 0; i < executeCount; i++) {
+            try {
+              const result = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'artifact_lottery',
+                { type: 1, lotteryNumber: 10, newFree: true },
+                10000
+              )
+              
+              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
+                console.warn(`[序号${tokenIndex}] 盐罐执行失败: ${errorMsg}`)
+                break
+              }
+            } catch (error) {
+              console.error(`[序号${tokenIndex}] 盐罐执行异常:`, error)
+              break
+            }
+            
+            if (i < executeCount - 1) {
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
+          }
+          
+          // 执行活动奖励领取（从currentMissionId开始，直到80或出错）
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取任务奖励，起始任务ID: ${currentMissionId}`)
+          
+          for (let missionId = currentMissionId; missionId <= 80; missionId++) {
+            try {
+              const rewardResult = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimtaskreward',
+                { activityId: Number(taskName.value) || 2606191, missionId: missionId },
+                10000
+              )
+              
+              if (!(rewardResult && (rewardResult.code === 0 || rewardResult.code === undefined || rewardResult.success === true))) {
+                console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取完成或出错，停止`)
+                break
+              }
+              
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取成功`)
+            } catch (error) {
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          }
+          
+          // 刷新角色信息
+          await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 盐罐执行完成，执行${executeCount}次`)
+          return { success: true, token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 金鱼失败:`, error)
-          return { success: false, token: token, error: error.message || '未知错误' }
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 盐罐执行失败:`, error)
+          return { success: false, token, error: error.message || '未知错误' }
         }
       },
       {
@@ -1753,14 +2474,553 @@ const batchQuickFishing = async () => {
     
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
-    message.success(`批量金鱼完成：成功${successCount}个，失败${failCount}个`)
+    message.success(`批量盐罐完成：成功${successCount}个，失败${failCount}个`)
   } catch (error) {
-    console.error('批量金鱼失败:', error)
-    message.error(`批量金鱼失败: ${error.message || '未知错误'}`)
-  } finally {
-    quickFishingRunning.value = false
+    console.error('批量盐罐失败:', error)
+    message.error(`批量盐罐失败: ${error.message || '未知错误'}`)
   }
 }
+
+// 批量购买金竿
+const batchBuyGoldRod = async () => {
+  const buyCount = parseInt(goldRodBuyCount.value)
+  if (!buyCount || buyCount <= 0) {
+    message.warning('请输入有效的购买数量')
+    return
+  }
+  
+  const executeCount = Math.floor(buyCount / 10)
+  if (executeCount <= 0) {
+    message.warning('购买数量至少为10')
+    return
+  }
+  
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量购买金竿（${rangeText}），共${targetTokens.length}个Token，购买数量: ${buyCount}，执行次数: ${executeCount}...`)
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在购买金竿...`)
+          
+          // 循环执行购买金竿命令
+          for (let i = 0; i < executeCount; i++) {
+            try {
+              const result = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'shop_buy',
+                { shopId: 1, goodsId: 1001, buyNum: 10 },
+                10000
+              )
+              
+              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
+                console.warn(`[序号${tokenIndex}] 购买金竿失败: ${errorMsg}`)
+                break
+              }
+            } catch (error) {
+              console.error(`[序号${tokenIndex}] 购买金竿异常:`, error)
+              break
+            }
+            
+            if (i < executeCount - 1) {
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
+          }
+          
+          // 刷新角色信息
+          await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿完成，执行${executeCount}次`)
+          return { success: true, token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿失败:`, error)
+          return { success: false, token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    message.success(`批量购买金竿完成：成功${successCount}个，失败${failCount}个`)
+  } catch (error) {
+    console.error('批量购买金竿失败:', error)
+    message.error(`批量购买金竿失败: ${error.message || '未知错误'}`)
+  }
+}
+
+// 批量使用道具
+const batchUseItem = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量使用道具（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在使用道具...`)
+          
+          let useCount = 0
+          
+          // 循环执行使用道具，直到出错
+          while (true) {
+            try {
+              const result = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'item_openbox',
+                [{ itemId: Number(taskItemId.value) || 5279, number: 12, index: 0 }],
+                10000
+              )
+              
+              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                console.log(`${token.name || token.id} 道具使用完成或出错，已使用${useCount}次`)
+                break
+              }
+              
+              useCount++
+            } catch (error) {
+              console.log(`${token.name || token.id} 道具使用出错，已使用${useCount}次`)
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          }
+          
+          // 刷新角色信息
+          await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 使用道具完成，执行${useCount}次`)
+          return { success: true, token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 使用道具失败:`, error)
+          return { success: false, token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    message.success(`批量使用道具完成：成功${successCount}个，失败${failCount}个`)
+  } catch (error) {
+    console.error('批量使用道具失败:', error)
+    message.error(`批量使用道具失败: ${error.message || '未知错误'}`)
+  }
+}
+
+// 批量金砖
+const batchGoldBrick = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量金砖（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在执行金砖...`)
+          
+          // 获取活动信息
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          if (!activityInfo || !activityInfo.activity || !activityInfo.activity.commonActivityInfo) {
+            return { success: false, token, error: '获取活动信息失败' }
+          }
+          
+          const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const records = commonInfo.record || {}
+          
+          // 获取已用金砖数量（从task中获取，根据实际任务ID调整）
+          const usedGoldBrick = tasks['4'] || 0
+          
+          // 查找起始任务ID（81-100中哪个有时间戳，哪个就已完成）
+          let startMissionId = 81
+          for (let i = 81; i <= 100; i++) {
+            if (records[i]) {
+              startMissionId = i
+              console.log(`${token.name || token.id} 起始任务ID: ${i} (已完成，时间戳: ${records[i]})`)
+            }
+          }
+          
+          // 从下一位开始执行
+          let currentMissionId = startMissionId + 1
+          
+          // 金砖目标（根据实际需求调整）
+          const targetGoldBrick = 10000
+          
+          // 获取现有金砖数量（从items中获取，itemId根据实际调整）
+          const items = activityInfo?.activity?.role?.items || {}
+          const currentGoldBrickCount = items['1002']?.quantity || 0
+          
+          // 计算执行次数
+          const needCount = Math.floor((targetGoldBrick - usedGoldBrick) / 10)
+          const brickCount = Math.floor(currentGoldBrickCount / 10)
+          const executeCount = Math.min(needCount, brickCount)
+          
+          console.log(`${token.name || token.id} 已用金砖: ${usedGoldBrick}, 起始任务ID: ${startMissionId}, 现有金砖: ${currentGoldBrickCount}, 需要次数: ${needCount}, 金砖可执行: ${brickCount}, 执行次数: ${executeCount}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已用金砖: ${usedGoldBrick}, 起始任务ID: ${startMissionId}, 执行次数: ${executeCount}`)
+          
+          if (executeCount <= 0) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金砖数量不足或已达到目标`)
+            return { success: false, token, error: '金砖数量不足或已达到目标' }
+          }
+          
+          // 循环执行金砖
+          for (let i = 0; i < executeCount; i++) {
+            try {
+              // 根据实际金砖命令调整
+              const result = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'artifact_lottery',
+                { type: 3, lotteryNumber: 10, newFree: true },
+                10000
+              )
+              
+              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
+                console.warn(`[序号${tokenIndex}] 金砖执行失败: ${errorMsg}`)
+                break
+              }
+            } catch (error) {
+              console.error(`[序号${tokenIndex}] 金砖执行异常:`, error)
+              break
+            }
+            
+            if (i < executeCount - 1) {
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
+          }
+          
+          // 执行活动奖励领取（从currentMissionId开始，直到100或出错）
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始领取任务奖励，起始任务ID: ${currentMissionId}`)
+          
+          for (let missionId = currentMissionId; missionId <= 100; missionId++) {
+            try {
+              const rewardResult = await tokenStore.sendMessageWithPromise(
+                token.id,
+                'activity_claimtaskreward',
+                { activityId: Number(taskName.value) || 2606191, missionId: missionId },
+                10000
+              )
+              
+              if (!(rewardResult && (rewardResult.code === 0 || rewardResult.code === undefined || rewardResult.success === true))) {
+                console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取完成或出错，停止`)
+                break
+              }
+              
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取成功`)
+            } catch (error) {
+              console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
+              break
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          }
+          
+          // 刷新角色信息
+          await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 金砖完成，执行${executeCount}次`)
+          return { success: true, token }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 金砖失败:`, error)
+          return { success: false, token, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    message.success(`批量金砖完成：成功${successCount}个，失败${failCount}个`)
+  } catch (error) {
+    console.error('批量金砖失败:', error)
+    message.error(`批量金砖失败: ${error.message || '未知错误'}`)
+  }
+}
+
+// 批量导出道具数量
+const batchExportItems = async () => {
+  if (!tokenStore.hasTokens) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const sortedTargetTokens = targetTokens
+    .map(token => ({ token, index: getTokenIndex(token) }))
+    .sort((a, b) => a.index - b.index)
+    .map(item => item.token)
+
+  isBatchCheerRunning.value = true
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
+  message.info(`开始批量导出道具数量（${rangeText}），共${sortedTargetTokens.length}个Token...`)
+
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '金鱼资源',
+    operation: '批量导出道具数量',
+    status: 'info',
+    message: `开始批量导出道具数量，${rangeText}，共${sortedTargetTokens.length}个Token`
+  })
+
+  const csvRows = []
+  csvRows.push('账号,助威道具(5278),任务道具(5279),金鱼道具(5280)')
+
+  let successCount = 0
+  let failCount = 0
+
+  for (let i = 0; i < sortedTargetTokens.length; i++) {
+    const token = sortedTargetTokens[i]
+    if (!token || !token.id) continue
+
+    const tokenIndex = getTokenIndex(token)
+
+    try {
+      const connectionAcquired = await connectionPool.acquire(token.id)
+
+      if (!connectionAcquired) {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败`)
+        failCount++
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '金鱼资源',
+          operation: '批量导出道具数量',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `【序号${tokenIndex}】[${token.name || token.id}] 连接失败`
+        })
+        continue
+      }
+
+      await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+
+      if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} WebSocket未连接`)
+        await connectionPool.release(token.id, false)
+        failCount++
+        continue
+      }
+
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取道具数量...`)
+
+      const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
+
+      if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
+        throw new Error('获取角色信息失败')
+      }
+
+      const items = roleInfo.role.items
+      const cheerCount = items['5278']?.quantity || 0
+      const taskCount = items['5279']?.quantity || 0
+      const fishCount = items['5280']?.quantity || 0
+
+      const csvRow = [
+        token.name || token.id,
+        cheerCount,
+        taskCount,
+        fishCount
+      ].join(',')
+      csvRows.push(csvRow)
+
+      await connectionPool.release(token.id, false)
+
+      message.success(`[序号${tokenIndex}] ${token.name || token.id} 导出成功`)
+      successCount++
+
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '金鱼资源',
+        operation: '批量导出道具数量',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'success',
+        message: `【序号${tokenIndex}】[${token.name || token.id}] 导出成功：助威${cheerCount}，任务${taskCount}，金鱼${fishCount}`
+      })
+    } catch (error) {
+      console.error(`${token.name} 导出道具数量失败:`, error)
+      message.error(`[序号${tokenIndex}] ${token.name || token.id} 导出失败：${error.message}`)
+      failCount++
+      logStore.addLog({
+        page: 'fish-helper',
+        cardType: '金鱼资源',
+        operation: '批量导出道具数量',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'error',
+        message: `【序号${tokenIndex}】[${token.name || token.id}] 导出失败：${error.message}`
+      })
+      try {
+        await connectionPool.release(token.id, false)
+      } catch (releaseError) {
+        console.error('释放连接失败:', releaseError)
+      }
+    }
+
+    if (i < sortedTargetTokens.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+    }
+  }
+
+  // 生成CSV文件并下载
+  if (csvRows.length > 1) {
+    const csvContent = csvRows.join('\n')
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `道具数量_${new Date().toLocaleDateString()}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    message.success(`道具数量导出完成！成功: ${successCount}，失败: ${failCount}，已下载CSV文件`)
+
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '金鱼资源',
+      operation: '批量导出道具数量',
+      status: 'info',
+      message: `道具数量导出完成（${rangeText}），成功: ${successCount}，失败: ${failCount}，已下载CSV文件`
+    })
+  } else {
+    message.warning('没有成功导出任何数据')
+  }
+
+  isBatchCheerRunning.value = false
+}
+
 </script>
 
 <style scoped>
