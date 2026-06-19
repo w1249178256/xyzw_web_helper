@@ -113,6 +113,8 @@
             button-text="批量购买金竿"
             :disabled="isAnyOperationRunning"
             @button-click="batchBuyGoldRod"
+            v-model:placeholderValue="goldRodBuyCount"
+            placeholder="输入购买数量"
           />
           <CustomizedCard
             mode="button-placeholder"

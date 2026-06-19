@@ -25,7 +25,7 @@
       />
     </div>
     
-    <!-- 模式3：按钮和占位符 -->
+    <!-- 模式3：按钮和占位符/输入框 -->
     <div v-if="mode === 'button-placeholder'" class="card-item">
       <n-button 
         :type="disabled ? 'default' : 'primary'" 
@@ -36,7 +36,17 @@
       >
         {{ buttonText }}
       </n-button>
-      <div class="placeholder"></div>
+      <n-input
+        v-if="placeholderValue !== undefined"
+        :value="placeholderValue"
+        @update:value="(value) => emit('update:placeholderValue', value)"
+        size="small"
+        :placeholder="placeholder"
+        class="n-input"
+        style="width: 80px;"
+        type="text"
+      />
+      <div v-else class="placeholder"></div>
     </div>
     
     <!-- 模式5：按钮模式 -->
@@ -273,6 +283,10 @@ const props = defineProps({
   buttonText: {
     type: String,
     default: '按钮'
+  },
+  placeholderValue: {
+    type: [String, Number],
+    default: undefined
   },
   
   // 模式5：按钮模式
