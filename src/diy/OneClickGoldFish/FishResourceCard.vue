@@ -1897,11 +1897,22 @@ const batchBoxWeek = async () => {
           await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           let D = diamondRoleInfo?.role?.items?.['2005']?.quantity || 0
           let diamondOpenCount = 0
-          while (D >= 10) {
-            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, number: 10 }, 10000)
+          
+          // 根据钻石宝箱数量选择开箱数量：小于10有几个开几个，10-99开10的倍数，>=100开100个
+          while (D > 0) {
+            let openNum
+            if (D >= 100) {
+              openNum = 100 // 数量>=100时，每次开100个
+            } else if (D >= 10) {
+              openNum = Math.floor(D / 10) * 10 // 数量10-99时，开10的倍数
+            } else {
+              openNum = D // 数量<10时，有几个开几个
+            }
+            
+            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2005, number: openNum }, 10000)
             await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
-            D -= 10
-            diamondOpenCount += 10
+            D -= openNum
+            diamondOpenCount += openNum
           }
           
           if (diamondOpenCount > 0) {
