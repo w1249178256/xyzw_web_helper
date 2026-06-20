@@ -239,10 +239,11 @@ const quickFishingRunning = ref(false)
 const boxWeekRunning = ref(false)
 const boxWeekCancelled = ref(false)
 const recruitWeekRunning = ref(false)
+const exportRunning = ref(false)
 
 // 计算是否有任何操作正在运行
 const isAnyOperationRunning = computed(() => {
-  return boxOpening.value || fishingRunning.value || recruitRunning.value || cheerRunning.value || quickFishingRunning.value || boxWeekRunning.value || recruitWeekRunning.value
+  return boxOpening.value || fishingRunning.value || recruitRunning.value || cheerRunning.value || quickFishingRunning.value || boxWeekRunning.value || recruitWeekRunning.value || exportRunning.value
 })
 
 // 获取资源数量
@@ -3033,7 +3034,7 @@ const batchExportItems = async () => {
     .sort((a, b) => a.index - b.index)
     .map(item => item.token)
 
-  isBatchCheerRunning.value = true
+  exportRunning.value = true
   const rangeText = executionRange.value ? `范围${executionRange.value}` : '全部'
   message.info(`开始批量导出道具数量（${rangeText}），共${sortedTargetTokens.length}个Token...`)
 
@@ -3046,7 +3047,7 @@ const batchExportItems = async () => {
   })
 
   const csvRows = []
-  csvRows.push('账号,助威道具(5278),任务道具(5279),金鱼道具(5280)')
+  csvRows.push('账号,助威道具(5278),任务道具(5279),金鱼道具(5280),已用宝箱分,已用金竿,已用招募,已用盐罐,已用金砖')
 
   let successCount = 0
   let failCount = 0
@@ -3086,6 +3087,7 @@ const batchExportItems = async () => {
 
       message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取道具数量...`)
 
+      // 获取角色信息（道具数量）
       const roleInfo = await tokenStore.sendMessageWithPromise(token.id, 'role_getroleinfo', {}, 10000)
 
       if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
@@ -3097,11 +3099,34 @@ const batchExportItems = async () => {
       const taskCount = items['5279']?.quantity || 0
       const fishCount = items['5280']?.quantity || 0
 
+      // 获取活动信息（已用资源）
+      const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+      let usedBoxScore = 0
+      let usedGoldRod = 0
+      let usedRecruit = 0
+      let usedSaltJar = 0
+      let usedGoldBrick = 0
+
+      if (activityInfo && activityInfo.activity && activityInfo.activity.commonActivityInfo) {
+        const commonInfo = activityInfo.activity.commonActivityInfo['2606191'] || {}
+        const tasks = commonInfo.task || {}
+        usedBoxScore = tasks['2'] || 0
+        usedGoldRod = tasks['3'] || 0
+        usedRecruit = tasks['1'] || 0
+        usedSaltJar = tasks['4'] || 0
+        usedGoldBrick = tasks['5'] || 0
+      }
+
       const csvRow = [
         token.name || token.id,
         cheerCount,
         taskCount,
-        fishCount
+        fishCount,
+        usedBoxScore,
+        usedGoldRod,
+        usedRecruit,
+        usedSaltJar,
+        usedGoldBrick
       ].join(',')
       csvRows.push(csvRow)
 
@@ -3117,7 +3142,7 @@ const batchExportItems = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'success',
-        message: `【序号${tokenIndex}】[${token.name || token.id}] 导出成功：助威${cheerCount}，任务${taskCount}，金鱼${fishCount}`
+        message: `【序号${tokenIndex}】[${token.name || token.id}] 导出成功：助威${cheerCount}，任务${taskCount}，金鱼${fishCount}，宝箱分${usedBoxScore}，金竿${usedGoldRod}，招募${usedRecruit}，盐罐${usedSaltJar}，金砖${usedGoldBrick}`
       })
     } catch (error) {
       console.error(`${token.name} 导出道具数量失败:`, error)
@@ -3170,7 +3195,7 @@ const batchExportItems = async () => {
     message.warning('没有成功导出任何数据')
   }
 
-  isBatchCheerRunning.value = false
+  exportRunning.value = false
 }
 
 </script>
