@@ -506,6 +506,7 @@ export function registerDefaultCommands(reg) {
     .register("equipment_batchupgradelevel", { heroId: 107 })
     .register("hero_skillawake", { heroId: 107, index: -1 })
     .register("system_hangupupgrade", { upgradeNum: 10 })
+    .register("system_buyitem")
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1202,6 +1203,7 @@ export class XyzwWebSocketClient {
       mail_claimallattachmentresp: "mail_claimallattachment",
       store_buyresp: "store_purchase",
       system_getdatabundleverresp: "system_getdatabundlever",
+      system_buyitemresp: "system_buyitem",
       tower_claimrewardresp: "tower_claimreward",
       fight_starttowerresp: "fight_starttower",
       evotowerinforesp: "evotower_getinfo",

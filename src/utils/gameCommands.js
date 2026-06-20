@@ -2287,6 +2287,24 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 购买金竿
+   */
+  system_buyitem(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  itemId:params.itemId,
+        buyNum: params.buyNum,
+        ...params
+      }),
+      cmd: "system_buyitem",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 打开袋子
    */
   item_openpack(ack = 0, seq = 0, params = {}) {

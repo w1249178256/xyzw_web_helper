@@ -2687,11 +2687,9 @@ const batchBuyGoldRod = async () => {
           // 循环执行购买金竿命令
           for (let i = 0; i < executeCount; i++) {
             try {
-              const result = await tokenStore.sendMessageWithPromise(
+              const result = await tokenStore.sendSystemBuyItem(
                 token.id,
-                'shop_buy',
-                { shopId: 1, goodsId: 1001, buyNum: 10 },
-                10000
+                { itemId: 1012, buyNum: buyCount }
               )
               
               if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {

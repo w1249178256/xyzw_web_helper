@@ -1562,6 +1562,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "system_hangupupgrade", params);
   };
 
+  // 发送购买物品
+  const sendSystemBuyItem = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "system_buyitem", params);
+  };
+
   // 发送重命名
   const sendSystemEditName = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "system_editname", params);
@@ -2309,6 +2314,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendEquipmentBatchUpgradeLevel,
     sendHeroSkillAwake,
     sendSystemHangupUpgrade,
+    sendSystemBuyItem,
     sendSystemEditName,
     sendHeroUpgradeStar,
     sendHeroSynthetic,
