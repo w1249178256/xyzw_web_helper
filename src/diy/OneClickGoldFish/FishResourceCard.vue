@@ -970,7 +970,7 @@ const batchStartFishing = async () => {
             console.log(`${token.name || token.id} 已用金竿不存在，先使用10个金竿`)
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用金竿不存在，先使用10个金竿`)
             
-            await tokenStore.sendMessageWithPromise(token.id, 'hero_recruit', { recruitType: 1, recruitNumber: 10 }, 10000)
+            await tokenStore.sendMessageWithPromise(token.id, 'artifact_lottery', { type: 2, lotteryNumber: 10, newFree: true }, 10000)
             await new Promise(resolve => setTimeout(resolve, 3000))
             
             // 重新获取活动信息
