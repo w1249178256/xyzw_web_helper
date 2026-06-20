@@ -962,18 +962,50 @@ const batchStartFishing = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用金竿数量（task['3']）
-          if (!('3' in tasks)) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用金竿失败，跳过该token`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '金鱼资源',
-              operation: '批量金竿',
-              status: 'warn',
-              message: `${token.name} - 获取已用金竿失败，跳过该token`
-            })
-            return { success: false, token, error: '获取已用金竿失败' }
+          let usedFishing = tasks['3']
+          
+          // 如果 task['3'] 不存在，使用10个金竿后重新获取
+          if (usedFishing === undefined) {
+            console.log(`${token.name || token.id} 已用金竿不存在，先使用10个金竿`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用金竿不存在，先使用10个金竿`)
+            
+            await tokenStore.sendMessageWithPromise(token.id, 'hero_recruit', { recruitType: 1, recruitNumber: 10 }, 10000)
+            await new Promise(resolve => setTimeout(resolve, 3000))
+            
+            // 重新获取活动信息
+            const retryActivityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            
+            if (!retryActivityInfo || !retryActivityInfo.activity || !retryActivityInfo.activity.commonActivityInfo) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 重新获取活动信息失败，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量金竿',
+                status: 'warn',
+                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+              })
+              return { success: false, token, error: '重新获取活动信息失败' }
+            }
+            
+            const retryCommonInfo = retryActivityInfo.activity.commonActivityInfo['2606191'] || {}
+            const retryTasks = retryCommonInfo.task || {}
+            
+            if (!('3' in retryTasks)) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 使用金竿后已用金竿仍不存在，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量金竿',
+                status: 'warn',
+                message: `${token.name} - 使用金竿后已用金竿仍不存在，跳过该token`
+              })
+              return { success: false, token, error: '使用金竿后已用金竿仍不存在' }
+            }
+            
+            usedFishing = retryTasks['3']
+            console.log(`${token.name || token.id} 使用金竿后重新获取已用金竿: ${usedFishing}`)
           }
-          const usedFishing = tasks['3']
           
           // 查找起始任务ID（41-60中哪个有时间戳，哪个就已完成）
           let startMissionId = 40 // 默认40，currentMissionId从41开始
@@ -1272,18 +1304,50 @@ const batchBoxWeek = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用宝箱分Y（task['2']）
-          if (!('2' in tasks)) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用宝箱分失败，跳过该token`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '金鱼资源',
-              operation: '批量宝箱',
-              status: 'warn',
-              message: `${token.name} - 获取已用宝箱分失败，跳过该token`
-            })
-            return { success: false, token, error: '获取已用宝箱分失败' }
-          }
           let Y = tasks['2']
+          
+          // 如果 task['2'] 不存在，开10个木头箱子后重新获取
+          if (Y === undefined) {
+            console.log(`${token.name || token.id} 已用宝箱分不存在，先开10个木质宝箱`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用宝箱分不存在，先开10个木质宝箱`)
+            
+            await tokenStore.sendMessageWithPromise(token.id, 'item_openbox', { itemId: 2001, number: 10 }, 10000)
+            await new Promise(resolve => setTimeout(resolve, 3000))
+            
+            // 重新获取活动信息
+            const retryActivityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            
+            if (!retryActivityInfo || !retryActivityInfo.activity || !retryActivityInfo.activity.commonActivityInfo) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 重新获取活动信息失败，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'warn',
+                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+              })
+              return { success: false, token, error: '重新获取活动信息失败' }
+            }
+            
+            const retryCommonInfo = retryActivityInfo.activity.commonActivityInfo['2606191'] || {}
+            const retryTasks = retryCommonInfo.task || {}
+            
+            if (!('2' in retryTasks)) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 开箱后已用宝箱分仍不存在，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量宝箱',
+                status: 'warn',
+                message: `${token.name} - 开箱后已用宝箱分仍不存在，跳过该token`
+              })
+              return { success: false, token, error: '开箱后已用宝箱分仍不存在' }
+            }
+            
+            Y = retryTasks['2']
+            console.log(`${token.name || token.id} 开箱后重新获取已用宝箱分: ${Y}`)
+          }
           
           // 查找起始任务ID（21-40中哪个有时间戳，哪个就已完成）
           let startMissionId = 20 // 默认20，currentMissionId从21开始
@@ -2071,18 +2135,50 @@ const batchRecruitWeek = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用招募令数量（task['1']）
-          if (!('1' in tasks)) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用招募令失败，跳过该token`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '金鱼资源',
-              operation: '批量招募',
-              status: 'warn',
-              message: `${token.name} - 获取已用招募令失败，跳过该token`
-            })
-            return { success: false, token, error: '获取已用招募令失败' }
+          let usedRecruitCount = tasks['1']
+          
+          // 如果 task['1'] 不存在，使用10个招募令后重新获取
+          if (usedRecruitCount === undefined) {
+            console.log(`${token.name || token.id} 已用招募令不存在，先使用10个招募令`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令不存在，先使用10个招募令`)
+            
+            await tokenStore.sendMessageWithPromise(token.id, 'hero_recruit', { recruitType: 1, recruitNumber: 10 }, 10000)
+            await new Promise(resolve => setTimeout(resolve, 3000))
+            
+            // 重新获取活动信息
+            const retryActivityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            
+            if (!retryActivityInfo || !retryActivityInfo.activity || !retryActivityInfo.activity.commonActivityInfo) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 重新获取活动信息失败，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量招募',
+                status: 'warn',
+                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+              })
+              return { success: false, token, error: '重新获取活动信息失败' }
+            }
+            
+            const retryCommonInfo = retryActivityInfo.activity.commonActivityInfo['2606191'] || {}
+            const retryTasks = retryCommonInfo.task || {}
+            
+            if (!('1' in retryTasks)) {
+              message.warning(`[序号${tokenIndex}] ${token.name || token.id} 使用招募令后已用招募令仍不存在，跳过该token`)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '金鱼资源',
+                operation: '批量招募',
+                status: 'warn',
+                message: `${token.name} - 使用招募令后已用招募令仍不存在，跳过该token`
+              })
+              return { success: false, token, error: '使用招募令后已用招募令仍不存在' }
+            }
+            
+            usedRecruitCount = retryTasks['1']
+            console.log(`${token.name || token.id} 使用招募令后重新获取已用招募令: ${usedRecruitCount}`)
           }
-          const usedRecruitCount = tasks['1']
           
           // 查找起始任务ID（1-20中哪个有时间戳，哪个就已完成）
           let startMissionId = 0 // 默认0，currentMissionId从1开始

@@ -1,0 +1,74 @@
+[10:59:24] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: 
+Object
+battleData
+: 
+leftTeam
+: 
+levelWeaponSkillId
+: 
+[]
+lordSkill
+: 
+[]
+lordSkinId
+: 
+2
+petId
+: 
+403
+petPassiveSkillIds
+: 
+[4030101]
+petUId
+: 
+"22-deL"
+power
+: 
+9946644964
+roleId
+: 
+586281307
+tapAttack
+: 
+77885
+team
+: 
+0
+: 
+{id: 110, type: 0, index: 0, level: 6000, attack: 788673342, …}
+1
+: 
+{id: 116, type: 0, index: 1, level: 6000, attack: 362459741, …}
+2
+: 
+{id: 120, type: 0, index: 2, level: 6000, attack: 605975196, …}
+3
+: 
+{id: 104, type: 0, index: 3, level: 6000, attack: 421999231, …}
+4
+: 
+{id: 106, type: 0, index: 4, level: 6000, attack: 450970374, …}
+[[Prototype]]
+: 
+Object
+weaponActiveLevelId
+: 
+1185
+weaponId
+: 
+8
+[[Prototype]]
+: 
+Object
+options
+: 
+{levelId: 8619, autoSpeed: 100, IsActLevel: 0}
+randomSeed
+: 
+1449
+rightTeam
+: 
+{team: {…}}
+version
+: 
+240504

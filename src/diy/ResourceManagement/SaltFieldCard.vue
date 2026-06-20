@@ -462,12 +462,26 @@ const handleSaltFieldFormation = async () => {
         let battleTeam = {}
         let lordWeaponId = 0
         
-        if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
-          battleTeam = fightResult.battleData.leftTeam.team
-          lordWeaponId = fightResult.battleData.leftTeam.lordWeaponId || 0
-        } else if (fightResult && fightResult.leftTeam && fightResult.leftTeam.team) {
-          battleTeam = fightResult.leftTeam.team
-          lordWeaponId = fightResult.leftTeam.lordWeaponId || 0
+        // 从响应中提取数据
+        let leftTeam = null
+        if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam) {
+          leftTeam = fightResult.battleData.leftTeam
+        } else if (fightResult && fightResult.leftTeam) {
+          leftTeam = fightResult.leftTeam
+        }
+        
+        if (leftTeam) {
+          // 提取 lordWeaponId（使用 weaponId）
+          lordWeaponId = leftTeam.weaponId || 0
+          
+          // 提取 battleTeam：从 team 数组中提取 slot 位置 (index) 和 hero id
+          if (leftTeam.team && Array.isArray(leftTeam.team)) {
+            leftTeam.team.forEach(hero => {
+              if (hero && hero.index !== undefined && hero.id !== undefined) {
+                battleTeam[hero.index] = hero.id
+              }
+            })
+          }
         }
         
         await waitCommandDelay()
