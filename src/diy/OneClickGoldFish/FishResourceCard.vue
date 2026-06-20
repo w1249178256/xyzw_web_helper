@@ -2688,8 +2688,8 @@ const batchUseItem = async () => {
             try {
               const result = await tokenStore.sendMessageWithPromise(
                 token.id,
-                'item_openbox',
-                [{ itemId: Number(taskItemId.value) || 5279, number: 12, index: 0 }],
+                'item_openpack',
+                { itemId: Number(taskItemId.value) || 5279, number: 12, index: 0 },
                 10000
               )
               
