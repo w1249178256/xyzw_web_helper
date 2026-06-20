@@ -1108,7 +1108,7 @@ const batchStartFishing = async () => {
             }
             
             if (i < executeCount - 1) {
-              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+              await new Promise(resolve => setTimeout(resolve, 1000))
             }
           }
           } // end if (!skipFishing)
