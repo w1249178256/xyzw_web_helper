@@ -962,7 +962,18 @@ const batchStartFishing = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用金竿数量（task['3']）
-          const usedFishing = tasks['3'] || 0
+          if (!('3' in tasks)) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用金竿失败，跳过该token`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量金竿',
+              status: 'warn',
+              message: `${token.name} - 获取已用金竿失败，跳过该token`
+            })
+            return { success: false, token, error: '获取已用金竿失败' }
+          }
+          const usedFishing = tasks['3']
           
           // 查找起始任务ID（41-60中哪个有时间戳，哪个就已完成）
           let startMissionId = 40 // 默认40，currentMissionId从41开始
@@ -1261,7 +1272,18 @@ const batchBoxWeek = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用宝箱分Y（task['2']）
-          let Y = tasks['2'] || 0
+          if (!('2' in tasks)) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用宝箱分失败，跳过该token`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量宝箱',
+              status: 'warn',
+              message: `${token.name} - 获取已用宝箱分失败，跳过该token`
+            })
+            return { success: false, token, error: '获取已用宝箱分失败' }
+          }
+          let Y = tasks['2']
           
           // 查找起始任务ID（21-40中哪个有时间戳，哪个就已完成）
           let startMissionId = 20 // 默认20，currentMissionId从21开始
@@ -1952,21 +1974,6 @@ const batchBoxWeek = async () => {
             })
           }
           
-          // 领取宝箱周奖励
-          try {
-            await tokenStore.sendMessageWithPromise(token.id, 'activity_claimweekactreward', {}, 10000)
-            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '金鱼资源',
-              operation: '批量宝箱',
-              status: 'success',
-              message: `${token.name} - 领取宝箱周奖励完成`
-            })
-          } catch (e) {
-            // 继续执行
-          }
-          
           message.success(`[序号${tokenIndex}] ${token.name} 宝箱周完成`)
           return { success: true, token }
         } catch (error) {
@@ -2064,7 +2071,18 @@ const batchRecruitWeek = async () => {
           const records = commonInfo.record || {}
           
           // 获取已用招募令数量（task['1']）
-          const usedRecruitCount = tasks['1'] || 0
+          if (!('1' in tasks)) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取已用招募令失败，跳过该token`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量招募',
+              status: 'warn',
+              message: `${token.name} - 获取已用招募令失败，跳过该token`
+            })
+            return { success: false, token, error: '获取已用招募令失败' }
+          }
+          const usedRecruitCount = tasks['1']
           
           // 查找起始任务ID（1-20中哪个有时间戳，哪个就已完成）
           let startMissionId = 0 // 默认0，currentMissionId从1开始
