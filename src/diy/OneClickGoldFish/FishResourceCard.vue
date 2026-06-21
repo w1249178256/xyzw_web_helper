@@ -118,6 +118,12 @@
           />
           <CustomizedCard
             mode="button-placeholder"
+            button-text="批量领取奖励"
+            :disabled="isAnyOperationRunning"
+            @button-click="batchClaimRewards"
+          />
+          <CustomizedCard
+            mode="button-placeholder"
             button-text="批量导出"
             :disabled="isAnyOperationRunning"
             @button-click="batchExportItems"
@@ -2638,15 +2644,9 @@ const batchSaltJar = async () => {
 
 // 批量购买金竿
 const batchBuyGoldRod = async () => {
-  const buyCount = parseInt(goldRodBuyCount.value)
-  if (!buyCount || buyCount <= 0) {
+  const inputBuyCount = parseInt(goldRodBuyCount.value)
+  if (!inputBuyCount || inputBuyCount <= 0) {
     message.warning('请输入有效的购买数量')
-    return
-  }
-  
-  const executeCount = Math.floor(buyCount / 10)
-  if (executeCount <= 0) {
-    message.warning('购买数量至少为10')
     return
   }
   
@@ -2675,7 +2675,15 @@ const batchBuyGoldRod = async () => {
   }
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
-  message.info(`开始批量购买金竿（${rangeText}），共${targetTokens.length}个Token，购买数量: ${buyCount}，执行次数: ${executeCount}...`)
+  message.info(`开始批量购买金竿（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '金鱼资源',
+    operation: '批量购买金竿',
+    status: 'info',
+    message: `开始批量购买金竿，${rangeText}，共${targetTokens.length}个Token`
+  })
   
   try {
     const results = await connectionPool.batchOperate(
@@ -2683,35 +2691,77 @@ const batchBuyGoldRod = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在购买金竿...`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取金砖信息...`)
           
-          // 循环执行购买金竿命令
-          for (let i = 0; i < executeCount; i++) {
-            try {
-              const result = await tokenStore.sendSystemBuyItem(
-                token.id,
-                { itemId: 1012, buyNum: buyCount }
-              )
-              
-              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
-                const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
-                console.warn(`[序号${tokenIndex}] 购买金竿失败: ${errorMsg}`)
-                break
-              }
-            } catch (error) {
-              console.error(`[序号${tokenIndex}] 购买金竿异常:`, error)
-              break
-            }
-            
-            if (i < executeCount - 1) {
-              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
-            }
+          // 获取现有金砖数量 G
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          const G = roleInfo?.role?.items?.['5']?.quantity || 0
+          
+          // 获取已用金砖数量 YG（task['5']）
+          const activityInfo = await tokenStore.sendMessageWithPromise(token.id, 'activity_get', {}, 10000)
+          await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+          const commonInfo = activityInfo?.activity?.commonActivityInfo?.['2606191'] || {}
+          const tasks = commonInfo.task || {}
+          const YG = tasks['5'] || 0
+          
+          // 计算可购买数量
+          const A = Math.floor((420000 - YG) / 600)
+          const B = Math.floor(G / 600)
+          const buyNum = Math.min(A, B, inputBuyCount)
+          
+          if (buyNum <= 0) {
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 金砖不足或已达上限`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量购买金竿',
+              status: 'warn',
+              message: `${token.name} - 现有金砖: ${G}, 已用金砖: ${YG}, 可购买: ${buyNum}，跳过`
+            })
+            return { success: false, token, error: '金砖不足或已达上限' }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 现有金砖: ${G}, 已用金砖: ${YG}, 可购买A: ${A}, 可购买B: ${B}, 实际购买: ${buyNum}`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量购买金竿',
+            status: 'info',
+            message: `${token.name} - 现有金砖: ${G}, 已用金砖: ${YG}, 可购买A: ${A}, 可购买B: ${B}, 实际购买: ${buyNum}`
+          })
+          
+          // 执行购买
+          const result = await tokenStore.sendSystemBuyItem(
+            token.id,
+            { itemId: 1012, buyNum: buyNum }
+          )
+          
+          if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+            const errorMsg = result?.hint || result?.message || `未知错误 (Code: ${result?.code || 'N/A'})`
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿失败: ${errorMsg}`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '金鱼资源',
+              operation: '批量购买金竿',
+              status: 'error',
+              message: `${token.name} - 购买金竿失败: ${errorMsg}`
+            })
+            return { success: false, token, error: errorMsg }
           }
           
           // 刷新角色信息
           await tokenStore.sendGameMessage(token.id, 'role_getroleinfo', {})
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿完成，执行${executeCount}次`)
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 购买金竿完成，购买数量: ${buyNum}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '金鱼资源',
+            operation: '批量购买金竿',
+            status: 'success',
+            message: `${token.name} - 购买金竿完成，数量: ${buyNum}`
+          })
           return { success: true, token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
@@ -2733,6 +2783,14 @@ const batchBuyGoldRod = async () => {
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
     message.success(`批量购买金竿完成：成功${successCount}个，失败${failCount}个`)
+    
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '金鱼资源',
+      operation: '批量购买金竿',
+      status: 'info',
+      message: `批量购买金竿完成：成功${successCount}个，失败${failCount}个`
+    })
   } catch (error) {
     console.error('批量购买金竿失败:', error)
     message.error(`批量购买金竿失败: ${error.message || '未知错误'}`)
