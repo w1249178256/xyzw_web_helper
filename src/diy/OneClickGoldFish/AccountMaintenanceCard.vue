@@ -365,7 +365,7 @@ import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import ScheduledTasksCard from '@/diy/OneClickGoldFish/ScheduledTasksCard.vue'
 import { GameController } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
-import { HERO_DICT } from '@/utils/HeroList'
+import { HERO_DICT, STAR_DICT } from '@/utils/HeroList'
 
 const tokenStore = useTokenStore()
 
@@ -486,33 +486,13 @@ const selectedUpgradeStarHero = ref(null)
 const selectedSyntheticHero = ref('lvbu')
 
 // 英雄选项（从HERO_DICT生成，只保留红色武将，即ID以1开头的）
-// 同时添加玩具阵容的武将（紫将：关平306、许攸302、潘凤311、周泰301、邢道荣312、程普307、许褚215、于禁303、张昭308、陆绩309）
 const heroOptions = computed(() => {
-  const redHeroes = Object.entries(HERO_DICT)
+  return Object.entries(HERO_DICT)
     .filter(([id, hero]) => id.startsWith('1'))
     .map(([id, hero]) => ({
       label: hero.name,
       value: parseInt(id)
     })).sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
-  
-  // 添加玩具阵容武将
-  const toyTeamHeroes = [
-    { label: '关平', value: 306 },
-    { label: '许攸', value: 302 },
-    { label: '潘凤', value: 311 },
-    { label: '周泰', value: 301 },
-    { label: '邢道荣', value: 312 },
-    { label: '程普', value: 307 },
-    { label: '许褚', value: 215 },
-    { label: '于禁', value: 303 },
-    { label: '张昭', value: 308 },
-    { label: '陆绩', value: 309 }
-  ]
-  
-  // 被动紫将（关平到陆绩10个紫将）
-  const passiveHeroOption = { label: '被动', value: 'passive' }
-  
-  return [passiveHeroOption, ...redHeroes, ...toyTeamHeroes]
 })
 
 // 被动紫将列表（关平到陆绩10个紫将）
@@ -534,6 +514,8 @@ const syntheticHeroOptions = computed(() => {
   return [
     { label: '吕布', value: 'lvbu' },
     { label: '张飞', value: 'zhangfei' },
+    { label: '合太史慈', value: 'hetaishici' },
+    { label: '合郭嘉', value: 'heguojia' },
     { label: '全部', value: 'all' }
   ]
 })
@@ -1740,7 +1722,7 @@ const handleUseUniversalRed = async () => {
           }
         }
 
-        // 获取角色信息，获取万能红数量和目标英雄星级
+        // 获取角色信息，获取万能红数量和目标英雄星级、碎片数量
         message.info(`[序号${tokenIndex}] ${token.name || token.id} - 正在获取角色信息...`)
         const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
         if (!roleInfo || !roleInfo.role || !roleInfo.role.items) {
@@ -1751,19 +1733,65 @@ const handleUseUniversalRed = async () => {
 
         // 获取目标英雄星级
         let heroStar = 0
-        const heroId = String(selectedUniversalRedHero.value)
+        const heroId = selectedUniversalRedHero.value
         if (roleInfo.role.heroes && roleInfo.role.heroes[heroId]) {
           heroStar = roleInfo.role.heroes[heroId].star || 0
         }
 
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 万能红数量: ${universalRedCount}, ${selectedHeroName}星级: ${heroStar}`)
+        // 获取英雄碎片数量（碎片itemId与heroId相同）
+        let heroFragmentCount = 0
+        if (roleInfo.role.items && roleInfo.role.items[heroId]) {
+          heroFragmentCount = roleInfo.role.items[heroId].quantity || 0
+        } else if (roleInfo.role.items && roleInfo.role.items[String(heroId)]) {
+          heroFragmentCount = roleInfo.role.items[String(heroId)].quantity || 0
+        }
 
-        // 判断是否是吕布或公孙瓒
-        const isLuBuOrGongsun = selectedUniversalRedHero.value === 107 || selectedUniversalRedHero.value === 116
+        // 确定目标星级：吕布(107)、太史慈(120)、郭嘉(102)最多30星，其他红将最多28星
+        const targetStar = (heroId === 107 || heroId === 120 || heroId === 102) ? 30 : 28
 
-        // 非吕布/公孙瓒的英雄，星级大于27星时停止使用万能红
-        if (!isLuBuOrGongsun && heroStar > 27) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`)
+        // 在控制台和操作日志中显示获取的信息
+        console.log(`[序号${tokenIndex}] 获取的信息：${selectedHeroName}：${heroStar}星，碎片：${heroFragmentCount}，万能红：${universalRedCount}，目标：${targetStar}星`)
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 获取的信息：${selectedHeroName}：${heroStar}星，碎片：${heroFragmentCount}，万能红：${universalRedCount}，目标：${targetStar}星`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '使用万能红',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `【序号${tokenIndex}】[${token.name || token.id}]获取的信息：${selectedHeroName}：${heroStar}星，碎片：${heroFragmentCount}，万能红：${universalRedCount}，目标：${targetStar}星`
+        })
+
+        // 计算从当前星级升到目标星级需要的总碎片
+        let totalFragmentNeeded = 0
+        for (let star = heroStar; star < targetStar; star++) {
+          const cost = STAR_DICT[star]?.cost || 0
+          totalFragmentNeeded += cost
+        }
+
+        // 计算缺少的万能红数量 = 所需碎片总数 - 现有碎片数量
+        const universalRedNeeded = Math.max(0, totalFragmentNeeded - heroFragmentCount)
+        const actualUseCount = Math.min(universalRedCount, universalRedNeeded)
+
+        // 在控制台和操作日志中显示计算结果
+        console.log(`[序号${tokenIndex}] 计算结果：升${targetStar}星需${totalFragmentNeeded}碎片，缺${universalRedNeeded}万能红，实际使用${actualUseCount}个`)
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 计算结果：升${targetStar}星需${totalFragmentNeeded}碎片，缺${universalRedNeeded}万能红，实际使用${actualUseCount}个`)
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '养号',
+          operation: '使用万能红',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `【序号${tokenIndex}】[${token.name || token.id}]计算结果：升${targetStar}星需${totalFragmentNeeded}碎片，缺${universalRedNeeded}万能红，实际使用${actualUseCount}个`
+        })
+
+        // 判断是否是吕布、太史慈或郭嘉
+        const isSpecialHero = selectedUniversalRedHero.value === 107 || selectedUniversalRedHero.value === 120 || selectedUniversalRedHero.value === 102
+
+        // 条件判断：吕布/太史慈/郭嘉>=30星停止，非吕布>=28星停止
+        if (isSpecialHero && heroStar >= 30) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已${heroStar}星（>=30星），停止使用万能红`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
@@ -1771,10 +1799,10 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已${heroStar}星（>27星），停止使用万能红`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已${heroStar}星（>=30星），停止使用万能红`
           })
-        } else if (heroStar >= 30) {
-          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已30星，跳过使用万能红`)
+        } else if (!isSpecialHero && heroStar >= 28) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已${heroStar}星（>=28星），停止使用万能红`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '养号',
@@ -1782,7 +1810,7 @@ const handleUseUniversalRed = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'warning',
-            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已30星，跳过使用万能红`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]${selectedHeroName}已${heroStar}星（>=28星），停止使用万能红`
           })
         } else if (universalRedCount === 0) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 没有万能红，跳过`)
@@ -1796,62 +1824,93 @@ const handleUseUniversalRed = async () => {
             message: `【序号${tokenIndex}】[${token.name || token.id}]没有万能红，跳过`
           })
         } else {
-          // 吕布/公孙瓒：使用现有逻辑（包括29星特殊处理）
-          if (isLuBuOrGongsun && heroStar === 29) {
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 当前29星，执行100+升星循环，最多4次`)
-            
-            let totalUsed = 0
-            let totalUpgrades = 0
-            let maxCycles = 4
-            
-            for (let cycle = 1; cycle <= maxCycles; cycle++) {
-              // 检查万能红数量
-              const currentRoleInfo = await tokenStore.sendGetRoleInfo(token.id)
-              const currentUniversalRedCount = currentRoleInfo.role.items['3201']?.quantity || 0
-              
-              if (currentUniversalRedCount < 100) {
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红不足100个，停止循环`)
-                break
+          // 使用计算出的实际使用数量
+          // 分批使用万能红，每次最多999个
+          let remainingCount = actualUseCount
+          let totalUsed = 0
+          let batchCount = 0
+
+          while (remainingCount > 0) {
+            const useCount = Math.min(remainingCount, 999)
+            batchCount++
+
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红: ${useCount}个`)
+
+            try {
+              await tokenStore.sendItemOpenPack(token.id, {
+                index: selectedUniversalRedHero.value - 101,
+                itemId: 3201,
+                number: useCount
+              })
+
+              remainingCount -= useCount
+              totalUsed += useCount
+
+              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红成功: ${useCount}个`)
+
+              // 每批之间等待500ms
+              if (remainingCount > 0) {
+                await waitCommandDelay()
               }
-              
-              // 使用100万能红
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次使用100万能红`)
+            } catch (error) {
+              message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红失败: ${error.message || '未知错误'}`)
+              throw error
+            }
+          }
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红完成，共使用${totalUsed}个`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '使用万能红',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个（原${heroStar}星）`
+          })
+
+          // 只有在使用了 400 个万能红（升了一星）的情况下才执行升星操作
+          if (totalUsed >= 400) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已使用${totalUsed}个万能红，开始执行升星操作...`)
+            
+            // 等待 1 秒后开始升星
+            await waitCommandDelay()
+
+            // 开始升星，最多 10 次
+            let upgradeCount = 0
+            for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
               try {
-                await tokenStore.sendItemOpenPack(token.id, {
-                  index: selectedUniversalRedHero.value - 101,
-                  itemId: 3201,
-                  number: 100
-                })
-                totalUsed += 100
-                message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次使用100万能红成功`)
-              } catch (error) {
-                message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次使用万能红失败: ${error.message}`)
-                break
-              }
-              
-              await waitCommandDelay()
-              
-              // 执行升星
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次升星`)
-              try {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星...`)
+                
                 await tokenStore.sendMessageWithPromise(
                   token.id,
                   'hero_heroupgradestar',
                   { heroId: selectedUniversalRedHero.value },
                   8000
                 )
-                totalUpgrades++
-                message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次升星成功`)
+
+                upgradeCount++
+                message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星成功`)
+
+                // 升星后等待 1 秒
+                await waitCommandDelay()
               } catch (error) {
                 const errorMsg = error.message || String(error)
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 第${cycle}次升星失败: ${errorMsg}，继续下一次`)
+                // 检查是否是物品数量不足的错误
+                if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
+                  message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红碎片不足，停止升星`)
+                  break
+                }
+                // 其他错误也停止
+                message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星失败：${errorMsg}`)
+                break
               }
-              
-              await waitCommandDelay()
             }
-            
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 29星循环完成，共使用${totalUsed}万能红，升星${totalUpgrades}次`)
-            
+
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升星完成，共升星${upgradeCount}次`)
+
+            // 添加操作日志
             logStore.addLog({
               page: 'fish-helper',
               cardType: '养号',
@@ -1859,113 +1918,19 @@ const handleUseUniversalRed = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]29星循环完成，使用${totalUsed}万能红，升星${totalUpgrades}次（原${heroStar}星）`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
             })
           } else {
-            // 非29星：原有逻辑
-            // 计算最多可使用的万能红数量：400*(30-当前星级）
-            const maxUseCount = 400 * (30 - heroStar)
-            const actualUseCount = Math.min(universalRedCount, maxUseCount)
-
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 最多可使用${actualUseCount}个万能红（400*(30-${heroStar})）`)
-
-            // 分批使用万能红，每次最多999个
-            let remainingCount = actualUseCount
-            let totalUsed = 0
-            let batchCount = 0
-
-            while (remainingCount > 0) {
-              const useCount = Math.min(remainingCount, 999)
-              batchCount++
-
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红: ${useCount}个`)
-
-              try {
-                await tokenStore.sendItemOpenPack(token.id, {
-                  index: selectedUniversalRedHero.value - 101,
-                  itemId: 3201,
-                  number: useCount
-                })
-
-                remainingCount -= useCount
-                totalUsed += useCount
-
-                message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红成功: ${useCount}个`)
-
-                // 每批之间等待500ms
-                if (remainingCount > 0) {
-                  await waitCommandDelay()
-                }
-              } catch (error) {
-                message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${batchCount}批使用万能红失败: ${error.message || '未知错误'}`)
-                throw error
-              }
-            }
-
-            message.success(`[序号${tokenIndex}] ${token.name || token.id} - 使用万能红完成，共使用${totalUsed}个`)
-
-            // 只有在使用了 400 个万能红（升了一星）的情况下才执行升星操作
-            if (totalUsed >= 400) {
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 已使用${totalUsed}个万能红，开始执行升星操作...`)
-              
-              // 等待 1 秒后开始升星
-              await waitCommandDelay()
-
-              // 开始升星，最多 10 次
-              let upgradeCount = 0
-              for (let upgradeAttempt = 1; upgradeAttempt <= 10; upgradeAttempt++) {
-                try {
-                  message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星...`)
-                  
-                  await tokenStore.sendMessageWithPromise(
-                    token.id,
-                    'hero_heroupgradestar',
-                    { heroId: selectedUniversalRedHero.value },
-                    8000
-                  )
-
-                  upgradeCount++
-                  message.success(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星成功`)
-
-                  // 升星后等待 1 秒
-                  await waitCommandDelay()
-                } catch (error) {
-                  const errorMsg = error.message || String(error)
-                  // 检查是否是物品数量不足的错误
-                  if (errorMsg.includes('物品数量不足') || errorMsg.includes('400010')) {
-                    message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 万能红碎片不足，停止升星`)
-                    break
-                  }
-                  // 其他错误也停止
-                  message.error(`[序号${tokenIndex}] ${token.name || token.id} - 第${upgradeAttempt}次升星失败：${errorMsg}`)
-                  break
-                }
-              }
-
-              message.success(`[序号${tokenIndex}] ${token.name || token.id} - 升星完成，共升星${upgradeCount}次`)
-
-              // 添加操作日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '使用万能红',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个，升星${upgradeCount}次（原${heroStar}星）`
-              })
-            } else {
-              // 添加操作日志
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '养号',
-                operation: '使用万能红',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
-              })
-            }
+            // 添加操作日志
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '使用万能红',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]使用万能红${totalUsed}个（未满 400，不升星，原${heroStar}星）`
+            })
           }
         }
 
@@ -2309,6 +2274,14 @@ const handleBatchHeroSynthetic = async () => {
             // 选择张飞，执行参数 204
             itemId = 204
             message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成张飞...`)
+          } else if (selectedSyntheticHero.value === 'hetaishici') {
+            // 选择合太史慈，执行参数 120
+            itemId = 120
+            message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成太史慈...`)
+          } else if (selectedSyntheticHero.value === 'heguojia') {
+            // 选择合郭嘉，执行参数 102
+            itemId = 102
+            message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在合成郭嘉...`)
           } else {
             // 选择全部，参照英雄升星执行全部红将、橙将、紫将
             // 红将：101-120，橙将：201-228，紫将：301-314

@@ -1,0 +1,263 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/6/21 12:07:20
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1780585480748.02-%E7%A5%9E%E5%B7%9E%E4%B8%B6%E7%9B%B8%E7%AC%A6-8%23.bin&fromManager=true&viewId=game-window-1782014808293-zja0ncu5i
+记录数量: 3
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta3 Chrome/148.0.7778.218 Electron/42.3.2 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/6/21 12:07:13
+服务: AutumnService
+方法: getRoleRank
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 51,
+    "ack": 49,
+    "time": 1782014838564,
+    "resp": 49,
+    "cmd": "autumn_getrolerankresp",
+    "body": {
+      "list": [
+        {
+          "roleId": 111542093,
+          "serverId": 8946,
+          "name": "五月",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEKPia1rvBHVNnYpFHhevuZWCCBYU1Ysd3a0rklkVmW1mjFBQ8Nhy3vTPCg0onx7w2cVWk3QsnVV0aQ/132",
+          "level": 6000,
+          "levelId": 8776,
+          "power": 10714025486,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "itemNum": 0,
+          "rank": 1,
+          "distance": 12,
+          "score": 12,
+          "avatarFrame": {
+            "id": 110702,
+            "expire": -1
+          }
+        },
+        {
+          "roleId": 111586321,
+          "serverId": 8950,
+          "name": "暮雨",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/9Guhwr8UXDLx6OBzEFaCyL3r59hpLsaNW9eJwXMP7DIgq64ACFMzYLO5c8d8fHG8PcozXDFNrg0yaWiaBiczOdZQ/132",
+          "level": 6000,
+          "levelId": 8570,
+          "power": 6586347398,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "itemNum": 0,
+          "rank": 2,
+          "distance": 1,
+          "score": 1,
+          "avatarFrame": {
+            "id": 3004,
+            "expire": -1
+          }
+        },
+        {
+          "roleId": 111603697,
+          "serverId": 8951,
+          "name": "初鸿ᝰ杨少",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111603697/1763812286.jpg",
+          "level": 6000,
+          "levelId": 8888,
+          "power": 11778977880,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "itemNum": 0,
+          "rank": 3,
+          "distance": 1,
+          "score": 1,
+          "avatarFrame": {
+            "id": 1107,
+            "expire": -1
+          }
+        },
+        {
+          "roleId": 111582820,
+          "serverId": 8949,
+          "name": "神州丶相符",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+          "level": 6000,
+          "levelId": 8775,
+          "power": 12504156904,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "itemNum": 0,
+          "rank": 4,
+          "distance": 1,
+          "score": 1,
+          "avatarFrame": {
+            "id": 110503,
+            "expire": -1
+          }
+        }
+      ],
+      "myRank": {
+        "roleId": 111582820,
+        "serverId": 8949,
+        "name": "神州丶相符",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/H1GOv5KTD4x0x61Niao2hJGD6xefwibVmicntHDMbTLLj1qtVxPVYvVFWHB6yqu53acYhLCwHhQkR63fkPSWdtxQu5TVMwwsrUHLTcGcUaZCP8/132",
+        "level": 6000,
+        "levelId": 8775,
+        "power": 12504156904,
+        "rank": 4,
+        "distance": 1,
+        "score": 1,
+        "avatarFrame": {
+          "id": 110503,
+          "expire": -1
+        }
+      },
+      "roleAutumn": {
+        "actId": 2606192,
+        "areaId": 448,
+        "itemNum": 1,
+        "distance": 1,
+        "lastUseItemTime": 1782014838,
+        "lastUseItemNum": 1,
+        "incUId": 7,
+        "groupIdId": 1
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1782014833394_ijca6qj53
+
+记录 #2:
+----------------------------------------
+时间: 2026/6/21 12:07:13
+服务: AutumnService
+方法: useItem
+参数: [{"itemNum":1}]
+结果:
+{
+  "_raw": {
+    "seq": 50,
+    "ack": 0,
+    "time": 1782014838531,
+    "resp": 48,
+    "cmd": "autumn_useitemresp",
+    "body": {
+      "role": {
+        "items": {
+          "1016": {
+            "quantity": 521192
+          },
+          "5278": {
+            "quantity": 5921
+          }
+        },
+        "statistics": {
+          "au:f:le:id:2606192": 6482066
+        },
+        "medallion": null
+      },
+      "itemNum": 1,
+      "distance": 1,
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1016,
+          "value": 10,
+          "ext": 0
+        }
+      ],
+      "roleAutumn": {
+        "areaId": 448,
+        "itemNum": 1,
+        "distance": 1,
+        "lastUseItemTime": 1782014838,
+        "lastUseItemNum": 1,
+        "incUId": 7,
+        "groupIdId": 1
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 54
+}
+异步: 是
+调用ID: call_1782014833338_76jwue1cq
+
+记录 #3:
+----------------------------------------
+时间: 2026/6/21 12:07:08
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 0,
+    "time": 1782014833579,
+    "resp": 47,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 1677645743,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 1700750827,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1782014828417_os5syr2si
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

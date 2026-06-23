@@ -2098,9 +2098,9 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     return {
       ack,
       body: this.g_utils.bon.encode({
-        activityId:2605014,
-        	goodsId:260501422,
-        	quantity:1,
+        activityId:params.activityId,
+        goodsId:params.goodsId,
+        quantity:1,
           ...params
       }),
       cmd: "activity_exchange",
