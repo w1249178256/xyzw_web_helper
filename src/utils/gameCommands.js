@@ -2057,6 +2057,24 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
 
 
   /**
+   * 领取扭蛋奖励
+   */
+  gacha_drawreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        num:1,
+        isGroup:false,
+          ...params
+      }),
+      cmd: "gacha_drawreward",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 领取五一累充道具
    */
   common_claimtotalreward(ack = 0, seq = 0, params = {}) {
@@ -2118,6 +2136,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       ack,
       body: this.g_utils.bon.encode({
       	  towerType:params.towerType,
+      	  	 actId:params.actId,
           ...params
       }),
       cmd: "towers_fight",
@@ -2134,6 +2153,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       ack,
       body: this.g_utils.bon.encode({
       	   towerType:params.towerType,
+      	   	   actId:params.actId,
           ...params
       }),
       cmd: "towers_start",

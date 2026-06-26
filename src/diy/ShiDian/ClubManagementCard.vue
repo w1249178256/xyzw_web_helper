@@ -13,43 +13,6 @@
     </template>
     <template #default>
       <div class="club-management-content">
-        <!-- 功法图鉴信息表格 - 移到上方 -->
-        <div class="legacy-book-table-container" v-if="legacyBookInfo.books || legacyBookInfo.storage">
-          <table class="legacy-book-table">
-            <thead>
-              <tr>
-                <th>名称</th>
-                <th>金卡</th>
-                <th>红卡</th>
-                <th>橙卡</th>
-                <th>蓝卡</th>
-                <th>紫卡</th>
-                <th>绿卡</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>图鉴</td>
-                <td>{{ legacyBookInfo.books['501'] || 0 }}</td>
-                <td>{{ legacyBookInfo.books['401'] || 0 }}<br>{{ legacyBookInfo.books['402'] || 0 }}<br>{{ legacyBookInfo.books['403'] || 0 }}</td>
-                <td>{{ legacyBookInfo.books['301'] || 0 }}<br>{{ legacyBookInfo.books['302'] || 0 }}</td>
-                <td>{{ legacyBookInfo.books['201'] || 0 }}<br>{{ legacyBookInfo.books['202'] || 0 }}</td>
-                <td>{{ legacyBookInfo.books['101'] || 0 }}<br>{{ legacyBookInfo.books['102'] || 0 }}</td>
-                <td>{{ legacyBookInfo.books['1'] || 0 }}<br>{{ legacyBookInfo.books['2'] || 0 }}</td>
-              </tr>
-              <tr>
-                <td>仓库</td>
-                <td>{{ legacyBookInfo.storage['501'] || 0 }}</td>
-                <td>{{ legacyBookInfo.storage['401'] || 0 }}<br>{{ legacyBookInfo.storage['402'] || 0 }}<br>{{ legacyBookInfo.storage['403'] || 0 }}</td>
-                <td>{{ legacyBookInfo.storage['301'] || 0 }}<br>{{ legacyBookInfo.storage['302'] || 0 }}</td>
-                <td>{{ legacyBookInfo.storage['201'] || 0 }}<br>{{ legacyBookInfo.storage['202'] || 0 }}</td>
-                <td>{{ legacyBookInfo.storage['101'] || 0 }}<br>{{ legacyBookInfo.storage['102'] || 0 }}</td>
-                <td>{{ legacyBookInfo.storage['1'] || 0 }}<br>{{ legacyBookInfo.storage['2'] || 0 }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
         <!-- 俱乐部功能显示 - 使用一个CustomizedCard容器容纳主要操作按钮 -->
         <CustomizedCard mode="container">
           <!-- 功法图鉴功能区域 -->

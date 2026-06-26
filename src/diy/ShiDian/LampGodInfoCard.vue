@@ -9,32 +9,18 @@
       <h3>灯神信息</h3>
     </template>
     <template #default>
-      <!-- 灯神层数信息表格 -->
-      <div class="lampgod-levels-container">
-        <div class="levels-grid">
-          <div class="level-item">
-            <div class="level-value">{{ lampGodLevels['1'] }}</div>
-            <div class="level-label">魏国</div>
-          </div>
-          <div class="level-item">
-            <div class="level-value">{{ lampGodLevels['2'] }}</div>
-            <div class="level-label">蜀国</div>
-          </div>
-          <div class="level-item">
-            <div class="level-value">{{ lampGodLevels['3'] }}</div>
-            <div class="level-label">吴国</div>
-          </div>
-          <div class="level-item">
-            <div class="level-value">{{ lampGodLevels['4'] }}</div>
-            <div class="level-label">群雄</div>
-          </div>
-          <div class="level-item">
-            <div class="level-value">{{ lampGodLevels['5'] }}</div>
-            <div class="level-label">深海</div>
-          </div>
-          <div class="level-item">
-            <div class="level-value">{{ sweepCarpetCount }}</div>
-            <div class="level-label">扫荡魔毯</div>
+      <!-- 灯神阵容选择区域 -->
+      <div class="team-select-container">
+        <div class="team-slots">
+          <div v-for="i in 5" :key="'slot-' + i" class="hero-slot-wrapper">
+            <select v-model="selectedHeroes[i-1]" class="hero-select">
+              <option value="">空位</option>
+              <option v-for="option in heroOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <img v-if="selectedHeroes[i-1]" :src="getHeroAvatar(selectedHeroes[i-1])" class="hero-avatar" />
+            <div v-else class="hero-avatar-placeholder">空位</div>
           </div>
         </div>
       </div>
@@ -134,6 +120,26 @@ const props = defineProps({
     default: null
   }
 })
+
+// 阵容选择
+const selectedHeroes = ref(['', '', '', '', ''])
+
+// 英雄选项（从HERO_DICT生成，只保留红色武将）
+const heroOptions = computed(() => {
+  return Object.entries(HERO_DICT)
+    .filter(([id, hero]) => id.startsWith('1'))
+    .map(([id, hero]) => ({
+      label: hero.name,
+      value: parseInt(id)
+    })).sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
+})
+
+// 获取英雄头像
+const getHeroAvatar = (heroId) => {
+  if (!heroId) return ''
+  const hero = HERO_DICT[heroId]
+  return hero ? hero.avatar : ''
+}
 
 // 阵容信息
 const teamInfo = ref({})
@@ -2581,39 +2587,58 @@ const exportLampGodInfo = async () => {
 </script>
 
 <style scoped>
-.lampgod-levels-container {
-  margin-bottom: 16px;
-  width: 100%;
-}
-
-.levels-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-  padding: 12px;
+.team-select-container {
+  padding: 16px;
   background-color: #f9f9f9;
   border-radius: 8px;
+  margin-bottom: 16px;
 }
 
-.level-item {
+.team-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.hero-slot-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 8px;
+}
+
+.hero-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   background-color: white;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.level-value {
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-}
-
-.level-label {
   font-size: 12px;
-  color: #666;
+  cursor: pointer;
+}
+
+.hero-select:hover {
+  border-color: #1890ff;
+}
+
+.hero-avatar {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e8e8e8;
+}
+
+.hero-avatar-placeholder {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 2px dashed #d9d9d9;
+  color: #999;
+  font-size: 14px;
 }
 </style>

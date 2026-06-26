@@ -85,8 +85,8 @@ const isUsingResources = ref(false)
 const isBatchUsingResources = ref(false)
 const isRefreshingItems = ref(false)
 
-// 金币袋子开关（默认开启）
-const useGoldCoinBag = ref(true)
+// 金币袋子开关（默认关闭）
+const useGoldCoinBag = ref(false)
 
 // 执行范围
 const resourceTokens = ref('')

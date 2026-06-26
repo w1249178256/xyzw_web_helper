@@ -79,8 +79,12 @@
             @button-click="batchRecruitWeek"
           />
           <CustomizedCard
-            mode="button-placeholder"
+            mode="button-with-select"
             button-text="批量使用道具"
+            :select-value="useItemMode"
+            @update:select-value="(val) => useItemMode = val"
+            :select-options="useItemModeOptions"
+            placeholder="选择模式"
             :disabled="isAnyOperationRunning"
             @button-click="batchUseItem"
           />
@@ -198,6 +202,13 @@ const cheerItemId = ref('5278')
 const taskName = ref('202606191')
 const executionRange = ref('') // 执行范围
 const goldFishChangeCount = ref('') // 批量换金鱼数量
+const useItemMode = ref('12') // 使用道具模式：'12' 每次12个直到出错, 'openAll' 开完
+
+// 使用道具模式选项
+const useItemModeOptions = [
+  { label: '开完', value: 'openAll' },
+  { label: '12', value: '12' }
+]
 
 // 保存输入框状态到本地存储
 const saveInputSettings = async () => {
@@ -2529,6 +2540,19 @@ const batchCheer = async () => {
         message: `第${round}轮完成：成功${successCount}个，失败${failCount}个`
       })
       
+      // 如果达到最大轮数3轮，停止循环
+      if (round >= 3) {
+        message.info('已达到最大轮数（3轮），停止循环')
+        logStore.addLog({
+          page: 'fish-helper',
+          cardType: '金鱼资源',
+          operation: '批量助威',
+          status: 'info',
+          message: '已达到最大轮数（3轮），停止循环'
+        })
+        break
+      }
+      
       // 如果道具不足，停止循环
       if (hasInsufficientItem) {
         message.info('助威道具数量不足，停止循环')
@@ -4033,8 +4057,11 @@ const batchUseItem = async () => {
     return index + 1
   }
   
+  const mode = useItemMode.value || '12'
+  const modeText = mode === 'openAll' ? '开完' : '12'
+  
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
-  message.info(`开始批量使用道具（${rangeText}），共${targetTokens.length}个Token...`)
+  message.info(`开始批量使用道具（${rangeText}），模式：${modeText}，共${targetTokens.length}个Token...`)
   
   try {
     const results = await connectionPool.batchOperate(
@@ -4042,32 +4069,103 @@ const batchUseItem = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在使用道具...`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在使用道具（${modeText}）...`)
           
           let useCount = 0
+          const itemId = Number(taskItemId.value) || 5279
           
-          // 循环执行使用道具，直到出错
-          while (true) {
-            try {
-              const result = await tokenStore.sendMessageWithPromise(
-                token.id,
-                'item_openpack',
-                { itemId: Number(taskItemId.value) || 5279, number: 12, index: 0 },
-                10000
-              )
-              
-              if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
-                console.log(`${token.name || token.id} 道具使用完成或出错，已使用${useCount}次`)
+          if (mode === 'openAll') {
+            // 开完：获取道具数量，每次12个，不足12个时使用剩余数量
+            const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            
+            let itemCount = 0
+            if (roleInfo && roleInfo.role && roleInfo.role.items) {
+              const item = roleInfo.role.items[String(itemId)]
+              if (item) {
+                itemCount = item.quantity || item.count || 0
+              }
+            } else if (roleInfo && roleInfo._raw && roleInfo._raw.body && roleInfo._raw.body.role && roleInfo._raw.body.role.items) {
+              const item = roleInfo._raw.body.role.items[String(itemId)]
+              if (item) {
+                itemCount = item.quantity || item.count || 0
+              }
+            }
+            
+            if (itemCount <= 0) {
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 道具数量为0，跳过`)
+              return { success: true, token, skipped: true }
+            }
+            
+            const fullCount = Math.floor(itemCount / 12)
+            const remainCount = itemCount % 12
+            
+            // 每次12个
+            for (let i = 0; i < fullCount; i++) {
+              try {
+                const result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'item_openpack',
+                  { itemId: itemId, number: 12, index: 0 },
+                  10000
+                )
+                
+                if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                  console.log(`${token.name || token.id} 道具开完过程中出错，已使用${useCount}次`)
+                  break
+                }
+                
+                useCount++
+              } catch (error) {
+                console.log(`${token.name || token.id} 道具开完出错，已使用${useCount}次`)
                 break
               }
               
-              useCount++
-            } catch (error) {
-              console.log(`${token.name || token.id} 道具使用出错，已使用${useCount}次`)
-              break
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
             }
             
-            await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            // 不足12个，使用剩余数量
+            if (remainCount > 0) {
+              try {
+                const result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'item_openpack',
+                  { itemId: itemId, number: remainCount, index: 0 },
+                  10000
+                )
+                
+                if (result && (result.code === 0 || result.code === undefined || result.success === true)) {
+                  useCount++
+                  console.log(`${token.name || token.id} 道具剩余${remainCount}个开完`)
+                }
+              } catch (error) {
+                console.log(`${token.name || token.id} 道具剩余开完出错`)
+              }
+            }
+          } else {
+            // 12：每次12个，直到出错
+            while (true) {
+              try {
+                const result = await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'item_openpack',
+                  { itemId: itemId, number: 12, index: 0 },
+                  10000
+                )
+                
+                if (!(result && (result.code === 0 || result.code === undefined || result.success === true))) {
+                  console.log(`${token.name || token.id} 道具使用完成或出错，已使用${useCount}次`)
+                  break
+                }
+                
+                useCount++
+              } catch (error) {
+                console.log(`${token.name || token.id} 道具使用出错，已使用${useCount}次`)
+                break
+              }
+              
+              await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
+            }
           }
           
           // 刷新角色信息

@@ -13,61 +13,20 @@
     </template>
     <template #default>
       <div class="dream-assistant-content">
-        <!-- 阵容信息表格 -->
-        <div class="team-table-container">
-          <table class="team-table">
-            <thead>
-              <tr>
-                <th>阵容</th>
-                <th v-for="i in 5" :key="i">位置{{ i }}</th>
-                <th>资源</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr :class="{ 'current-team': currentUseTeamId === 1 }">
-                <td>阵容1</td>
-                <td v-for="i in 5" :key="i">
-                  <div v-if="teamInfo[1] && teamInfo[1][i-1]">
-                    <div class="hero-info">
-                      <div class="hero-level">{{ teamInfo[1][i-1].level }}级</div>
-                      <div class="hero-name">{{ getHeroName(teamInfo[1][i-1].heroId) }}</div>
-                      <div class="hero-star">{{ getStarDisplay(teamInfo[1][i-1].star) }}</div>
-                    </div>
-                  </div>
-                  <div v-else class="empty-slot">空位</div>
-                </td>
-                <td class="resource-cell">
-                  <div class="resource-info">
-                    <div class="resource-item">
-                      <span class="resource-label">金币:</span>
-                    </div>
-                    <div class="resource-value">{{ getGold(selectedTokenId) }}</div>
-                  </div>
-                </td>
-              </tr>
-              <tr :class="{ 'current-team': currentUseTeamId === 2 }">
-                <td>阵容2</td>
-                <td v-for="i in 5" :key="i">
-                  <div v-if="teamInfo[2] && teamInfo[2][i-1]">
-                    <div class="hero-info">
-                      <div class="hero-level">{{ teamInfo[2][i-1].level }}级</div>
-                      <div class="hero-name">{{ getHeroName(teamInfo[2][i-1].heroId) }}</div>
-                      <div class="hero-star">{{ getStarDisplay(teamInfo[2][i-1].star) }}</div>
-                    </div>
-                  </div>
-                  <div v-else class="empty-slot">空位</div>
-                </td>
-                <td class="resource-cell">
-                  <div class="resource-info">
-                    <div class="resource-item">
-                      <span class="resource-label">进阶石:</span>
-                    </div>
-                    <div class="resource-value">{{ getUpgradeStone(selectedTokenId) }}</div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- 阵容选择区域 -->
+        <div class="team-select-container">
+          <div class="team-slots">
+            <div v-for="i in 5" :key="'slot-' + i" class="hero-slot-wrapper">
+              <select v-model="selectedHeroes[i-1]" class="hero-select">
+                <option value="">空位</option>
+                <option v-for="option in heroOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+              <img v-if="selectedHeroes[i-1]" :src="getHeroAvatar(selectedHeroes[i-1])" class="hero-avatar" />
+              <div v-else class="hero-avatar-placeholder">空位</div>
+            </div>
+          </div>
         </div>
         
         <!-- 阵容操作按钮 -->
@@ -110,6 +69,12 @@
               @button-click="handleDreamFight"
               :disabled="isRunning || !tokenStore.hasTokens"
               :loading="isRunning"
+            />
+            <CustomizedCard 
+              mode="button"
+              name="批量扭蛋"
+              :disabled="isBatchGachaRunning || !tokenStore.hasTokens"
+              @button-click="handleBatchGacha"
             />
           </CustomizedCard>
         </div>
@@ -162,12 +127,26 @@ const isRunning = ref(false)
 const executionRange = ref('')
 const selectedHeroForSelect = ref('107')
 const selectedHeroForFight = ref('107')
+const isBatchGachaRunning = ref(false)
 
 // 英雄选项
-const heroOptions = [
-  { label: '吕布', value: '107' },
-  { label: '赵云', value: '118' }
-]
+const heroOptions = computed(() => {
+  return Object.entries(HERO_DICT)
+    .map(([id, hero]) => ({
+      label: hero.name,
+      value: parseInt(id)
+    })).sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
+})
+
+// 阵容选择状态
+const selectedHeroes = ref(['', '', '', '', ''])
+
+// 根据英雄id获取头像路径
+const getHeroAvatar = (heroId) => {
+  if (!heroId) return ''
+  const hero = HERO_DICT[heroId]
+  return hero ? hero.avatar : ''
+}
 
 // 武将信息相关状态
 const upgradeTokens = ref('')
@@ -1389,7 +1368,7 @@ const batchUpgradeOne = async () => {
           await heroUpgradeInternal(token.id)
           
           message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容1升级完成`)
-          logOperation('shidian', '批量升级阵容1', {
+          logOperation('fish-helper', '批量升级阵容1', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1401,7 +1380,7 @@ const batchUpgradeOne = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容1失败:`, error)
           message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容1失败: ${error.message || '未知错误'}`)
-          logOperation('shidian', '批量升级阵容1', {
+          logOperation('fish-helper', '批量升级阵容1', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1442,7 +1421,7 @@ const batchUpgradeOne = async () => {
     const failCount = results.filter(r => !r.success).length
     
     message.success(`批量升级阵容1完成：成功${successCount}个，失败${failCount}个`)
-    logOperation('shidian', '批量升级阵容1', {
+    logOperation('fish-helper', '批量升级阵容1', {
       cardType: '梦境助手',
       status: 'success',
       message: `批量升级阵容1完成：成功${successCount}个，失败${failCount}个`
@@ -1450,7 +1429,7 @@ const batchUpgradeOne = async () => {
   } catch (error) {
     console.error('批量升级阵容1失败:', error)
     message.error('批量升级阵容1失败: ' + (error.message || '未知错误'))
-    logOperation('shidian', '批量升级阵容1', {
+    logOperation('fish-helper', '批量升级阵容1', {
       cardType: '梦境助手',
       status: 'error',
       message: `批量升级阵容1失败: ${error.message || '未知错误'}`
@@ -1504,7 +1483,7 @@ const batchUpgradeTwo = async () => {
           await heroUpgradeInternal(token.id)
           
           message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容2升级完成`)
-          logOperation('shidian', '批量升级阵容2', {
+          logOperation('fish-helper', '批量升级阵容2', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1516,7 +1495,7 @@ const batchUpgradeTwo = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容2失败:`, error)
           message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量升级阵容2失败: ${error.message || '未知错误'}`)
-          logOperation('shidian', '批量升级阵容2', {
+          logOperation('fish-helper', '批量升级阵容2', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1557,7 +1536,7 @@ const batchUpgradeTwo = async () => {
     const failCount = results.filter(r => !r.success).length
     
     message.success(`批量升级阵容2完成：成功${successCount}个，失败${failCount}个`)
-    logOperation('shidian', '批量升级阵容2', {
+    logOperation('fish-helper', '批量升级阵容2', {
       cardType: '梦境助手',
       status: 'success',
       message: `批量升级阵容2完成：成功${successCount}个，失败${failCount}个`
@@ -1565,7 +1544,7 @@ const batchUpgradeTwo = async () => {
   } catch (error) {
     console.error('批量升级阵容2失败:', error)
     message.error('批量升级阵容2失败: ' + (error.message || '未知错误'))
-    logOperation('shidian', '批量升级阵容2', {
+    logOperation('fish-helper', '批量升级阵容2', {
       cardType: '梦境助手',
       status: 'error',
       message: `批量升级阵容2失败: ${error.message || '未知错误'}`
@@ -1928,6 +1907,140 @@ const handleDreamFight = async () => {
   }
 }
 
+// 批量扭蛋
+const handleBatchGacha = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量扭蛋（${rangeText}），共${targetTokens.length}个Token...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量扭蛋',
+    status: 'info',
+    message: `开始批量扭蛋，${rangeText}，共${targetTokens.length}个Token`
+  })
+  
+  try {
+    isBatchGachaRunning.value = true
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在扭蛋...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量扭蛋',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] 开始扭蛋`
+          })
+          
+          await tokenStore.sendGachaDrawReward(token.id, {})
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量扭蛋',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] 扭蛋完成`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量扭蛋',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] 扭蛋失败：${error.message || '未知错误'}`
+          })
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 300,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量扭蛋完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量扭蛋',
+      status: 'success',
+      message: `批量扭蛋完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量扭蛋出错:', error)
+    message.error(`批量扭蛋出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量扭蛋',
+      status: 'error',
+      message: `批量扭蛋出错：${error.message || error}`
+    })
+  } finally {
+    isBatchGachaRunning.value = false
+  }
+}
+
 </script>
 
 <style scoped>
@@ -1935,37 +2048,71 @@ const handleDreamFight = async () => {
   width: 100%;
 }
 
-.team-table-container {
+.team-grid-container {
   margin-bottom: 16px;
   width: 100%;
 }
 
-.team-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
+.team-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
 
-.team-table th,
-.team-table td {
-  border: 1px solid #e0e0e0;
-  padding: 8px;
+.team-row {
+  display: grid;
+  grid-template-columns: 60px 100px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.team-header {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
   text-align: center;
 }
 
-.team-table th {
+.team-resource {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.resource-label {
+  font-size: 11px;
+  color: #666;
+}
+
+.resource-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #16a34a;
+}
+
+.team-heroes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.hero-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px;
   background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.team-table td {
-  background-color: white;
-}
-
-.current-team {
-  background-color: #f0f9ff;
+  border-radius: 4px;
+  min-height: 60px;
+  justify-content: center;
 }
 
 .hero-info {
@@ -1976,50 +2123,79 @@ const handleDreamFight = async () => {
 }
 
 .hero-level {
-  font-size: 12px;
+  font-size: 11px;
   color: #666;
 }
 
 .hero-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 }
 
 .hero-star {
-  font-size: 12px;
+  font-size: 11px;
   color: #f59e0b;
 }
 
 .empty-slot {
   color: #999;
   font-style: italic;
+  font-size: 12px;
 }
 
-.resource-cell {
-  min-width: 120px;
+/* 阵容选择区域样式 */
+.team-select-container {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 16px;
 }
 
-.resource-info {
+.team-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.hero-slot-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
-.resource-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.resource-label {
+.hero-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
   font-size: 12px;
-  color: #666;
+  cursor: pointer;
 }
 
-.resource-value {
+.hero-select:hover {
+  border-color: #1890ff;
+}
+
+.hero-avatar {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e8e8e8;
+}
+
+.hero-avatar-placeholder {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 2px dashed #d9d9d9;
+  color: #999;
   font-size: 14px;
-  font-weight: 500;
-  color: #16a34a;
 }
 </style>

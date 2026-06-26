@@ -1358,6 +1358,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "fight_startlevel", params);
   };
 
+  // 发送扭蛋抽奖
+  const sendGachaDrawReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "gacha_drawreward", params);
+  };
+
   // 发送英雄交换
   const sendHeroExchange = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_exchange", params);
@@ -1655,6 +1660,11 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送打开道具包
   const sendItemOpenPack = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "item_openpack", params);
+  };
+
+  // 发送开宝箱
+  const sendItemOpenBox = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "item_openbox", params);
   };
 
   // 发送使用道具
@@ -2273,6 +2283,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendMatchTeamGetTeamInfo,
     sendFightStartGenie,
     sendFightStartLevel,
+    sendGachaDrawReward,
     sendHeroExchange,
     sendHeroUpgradeLevel,
     sendHeroLordUpgradeLevel,
@@ -2333,6 +2344,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendTowersGetInfo,
     sendMailClaimAllAttachment,
     sendItemOpenPack,
+    sendItemOpenBox,
     sendItemConsume,
     sendClaimHangupOrder,
     sendClaimCdkReward,

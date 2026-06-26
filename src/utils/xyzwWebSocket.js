@@ -247,6 +247,9 @@ export function registerDefaultCommands(reg) {
     .register("fight_startdungeon")
     .register("fight_startpvp")
 
+    // 扭蛋
+    .register("gacha_drawreward", { num: 1, isGroup: false })
+
     // 怪异咸将塔
     .register("evotower_getinfo")
     .register("evotower_fight")
@@ -1206,6 +1209,7 @@ export class XyzwWebSocketClient {
       system_buyitemresp: "system_buyitem",
       tower_claimrewardresp: "tower_claimreward",
       fight_starttowerresp: "fight_starttower",
+      gacha_drawrewardresp: "gacha_drawreward",
       evotowerinforesp: "evotower_getinfo",
       evotower_fightresp: "evotower_fight",
       evotower_getlegionjoinmembersresp: "evotower_getlegionjoinmembers",

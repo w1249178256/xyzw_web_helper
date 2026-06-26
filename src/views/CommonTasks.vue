@@ -54,8 +54,8 @@
           :selected-token-id="selectedTokenId"
         />
 
-        <!-- 阵容助手卡片 -->
-        <UnlimitedlineCard 
+        <!-- 武将卡片 -->
+        <HeroManagementCard 
           :selected-token-id="selectedTokenId"
         />
 
@@ -128,10 +128,10 @@ import UrlTokenForm from '@/views/TokenImport/url.vue'
 import BinTokenForm from '@/views/TokenImport/bin.vue'
 
 // 导入模块化卡片组件
-import UnlimitedlineCard from '@/diy/ResourceManagement/Unlimitedline.vue'
-import WeirdTowerCard from '@/diy/ResourceManagement/WeirdTowerCard.vue'
-import SaltFieldCard from '@/diy/ResourceManagement/SaltFieldCard.vue'
-import DreamAssistantCard from '@/diy/ResourceManagement/DreamAssistantCard.vue'
+import HeroManagementCard from '@/diy/CommonTasks/HeroManagementCard.vue'
+import WeirdTowerCard from '@/diy/CommonTasks/WeirdTowerCard.vue'
+import SaltFieldCard from '@/diy/CommonTasks/SaltFieldCard.vue'
+import DreamAssistantCard from '@/diy/CommonTasks/DreamAssistantCard.vue'
 
 const router = useRouter()
 const tokenStore = useTokenStore()

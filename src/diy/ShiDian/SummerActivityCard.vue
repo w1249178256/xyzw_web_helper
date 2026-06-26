@@ -299,7 +299,7 @@ const setActivityIdsByDate = () => {
   const year = fridayDate.substring(2, 4);
   const month = fridayDate.substring(4, 6);
   const day = fridayDate.substring(6, 8);
-  activityId.value = `${year}${month}${day}2`;
+  activityId.value = `${year}${month}${day}1`;
   localStorage.setItem("summerActivity_activityId", activityId.value);
   
   freeGoodsId.value = `${year}${month}${day}31`;
@@ -617,10 +617,10 @@ const startTower = async () => {
       selectedTokenId.value,
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'towers_start',
-      { towerType: bossSelect.value },
+      { towerType: bossSelect.value, actId: Number(activityId.value) },
       (async () => {
         await waitCommandDelay();
-        return tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value });
+        return tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value, actId: Number(activityId.value) });
       })(),
       true,
       '暑期活动'
@@ -662,10 +662,10 @@ const fightTower = async () => {
       selectedTokenId.value,
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'towers_fight',
-      { towerType: bossSelect.value },
+      { towerType: bossSelect.value, actId: Number(activityId.value) },
       (async () => {
         await waitCommandDelay();
-        return tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value });
+        return tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value, actId: Number(activityId.value) });
       })(),
       true,
       '暑期活动'
@@ -967,8 +967,8 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
         'towers_start',
-        { towerType: towerTypeValue },
-        tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+        { towerType: towerTypeValue, actId: Number(activityId.value) },
+        tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
         true,
         '暑期活动'
       );
@@ -981,8 +981,8 @@ const oneKeyActivityInternal = async (tokenId, actId, itemIdValue, freeGoodsIdVa
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
         'towers_fight',
-        { towerType: towerTypeValue },
-        tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
+        { towerType: towerTypeValue, actId: Number(activityId.value) },
+        tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
         true,
         '暑期活动'
       );
@@ -1297,8 +1297,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             tokenId,
             tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
             'towers_start',
-            { towerType: bossNumber },
-            tokenStore.sendTowersStart(tokenId, { towerType: bossNumber }),
+            { towerType: bossNumber, actId: Number(activityId.value) },
+            tokenStore.sendTowersStart(tokenId, { towerType: bossNumber, actId: Number(activityId.value) }),
             true,
             '暑期活动'
           );
@@ -1317,7 +1317,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                 tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
                 'towers_start',
                 { towerType: bossNumber },
-                tokenStore.sendTowersStart(tokenId, { towerType: bossNumber }),
+                tokenStore.sendTowersStart(tokenId, { towerType: bossNumber, actId: Number(activityId.value) }),
                 true,
                 '暑期活动'
               );
@@ -1375,8 +1375,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               tokenId,
               tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
               'towers_fight',
-              { towerType: bossNumber },
-              tokenStore.sendTowersFight(tokenId, { towerType: bossNumber }),
+              { towerType: bossNumber, actId: Number(activityId.value) },
+              tokenStore.sendTowersFight(tokenId, { towerType: bossNumber, actId: Number(activityId.value) }),
               true,
               '暑期活动'
             );
@@ -1504,7 +1504,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
           tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
           'towers_start',
           { towerType: towerTypeValue },
-          tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+          tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
           true,
           '暑期活动'
         );
@@ -1523,7 +1523,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
               'towers_start',
               { towerType: towerTypeValue },
-              tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue }),
+              tokenStore.sendTowersStart(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
               true,
               '暑期活动'
             );
@@ -1584,7 +1584,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
             'towers_fight',
             { towerType: towerTypeValue },
-            tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
+            tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
             true,
             '暑期活动'
           );
@@ -1609,7 +1609,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                 tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
                 'towers_fight',
                 { towerType: towerTypeValue },
-                tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue }),
+                tokenStore.sendTowersFight(tokenId, { towerType: towerTypeValue, actId: Number(activityId.value) }),
                 true,
                 '暑期活动'
               );
@@ -2644,8 +2644,8 @@ const oneKeyBattle = async () => {
               selectedTokenId.value,
               tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
               'towers_start',
-              { towerType: bossNumber },
-              tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossNumber }),
+              { towerType: bossNumber, actId: Number(activityId.value) },
+              tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossNumber, actId: Number(activityId.value) }),
               true,
               '暑期活动'
             );
@@ -2679,8 +2679,8 @@ const oneKeyBattle = async () => {
                 selectedTokenId.value,
                 tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
                 'towers_fight',
-                { towerType: bossNumber },
-                tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossNumber }),
+                { towerType: bossNumber, actId: Number(activityId.value) },
+                tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossNumber, actId: Number(activityId.value) }),
                 true,
                 '暑期活动'
               );
@@ -2708,7 +2708,7 @@ const oneKeyBattle = async () => {
                     tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
                     'towers_start',
                     { towerType: bossNumber },
-                    tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossNumber }),
+                    tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossNumber, actId: Number(activityId.value) }),
                     true,
                     '暑期活动'
                   );
@@ -2868,8 +2868,8 @@ const oneKeyBattle = async () => {
               selectedTokenId.value,
               tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
               'towers_start',
-              { towerType: bossSelect.value },
-              tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value }),
+              { towerType: bossSelect.value, actId: Number(activityId.value) },
+              tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value, actId: Number(activityId.value) }),
               true,
               '暑期活动'
             );
@@ -2903,8 +2903,8 @@ const oneKeyBattle = async () => {
               selectedTokenId.value,
               tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
               'towers_fight',
-              { towerType: bossSelect.value },
-              tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value }),
+              { towerType: bossSelect.value, actId: Number(activityId.value) },
+              tokenStore.sendTowersFight(selectedTokenId.value, { towerType: bossSelect.value, actId: Number(activityId.value) }),
               true,
               '暑期活动'
             );
@@ -2932,7 +2932,7 @@ const oneKeyBattle = async () => {
                   tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
                   'towers_start',
                   { towerType: bossSelect.value },
-                  tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value }),
+                  tokenStore.sendTowersStart(selectedTokenId.value, { towerType: bossSelect.value, actId: Number(activityId.value) }),
                   true,
                   '暑期活动'
                 );

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -4358,89 +4358,6 @@ const handleBatchBoxWeek = async () => {
       status: 'info',
       message: `开始批量宝箱周（${rangeText}），共${targetTokens.length}个Token`
     })
-    
-    // 先使用第一个Token开10个木质宝箱，检查分数是否增加
-    message.info('正在使用第一个Token开10个木质宝箱，检查分数是否增加...')
-    let scoreIncreased = false
-    const firstToken = targetTokens[0]
-    
-    try {
-      // 连接第一个Token
-      const status = tokenStore.getWebSocketStatus(firstToken.id)
-      if (status !== 'connected') {
-        await tokenStore.createWebSocketConnection(firstToken.id, firstToken.token, firstToken.wsUrl)
-        let retryCount = 0
-        while (tokenStore.getWebSocketStatus(firstToken.id) !== 'connected' && retryCount < 30) {
-          await waitCommandDelay()
-          retryCount++
-        }
-        if (tokenStore.getWebSocketStatus(firstToken.id) !== 'connected') {
-          throw new Error('Token连接失败')
-        }
-      }
-      
-      // 获取开宝箱前的已用分数
-      const activityInfoBefore = await tokenStore.sendActivityGet(firstToken.id)
-      let scoreBefore = 0
-      if (activityInfoBefore && activityInfoBefore.activity && activityInfoBefore.activity.myTotalInfo && activityInfoBefore.activity.myTotalInfo['2']) {
-        const info = activityInfoBefore.activity.myTotalInfo['2']
-        const rounds = info.rounds || 1
-        const num = info.num || 0
-        scoreBefore = (rounds - 1) * 8000 + num
-      }
-      
-      // 开10个木质宝箱
-      await tokenStore.sendItemOpenBox(firstToken.id, {
-        itemId: 2001,
-        num: 10
-      })
-      await waitCommandDelay()
-      
-      // 获取开宝箱后的已用分数
-      const activityInfoAfter = await tokenStore.sendActivityGet(firstToken.id)
-      let scoreAfter = 0
-      if (activityInfoAfter && activityInfoAfter.activity && activityInfoAfter.activity.myTotalInfo && activityInfoAfter.activity.myTotalInfo['2']) {
-        const info = activityInfoAfter.activity.myTotalInfo['2']
-        const rounds = info.rounds || 1
-        const num = info.num || 0
-        scoreAfter = (rounds - 1) * 8000 + num
-      }
-      
-      message.info(`${firstToken.name} - 开10个木质宝箱前分数: ${scoreBefore}，开宝箱后分数: ${scoreAfter}`)
-      
-      if (scoreAfter > scoreBefore) {
-        scoreIncreased = true
-        message.success(`${firstToken.name} - 分数增加，宝箱周活动进行中`)
-        logStore.addLog({
-          page: 'fish-helper',
-          cardType: '养号',
-          operation: '批量宝箱周',
-          tokenId: firstToken.id,
-          tokenName: firstToken.name,
-          status: 'success',
-          message: `开10个木质宝箱，分数从${scoreBefore}增加到${scoreAfter}`
-        })
-      } else {
-        message.warning(`${firstToken.name} - 分数未增加`)
-      }
-    } catch (error) {
-      console.error(`${firstToken.name} - 检查分数失败:`, error)
-      message.warning(`${firstToken.name} - 检查分数失败: ${error.message}`)
-    }
-    
-    // 如果分数没有增加，停止运行
-    if (!scoreIncreased) {
-      message.warning('开10个木质宝箱后分数未增加，宝箱周活动可能未开始，停止运行')
-      logStore.addLog({
-        page: 'fish-helper',
-        cardType: '养号',
-        operation: '批量宝箱周',
-        status: 'warning',
-        message: '开10个木质宝箱后分数未增加，宝箱周活动可能未开始，停止运行'
-      })
-      isBatchBoxWeekRunning.value = false
-      return
-    }
     
     // 逐个处理Token
     for (let i = 0; i < targetTokens.length; i++) {
