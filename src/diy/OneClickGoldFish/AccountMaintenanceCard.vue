@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -106,9 +106,9 @@
           />
           <CustomizedCard 
             mode="button"
-            name="批量宝箱周"
+            :name="isBatchBoxWeekRunning ? '批量宝箱周中...' : '批量宝箱周'"
             @button-click="handleBatchBoxWeek"
-            :disabled="isAnyOperationRunning"
+            :disabled="isAnyOperationRunning || !isBoxWeekAvailable"
             :loading="isBatchBoxWeekRunning"
           />
           <CustomizedCard 
@@ -117,7 +117,7 @@
             :switch-value="enableRecruitWeek"
             @update:switch-value="(val) => enableRecruitWeek = val"
             @button-click="handleBatchRecruitWeek"
-            :disabled="isBatchRecruitWeekRunning"
+            :disabled="isBatchRecruitWeekRunning || !isRecruitWeekAvailable"
             :loading="isBatchRecruitWeekRunning"
           />
           <CustomizedCard 
@@ -257,6 +257,73 @@ const isAnyOperationRunning = computed(() => {
          isBatchUpgradingEquipment.value || isBatchUpgradingHangup.value ||
          isBatchClaimingHangupReward.value || isBatchRenaming.value || isRecruitWeekRunning.value ||
          isExportingDetails.value
+})
+
+// 计算宝箱周是否可用
+// 宝箱周从2026-07-03 12:00开始，每4周循环一次（宝箱周→黑市周→招募周→宝箱周）
+// 每周从周五12:00到周四24:00
+const isBoxWeekAvailable = computed(() => {
+  const now = new Date()
+  
+  // 基准日期：2026-07-03 12:00（第一个宝箱周的周五）
+  const baseDate = new Date(2026, 6, 3, 12, 0, 0) // 月份从0开始，6表示7月
+  
+  // 如果当前时间早于基准时间，不可用
+  if (now < baseDate) {
+    return false
+  }
+  
+  // 找到当前周的周五（从当前时间往前找最近的周五）
+  const currentDay = now.getDay() // 0=周日, 5=周五
+  const daysSinceFriday = (currentDay + 2) % 7 // 计算距离上一个周五的天数
+  const currentFriday = new Date(now)
+  currentFriday.setDate(now.getDate() - daysSinceFriday)
+  currentFriday.setHours(12, 0, 0, 0)
+  
+  // 如果还没到周五12点，使用上一个周五
+  if (now < currentFriday) {
+    currentFriday.setDate(currentFriday.getDate() - 7)
+  }
+  
+  // 计算距离基准日期的周数
+  const weeksDiff = Math.round((currentFriday - baseDate) / (7 * 24 * 60 * 60 * 1000))
+  
+  // 处理负数取模：((a % n) + n) % n
+  const weekInCycle = ((weeksDiff % 3) + 3) % 3
+  
+  // 宝箱周是循环中的第0周
+  return weekInCycle === 0
+})
+
+// 计算招募周是否可用
+// 招募周从2026-07-17 12:00开始（宝箱周后2周），每3周循环一次（宝箱周→黑市周→招募周→宝箱周...）
+// 每周从周五12:00到周四24:00
+const isRecruitWeekAvailable = computed(() => {
+  const now = new Date()
+  
+  // 基准日期：2026-07-03 12:00（第一个宝箱周的周五）
+  const baseDate = new Date(2026, 6, 3, 12, 0, 0) // 月份从0开始，6表示7月
+  
+  // 找到当前周的周五（从当前时间往前找最近的周五）
+  const currentDay = now.getDay() // 0=周日, 5=周五
+  const daysSinceFriday = (currentDay + 2) % 7 // 计算距离上一个周五的天数
+  const currentFriday = new Date(now)
+  currentFriday.setDate(now.getDate() - daysSinceFriday)
+  currentFriday.setHours(12, 0, 0, 0)
+  
+  // 如果还没到周五12点，使用上一个周五
+  if (now < currentFriday) {
+    currentFriday.setDate(currentFriday.getDate() - 7)
+  }
+  
+  // 计算距离基准日期的周数
+  const weeksDiff = Math.round((currentFriday - baseDate) / (7 * 24 * 60 * 60 * 1000))
+  
+  // 处理负数取模：((a % n) + n) % n
+  const weekInCycle = ((weeksDiff % 3) + 3) % 3
+  
+  // 招募周是循环中的第2周（宝箱周=0，黑市周=1，招募周=2）
+  return weekInCycle === 2
 })
 
 // 新增状态
