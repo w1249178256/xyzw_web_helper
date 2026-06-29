@@ -1748,8 +1748,8 @@ const batchUseItem = async () => {
                 token.id,
                 token.name || token.id,
                 'activity_startactegame',
-                { actId: Number(activityId.value) },
-                tokenStore.sendActivityStartActeGame(token.id, { actId: Number(activityId.value) }),
+                { actId: Number(activityId.value) + 1 },
+                tokenStore.sendActivityStartActeGame(token.id, { actId: Number(activityId.value) + 1 }),
                 true,
                 '暑期活动'
               );
@@ -1780,8 +1780,8 @@ const batchUseItem = async () => {
                     token.id,
                     token.name || token.id,
                     'activity_actegamestageclaim',
-                    { actId: Number(activityId.value) },
-                    tokenStore.sendActivityActeGameStageClaim(token.id, { actId: Number(activityId.value) }),
+                    { actId: Number(activityId.value) + 1 },
+                    tokenStore.sendActivityActeGameStageClaim(token.id, { actId: Number(activityId.value) + 1 }),
                     true,
                     '暑期活动'
                   );
