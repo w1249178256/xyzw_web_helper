@@ -46,25 +46,19 @@ export const useOperationLogStore = defineStore('operationLog', () => {
 
   // 获取指定页面的日志
   const getLogsByPage = (page: 'shidian' | 'fish-helper') => {
-    return computed(() => {
-      const filteredLogs = logs.value.filter(log => log.page === page)
-      // 最多显示100条日志
-      return filteredLogs.slice(0, 100)
-    })
+    const filteredLogs = logs.value.filter(log => log.page === page)
+    return filteredLogs.slice(0, 100)
   }
 
   // 获取指定页面和卡片类型的日志
   const getLogsByPageAndCardType = (page: 'shidian' | 'fish-helper', cardType?: string) => {
-    return computed(() => {
-      let filteredLogs
-      if (!cardType) {
-        filteredLogs = logs.value.filter(log => log.page === page)
-      } else {
-        filteredLogs = logs.value.filter(log => log.page === page && log.cardType === cardType)
-      }
-      // 最多显示100条日志
-      return filteredLogs.slice(0, 100)
-    })
+    let filteredLogs
+    if (!cardType) {
+      filteredLogs = logs.value.filter(log => log.page === page)
+    } else {
+      filteredLogs = logs.value.filter(log => log.page === page && log.cardType === cardType)
+    }
+    return filteredLogs.slice(0, 100)
   }
 
   // 清空指定页面的日志

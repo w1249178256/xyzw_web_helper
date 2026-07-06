@@ -63,19 +63,19 @@
             mode="button"
             name="批量宝箱"
             @button-click="batchBoxWeek"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             :loading="boxWeekRunning"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量金竿"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchStartFishing"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量招募"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchRecruitWeek"
           />
           <CustomizedCard
@@ -85,49 +85,49 @@
             @update:select-value="(val) => useItemMode = val"
             :select-options="useItemModeOptions"
             placeholder="选择模式"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchUseItem"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量助威"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchCheer"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量领取奖励"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchClaimRewards"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量导出"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchExportItems"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="38+1600"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batch38Plus1600"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="42+1600"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batch42Plus1600"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="46+1600"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batch46Plus1600"
           />
           <CustomizedCard
             mode="button-placeholder"
             button-text="批量换金鱼"
-            :disabled="isAnyOperationRunning"
+            :disabled="isButtonDisabled"
             @button-click="batchChangeGoldFish"
             v-model:placeholderValue="goldFishChangeCount"
             placeholder="输入金鱼goodsId(9位数字)"
@@ -266,6 +266,86 @@ const batchChangeGoldFishRunning = ref(false)
 // 计算是否有任何操作正在运行
 const isAnyOperationRunning = computed(() => {
   return boxOpening.value || fishingRunning.value || recruitRunning.value || cheerRunning.value || quickFishingRunning.value || boxWeekRunning.value || recruitWeekRunning.value || claimRewardsRunning.value || exportRunning.value || batch38Running.value || batch42Running.value || batch46Running.value || batchChangeGoldFishRunning.value
+})
+
+// 判断当前日期是否在节日周内（端午、中秋、元旦）
+const isFestivalWeekAvailable = computed(() => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  const dayOfWeek = now.getDay() // 0=周日, 1=周一, ..., 6=周六
+  
+  // 获取本周一和周五的日期
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+  const monday = new Date(year, month - 1, day + mondayOffset)
+  const friday = new Date(monday)
+  friday.setDate(friday.getDate() + 4)
+  
+  // 检查当前日期是否在周一到周五之间
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5
+  
+  // 元旦：公历1月1日所在周
+  if (month === 1 && day >= 1 && day <= 7 && isWeekday) {
+    return true
+  }
+  
+  // 端午节：农历五月初五（需要手动计算或查表）
+  // 2024年端午节：6月10日（农历五月初五）
+  // 2025年端午节：5月31日（农历五月初五）
+  // 2026年端午节：6月19日（农历五月初五）
+  const duanwuDates = {
+    2024: { month: 6, day: 10 },
+    2025: { month: 5, day: 31 },
+    2026: { month: 6, day: 19 },
+    2027: { month: 6, day: 9 }
+  }
+  
+  if (duanwuDates[year]) {
+    const duanwuDate = new Date(year, duanwuDates[year].month - 1, duanwuDates[year].day)
+    const duanwuMonday = new Date(duanwuDate)
+    const duanwuDayOfWeek = duanwuDate.getDay()
+    const duanwuMondayOffset = duanwuDayOfWeek === 0 ? -6 : 1 - duanwuDayOfWeek
+    duanwuMonday.setDate(duanwuDate.getDate() + duanwuMondayOffset)
+    const duanwuFriday = new Date(duanwuMonday)
+    duanwuFriday.setDate(duanwuFriday.getDate() + 4)
+    
+    if (now >= duanwuMonday && now <= duanwuFriday && isWeekday) {
+      return true
+    }
+  }
+  
+  // 中秋节：农历八月十五
+  // 2024年中秋节：9月17日（农历八月十五）
+  // 2025年中秋节：10月6日（农历八月十五）
+  // 2026年中秋节：9月25日（农历八月十五）
+  const zhongqiuDates = {
+    2024: { month: 9, day: 17 },
+    2025: { month: 10, day: 6 },
+    2026: { month: 9, day: 25 },
+    2027: { month: 9, day: 15 }
+  }
+  
+  if (zhongqiuDates[year]) {
+    const zhongqiuDate = new Date(year, zhongqiuDates[year].month - 1, zhongqiuDates[year].day)
+    const zhongqiuMonday = new Date(zhongqiuDate)
+    const zhongqiuDayOfWeek = zhongqiuDate.getDay()
+    const zhongqiuMondayOffset = zhongqiuDayOfWeek === 0 ? -6 : 1 - zhongqiuDayOfWeek
+    zhongqiuMonday.setDate(zhongqiuDate.getDate() + zhongqiuMondayOffset)
+    const zhongqiuFriday = new Date(zhongqiuMonday)
+    zhongqiuFriday.setDate(zhongqiuFriday.getDate() + 4)
+    
+    if (now >= zhongqiuMonday && now <= zhongqiuFriday && isWeekday) {
+      return true
+    }
+  }
+  
+  return false
+})
+
+// 按钮是否禁用：非节日周或有操作正在运行
+const isButtonDisabled = computed(() => {
+  return !isFestivalWeekAvailable.value || isAnyOperationRunning.value
 })
 
 // 获取资源数量

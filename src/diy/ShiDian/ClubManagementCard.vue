@@ -48,7 +48,14 @@
             :disabled="isExportClubInfoRunning"
             @button-click="handleExportClubInfo"
           />
-          <CustomizedCard mode="button" :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" :disabled="isLegacyClaimGiftRunning" @button-click="handleBatchLegacyClaimGift" />
+          <CustomizedCard 
+            mode="button-number-input" 
+            :name="isLegacyClaimGiftRunning ? '批量赠送中...' : '批量赠送功法'" 
+            v-model:inputValue="legacyTargetId" 
+            placeholder="输入赠送目标ID" 
+            @button-click="handleBatchLegacyClaimGift" 
+            :disabled="isLegacyClaimGiftRunning"
+          />
           <CustomizedCard 
             mode="button" 
             :name="isAcceptGiftRunning ? '批量加入中...' : '批量加入俱乐部'" 
@@ -90,7 +97,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, computed, onBeforeUnmount, inject } from 'vue'
+import { defineProps, defineEmits, ref, computed, onBeforeUnmount, inject, watch } from 'vue'
 import { useTokenStore } from '@/stores/tokenStore'
 import { useMessage } from 'naive-ui'
 import { logOperation } from '@/utils/operationLogger'
@@ -112,7 +119,12 @@ const waitCommandDelay = () => new Promise(resolve => setTimeout(resolve, comman
 const legionTokens = ref(localStorage.getItem('clubLegionTokens') || '')
 const exportClubInfoTokens = ref('')
 const legionId = ref('')
-const legacyTargetId = ref('111582820') // 默认赠送目标
+const legacyTargetId = ref(localStorage.getItem('legacyTargetId') || '111582820') // 默认赠送目标
+
+// 监听赠送目标ID变化，持久化保存
+watch(legacyTargetId, (newValue) => {
+  localStorage.setItem('legacyTargetId', newValue)
+})
 const legacyPassword = ref('946215') // 默认密码
 const quickSendLegacyTargetId = ref(localStorage.getItem('quickSendLegacyTargetId') || '') // 一键送功法目标ID
 const quickSendLegacyCount = ref('10') // 一键送功法次数
@@ -571,7 +583,7 @@ const handleQuickAcceptGift = async () => {
       if (!isQuickAcceptGiftRunning.value) break
 
       try {
-        await tokenStore.sendLegacyClaimGift(connectedToken.id, {})
+        await tokenStore.sendLegacyClaimGift(connectedToken.id, { targetId: legacyTargetId.value ? parseInt(legacyTargetId.value) : 111582820 })
         message.success(`[${connectedToken.name || connectedToken.id}] 第 ${i + 1}/3 次接受礼物成功`)
         logOperation('shidian', '一键接受礼物', {
           cardType: '俱乐部管理',

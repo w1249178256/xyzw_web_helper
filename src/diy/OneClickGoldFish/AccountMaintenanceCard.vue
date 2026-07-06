@@ -4426,9 +4426,9 @@ const handleBatchBoxWeek = async () => {
       message: `开始批量宝箱周（${rangeText}），共${targetTokens.length}个Token`
     })
     
-    // 先使用第一个Token开10个木质宝箱，检查分数是否增加
-    message.info('正在使用第一个Token开10个木质宝箱，检查分数是否增加...')
-    let scoreIncreased = false
+    // 先使用第一个Token检查宝箱周活动状态
+    message.info('正在检查宝箱周活动状态...')
+    let canContinue = false
     const firstToken = targetTokens[0]
     
     try {
@@ -4446,7 +4446,7 @@ const handleBatchBoxWeek = async () => {
         }
       }
       
-      // 获取开宝箱前的已用分数
+      // 获取开宝箱前的已用分数Y
       const activityInfoBefore = await tokenStore.sendActivityGet(firstToken.id)
       let scoreBefore = 0
       if (activityInfoBefore && activityInfoBefore.activity && activityInfoBefore.activity.myTotalInfo && activityInfoBefore.activity.myTotalInfo['2']) {
@@ -4456,28 +4456,11 @@ const handleBatchBoxWeek = async () => {
         scoreBefore = (rounds - 1) * 8000 + num
       }
       
-      // 开10个木质宝箱
-      await tokenStore.sendItemOpenBox(firstToken.id, {
-        itemId: 2001,
-        num: 10
-      })
-      await waitCommandDelay()
+      message.info(`${firstToken.name} - 开宝箱前分数Y: ${scoreBefore}`)
       
-      // 获取开宝箱后的已用分数
-      const activityInfoAfter = await tokenStore.sendActivityGet(firstToken.id)
-      let scoreAfter = 0
-      if (activityInfoAfter && activityInfoAfter.activity && activityInfoAfter.activity.myTotalInfo && activityInfoAfter.activity.myTotalInfo['2']) {
-        const info = activityInfoAfter.activity.myTotalInfo['2']
-        const rounds = info.rounds || 1
-        const num = info.num || 0
-        scoreAfter = (rounds - 1) * 8000 + num
-      }
-      
-      message.info(`${firstToken.name} - 开10个木质宝箱前分数: ${scoreBefore}，开宝箱后分数: ${scoreAfter}`)
-      
-      if (scoreAfter > scoreBefore) {
-        scoreIncreased = true
-        message.success(`${firstToken.name} - 分数增加，宝箱周活动进行中`)
+      // 如果Y > 0，直接跳转到步骤2（跳过开箱检查）
+      if (scoreBefore > 0) {
+        message.success(`${firstToken.name} - 分数Y=${scoreBefore} > 0，宝箱周活动进行中，跳过开箱检查`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '养号',
@@ -4485,25 +4468,63 @@ const handleBatchBoxWeek = async () => {
           tokenId: firstToken.id,
           tokenName: firstToken.name,
           status: 'success',
-          message: `开10个木质宝箱，分数从${scoreBefore}增加到${scoreAfter}`
+          message: `分数Y=${scoreBefore} > 0，宝箱周活动进行中，跳过开箱检查`
         })
+        canContinue = true
       } else {
-        message.warning(`${firstToken.name} - 分数未增加`)
+        // Y == 0或获取失败，继续执行开箱检查
+        message.info(`${firstToken.name} - 分数Y=${scoreBefore}，开10个木质宝箱检查活动...`)
+        
+        // 开10个木质宝箱
+        await tokenStore.sendItemOpenBox(firstToken.id, {
+          itemId: 2001,
+          num: 10
+        })
+        await waitCommandDelay()
+        
+        // 获取开宝箱后的已用分数
+        const activityInfoAfter = await tokenStore.sendActivityGet(firstToken.id)
+        let scoreAfter = 0
+        if (activityInfoAfter && activityInfoAfter.activity && activityInfoAfter.activity.myTotalInfo && activityInfoAfter.activity.myTotalInfo['2']) {
+          const info = activityInfoAfter.activity.myTotalInfo['2']
+          const rounds = info.rounds || 1
+          const num = info.num || 0
+          scoreAfter = (rounds - 1) * 8000 + num
+        }
+        
+        message.info(`${firstToken.name} - 开10个木质宝箱后分数: ${scoreAfter}`)
+        
+        // 比较分数
+        if (scoreAfter > scoreBefore) {
+          canContinue = true
+          message.success(`${firstToken.name} - 分数增加，宝箱周活动进行中`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量宝箱周',
+            tokenId: firstToken.id,
+            tokenName: firstToken.name,
+            status: 'success',
+            message: `开10个木质宝箱，分数从${scoreBefore}增加到${scoreAfter}`
+          })
+        } else {
+          message.warning(`${firstToken.name} - 分数未增加`)
+        }
       }
     } catch (error) {
       console.error(`${firstToken.name} - 检查分数失败:`, error)
       message.warning(`${firstToken.name} - 检查分数失败: ${error.message}`)
     }
     
-    // 如果分数没有增加，停止运行
-    if (!scoreIncreased) {
-      message.warning('开10个木质宝箱后分数未增加，宝箱周活动可能未开始，停止运行')
+    // 如果无法继续，停止运行
+    if (!canContinue) {
+      message.warning('宝箱周活动可能未开始，停止运行')
       logStore.addLog({
         page: 'fish-helper',
         cardType: '养号',
         operation: '批量宝箱周',
         status: 'warning',
-        message: '开10个木质宝箱后分数未增加，宝箱周活动可能未开始，停止运行'
+        message: '宝箱周活动可能未开始，停止运行'
       })
       isBatchBoxWeekRunning.value = false
       return

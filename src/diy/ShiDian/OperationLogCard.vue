@@ -86,9 +86,9 @@ const logListRef = ref(null)
 
 const pageLogs = computed(() => {
   if (props.cardType) {
-    return logStore.getLogsByPageAndCardType(props.page, props.cardType).value
+    return logStore.getLogsByPageAndCardType(props.page, props.cardType)
   }
-  return logStore.getLogsByPage(props.page).value
+  return logStore.getLogsByPage(props.page)
 })
 
 const filteredLogs = computed(() => {
@@ -137,8 +137,8 @@ const handleClearLogs = () => {
   if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只清空这些操作的日志
     const allLogs = props.cardType 
-      ? logStore.getLogsByPageAndCardType(props.page, props.cardType).value
-      : logStore.getLogsByPage(props.page).value
+      ? logStore.getLogsByPageAndCardType(props.page, props.cardType)
+      : logStore.getLogsByPage(props.page)
     const logsToKeep = allLogs.filter(log => !props.filterOperations.includes(log.operation))
     logStore.logs = [...logsToKeep]
     message.success('日志已清空')
@@ -152,8 +152,8 @@ const handleExportLogs = () => {
   if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只导出这些操作的日志
     const allLogs = props.cardType 
-      ? logStore.getLogsByPageAndCardType(props.page, props.cardType).value
-      : logStore.getLogsByPage(props.page).value
+      ? logStore.getLogsByPageAndCardType(props.page, props.cardType)
+      : logStore.getLogsByPage(props.page)
     const logsToExport = allLogs.filter(log => props.filterOperations.includes(log.operation))
     
     const lines = []

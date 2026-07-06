@@ -124,10 +124,11 @@ const props = defineProps({
 // 阵容选择
 const selectedHeroes = ref(['', '', '', '', ''])
 
-// 英雄选项（从HERO_DICT生成，只保留红色武将）
+// 英雄选项（从HERO_DICT生成，红将及指定橙将）
 const heroOptions = computed(() => {
+  const allowedHeroIds = ['202', '206', '209', '210', '213', '217', '220', '312']
   return Object.entries(HERO_DICT)
-    .filter(([id, hero]) => id.startsWith('1'))
+    .filter(([id, hero]) => id.startsWith('1') || allowedHeroIds.includes(id))
     .map(([id, hero]) => ({
       label: hero.name,
       value: parseInt(id)
@@ -1493,70 +1494,43 @@ const lampGodAction = async () => {
       // 模拟点击灯神战斗
       message.info(`${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
       
-      // 第一次战斗前获取阵容并执行hero_calcpowerbyteam
-      let currentBattleTeam = {}
-      try {
-        message.info(`${type.name} 第 1 次战斗前获取当前阵容...`)
-        const currentFightResult = await tokenStore.sendFightStartLevel(token.id, {})
-        
-        // 提取当前阵容
-        if (currentFightResult && currentFightResult.battleData && currentFightResult.battleData.leftTeam && currentFightResult.battleData.leftTeam.team) {
-          const team = currentFightResult.battleData.leftTeam.team
-          for (let pos = 0; pos < 5; pos++) {
-            const hero = team[String(pos)] || team[pos]
-            currentBattleTeam[pos] = hero && hero.id ? hero.id : 0
-          }
-        } else if (currentFightResult && currentFightResult.body && currentFightResult.body.battleData && currentFightResult.body.battleData.leftTeam && currentFightResult.body.battleData.leftTeam.team) {
-          const team = currentFightResult.body.battleData.leftTeam.team
-          for (let pos = 0; pos < 5; pos++) {
-            const hero = team[String(pos)] || team[pos]
-            currentBattleTeam[pos] = hero && hero.id ? hero.id : 0
-          }
-        } else {
-          // 如果获取失败，使用之前的阵容
-          for (let pos = 0; pos < 5; pos++) {
-            currentBattleTeam[pos] = battleTeamData[pos] || 0
-          }
-        }
-        
-        // 获取当前阵容英雄名称用于日志
-        const currentHeroNames = []
-        for (let pos = 0; pos < 5; pos++) {
-          const heroId = currentBattleTeam[pos]
-          if (heroId > 0) {
-            currentHeroNames.push(getHeroName(heroId))
-          }
-        }
-        
-        logOperation('shidian', '灯神战斗', {
-          cardType: '灯神信息',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: `执行命令: fight_startlevel, 第 1 次战斗前获取当前阵容: [${currentHeroNames.join(', ')}]`
-        })
-        
-        // 第一次执行计算英雄战力
-        const calcPowerParams = {
-          battleTeam: currentBattleTeam,
-          lordWeaponId: selectedWeaponId.value
-        }
-        await tokenStore.sendHeroCalcpowerbyteam(token.id, calcPowerParams)
-        logOperation('shidian', '灯神战斗', {
-          cardType: '灯神信息',
-          tokenId: token.id,
-          tokenName: token.name,
-          status: 'info',
-          message: `执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
-        })
-      } catch (error) {
-        console.error(`${type.name} 第 1 次战斗前获取阵容失败:`, error)
-        message.warning(`${type.name} 第 1 次战斗前获取阵容失败，使用默认阵容`)
-        // 使用默认阵容
-        for (let pos = 0; pos < 5; pos++) {
-          currentBattleTeam[pos] = battleTeamData[pos] || 0
+      // 使用灯神信息表格的selectedHeroes作为battleTeam（slot 0-4的heroId）
+      const currentBattleTeam = {}
+      for (let pos = 0; pos < 5; pos++) {
+        const heroId = selectedHeroes.value[pos] ? parseInt(selectedHeroes.value[pos]) : 0
+        currentBattleTeam[pos] = heroId
+      }
+      
+      // 获取阵容英雄名称用于日志
+      const currentHeroNames = []
+      for (let pos = 0; pos < 5; pos++) {
+        const heroId = currentBattleTeam[pos]
+        if (heroId > 0) {
+          currentHeroNames.push(getHeroName(heroId))
         }
       }
+      
+      logOperation('shidian', '灯神战斗', {
+        cardType: '灯神信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `使用灯神表格阵容: [${currentHeroNames.join(', ')}]`
+      })
+      
+      // 执行计算英雄战力
+      const calcPowerParams = {
+        battleTeam: currentBattleTeam,
+        lordWeaponId: selectedWeaponId.value
+      }
+      await tokenStore.sendHeroCalcpowerbyteam(token.id, calcPowerParams)
+      logOperation('shidian', '灯神战斗', {
+        cardType: '灯神信息',
+        tokenId: token.id,
+        tokenName: token.name,
+        status: 'info',
+        message: `执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
+      })
       
       let challengeExhausted = false
       for (let i = 0; i < lampGodFightCount.value; i++) {

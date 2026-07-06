@@ -129,12 +129,17 @@ const selectedHeroForSelect = ref('107')
 const selectedHeroForFight = ref('107')
 const isBatchGachaRunning = ref(false)
 
-// 英雄选项
+// 英雄选项（红将及指定橙将）
 const heroOptions = computed(() => {
+  if (!HERO_DICT || typeof HERO_DICT !== 'object') {
+    return []
+  }
+  const allowedHeroIds = ['202', '206', '209', '210', '213', '217', '220', '312']
   return Object.entries(HERO_DICT)
+    .filter(([id]) => String(id).startsWith('1') || allowedHeroIds.includes(id))
     .map(([id, hero]) => ({
       label: hero.name,
-      value: parseInt(id)
+      value: id
     })).sort((a, b) => a.label.localeCompare(b.label, 'zh-CN'))
 })
 
@@ -190,12 +195,12 @@ onMounted(() => {
     }
     
     const savedHeroForSelect = localStorage.getItem(STORAGE_KEYS.selectedHeroForSelect)
-    if (savedHeroForSelect) {
+    if (savedHeroForSelect && String(savedHeroForSelect).startsWith('1')) {
       selectedHeroForSelect.value = savedHeroForSelect
     }
     
     const savedHeroForFight = localStorage.getItem(STORAGE_KEYS.selectedHeroForFight)
-    if (savedHeroForFight) {
+    if (savedHeroForFight && String(savedHeroForFight).startsWith('1')) {
       selectedHeroForFight.value = savedHeroForFight
     }
   } catch (error) {
@@ -1576,7 +1581,7 @@ const handleDreamSelect = async () => {
   }
   
   const heroId = parseInt(selectedHeroForSelect.value)
-  const heroName = heroOptions.find(h => h.value === selectedHeroForSelect.value)?.label || '未知'
+  const heroName = HERO_DICT[selectedHeroForSelect.value]?.name || '未知'
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
   message.info(`开始梦境选择-${heroName}（${rangeText}），共${targetTokens.length}个Token...`)
@@ -1710,7 +1715,7 @@ const handleDreamFight = async () => {
   
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
   const heroId = parseInt(selectedHeroForFight.value)
-  const heroName = heroOptions.find(h => h.value === selectedHeroForFight.value)?.label || '未知'
+  const heroName = HERO_DICT[selectedHeroForFight.value]?.name || '未知'
   message.info(`开始梦境出战-${heroName}（${rangeText}），共${targetTokens.length}个Token，最多执行200次...`)
   logStore.addLog({
     page: 'fish-helper',

@@ -69,6 +69,7 @@ import MyCard from '@/components/Common/MyCard.vue'
 import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { Settings } from '@vicons/ionicons5'
+import { logOperation } from '@/utils/operationLogger'
 
 const tokenStore = useTokenStore()
 const message = useMessage()
@@ -393,6 +394,13 @@ const batchUseResources = async () => {
     isBatchUsingResources.value = true
     const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
     message.info(`开始批量使用资源（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+    logOperation('fish-helper', '批量使用资源', {
+      cardType: '资源管理',
+      tokenId: null,
+      tokenName: null,
+      status: 'info',
+      message: `开始批量使用资源，${rangeText}，共${targetTokens.length}个Token`
+    })
     
     let successCount = 0
     let failCount = 0
@@ -404,6 +412,13 @@ const batchUseResources = async () => {
       try {
         // 连接Token
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
+        logOperation('fish-helper', '批量使用资源', {
+          cardType: '资源管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'info',
+          message: `【序号${tokenIndex}】[${token.name || token.id}] 正在连接...`
+        })
         tokenStore.selectToken(token.id, true)
         
         // 等待连接，最多重试5次
@@ -424,6 +439,13 @@ const batchUseResources = async () => {
         
         if (status !== 'connected') {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          logOperation('fish-helper', '批量使用资源', {
+            cardType: '资源管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}] 连接失败，跳过`
+          })
           failCount++
           continue
         }
@@ -440,6 +462,13 @@ const batchUseResources = async () => {
         const refreshedToken = tokenStore.gameTokens.find(t => t.id === token.id)
         if (!refreshedToken) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} Token不存在，跳过`)
+          logOperation('fish-helper', '批量使用资源', {
+            cardType: '资源管理',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}] Token不存在，跳过`
+          })
           failCount++
           continue
         }
@@ -483,12 +512,26 @@ const batchUseResources = async () => {
           if (count > 0) {
             try {
               message.info(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)}: ${count} 个`)
+              logOperation('fish-helper', '批量使用资源', {
+                cardType: '资源管理',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `【序号${tokenIndex}】[${token.name || token.id}] 使用 ${getItemName(itemType.id)}: ${count} 个`
+              })
               await useBagForToken(token.id, itemType.id, count)
               // 使用后等待，确保数据已更新到token对象
               await new Promise(resolve => setTimeout(resolve, 500))
             } catch (error) {
               console.error(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)} 失败:`, error)
               message.warning(`[序号${tokenIndex}] 使用 ${getItemName(itemType.id)} 失败: ${error.message || '未知错误'}`)
+              logOperation('fish-helper', '批量使用资源', {
+                cardType: '资源管理',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `【序号${tokenIndex}】[${token.name || token.id}] 使用 ${getItemName(itemType.id)} 失败: ${error.message || '未知错误'}`
+              })
               // 继续处理下一个袋子
             }
           }
@@ -499,6 +542,13 @@ const batchUseResources = async () => {
         await new Promise(resolve => setTimeout(resolve, 500))
         
         message.success(`[序号${tokenIndex}] ${token.name || token.id} 资源使用完成`)
+        logOperation('fish-helper', '批量使用资源', {
+          cardType: '资源管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: `【序号${tokenIndex}】[${token.name || token.id}] 资源使用完成`
+        })
         successCount++
         
         if (i < targetTokens.length - 1) {
@@ -507,14 +557,36 @@ const batchUseResources = async () => {
       } catch (error) {
         console.error(`[序号${tokenIndex}] ${token.name || token.id} 批量使用资源失败:`, error)
         message.error(`[序号${tokenIndex}] ${token.name || token.id}: 使用失败 - ${error.message || '未知错误'}`)
+        logOperation('fish-helper', '批量使用资源', {
+          cardType: '资源管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `【序号${tokenIndex}】[${token.name || token.id}] 批量使用资源失败: ${error.message || '未知错误'}`
+        })
         failCount++
       }
     }
     
     message.success(`批量使用资源完成（成功: ${successCount}, 失败: ${failCount}）`)
+    const failedTokensStr = failCount > 0 ? `，失败${failCount}个` : ''
+    logOperation('fish-helper', '批量使用资源', {
+      cardType: '资源管理',
+      tokenId: null,
+      tokenName: null,
+      status: 'success',
+      message: `批量使用资源完成：成功${successCount}个${failedTokensStr}`
+    })
   } catch (error) {
     console.error('批量使用资源失败:', error)
     message.error('批量使用资源失败: ' + (error.message || '未知错误'))
+    logOperation('fish-helper', '批量使用资源', {
+      cardType: '资源管理',
+      tokenId: null,
+      tokenName: null,
+      status: 'error',
+      message: `批量使用资源失败: ${error.message || '未知错误'}`
+    })
   } finally {
     isBatchUsingResources.value = false
   }

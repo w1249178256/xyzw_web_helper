@@ -30,10 +30,24 @@
         <CustomizedCard mode="container">
           <CustomizedCard 
             mode="button"
-            :name="isExportingDetails ? '导出详情中...' : '导出详情'"
-            @button-click="handleExportDetails"
-            :disabled="isExportingDetails"
-            :loading="isExportingDetails"
+            :name="isBatchReplacingHero ? '批量换将中...' : '批量换将'"
+            @button-click="handleBatchReplaceHero"
+            :disabled="isBatchReplacingHero"
+            :loading="isBatchReplacingHero"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchHeroBattle ? '批量上阵中...' : '批量上阵'"
+            @button-click="handleBatchHeroBattle"
+            :disabled="isBatchHeroBattle"
+            :loading="isBatchHeroBattle"
+          />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchUnloadingHeroes ? '批量下阵中...' : '批量下阵'"
+            @button-click="handleBatchUnloadHeroes"
+            :disabled="isBatchUnloadingHeroes"
+            :loading="isBatchUnloadingHeroes"
           />
           <CustomizedCard 
             mode="button-with-select"
@@ -129,66 +143,18 @@
             :loading="isBatchUpgradingToys"
           />
           <CustomizedCard 
-            mode="button-with-select"
-            :button-text="isBatchUpgrading900 ? '批量升级中...' : '批量升级'"
-            :select-value="selectedUpgradeMode"
-            @update:select-value="(val) => selectedUpgradeMode = val"
-            :select-options="[
-              { label: '推图', value: 'story' },
-              { label: '爬塔', value: 'tower' },
-              { label: '单个红色英雄', value: 'single' },
-              { label: '群雄', value: 'qunxiong' }
-            ]"
-            placeholder="选择升级模式"
+            mode="button"
+            :name="isBatchUpgrading900 ? '批量升级中...' : '批量升级'"
             @button-click="handleBatchUpgrade900"
             :disabled="isBatchUpgrading900"
             :loading="isBatchUpgrading900"
           />
           <CustomizedCard 
-            v-if="selectedUpgradeMode === 'single'"
-            mode="button-with-select"
-            :button-text="isBatchUpgrading900 ? '升级中...' : '升级武将'"
-            :select-value="selectedSingleHero"
-            @update:select-value="(val) => selectedSingleHero = val"
-            :select-options="heroOptions"
-            placeholder="选择武将"
-            @button-click="handleBatchUpgradeSingleHero"
-            :disabled="isBatchUpgrading900"
-            :loading="isBatchUpgrading900"
-          />
-          <CustomizedCard 
-            mode="button-with-select"
-            :button-text="isBatchHeroBattle ? '批量上阵中...' : '批量上阵'"
-            :select-value="selectedBatchHero"
-            @update:select-value="(val) => selectedBatchHero = val"
-            :select-options="[
-              { label: '2吕布', value: '107_slot2' },
-              { label: '0吕布', value: '107_slot0' },
-              { label: '张飞', value: '204' },
-              { label: '魏延', value: '217' },
-              { label: '推图', value: 'story' },
-              { label: '爬塔', value: 'tower' }
-            ]"
-            placeholder="选择英雄"
-            @button-click="handleBatchHeroBattle"
-            :disabled="isBatchHeroBattle"
-            :loading="isBatchHeroBattle"
-          />
-          <CustomizedCard 
-            mode="button-with-select"
-            :button-text="isBatchUnloadingHeroes ? '批量下阵中...' : '批量下阵'"
-            :select-value="selectedUnloadHero"
-            @update:select-value="(val) => selectedUnloadHero = val"
-            :select-options="[
-              { label: '后排', value: 'back' },
-              { label: '吕布', value: '107' },
-              { label: '张飞', value: '204' },
-              { label: '魏延', value: '217' }
-            ]"
-            placeholder="选择武将"
-            @button-click="handleBatchUnloadHeroes"
-            :disabled="isBatchUnloadingHeroes"
-            :loading="isBatchUnloadingHeroes"
+            mode="button"
+            :name="isExportingDetails ? '导出详情中...' : '导出详情'"
+            @button-click="handleExportDetails"
+            :disabled="isExportingDetails"
+            :loading="isExportingDetails"
           />
         </CustomizedCard>
         
@@ -381,6 +347,7 @@ const isBatchUpgradingToys = ref(false)
 const isBatchUpgrading900 = ref(false)
 const isBatchHeroBattle = ref(false)
 const isBatchUnloadingHeroes = ref(false)
+const isBatchReplacingHero = ref(false)
 
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
@@ -397,10 +364,11 @@ const selectedSingleHero = ref('107')
 // 阵容选择状态
 const selectedHeroes = ref(['', '', '', '', ''])
 
-// 英雄选项（从HERO_DICT生成，只保留红色武将，即ID以1开头的）
+// 英雄选项（从HERO_DICT生成，红将及指定橙将）
 const heroOptions = computed(() => {
+  const allowedHeroIds = ['202', '204', '206', '209', '210', '213', '217', '220', '312']
   return Object.entries(HERO_DICT)
-    .filter(([id, hero]) => id.startsWith('1'))
+    .filter(([id, hero]) => id.startsWith('1') || allowedHeroIds.includes(id))
     .map(([id, hero]) => ({
       label: hero.name,
       value: parseInt(id)
@@ -3237,23 +3205,6 @@ const handleBatchUpgradeToys = async () => {
 
 // 10. 批量升级（推图模式）
 const handleBatchUpgrade900 = async () => {
-  const upgradeMode = selectedUpgradeMode.value
-  
-  if (upgradeMode === 'single') {
-    await handleBatchUpgradeSingleHero()
-    return
-  }
-  
-  if (upgradeMode === 'qunxiong') {
-    await handleBatchUpgradeQunxiong()
-    return
-  }
-  
-  if (upgradeMode === 'tower') {
-    await handleBatchUpgradeTower()
-    return
-  }
-  
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase()
     const nameB = (b.name || '未命名').toLowerCase()
@@ -3273,19 +3224,37 @@ const handleBatchUpgrade900 = async () => {
     return
   }
   
+  // 从武将子卡片表格中获取要升级的武将（slot 0-4）
+  const upgradeHeroes = []
+  for (let slot = 0; slot < 5; slot++) {
+    const heroId = selectedHeroes.value[slot] ? parseInt(selectedHeroes.value[slot]) : null
+    if (heroId) {
+      const heroName = HERO_DICT[heroId]?.name || heroId
+      // 魏延升到250级，其他升到900级
+      const maxLevel = heroId === 217 ? 250 : 900
+      upgradeHeroes.push({ heroId, name: heroName, maxLevel })
+    }
+  }
+  
+  if (upgradeHeroes.length === 0) {
+    message.warning('请先在武将子卡片表格中选择要升级的武将')
+    return
+  }
+  
   const getTokenIndex = (token) => {
     const index = sortedTokensList.findIndex(t => t.id === token.id)
     return index + 1
   }
   
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量升级（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
+  const heroNames = upgradeHeroes.map(h => `${h.name}(${h.maxLevel}级)`).join('、')
+  message.info(`开始批量升级（${rangeText}），共${targetTokens.length}个Token，升级武将：${heroNames}`)
   logStore.addLog({
     page: 'fish-helper',
     cardType: '武将',
     operation: '批量升级',
     status: 'info',
-    message: `开始批量升级（推图模式），${rangeText}，共${targetTokens.length}个Token`
+    message: `开始批量升级，${rangeText}，共${targetTokens.length}个Token，升级武将：${heroNames}`
   })
   
   try {
@@ -3314,13 +3283,8 @@ const handleBatchUpgrade900 = async () => {
             throw new Error('无法获取武将数据')
           }
           
-          const storyHeroes = [
-            { heroId: 107, name: '吕布' },
-            { heroId: 204, name: '张飞' },
-            { heroId: 110, name: '黄月英' },
-            { heroId: 106, name: '太史慈' },
-            { heroId: 217, name: '魏延', maxLevel: 250 }
-          ]
+          // 使用武将子卡片表格中的武将列表
+          const storyHeroes = upgradeHeroes
           
           for (const storyHero of storyHeroes) {
             const hero = heroesData[String(storyHero.heroId)] || heroesData[storyHero.heroId]
@@ -3986,39 +3950,29 @@ const handleBatchUpgradeSingleHero = async () => {
   }
 }
 
-// 11. 批量上阵
-const handleBatchHeroBattle = async () => {
-  const selectedValue = selectedBatchHero.value
-  let heroId, heroName, slot
-  
-  if (selectedValue === 'story') {
-    return await handleBatchStoryTeamInternal()
+// 从fight_startlevel响应中提取当前阵容（slot 0-4 -> heroId）
+const extractCurrentTeamFromFight = (fightResult) => {
+  let battleTeam = null
+  if (fightResult?.battleData?.leftTeam?.team) {
+    battleTeam = fightResult.battleData.leftTeam.team
+  } else if (fightResult?.leftTeam?.team) {
+    battleTeam = fightResult.leftTeam.team
   }
   
-  if (selectedValue === 'tower') {
-    return await handleBatchTowerTeamInternal()
+  const team = {}
+  if (battleTeam) {
+    for (let i = 0; i < 5; i++) {
+      const hero = battleTeam[String(i)] || battleTeam[i]
+      team[i] = hero?.id ? Number(hero.id) : null
+    }
   }
-  
-  // 处理2吕布和0吕布
-  if (selectedValue === '107_slot2' || selectedValue === '107_slot0') {
-    return await handleBatchLuBuBattle(selectedValue)
-  }
-  
-  heroId = parseInt(selectedValue)
-  
-  if (heroId === 107) {
-    heroName = '吕布'
-    slot = 0
-  } else if (heroId === 204) {
-    heroName = '张飞'
-    slot = 1
-  } else if (heroId === 217) {
-    heroName = '魏延'
-    slot = 4
-  }
-  
+  return team
+}
+
+// 10. 批量换将 - 通过fight_startlevel获取当前阵容，对不同的执行hero_exchange
+const handleBatchReplaceHero = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
-  const allTokens = [...tokenStore.gameTokens].sort((a, b) => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || a.id || '').toLowerCase()
     const nameB = (b.name || b.id || '').toLowerCase()
     return nameA.localeCompare(nameB)
@@ -4026,9 +3980,158 @@ const handleBatchHeroBattle = async () => {
   
   let targetTokens
   if (tokenIndices === null) {
-    targetTokens = allTokens
+    targetTokens = sortedTokensList
   } else {
-    targetTokens = tokenIndices.map(i => allTokens[i - 1]).filter(Boolean)
+    targetTokens = tokenIndices.map(i => sortedTokensList[i - 1]).filter(Boolean)
+  }
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  // 检查是否有选择武将
+  const hasSelection = selectedHeroes.value.some(h => h !== '' && h !== null)
+  if (!hasSelection) {
+    message.warning('请先在阵容选择区域选择要替换的武将')
+    return
+  }
+  
+  const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
+  message.info(`开始批量换将（${rangeText}），共${targetTokens.length}个Token...`)
+  
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '武将',
+    operation: '批量换将',
+    status: 'info',
+    message: `开始批量换将（${rangeText}），共${targetTokens.length}个Token`
+  })
+  
+  isBatchReplacingHero.value = true
+  
+  try {
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
+          
+          // 获取当前阵容
+          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          await waitCommandDelay()
+          
+          const currentTeam = extractCurrentTeamFromFight(fightResult)
+          
+          let exchangeCount = 0
+          
+          // 检查每个slot
+          for (let slot = 0; slot < 5; slot++) {
+            const targetHeroId = selectedHeroes.value[slot] ? parseInt(selectedHeroes.value[slot]) : null
+            if (!targetHeroId) continue
+            
+            const currentHeroId = currentTeam[slot]
+            
+            if (currentHeroId === targetHeroId) {
+              // heroId相同，跳过
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '武将',
+                operation: '批量换将',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'info',
+                message: `位置${slot}武将相同(${HERO_DICT[targetHeroId]?.name || targetHeroId})，跳过`
+              })
+              continue
+            }
+            
+            // heroId不同，执行hero_exchange
+            const currentName = currentHeroId ? (HERO_DICT[currentHeroId]?.name || currentHeroId) : '空'
+            const targetName = HERO_DICT[targetHeroId]?.name || targetHeroId
+            
+            message.info(`[${tokenIndex}] ${token.name || token.id} 位置${slot}: ${currentName} → ${targetName}`)
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_exchange',
+              { heroId: currentHeroId, targetHeroId: targetHeroId },
+              5000
+            )
+            await waitCommandDelay()
+            exchangeCount++
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '武将',
+              operation: '批量换将',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `位置${slot}: ${currentName} → ${targetName}`
+            })
+          }
+          
+          message.success(`[${tokenIndex}] ${token.name || token.id} 换将完成，共换${exchangeCount}个`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '武将',
+            operation: '批量换将',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `换将完成，共换${exchangeCount}个`
+          })
+          
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 换将失败:`, error)
+          throw error
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.status === 'fulfilled').length
+    const failCount = results.filter(r => r.status === 'rejected').length
+    
+    message.success(`批量换将完成！成功：${successCount}，失败：${failCount}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '武将',
+      operation: '批量换将',
+      status: 'success',
+      message: `批量换将完成，成功：${successCount}，失败：${failCount}`
+    })
+    
+  } catch (error) {
+    console.error('批量换将失败:', error)
+    message.error('批量换将失败')
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '武将',
+      operation: '批量换将',
+      status: 'error',
+      message: `批量换将失败：${error.message}`
+    })
+  } finally {
+    isBatchReplacingHero.value = false
+  }
+}
+
+// 11. 批量上阵 - 通过fight_startlevel获取当前阵容，对空白位置执行hero_gointobattle
+const handleBatchHeroBattle = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices.map(i => sortedTokensList[i - 1]).filter(Boolean)
   }
   
   if (targetTokens.length === 0) {
@@ -4037,14 +4140,14 @@ const handleBatchHeroBattle = async () => {
   }
   
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  message.info(`开始批量上阵${heroName}（${rangeText}），共${targetTokens.length}个Token...`)
+  message.info(`开始批量上阵（${rangeText}），共${targetTokens.length}个Token...`)
   
   logStore.addLog({
     page: 'fish-helper',
     cardType: '武将',
     operation: '批量上阵',
     status: 'info',
-    message: `开始批量上阵${heroName}（${rangeText}），共${targetTokens.length}个Token`
+    message: `开始批量上阵（${rangeText}），共${targetTokens.length}个Token`
   })
   
   isBatchHeroBattle.value = true
@@ -4055,215 +4158,66 @@ const handleBatchHeroBattle = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
-          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在上阵${heroName}...`)
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
           
-          if (heroId === 217) {
-            const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
-            await waitCommandDelay()
+          // 获取当前阵容
+          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          await waitCommandDelay()
+          
+          const currentTeam = extractCurrentTeamFromFight(fightResult)
+          
+          let battleCount = 0
+          
+          // 检查每个slot
+          for (let slot = 0; slot < 5; slot++) {
+            const targetHeroId = selectedHeroes.value[slot] ? parseInt(selectedHeroes.value[slot]) : null
+            const currentHeroId = currentTeam[slot]
             
-            let heroes = null
-            if (roleInfo && roleInfo.role && roleInfo.role.heroes) {
-              heroes = roleInfo.role.heroes
-            } else if (roleInfo && roleInfo._raw && roleInfo._raw.body && roleInfo._raw.body.role && roleInfo._raw.body.role.heroes) {
-              heroes = roleInfo._raw.body.role.heroes
-            } else if (roleInfo && roleInfo.body && roleInfo.body.role && roleInfo.body.role.heroes) {
-              heroes = roleInfo.body.role.heroes
-            }
-            
-            const weiYanHero = heroes ? (heroes['217'] || heroes[217]) : null
-            const weiYanLevel = weiYanHero?.level || 0
-            
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '武将',
-              operation: '批量上阵',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'info',
-              message: `魏延等级: ${weiYanLevel}`
-            })
-            
-            if (weiYanLevel < 400) {
-              await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 217, slot: 4 })
-              await waitCommandDelay()
-              
-              message.success(`[${tokenIndex}] ${token.name || token.id} 上阵魏延成功`)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量上阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `上阵魏延成功`
-              })
-            } else {
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量上阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `魏延等级${weiYanLevel}≥400，先下阵再重生`
-              })
-              
-              await tokenStore.sendHeroGoBackBattle(token.id, { heroId: 217, slot: 4 })
-              await waitCommandDelay()
-              
-              await tokenStore.sendHeroRebirth(token.id, { heroId: 217 })
-              await waitCommandDelay()
-              
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量上阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'info',
-                message: `开始升级魏延到250级`
-              })
-              
-              let currentLevel = 1
-              while (currentLevel < 250) {
-                const upgradeNum = calculateUpgradeNum(currentLevel)
-                
-                try {
-                  const upgradeRes = await tokenStore.sendMessageWithPromise(
-                    token.id,
-                    'hero_heroupgradelevel',
-                    {
-                      heroId: 217,
-                      upgradeNum: upgradeNum
-                    },
-                    5000
-                  )
-                  
-                  const errorMsg = upgradeRes?.hint || upgradeRes?.message || upgradeRes?.error || ''
-                  const errorMsgStr = String(errorMsg).toLowerCase()
-                  
-                  if (errorMsgStr.includes('未进阶') || errorMsgStr.includes('不能升级主公') || errorMsgStr.includes('400060') || errorMsgStr.includes('需要升阶')) {
-                    logStore.addLog({
-                      page: 'fish-helper',
-                      cardType: '武将',
-                      operation: '批量上阵',
-                      tokenId: token.id,
-                      tokenName: token.name,
-                      status: 'info',
-                      message: `魏延需要升阶，执行进阶命令`
-                    })
-                    await tokenStore.sendMessageWithPromise(
-                      token.id,
-                      'hero_heroupgradeorder',
-                      {
-                        heroId: 217
-                      },
-                      5000
-                    )
-                    await waitCommandDelay()
-                    continue
-                  }
-                  
-                  if (errorMsgStr.includes('物品数量不足')) {
-                    logStore.addLog({
-                      page: 'fish-helper',
-                      cardType: '武将',
-                      operation: '批量上阵',
-                      tokenId: token.id,
-                      tokenName: token.name,
-                      status: 'warning',
-                      message: `升级魏延失败: 物品数量不足`
-                    })
-                    break
-                  }
-                  
-                  let heroesData = null
-                  if (upgradeRes && upgradeRes.role && upgradeRes.role.heroes) {
-                    heroesData = upgradeRes.role.heroes
-                  } else if (upgradeRes && upgradeRes._raw && upgradeRes._raw.body && upgradeRes._raw.body.role && upgradeRes._raw.body.role.heroes) {
-                    heroesData = upgradeRes._raw.body.role.heroes
-                  } else if (upgradeRes && upgradeRes.body && upgradeRes.body.role && upgradeRes.body.role.heroes) {
-                    heroesData = upgradeRes.body.role.heroes
-                  }
-                  
-                  if (heroesData) {
-                    let updatedHero = null
-                    if (Array.isArray(heroesData)) {
-                      updatedHero = heroesData.find(h => Number(h.heroId) === 217)
-                    } else if (typeof heroesData === 'object') {
-                      updatedHero = heroesData[217] || heroesData['217'] ||
-                                   Object.values(heroesData).find(h => h && Number(h.heroId) === 217)
-                    }
-                    
-                    if (updatedHero && updatedHero.level > currentLevel) {
-                      const oldLevel = currentLevel
-                      currentLevel = updatedHero.level
-                      logStore.addLog({
-                        page: 'fish-helper',
-                        cardType: '武将',
-                        operation: '批量上阵',
-                        tokenId: token.id,
-                        tokenName: token.name,
-                        status: 'success',
-                        message: `【序号${tokenIndex}】[${token.name || token.id}]魏延升级成功: ${oldLevel} → ${currentLevel}`
-                      })
-                    } else {
-                      break
-                    }
-                  } else {
-                    break
-                  }
-                } catch (error) {
-                  const errorMsg = String(error.message || error || '').toLowerCase()
-                  if (errorMsg.includes('未进阶') || errorMsg.includes('不能升级主公') || errorMsg.includes('400060') || errorMsg.includes('需要升阶')) {
-                    logStore.addLog({
-                      page: 'fish-helper',
-                      cardType: '武将',
-                      operation: '批量上阵',
-                      tokenId: token.id,
-                      tokenName: token.name,
-                      status: 'info',
-                      message: `魏延需要升阶(异常)，执行进阶命令`
-                    })
-                    try {
-                      await tokenStore.sendMessageWithPromise(
-                        token.id,
-                        'hero_heroupgradeorder',
-                        {
-                          heroId: 217
-                        },
-                        5000
-                      )
-                      await waitCommandDelay()
-                      continue
-                    } catch (orderError) {
-                      console.error(`进阶魏延失败:`, orderError)
-                      break
-                    }
-                  }
-                  console.error(`升级魏延失败:`, error)
-                  break
-                }
+            if (!targetHeroId) {
+              // 表格为空 → 下阵该位置武将
+              if (currentHeroId) {
+                const heroName = HERO_DICT[currentHeroId]?.name || currentHeroId
+                message.info(`[${tokenIndex}] ${token.name || token.id} 下阵${heroName}从位置${slot}`)
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'hero_gobackbattle',
+                  { heroId: currentHeroId, slot: slot },
+                  5000
+                )
+                await waitCommandDelay()
+                battleCount++
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '武将',
+                  operation: '批量上阵',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'success',
+                  message: `[${tokenIndex}] ${token.name || token.id} 下阵${heroName}从位置${slot}`
+                })
               }
-              
-              await tokenStore.sendHeroGoIntoBattle(token.id, { heroId: 217, slot: 4 })
-              await waitCommandDelay()
-              
-              message.success(`[${tokenIndex}] ${token.name || token.id} 上阵魏延成功`)
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量上阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `上阵魏延成功`
-              })
+              continue
             }
-          } else {
-            await tokenStore.sendHeroGoIntoBattle(token.id, { heroId, slot })
             
-            message.success(`[${tokenIndex}] ${token.name || token.id} 上阵${heroName}成功`)
+            if (currentHeroId === targetHeroId) {
+              // 表格有武将且匹配 → 跳过
+              continue
+            }
+            
+            // 表格有武将但不匹配 → 上阵表格武将
+            // 表格有武将但实际该位置没有武将 → 上阵表格武将
+            const targetName = HERO_DICT[targetHeroId]?.name || targetHeroId
+            message.info(`[${tokenIndex}] ${token.name || token.id} 上阵${targetName}到位置${slot}`)
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_gointobattle',
+              { heroId: targetHeroId, slot: slot },
+              5000
+            )
+            await waitCommandDelay()
+            battleCount++
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '武将',
@@ -4271,67 +4225,49 @@ const handleBatchHeroBattle = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `上阵${heroName}成功`
+              message: `[${tokenIndex}] ${token.name || token.id} 上阵${targetName}到位置${slot}`
             })
           }
           
-          return { success: true }
-        } catch (error) {
-          console.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵${heroName}失败:`, error)
-          message.error(`[${globalIndex + 1}] ${token.name || token.id} 上阵${heroName}失败：${error.message || error}`)
+          message.success(`[${tokenIndex}] ${token.name || token.id} 上阵完成，共上阵${battleCount}个`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '武将',
             operation: '批量上阵',
             tokenId: token.id,
             tokenName: token.name,
-            status: 'error',
-            message: `上阵${heroName}失败：${error.message || error}`
+            status: 'success',
+            message: `上阵完成，共上阵${battleCount}个`
           })
-          return { success: false, error: error.message || error }
-        }
-      },
-      {
-        batchSize: 20,
-        delayBetween: 300,
-        onProgress: (progress) => {
-          if (progress.type === 'batch-start') {
-            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
-          } else if (progress.type === 'token-start') {
-            message.info(`${progress.tokenName} 正在获取连接...`)
-          } else if (progress.type === 'token-success') {
-            message.success(`${progress.tokenName} 连接成功`)
-          } else if (progress.type === 'token-error') {
-            if (progress.status === 'warning') {
-              message.warning(`${progress.tokenName} ${progress.message}`)
-            } else {
-              message.error(`${progress.tokenName} ${progress.message}`)
-            }
-          }
+          
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 上阵失败:`, error)
+          throw error
         }
       }
     )
     
-    const successCount = results.filter(r => r.success).length
-    const failCount = results.filter(r => !r.success).length
+    const successCount = results.filter(r => r.status === 'fulfilled').length
+    const failCount = results.filter(r => r.status === 'rejected').length
     
-    message.success(`批量上阵${heroName}完成：成功${successCount}个，失败${failCount}个`)
+    message.success(`批量上阵完成！成功：${successCount}，失败：${failCount}`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '武将',
       operation: '批量上阵',
       status: 'success',
-      message: `批量上阵${heroName}完成：成功${successCount}个，失败${failCount}个`
+      message: `批量上阵完成，成功：${successCount}，失败：${failCount}`
     })
+    
   } catch (error) {
     console.error('批量上阵失败:', error)
-    message.error(`批量上阵失败：${error.message || '未知错误'}`)
+    message.error('批量上阵失败')
     logStore.addLog({
       page: 'fish-helper',
       cardType: '武将',
       operation: '批量上阵',
       status: 'error',
-      message: `批量上阵失败：${error.message || '未知错误'}`
+      message: `批量上阵失败：${error.message}`
     })
   } finally {
     isBatchHeroBattle.value = false
@@ -4340,99 +4276,94 @@ const handleBatchHeroBattle = async () => {
 
 // 12. 批量下阵
 const handleBatchUnloadHeroes = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
-    const nameA = (a.name || '未命名').toLowerCase()
-    const nameB = (b.name || '未命名').toLowerCase()
+    const nameA = (a.name || a.id || '').toLowerCase()
+    const nameB = (b.name || b.id || '').toLowerCase()
     return nameA.localeCompare(nameB)
   })
   
-  if (sortedTokensList.length === 0) {
-    message.warning('没有可用的Token')
-    return
+  let targetTokens
+  if (tokenIndices === null) {
+    targetTokens = sortedTokensList
+  } else {
+    targetTokens = tokenIndices.map(i => sortedTokensList[i - 1]).filter(Boolean)
   }
-  
-  const tokenIndices = parseTokenRange(executionTokens.value)
-  const targetTokens = getTargetTokens(tokenIndices)
   
   if (targetTokens.length === 0) {
     message.warning('执行范围内没有有效的Token')
     return
   }
   
-  const getTokenIndex = (token) => {
-    const index = sortedTokensList.findIndex(t => t.id === token.id)
-    return index + 1
-  }
-  
   const rangeText = executionTokens.value ? `范围${executionTokens.value}` : "全部"
-  const selectedValue = selectedUnloadHero.value
-  const heroMap = {
-    'back': '后排',
-    '107': '吕布',
-    '204': '张飞',
-    '217': '魏延'
-  }
-  const heroText = heroMap[selectedValue] || '全部'
-  message.info(`开始批量下阵（${rangeText}），共${targetTokens.length}个Token，下阵武将：${heroText}`)
+  message.info(`开始批量下阵（${rangeText}），共${targetTokens.length}个Token...`)
+  
   logStore.addLog({
     page: 'fish-helper',
     cardType: '武将',
     operation: '批量下阵',
     status: 'info',
-    message: `开始批量下阵，${rangeText}，共${targetTokens.length}个Token，下阵武将：${heroText}`
+    message: `开始批量下阵（${rangeText}），共${targetTokens.length}个Token`
   })
   
+  isBatchUnloadingHeroes.value = true
+  
   try {
-    isBatchUnloadingHeroes.value = true
-    
     const results = await connectionPool.batchOperate(
       targetTokens,
       async (token, globalIndex) => {
         try {
-          const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在下阵武将...`)
+          const tokenIndex = globalIndex + 1
+          message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
           
-          // 下阵 2-4 号位（slot: 2-4）
-          const unloadSlots = [
-            { slot: 2, positionName: '2号位' },
-            { slot: 3, positionName: '3号位' },
-            { slot: 4, positionName: '4号位' }
-          ]
+          // 获取当前阵容
+          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          await waitCommandDelay()
           
-          for (const { slot, positionName } of unloadSlots) {
-            try {
-              await tokenStore.sendMessageWithPromise(
-                token.id,
-                'hero_gobackbattle',
-                {
-                  slot: slot
-                },
-                5000
-              )
-              await waitCommandDelay()
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量下阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'success',
-                message: `下阵${positionName}成功`
-              })
-            } catch (error) {
-              logStore.addLog({
-                page: 'fish-helper',
-                cardType: '武将',
-                operation: '批量下阵',
-                tokenId: token.id,
-                tokenName: token.name,
-                status: 'warning',
-                message: `${positionName}没有武将或下阵失败：${error.message}`
-              })
+          const currentTeam = extractCurrentTeamFromFight(fightResult)
+          
+          let unloadCount = 0
+          
+          // 检查每个slot
+          for (let slot = 0; slot < 5; slot++) {
+            const targetHeroId = selectedHeroes.value[slot] ? parseInt(selectedHeroes.value[slot]) : null
+            const currentHeroId = currentTeam[slot]
+            
+            if (!targetHeroId) {
+              // 表格为空 → 跳过
+              continue
             }
+            
+            if (!currentHeroId) {
+              // 该位置没有武将 → 跳过
+              continue
+            }
+            
+            // 表格有武将（无论是否匹配）→ 下阵该位置武将
+            const heroName = HERO_DICT[currentHeroId]?.name || currentHeroId
+            message.info(`[${tokenIndex}] ${token.name || token.id} 下阵${heroName}从位置${slot}`)
+            
+            await tokenStore.sendMessageWithPromise(
+              token.id,
+              'hero_gobackbattle',
+              { heroId: currentHeroId, slot: slot },
+              5000
+            )
+            await waitCommandDelay()
+            unloadCount++
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '武将',
+              operation: '批量下阵',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `下阵${heroName}从位置${slot}`
+            })
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 下阵完成`)
+          message.success(`[${tokenIndex}] ${token.name || token.id} 下阵完成，共下阵${unloadCount}个`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '武将',
@@ -4440,11 +4371,11 @@ const handleBatchUnloadHeroes = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '下阵完成'
+            message: `下阵完成，共下阵${unloadCount}个`
           })
           
         } catch (error) {
-          console.error(`[序号${getTokenIndex(token)}] ${token.name || token.id} 下阵失败:`, error)
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 下阵失败:`, error)
           throw error
         }
       }

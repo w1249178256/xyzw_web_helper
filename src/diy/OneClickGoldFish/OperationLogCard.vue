@@ -84,18 +84,22 @@ const logStore = useOperationLogStore()
 const message = useMessage()
 const logListRef = ref(null)
 
-const pageLogs = computed(() => logStore.getLogsByPage(props.page).value)
+const pageLogs = computed(() => {
+  const storeLogs = logStore.logs || []
+  return storeLogs.filter(log => log.page === props.page)
+})
 
 const filteredLogs = computed(() => {
-  let logs = pageLogs.value
+  const baseLogs = pageLogs.value || []
+  let logs = [...baseLogs]
   
   // 如果指定了卡片类型，先按卡片类型过滤
-  if (props.cardType) {
+  if (props.cardType && logs.length > 0) {
     logs = logs.filter(log => log.cardType === props.cardType)
   }
   
   // 如果指定了操作过滤，再按操作过滤
-  if (props.filterOperations.length > 0) {
+  if (props.filterOperations && props.filterOperations.length > 0 && logs.length > 0) {
     logs = logs.filter(log => props.filterOperations.includes(log.operation))
   }
   
@@ -126,6 +130,15 @@ const formatLogMessage = (msg) => {
     return `<span class="log-index">【序号${index}】</span><span class="log-token">[${token}]</span><span class="log-content-text">${content}</span>`
   }
   
+  // 匹配 [tokenIndex] tokenName 消息内容 格式
+  const bracketMatch = msg.match(/^\[(\d+)\]\s+([^\s].*?)\s+(上阵|下阵|完成.*)$/)
+  if (bracketMatch) {
+    const index = bracketMatch[1]
+    const token = bracketMatch[2]
+    const content = bracketMatch[3]
+    return `<span class="log-index">【序号${index}】</span><span class="log-token">[${token}]</span><span class="log-content-text"> ${content}</span>`
+  }
+  
   // 兼容旧格式 X、消息内容
   const oldMatch = msg.match(/^(\d+)、(.*)$/)
   if (oldMatch) {
@@ -145,7 +158,7 @@ const handleClearLogs = () => {
     message.success('日志已清空')
   } else if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只清空这些操作的日志
-    const allLogs = logStore.getLogsByPage(props.page).value
+    const allLogs = logStore.getLogsByPage(props.page)
     const logsToKeep = allLogs.filter(log => !props.filterOperations.includes(log.operation))
     logStore.logs = [...logsToKeep]
     message.success('日志已清空')
@@ -162,7 +175,7 @@ const handleExportLogs = () => {
     message.success('日志已导出')
   } else if (props.filterOperations.length > 0) {
     // 如果指定了过滤操作，只导出这些操作的日志
-    const allLogs = logStore.getLogsByPage(props.page).value
+    const allLogs = logStore.getLogsByPage(props.page)
     const logsToExport = allLogs.filter(log => props.filterOperations.includes(log.operation))
     
     const lines = []
