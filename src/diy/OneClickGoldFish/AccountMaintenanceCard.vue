@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ScheduledTasksCard />
   
   <MyCard class="helper" status-class="active">
@@ -569,7 +569,7 @@ const handleUseTorch = async () => {
       cardType: '养号',
       operation: '使用火把',
       status: 'success',
-      message: `批量使用火把完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量使用火把完成：成功 ${successCount} 个，失败 ${failureCount} 个`
     })
     
   } catch (error) {
@@ -581,7 +581,7 @@ const handleUseTorch = async () => {
       cardType: '养号',
       operation: '使用火把',
       status: 'error',
-      message: `批量使用火把失败: ${error.message}`
+      message: `【批量】批量使用火把失败: ${error.message}`
     })
   } finally {
     isUsingTorch.value = false
@@ -810,7 +810,7 @@ const handleUpgradeCrystal = async () => {
       cardType: '养号',
       operation: '升级水晶',
       status: 'success',
-      message: `批量升级水晶完成，目标英雄: ${selectedHeroName}，成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量升级水晶完成，目标英雄: ${selectedHeroName}，成功 ${successCount} 个，失败 ${failureCount} 个`
     })
 
   } catch (error) {
@@ -821,7 +821,7 @@ const handleUpgradeCrystal = async () => {
       cardType: '养号',
       operation: '升级水晶',
       status: 'error',
-      message: `批量升级水晶失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级水晶失败: ${error.message || '未知错误'}`
     })
   } finally {
     isUpgradingCrystal.value = false
@@ -905,7 +905,7 @@ const handleBatchUpgradeEquipment = async () => {
       cardType: '养号',
       operation: '升级装备',
       status: 'success',
-      message: `批量升级装备完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量升级装备完成，成功 ${successCount} 个，失败 ${failureCount} 个`
     })
 
     // 清空过程日志，只保留结果日志
@@ -921,7 +921,7 @@ const handleBatchUpgradeEquipment = async () => {
       cardType: '养号',
       operation: '升级装备',
       status: 'error',
-      message: `批量升级装备失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级装备失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgradingEquipment.value = false
@@ -1040,7 +1040,7 @@ const handleBatchAwakeSkill = async () => {
       cardType: '养号',
       operation: '觉醒',
       status: 'success',
-      message: `批量觉醒完成，共执行 ${totalSuccess + totalFail} 次，成功 ${totalSuccess} 次，失败 ${totalFail} 次`
+      message: `【批量】批量觉醒完成，共执行 ${totalSuccess + totalFail} 次，成功 ${totalSuccess} 次，失败 ${totalFail} 次`
     })
 
     // 清空过程日志，只保留结果日志
@@ -1056,7 +1056,7 @@ const handleBatchAwakeSkill = async () => {
       cardType: '养号',
       operation: '觉醒',
       status: 'error',
-      message: `批量觉醒失败: ${error.message || '未知错误'}`
+      message: `【批量】批量觉醒失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchAwakingSkill.value = false
@@ -1225,7 +1225,7 @@ const handleBatchUpgradeHangup = async () => {
       cardType: '养号',
       operation: '升级挂机',
       status: 'success',
-      message: `批量升级挂机完成，成功 ${successCount} 个，失败 ${failureCount} 个，共使用${totalUsed}个道具`
+      message: `【批量】批量升级挂机完成，成功 ${successCount} 个，失败 ${failureCount} 个，共使用${totalUsed}个道具`
     })
 
     // 清空过程日志，只保留结果日志
@@ -1241,7 +1241,7 @@ const handleBatchUpgradeHangup = async () => {
       cardType: '养号',
       operation: '升级挂机',
       status: 'error',
-      message: `批量升级挂机失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级挂机失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgradingHangup.value = false

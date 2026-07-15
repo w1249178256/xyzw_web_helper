@@ -323,7 +323,7 @@ const handleExecuteScheduledTasks = async () => {
     cardType: '定时任务',
     operation: '执行定时任务',
     status: 'info',
-    message: `开始执行定时任务（${rangeText}），共${targetTokens.length}个Token`
+    message: `【批量】开始执行定时任务（${rangeText}），共${targetTokens.length}个Token`
   })
   
   isExecutingScheduledTasks.value = true
@@ -1445,7 +1445,7 @@ const handleBatchBuyRecruit = async () => {
       cardType: '定时任务',
       operation: '批量购买招募',
       status: 'success',
-      message: `批量购买招募完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量购买招募完成：成功${successCount}个，失败${failCount}个`
     })
     
     if (failedTokens.length > 0) {
@@ -1582,7 +1582,7 @@ const handleBatchBlackMarketReward = async () => {
       cardType: '定时任务',
       operation: '批量黑市奖励',
       status: 'success',
-      message: `批量黑市奖励执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量黑市奖励执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
     })
   } catch (error) {
     console.error('批量黑市奖励失败:', error)
@@ -1593,7 +1593,7 @@ const handleBatchBlackMarketReward = async () => {
       cardType: '定时任务',
       operation: '批量黑市奖励',
       status: 'error',
-      message: `批量黑市奖励失败: ${error.message}`
+      message: `【批量】批量黑市奖励失败: ${error.message}`
     })
   } finally {
     isBatchBlackMarketRewardRunning.value = false

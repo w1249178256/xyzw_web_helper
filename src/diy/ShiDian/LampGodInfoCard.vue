@@ -1376,34 +1376,38 @@ const lampGodAction = async () => {
     // 获取武器名称
     const weaponName = weaponOptions.find(w => w.value === selectedWeaponId.value)?.label || '未激活'
     
+    // 获取当前token的序号
+    const tokenIndex = getTokenIndex(token)
+    const tokenPrefix = `【序号${tokenIndex}】[${token.name || token.id}]`
+    
     // 记录开始执行灯神按钮
     logOperation('shidian', '灯神按钮', {
       cardType: '灯神信息',
       tokenId: token.id,
       tokenName: token.name,
       status: 'info',
-      message: `开始执行灯神按钮，灯神类型: ${selectedTypes.map(t => t.name).join(', ')}, 玩具: ${weaponName}(ID:${selectedWeaponId.value})`
+      message: `${tokenPrefix} 开始执行灯神按钮，灯神类型: ${selectedTypes.map(t => t.name).join(', ')}, 玩具: ${weaponName}(ID:${selectedWeaponId.value})`
     })
     
     // 执行完整的灯神战斗流程
     for (const type of selectedTypes) {
       // 1. 切换到阵容1
       try {
-        message.info(`${type.name} 正在切换到阵容1...`)
+        message.info(`${tokenPrefix} ${type.name} 正在切换到阵容1...`)
         await switchToTeam1()
       } catch (error) {
-        console.error(`${type.name} 切换阵容1失败:`, error)
+        console.error(`${tokenPrefix} ${type.name} 切换阵容1失败:`, error)
         // 错误时不终止执行，继续下一步
       }
       
       // 爬塔类型只执行切换阵容1，不执行灯神战斗
       if (type.genieId === 6) { // 爬塔
-        message.info(`${type.name} 切换阵容1完成，跳过灯神战斗`)
+        message.info(`${tokenPrefix} ${type.name} 切换阵容1完成，跳过灯神战斗`)
         continue
       }
       
       // 2. 灯神战斗（非爬塔类型）：使用灯神信息表格的阵容作为灯神阵容
-      message.info(`${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
+      message.info(`${tokenPrefix} ${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
       
       // 使用灯神信息表格的selectedHeroes作为battleTeam（slot 0-4的heroId）
       const currentBattleTeam = {}
@@ -1426,7 +1430,7 @@ const lampGodAction = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `使用灯神表格阵容: [${currentHeroNames.join(', ')}]`
+        message: `${tokenPrefix} 使用灯神表格阵容: [${currentHeroNames.join(', ')}]`
       })
       
       // 执行计算英雄战力
@@ -1440,7 +1444,7 @@ const lampGodAction = async () => {
         tokenId: token.id,
         tokenName: token.name,
         status: 'info',
-        message: `执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
+        message: `${tokenPrefix} 执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
       })
       
       // 3. 循环执行灯神战斗
@@ -1461,35 +1465,35 @@ const lampGodAction = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `执行命令: fight_startgenie, 第 ${i + 1} 次, 参数: ${JSON.stringify(fightParams)}`
+            message: `${tokenPrefix} 执行命令: fight_startgenie, 第 ${i + 1} 次, 参数: ${JSON.stringify(fightParams)}`
           })
-          message.success(`${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
+          message.success(`${tokenPrefix} ${type.name} 灯神战斗第 ${i + 1} 次执行成功`)
           // 每次战斗间隔
           await waitCommandDelay()
         } catch (error) {
-          console.error(`${type.name} 灯神战斗第 ${i + 1} 次失败:`, error)
+          console.error(`${tokenPrefix} ${type.name} 灯神战斗第 ${i + 1} 次失败:`, error)
           const errorMessage = error.message || ''
           
           // 检查是否是挑战次数已用完的错误
           if (errorMessage.includes('挑战次数已用完') || errorMessage.includes('3300030')) {
-            message.warning(`${type.name} 挑战次数已用完，停止剩余挑战`)
+            message.warning(`${tokenPrefix} ${type.name} 挑战次数已用完，停止剩余挑战`)
             logOperation('shidian', '灯神战斗', {
               cardType: '灯神信息',
               tokenId: token.id,
               tokenName: token.name,
               status: 'warning',
-              message: `${type.name} 挑战次数已用完，停止剩余挑战`
+              message: `${tokenPrefix} ${type.name} 挑战次数已用完，停止剩余挑战`
             })
             challengeExhausted = true
           } else {
-            message.warning(`${type.name} 灯神战斗第 ${i + 1} 次失败: ${errorMessage || error}`)
+            message.warning(`${tokenPrefix} ${type.name} 灯神战斗第 ${i + 1} 次失败: ${errorMessage || error}`)
           }
         }
       }
       if (challengeExhausted) {
-        message.success(`${type.name} 灯神战斗因次数用完而结束`)
+        message.success(`${tokenPrefix} ${type.name} 灯神战斗因次数用完而结束`)
       } else {
-        message.success(`${type.name} 灯神战斗${lampGodFightCount.value}次执行完成`)
+        message.success(`${tokenPrefix} ${type.name} 灯神战斗${lampGodFightCount.value}次执行完成`)
       }
     }
     

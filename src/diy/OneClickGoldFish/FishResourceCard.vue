@@ -2178,7 +2178,7 @@ const batchBoxWeek = async () => {
       cardType: '金鱼资源',
       operation: '批量宝箱',
       status: successCount > 0 ? 'success' : 'error',
-      message: `批量宝箱完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量宝箱完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量宝箱周失败:', error)

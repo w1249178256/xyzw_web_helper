@@ -490,7 +490,7 @@ const handleBatchSetBlackMarket = async () => {
         cardType: '黑市购买设置',
         operation: '批量设置',
         status: 'error',
-        message: `批量设置完成，失败的Token: ${failedTokens.join(', ')}`
+        message: `【批量】批量设置完成，失败的Token: ${failedTokens.join(', ')}`
       })
     }
     
