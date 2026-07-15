@@ -71,10 +71,24 @@
               :loading="isRunning"
             />
             <CustomizedCard 
-              mode="button"
+              mode="button-number-input"
               name="批量扭蛋"
               :disabled="isBatchGachaRunning || !tokenStore.hasTokens"
+              v-model:input-value="batchGachaCount"
               @button-click="handleBatchGacha"
+            />
+            <CustomizedCard 
+              mode="button"
+              name="批量开卡"
+              :disabled="isBatchOpenCardRunning || !tokenStore.hasTokens"
+              @button-click="handleBatchOpenCard"
+            />
+            <CustomizedCard 
+              mode="button-with-input"
+              name="批量竞猜"
+              :disabled="isBatchBetRunning || !tokenStore.hasTokens"
+              v-model:input-value="betInput"
+              @button-click="handleBatchBet"
             />
           </CustomizedCard>
         </div>
@@ -128,6 +142,13 @@ const executionRange = ref('')
 const selectedHeroForSelect = ref('107')
 const selectedHeroForFight = ref('107')
 const isBatchGachaRunning = ref(false)
+const batchGachaCount = ref(localStorage.getItem('batchGachaCount') || '1')
+watch(batchGachaCount, (val) => {
+  localStorage.setItem('batchGachaCount', val)
+})
+const isBatchOpenCardRunning = ref(false)
+const isBatchBetRunning = ref(false)
+const betInput = ref('')
 
 // 英雄选项（红将及指定橙将）
 const heroOptions = computed(() => {
@@ -1968,10 +1989,13 @@ const handleBatchGacha = async () => {
             message: `[序号${tokenIndex}] 开始扭蛋`
           })
           
-          await tokenStore.sendGachaDrawReward(token.id, {})
-          await new Promise(resolve => setTimeout(resolve, 500))
+          const gachaCount = parseInt(batchGachaCount.value) || 1
+          for (let i = 0; i < gachaCount; i++) {
+            await tokenStore.sendGachaDrawReward(token.id, {})
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋完成`)
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋完成，共${gachaCount}次`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
@@ -2043,6 +2067,297 @@ const handleBatchGacha = async () => {
     })
   } finally {
     isBatchGachaRunning.value = false
+  }
+}
+
+// 批量开卡
+const handleBatchOpenCard = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量开卡（${rangeText}），共${targetTokens.length}个Token...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量开卡',
+    status: 'info',
+    message: `开始批量开卡，${rangeText}，共${targetTokens.length}个Token`
+  })
+  
+  try {
+    isBatchOpenCardRunning.value = true
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          let openCount = 0
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始开卡...`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量开卡',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] 开始开卡`
+          })
+          
+          // 循环执行直到失败
+          while (true) {
+            try {
+              await tokenStore.sendSaltcup26OpenStarPack(token.id, {})
+              openCount++
+              await new Promise(resolve => setTimeout(resolve, 500))
+            } catch (error) {
+              // 失败时停止循环
+              break
+            }
+          }
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 开卡完成，共开${openCount}次`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量开卡',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] 开卡完成，共开${openCount}次`
+          })
+          
+          return { success: true, openCount }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 开卡失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 开卡失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量开卡',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] 开卡失败：${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.tokenName) {
+            if (progress.status === 'success') {
+              message.success(`${progress.tokenName} ${progress.message}`)
+            } else if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量开卡完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量开卡',
+      status: 'success',
+      message: `批量开卡完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量开卡出错:', error)
+    message.error(`批量开卡出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量开卡',
+      status: 'error',
+      message: `批量开卡出错：${error.message || error}`
+    })
+  } finally {
+    isBatchOpenCardRunning.value = false
+  }
+}
+
+// 批量竞猜
+const handleBatchBet = async () => {
+  if (!betInput.value) {
+    message.warning('请输入竞猜参数，格式：matchId,pick')
+    return
+  }
+  
+  const parts = betInput.value.split(',')
+  if (parts.length !== 2) {
+    message.warning('输入格式错误，请使用英文逗号分隔，格式：matchId,pick')
+    return
+  }
+  
+  const matchId = parts[0].trim()
+  const pick = parseInt(parts[1].trim())
+  
+  if (!matchId || isNaN(pick)) {
+    message.warning('参数格式错误，matchId为字符串，pick为数字')
+    return
+  }
+  
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+  
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+  
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+  
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+  
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+  
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量竞猜（${rangeText}），共${targetTokens.length}个Token，matchId=${matchId}，pick=${pick}...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量竞猜',
+    status: 'info',
+    message: `开始批量竞猜，${rangeText}，共${targetTokens.length}个Token，matchId=${matchId}，pick=${pick}`
+  })
+  
+  try {
+    isBatchBetRunning.value = true
+    
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在竞猜...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量竞猜',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] 开始竞猜，matchId=${matchId}，pick=${pick}`
+          })
+          
+          await tokenStore.sendSaltcup26PlaceBet(token.id, { matchId, pick })
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 竞猜完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量竞猜',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] 竞猜完成`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 竞猜失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 竞猜失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量竞猜',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] 竞猜失败：${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.tokenName) {
+            if (progress.status === 'success') {
+              message.success(`${progress.tokenName} ${progress.message}`)
+            } else if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量竞猜完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量竞猜',
+      status: 'success',
+      message: `批量竞猜完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量竞猜出错:', error)
+    message.error(`批量竞猜出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量竞猜',
+      status: 'error',
+      message: `批量竞猜出错：${error.message || error}`
+    })
+  } finally {
+    isBatchBetRunning.value = false
   }
 }
 

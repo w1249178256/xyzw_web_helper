@@ -753,6 +753,25 @@ export class GameCommands {
   }
 
   /**
+   * 加载鱼灵
+   */
+  artifact_load(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        heroId:params.heroId,
+        itemId:params.itemId,
+        targetHeroId:-1,
+        pearlId:0
+        ...params,
+      }),
+      cmd: "artifact_load",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+  /**
    * 获取俱乐部战争详情
    */
   legionwar_getdetails(ack = 0, seq = 0, params = {}) {
@@ -2073,6 +2092,41 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
 
+  /**
+   * 世界杯开卡
+   */
+  saltcup26_openstarpack(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        packId:5501,
+        starId:0,
+        cnt:1,
+          ...params
+      }),
+      cmd: "saltcup26_openstarpack",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 世界杯竞猜
+   */
+  saltcup26_placebet(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        matchId:params.matchId,
+        	pick:params.pick,
+          ...params
+      }),
+      cmd: "saltcup26_placebet",
+      seq,
+      time: Date.now()
+    }
+  }
+
 
   /**
    * 领取五一累充道具
@@ -2169,6 +2223,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     return {
       ack,
       body: this.g_utils.bon.encode({
+      	  actId:params.actId,
           ...params
       }),
       cmd: "towers_getinfo",

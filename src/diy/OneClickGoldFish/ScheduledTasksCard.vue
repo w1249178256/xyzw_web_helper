@@ -1239,7 +1239,7 @@ const handleBatchBlackMarket = async () => {
             }
           }
           
-          if (diamondCount > 300000) {
+          if (diamondCount > 200000) {
             try {
               await tokenStore.sendMessageWithPromise(
                 token.id,

@@ -136,7 +136,7 @@
         />
         <CustomizedCard
           mode="button-placeholder"
-          button-text="批量导出道具数量"
+          button-text="批量导出活动详情"
           :disabled="isRunning"
           @button-click="batchExportItemCount()"
         />
@@ -537,8 +537,8 @@ const getActivityCount = async () => {
       selectedTokenId.value,
       tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
       'towers_getinfo',
-      {},
-      tokenStore.sendTowersGetInfo(selectedTokenId.value),
+      { actId: Number(activityId.value) },
+      tokenStore.sendTowersGetInfo(selectedTokenId.value, { actId: Number(activityId.value) }),
       true,
       '暑期活动'
     );
@@ -1155,8 +1155,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
         'towers_getinfo',
-        {},
-        tokenStore.sendTowersGetInfo(tokenId),
+        { actId: Number(activityId.value) },
+        tokenStore.sendTowersGetInfo(tokenId, { actId: Number(activityId.value) }),
         true,
         '暑期活动'
       );
@@ -1178,8 +1178,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
         'towers_getinfo',
-        {},
-        tokenStore.sendTowersGetInfo(tokenId),
+        { actId: Number(activityId.value) },
+        tokenStore.sendTowersGetInfo(tokenId, { actId: Number(activityId.value) }),
         true,
         '暑期活动'
       );
@@ -1334,7 +1334,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                   retryErrorMsg.includes('击杀所有') || 
                   retryErrorMsg.includes('7900022') ||
                   retryErrorMsg.includes('次数已用完') ||
-                  retryErrorMsg.includes('7900023')) {
+                  retryErrorMsg.includes('7900023') ||
+                  retryErrorMsg.includes('已达到使用次数上限')) {
                 console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行`);
                 return true;
               }
@@ -1345,7 +1346,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
               errorMsg.includes('击杀所有') || 
               errorMsg.includes('7900022') ||
               errorMsg.includes('次数已用完') ||
-              errorMsg.includes('7900023')) {
+              errorMsg.includes('7900023') ||
+              errorMsg.includes('已达到使用次数上限')) {
             console.log(`BOSS ${bossNumber} - 已经击杀所有 boss 或次数已用完，停止执行`);
             return true;
           } else {
@@ -1423,39 +1425,24 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     await switchToTeam2(tokenId);
     await waitCommandDelay();
 
-    // 2. 使用presetteam_getinfo获取当前阵容
+    // 2. 使用fight_startlevel获取当前阵容
     console.log("正在获取当前阵容信息...");
-    const presetTeamResponse = await logCommand(
+    const fightResult = await logCommand(
       'shidian',
       '一键战斗-获取阵容信息',
       tokenId,
       tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
-      'presetteam_getinfo',
+      'fight_startlevel',
       {},
-      tokenStore.sendPresetteamGetInfo(tokenId),
+      tokenStore.sendFightStartLevel(tokenId, {}),
       true,
       '暑期活动'
     );
     await waitCommandDelay();
 
-    // 检查presetTeamInfo中是否有阵容2
-    const presetTeamInfo = presetTeamResponse?.presetTeamInfo?.presetTeamInfo || presetTeamResponse?.presetTeamInfo || {};
-    const hasTeam1 = presetTeamInfo["1"] || presetTeamInfo[1];
-    const hasTeam2 = presetTeamInfo["2"] || presetTeamInfo[2];
-    const useTeamId = presetTeamResponse?.presetTeamInfo?.useTeamId || presetTeamResponse?.useTeamId || 1;
-
-    console.log(`阵容信息: 阵容1=${!!hasTeam1}, 阵容2=${!!hasTeam2}, 当前使用阵容=${useTeamId}`);
-
-    // 如果有1和2，检查useTeamId是否为2，如果不为2，切换到阵容2
-    if (hasTeam1 && hasTeam2 && useTeamId !== 2) {
-      console.log("当前不是阵容2，切换到阵容2...");
-      await switchToTeam2(tokenId);
-      await waitCommandDelay();
-    }
-
     // 3. 设置队伍
     console.log("正在设置队伍...");
-    await setTeam(tokenId, presetTeamResponse);
+    await setTeam(tokenId, fightResult);
     await waitCommandDelay();
 
     // 4. 获取活动次数
@@ -1468,8 +1455,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
         tokenId,
         tokenStore.gameTokens.find(t => t.id === tokenId)?.name || '',
         'towers_getinfo',
-        {},
-        tokenStore.sendTowersGetInfo(tokenId),
+        { actId: Number(activityId.value) },
+        tokenStore.sendTowersGetInfo(tokenId, { actId: Number(activityId.value) }),
         true,
         '暑期活动'
       );
@@ -1540,7 +1527,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
                 retryErrorMsg.includes('击杀所有') || 
                 retryErrorMsg.includes('7900022') ||
                 retryErrorMsg.includes('次数已用完') ||
-                retryErrorMsg.includes('7900023')) {
+                retryErrorMsg.includes('7900023') ||
+                retryErrorMsg.includes('已达到使用次数上限')) {
               console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
               return true;
             }
@@ -1551,7 +1539,8 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
             errorMsg.includes('击杀所有') || 
             errorMsg.includes('7900022') ||
             errorMsg.includes('次数已用完') ||
-            errorMsg.includes('7900023')) {
+            errorMsg.includes('7900023') ||
+            errorMsg.includes('已达到使用次数上限')) {
           console.log(`已经击杀所有 boss 或次数已用完，停止执行`);
           return true;
         } else if (errorMsg.includes('无效的ID') || errorMsg.includes('200330')) {
@@ -2501,8 +2490,8 @@ const oneKeyBattle = async () => {
           selectedTokenId.value,
           tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
           'towers_getinfo',
-          {},
-          tokenStore.sendTowersGetInfo(selectedTokenId.value),
+          { actId: Number(activityId.value) },
+          tokenStore.sendTowersGetInfo(selectedTokenId.value, { actId: Number(activityId.value) }),
           true,
           '暑期活动'
         );
@@ -2525,8 +2514,8 @@ const oneKeyBattle = async () => {
           selectedTokenId.value,
           tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
           'towers_getinfo',
-          {},
-          tokenStore.sendTowersGetInfo(selectedTokenId.value),
+          { actId: Number(activityId.value) },
+          tokenStore.sendTowersGetInfo(selectedTokenId.value, { actId: Number(activityId.value) }),
           true,
           '暑期活动'
         );
@@ -2744,8 +2733,8 @@ const oneKeyBattle = async () => {
           selectedTokenId.value,
           tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
           'towers_getinfo',
-          {},
-          tokenStore.sendTowersGetInfo(selectedTokenId.value),
+          { actId: Number(activityId.value) },
+          tokenStore.sendTowersGetInfo(selectedTokenId.value, { actId: Number(activityId.value) }),
           true,
           '暑期活动'
         );
@@ -2775,8 +2764,8 @@ const oneKeyBattle = async () => {
           selectedTokenId.value,
           tokenStore.gameTokens.find(t => t.id === selectedTokenId.value)?.name || '',
           'towers_getinfo',
-          {},
-          tokenStore.sendTowersGetInfo(selectedTokenId.value),
+          { actId: Number(activityId.value) },
+          tokenStore.sendTowersGetInfo(selectedTokenId.value, { actId: Number(activityId.value) }),
           true,
           '暑期活动'
         );
@@ -3116,7 +3105,7 @@ const batchBattle = async () => {
   }
 };
 
-// 批量导出道具数量
+// 批量导出活动详情
 const batchExportItemCount = async () => {
   if (!itemId.value) {
     message.warning("请输入道具ID");
@@ -3176,11 +3165,11 @@ const batchExportItemCount = async () => {
   };
 
   const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部";
-  message.info(`开始批量导出道具数量（${rangeText}），共${targetTokens.length}个Token...`);
-  logOperation('shidian', '批量导出道具数量', {
+  message.info(`开始批量导出活动详情（${rangeText}），共${targetTokens.length}个Token...`);
+  logOperation('shidian', '批量导出活动详情', {
     cardType: '暑期活动',
     status: 'info',
-    message: `开始批量导出道具数量，${rangeText}，共${targetTokens.length}个Token，道具ID: ${itemId.value}`
+    message: `开始批量导出活动详情，${rangeText}，共${targetTokens.length}个Token，道具ID: ${itemId.value}`
   });
 
   isRunning.value = true;
@@ -3216,25 +3205,57 @@ const batchExportItemCount = async () => {
           itemCount = roleInfo.role.items[itemId.value]?.quantity || 0;
         }
 
+        message.info(`序号 ${tokenIndex} ${token.name || token.id} - 正在获取活动信息...`);
+        const towersInfo = await tokenStore.sendMessageWithPromise(
+          token.id,
+          'towers_getinfo',
+          { actId: Number(activityId.value) },
+          5000
+        );
+
+        // 解析各BOSS层数
+        const bossLevels = {};
+        for (let j = 1; j <= 6; j++) {
+          bossLevels[j] = 0;
+        }
+
+        if (towersInfo && towersInfo.towerData && towersInfo.towerData.levelRewardMap) {
+          for (const [key, value] of Object.entries(towersInfo.towerData.levelRewardMap)) {
+            if (value === true) {
+              const bossNumber = parseInt(key.substring(0, 1));
+              const level = parseInt(key.substring(key.length - 2));
+              if (bossNumber >= 1 && bossNumber <= 6) {
+                bossLevels[bossNumber] = Math.max(bossLevels[bossNumber], level);
+              }
+            }
+          }
+        }
+
         results.push({
           tokenName: token.name || token.id,
           tokenId: token.id,
-          count: itemCount
+          count: itemCount,
+          boss1: bossLevels[1],
+          boss2: bossLevels[2],
+          boss3: bossLevels[3],
+          boss4: bossLevels[4],
+          boss5: bossLevels[5],
+          boss6: bossLevels[6]
         });
 
-        message.success(`序号 ${tokenIndex} ${token.name || token.id} - 道具数量: ${itemCount}`);
-        logOperation('shidian', '批量导出道具数量', {
+        message.success(`序号 ${tokenIndex} ${token.name || token.id} - 道具数量: ${itemCount}, BOSS层数: ${Object.values(bossLevels).join(',')}`);
+        logOperation('shidian', '批量导出活动详情', {
           cardType: '暑期活动',
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `【序号${tokenIndex}】[${token.name || token.id}]道具数量: ${itemCount}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]道具数量: ${itemCount}, BOSS层数: ${Object.values(bossLevels).join(',')}`
         });
 
       } catch (error) {
-        console.error(`序号 ${tokenIndex} ${token.name || token.id} - 获取道具数量失败:`, error);
+        console.error(`序号 ${tokenIndex} ${token.name || token.id} - 获取活动详情失败:`, error);
         message.error(`序号 ${tokenIndex} ${token.name || token.id} - 获取失败: ${error.message || '未知错误'}`);
-        logOperation('shidian', '批量导出道具数量', {
+        logOperation('shidian', '批量导出活动详情', {
           cardType: '暑期活动',
           tokenId: token.id,
           tokenName: token.name,
@@ -3244,7 +3265,13 @@ const batchExportItemCount = async () => {
         results.push({
           tokenName: token.name || token.id,
           tokenId: token.id,
-          count: '获取失败'
+          count: '获取失败',
+          boss1: '获取失败',
+          boss2: '获取失败',
+          boss3: '获取失败',
+          boss4: '获取失败',
+          boss5: '获取失败',
+          boss6: '获取失败'
         });
       } finally {
         if (tokenStore.getWebSocketStatus(token.id) === 'connected') {
@@ -3258,34 +3285,34 @@ const batchExportItemCount = async () => {
     }
 
     // 导出为CSV
-    const csvHeader = 'Token名称,Token ID,道具数量\n';
-    const csvRows = results.map(r => `${r.tokenName},${r.tokenId},${r.count}`).join('\n');
+    const csvHeader = 'Token名称,Token ID,道具数量,BOSS1层数,BOSS2层数,BOSS3层数,BOSS4层数,BOSS5层数,BOSS6层数\n';
+    const csvRows = results.map(r => `${r.tokenName},${r.tokenId},${r.count},${r.boss1},${r.boss2},${r.boss3},${r.boss4},${r.boss5},${r.boss6}`).join('\n');
     const csvContent = '\uFEFF' + csvHeader + csvRows;
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `道具数量_${itemId.value}_${new Date().toLocaleDateString()}.csv`);
+    link.setAttribute('download', `活动详情_${itemId.value}_${new Date().toLocaleDateString()}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
-    message.success(`批量导出道具数量完成，共导出${results.length}个Token`);
-    logOperation('shidian', '批量导出道具数量', {
+    message.success(`批量导出活动详情完成，共导出${results.length}个Token`);
+    logOperation('shidian', '批量导出活动详情', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量导出道具数量完成，共导出${results.length}个Token`
+      message: `批量导出活动详情完成，共导出${results.length}个Token`
     });
 
   } catch (error) {
-    console.error("批量导出道具数量失败:", error);
-    message.error(`批量导出道具数量失败: ${error.message || error}`);
-    logOperation('shidian', '批量导出道具数量', {
+    console.error("批量导出活动详情失败:", error);
+    message.error(`批量导出活动详情失败: ${error.message || error}`);
+    logOperation('shidian', '批量导出活动详情', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量导出道具数量失败: ${error.message || error}`
+      message: `批量导出活动详情失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3357,7 +3384,36 @@ const setTeam = async (tokenId = null, presetTeamResponse = null) => {
     let weaponId = 3; // 默认值
     let petUId = ""; // 默认值
 
-    if (presetTeamResponse && presetTeamResponse.presetTeamInfo) {
+    if (presetTeamResponse && presetTeamResponse.battleData && presetTeamResponse.battleData.leftTeam) {
+      // fight_startlevel 返回格式：battleData.leftTeam.team
+      const leftTeam = presetTeamResponse.battleData.leftTeam;
+      const teamData = leftTeam.team;
+      console.log("从fight_startlevel结果中提取阵容数据");
+      
+      if (teamData) {
+        for (let i = 0; i < 5; i++) {
+          const heroData = teamData[i.toString()] || teamData[i];
+          if (heroData) {
+            const heroId = heroData.id || heroData.heroId;
+            if (heroId && heroId !== 0) {
+              battleTeam[i.toString()] = Number(heroId);
+            }
+          }
+        }
+      }
+      
+      // 从fight_startlevel响应中提取玩具ID
+      if (leftTeam.lordWeapon && leftTeam.lordWeapon.weaponId !== undefined) {
+        weaponId = leftTeam.lordWeapon.weaponId;
+        console.log("从fight_startlevel响应中提取weaponId:", weaponId);
+      }
+      
+      // 从fight_startlevel响应中提取宠物ID
+      if (leftTeam.petUId !== undefined) {
+        petUId = leftTeam.petUId;
+        console.log("从fight_startlevel响应中提取petUId:", petUId);
+      }
+    } else if (presetTeamResponse && presetTeamResponse.presetTeamInfo) {
       const presetTeamInfo = presetTeamResponse.presetTeamInfo.presetTeamInfo || presetTeamResponse.presetTeamInfo;
       
       // 检查是否有阵容1和2

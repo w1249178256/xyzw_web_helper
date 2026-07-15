@@ -4622,30 +4622,10 @@ const handleBatchRecruitWeek = async () => {
         try {
           const tokenIndex = globalIndex + 1
           
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取活动详情...`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取角色信息...`)
           
-          let usedRecruitCount = 0
-          try {
-            const activityInfo = await tokenStore.sendMessageWithPromise(
-              token.id,
-              'activity_get',
-              { },
-              5000
-            )
-            
-            if (activityInfo?.activity?.myTotalInfo?.['1']?.num !== undefined) {
-              usedRecruitCount = activityInfo.activity.myTotalInfo['1'].num
-              console.log(`[批量招募周] activity.myTotalInfo['1'].num = ${usedRecruitCount}`)
-            } else {
-              console.warn('[批量招募周] 未找到 activity.myTotalInfo[\'1\'].num')
-            }
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令数量：${usedRecruitCount}`)
-          } catch (error) {
-            console.error(`获取活动详情失败：${error.message}`, error)
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取活动详情失败，继续执行`)
-          }
-          
+          // 1. 获取角色信息（包含图鉴点数、招募数量、爬塔信息）
+          let bookPoint = 0
           let currentRecruitCount = 0
           let towerFloor = 0
           try {
@@ -4656,17 +4636,24 @@ const handleBatchRecruitWeek = async () => {
               5000
             )
             
-            const items = roleInfo?.role?.items || {}
+            const role = roleInfo?.role || {}
+            
+            // 获取图鉴点数
+            bookPoint = role.book?.bookPoint || 0
+            
+            // 获取招募令数量
+            const items = role.items || {}
             if (items['1001']) {
               currentRecruitCount = items['1001'].quantity || items['1001'].num || 0
             }
             
             // 获取爬塔层数
-            const tower = roleInfo?.role?.tower
+            const tower = role.tower
             if (tower && tower.id) {
               towerFloor = Math.floor(tower.id / 10)
             }
             
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 图鉴点数：${bookPoint}`)
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 现有招募令数量：${currentRecruitCount}`)
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前爬塔层数：${towerFloor}层`)
           } catch (error) {
@@ -4674,28 +4661,104 @@ const handleBatchRecruitWeek = async () => {
             message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
           }
           
-          // 检查爬塔层数是否超过100层
-          if (towerFloor > 100) {
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 爬塔层数${towerFloor}层超过100层，跳过招募周操作`)
+          // 2. 获取玩具信息，检查被动3（skillId 11）
+          let passive3Level = 0
+          try {
+            const lordWeaponInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'lordweapon_get',
+              {},
+              5000
+            )
+            
+            const lordWeapon = lordWeaponInfo?.lordWeapon || {}
+            const toy3 = lordWeapon['3'] || {}
+            const passiveSkill = toy3.passiveSkill || {}
+            const passive3 = passiveSkill['11'] || {}
+            passive3Level = passive3.level || 0
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 玩具被动3等级：${passive3Level}`)
+          } catch (error) {
+            console.error(`获取玩具信息失败：${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取玩具信息失败，继续执行`)
+          }
+          
+          // 如果被动3等级不为0，跳过执行
+          if (passive3Level !== 0) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3已激活(${passive3Level}级)，跳过招募周`)
             logStore.addLog({
               page: 'fish-helper',
               cardType: '养号',
               operation: '批量招募周',
               tokenId: token.id,
               tokenName: token.name,
-              status: 'info',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]爬塔层数${towerFloor}层超过100层，跳过招募周操作`
+              status: 'success',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]被动3已激活(${passive3Level}级)，跳过招募周`
             })
-            return { success: false, reason: 'tower_floor_exceeded', towerFloor }
+            return { success: false, reason: 'passive3_activated', passive3Level }
           }
           
           await waitCommandDelay()
           
-          const totalRecruitCount = Math.floor(usedRecruitCount * 0.8 + currentRecruitCount)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 总招募令数量：${totalRecruitCount} (公式：${usedRecruitCount} * 0.8 + ${currentRecruitCount})`)
-          console.log(`[批量招募周] 总招募令数量：${totalRecruitCount}, 已用：${usedRecruitCount}, 现有：${currentRecruitCount}`)
+          // 3. 计算还能获取的招募令数量
+          // 图鉴奖励计算（从400开始，每150点增加20个招募令）
+          const calculateBookRewards = (point) => {
+            if (point < 400) return 0
+            const levels = Math.floor((point - 400) / 150) + 1
+            return levels * 20
+          }
           
-          const maxRounds = Math.floor(totalRecruitCount / 400)
+          // 爬塔奖励计算（1-100层每层10个，101-200层每层20个）
+          const calculateTowerRewards = (level) => {
+            if (level <= 0) return 0
+            if (level <= 100) {
+              return level * 10
+            } else if (level <= 200) {
+              return 100 * 10 + (level - 100) * 20
+            } else {
+              return 100 * 10 + 100 * 20
+            }
+          }
+          
+          // 图鉴：目标2100点
+          const currentBookRewards = calculateBookRewards(bookPoint)
+          const targetBookRewards = calculateBookRewards(2100)
+          const bookRemainingRewards = targetBookRewards - currentBookRewards
+          
+          // 爬塔：目标200层
+          const currentTowerRewards = calculateTowerRewards(towerFloor)
+          const targetTowerRewards = calculateTowerRewards(200)
+          const towerRemainingRewards = targetTowerRewards - currentTowerRewards
+          
+          // 还能获取的招募令总数
+          const potentialRecruits = bookRemainingRewards + towerRemainingRewards
+          
+          // 计算使用招募数量 SYZM = ZM + LZM - 3000
+          const totalRecruitCount = currentRecruitCount + potentialRecruits
+          const usableRecruits = totalRecruitCount - 3000
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 图鉴可获${bookRemainingRewards}, 爬塔可获${towerRemainingRewards}, 可用招募：${usableRecruits}`)
+          console.log(`[批量招募周] 当前招募：${currentRecruitCount}, 还能获取：${potentialRecruits}, 可用：${usableRecruits}`)
+          
+          // 4. 如果可用招募数量大于400，执行招募周；否则跳过
+          if (usableRecruits <= 400) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 可用招募${usableRecruits}个<=400，跳过招募周`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]可用招募${usableRecruits}个<=400，跳过招募周`
+            })
+            return { success: false, reason: 'insufficient_recruits', usableRecruits }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 可用招募${usableRecruits}个>400，开始执行招募周`)
+          
+          // 计算轮数
+          const maxRounds = Math.floor(usableRecruits / 400)
           console.log(`[批量招募周] 计划轮数：${maxRounds}`)
           
           const theoreticalUsed = maxRounds * 400

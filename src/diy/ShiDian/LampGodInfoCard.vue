@@ -1387,11 +1387,7 @@ const lampGodAction = async () => {
     
     // 执行完整的灯神战斗流程
     for (const type of selectedTypes) {
-      // 模拟点击刷新阵容
-      message.info(`${type.name} 正在刷新阵容...`)
-      await refreshTeamInfo()
-      
-      // 总是执行切换到阵容1，不管当前阵容是多少
+      // 1. 切换到阵容1
       try {
         message.info(`${type.name} 正在切换到阵容1...`)
         await switchToTeam1()
@@ -1400,98 +1396,13 @@ const lampGodAction = async () => {
         // 错误时不终止执行，继续下一步
       }
       
-      // 执行fight_startlevel获取当前阵容
-      message.info(`${type.name} 正在获取当前阵容...`)
-      const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
-      
-      // 获取当前阵容的英雄ID
-      let currentTeamHeroes = []
-      let currentTeamHeroNames = []
-      // fight_startlevel响应结构: { battleData: { leftTeam: { team: { "0": {...}, "1": {...} } } } }
-      let battleTeam = null
-      if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
-        battleTeam = fightResult.battleData.leftTeam.team
-      } else if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
-        battleTeam = fightResult.body.battleData.leftTeam.team
-      }
-      
-      if (battleTeam) {
-        for (let pos = 0; pos < 5; pos++) {
-          const hero = battleTeam[String(pos)] || battleTeam[pos]
-          const heroId = hero && hero.id ? hero.id : 0
-          currentTeamHeroes.push(heroId)
-          if (heroId > 0) {
-            currentTeamHeroNames.push(getHeroName(heroId))
-          }
-        }
-      }
-      
-      logOperation('shidian', '灯神按钮', {
-        cardType: '灯神信息',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'info',
-        message: `执行命令: fight_startlevel, 获取当前阵容: [${currentTeamHeroNames.join(', ')}]`
-      })
-      
-      // 获取灯神阵容配置
-      const config = lampGodConfigs[type.name === '爬塔' ? 'tower' : type.name === '魏国' ? 'wei' : type.name === '蜀国' ? 'shu' : type.name === '吴国' ? 'wu' : type.name === '群雄' ? 'qunxiong' : 'deepsea']
-      
-      // 比较当前阵容与灯神阵容
-      let needSwitchTeam = true
-      let comparisonResult = ''
-      if (config && config.heroes) {
-        const presetHeroNames = config.heroes.map(id => id > 0 ? getHeroName(id) : '空位')
-        needSwitchTeam = !currentTeamHeroes.every((heroId, index) => heroId === config.heroes[index])
-        comparisonResult = needSwitchTeam 
-          ? `当前阵容[${currentTeamHeroNames.join(', ')}] 与 预设阵容[${presetHeroNames.join(', ')}] 不同，需要切换`
-          : `当前阵容[${currentTeamHeroNames.join(', ')}] 与 预设阵容[${presetHeroNames.join(', ')}] 相同，跳过切换`
-      } else {
-        comparisonResult = '未找到预设阵容配置，需要切换'
-      }
-      
-      logOperation('shidian', '灯神按钮', {
-        cardType: '灯神信息',
-        tokenId: token.id,
-        tokenName: token.name,
-        status: 'info',
-        message: `阵容比较: ${comparisonResult}`
-      })
-      
-      // 如果阵容不同，执行切换阵容
-      if (needSwitchTeam) {
-        // 模拟点击切换阵容，将当前阵容使用hero_exchange切换为灯神阵容
-        message.info(`${type.name} 正在切换为灯神阵容...`)
-        await switchTeam()
-      } else {
-        message.info(`${type.name} 当前阵容与灯神阵容相同，跳过切换阵容`)
-      }
-      
-      // 爬塔类型只执行前四步，不执行灯神战斗
+      // 爬塔类型只执行切换阵容1，不执行灯神战斗
       if (type.genieId === 6) { // 爬塔
-        message.info(`${type.name} 前四步执行完成，跳过灯神战斗`)
+        message.info(`${type.name} 切换阵容1完成，跳过灯神战斗`)
         continue
       }
       
-      // 获取角色信息以获得灯神战斗阵容
-      let roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
-      let battleTeamData = null
-      
-      // 如果获取灯神战斗阵容失败，使用当前阵容
-      if (!roleInfo || !roleInfo.role || !roleInfo.role.genieBattleTeam || !roleInfo.role.genieBattleTeam[type.genieId]) {
-        message.warning(`${type.name} 获取灯神战斗阵容信息失败，使用当前阵容`)
-        // 使用之前获取的当前阵容
-        battleTeamData = currentTeamHeroes
-      } else {
-        battleTeamData = roleInfo.role.genieBattleTeam[type.genieId]
-      }
-      
-      if (!battleTeamData) {
-        message.warning(`${type.name} 灯神战斗阵容信息不存在`)
-        continue
-      }
-      
-      // 模拟点击灯神战斗
+      // 2. 灯神战斗（非爬塔类型）：使用灯神信息表格的阵容作为灯神阵容
       message.info(`${type.name} 灯神战斗开始（${lampGodFightCount.value}次）...`)
       
       // 使用灯神信息表格的selectedHeroes作为battleTeam（slot 0-4的heroId）
@@ -1532,6 +1443,7 @@ const lampGodAction = async () => {
         message: `执行命令: hero_calcpowerbyteam, 参数: ${JSON.stringify(calcPowerParams)}`
       })
       
+      // 3. 循环执行灯神战斗
       let challengeExhausted = false
       for (let i = 0; i < lampGodFightCount.value; i++) {
         if (challengeExhausted) break

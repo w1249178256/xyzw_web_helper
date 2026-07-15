@@ -1368,6 +1368,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "hero_exchange", params);
   };
 
+  // 发送神器装备
+  const sendArtifactLoad = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "artifact_load", params);
+  };
+
   // 发送咸将升级
   const sendHeroUpgradeLevel = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_heroupgradelevel", params);
@@ -1690,6 +1695,16 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送领取累充奖励
   const sendClaimTotalReward = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "common_claimtotalreward", params);
+  };
+
+  // 发送开启星 pack（世界杯活动）
+  const sendSaltcup26OpenStarPack = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_openstarpack", params);
+  };
+
+  // 发送竞猜下注（世界杯活动）
+  const sendSaltcup26PlaceBet = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_placebet", params);
   };
 
   // 发送武将上阵/下阵
@@ -2285,6 +2300,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendFightStartLevel,
     sendGachaDrawReward,
     sendHeroExchange,
+    sendArtifactLoad,
     sendHeroUpgradeLevel,
     sendHeroLordUpgradeLevel,
     sendHeroSimulation,
@@ -2350,6 +2366,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendClaimCdkReward,
     sendSystemClaimCdkReward,
     sendClaimTotalReward,
+    sendSaltcup26OpenStarPack,
+    sendSaltcup26PlaceBet,
     sendHeroGoIntoBattle,
     sendHeroGoBackBattle,
     sendHeroRebirth,

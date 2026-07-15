@@ -932,17 +932,7 @@ const executeHeroUpgrade = async (token) => {
     return
   }
 
-  let redHeroFailCount = 0 // 红将连续失败计数（包括物品数量不足）
-
   for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
-    // 检查红将连续失败次数（包括物品数量不足）
-    if (redHeroFailCount >= 3) {
-      message.info(`${token.name || token.id} 红将连续失败3个，跳过该token`)
-      throw new Error('红将连续失败3个，跳过该token')
-    }
-
-    let heroUpgradeSuccess = false
-
     // 计算最多可升次数
     const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost))
 
@@ -960,49 +950,16 @@ const executeHeroUpgrade = async (token) => {
           const errorMsg = result.hint || result.message || ''
           if (errorMsg.includes('物品数量不足') || errorMsg.includes('数量不足')) {
             await new Promise(resolve => setTimeout(resolve, 500))
-            // 只有红将的物品数量不足才计数
-            if (heroId >= 301 && heroId <= 314) {
-              redHeroFailCount++
-              message.info(`${token.name || token.id} 红将${heroId}升星失败：${errorMsg}，连续失败${redHeroFailCount}个`)
-            }
             break
           }
-        }
-
-        heroUpgradeSuccess = true
-        // 如果是红将且升星成功，重置失败计数
-        if (heroId >= 301 && heroId <= 314) {
-          redHeroFailCount = 0
         }
       } catch (err) {
         // 失败后也执行延迟
         await new Promise(resolve => setTimeout(resolve, 500))
-
-        // 检查是否是物品数量不足的错误
-        const errorMsg = err.message || ''
-        if (errorMsg.includes('物品数量不足') || errorMsg.includes('数量不足')) {
-          // 只有红将的物品数量不足才计数
-          if (heroId >= 301 && heroId <= 314) {
-            redHeroFailCount++
-            message.info(`${token.name || token.id} 红将${heroId}升星失败：${errorMsg}，连续失败${redHeroFailCount}个`)
-          }
-        } else {
-          // 如果是红将，增加失败计数
-          if (heroId >= 301 && heroId <= 314) {
-            redHeroFailCount++
-            message.info(`${token.name || token.id} 红将${heroId}升星失败，连续失败${redHeroFailCount}个`)
-          }
-        }
         break
       }
       // 每次升星后延迟
       await new Promise(resolve => setTimeout(resolve, 500))
-    }
-
-    // 如果是红将且本轮没有成功升星，检查是否需要跳过
-    if (heroId >= 301 && heroId <= 314 && !heroUpgradeSuccess && redHeroFailCount >= 3) {
-      message.info(`${token.name || token.id} 红将连续失败3个（${heroId}及之前），跳过该token`)
-      throw new Error('红将连续失败3个，跳过该token')
     }
   }
 
@@ -1153,26 +1110,7 @@ const handleBatchUpgrade = async () => {
           message: `序号 ${tokenIndex} 开始英雄升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始英雄升星...`)
-        let upgradableHeroes = []
-        try {
-          upgradableHeroes = await executeHeroUpgrade(token)
-        } catch (heroUpgradeError) {
-          // 如果是红将连续失败3个（包括物品数量不足），跳过该token的后续操作
-          if (heroUpgradeError.message === '红将连续失败3个，跳过该token') {
-            message.warning(`序号 ${tokenIndex} ${token.name || token.id} 红将连续失败3个，跳过`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '爬塔升星',
-              operation: '英雄升星',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'warning',
-              message: `序号 ${tokenIndex} 红将连续失败3个，跳过该token`
-            })
-            continue // 跳过后续操作，处理下一个token
-          }
-          throw heroUpgradeError // 其他错误继续抛出
-        }
+        const upgradableHeroes = await executeHeroUpgrade(token)
         message.success(`序号 ${tokenIndex} ${token.name || token.id} 英雄升星完成`)
         logStore.addLog({
           page: 'fish-helper',

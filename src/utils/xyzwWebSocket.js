@@ -164,6 +164,8 @@ export function registerDefaultCommands(reg) {
     .register("system_claimcdkreward")
     .register("system_editname")
     .register("common_claimtotalreward")
+    .register("saltcup26_openstarpack", { packId: 5501, starId: 0, cnt: 1 })
+    .register("saltcup26_placebet")
     .register("activity_exchange")
     .register("system_signinreward")
     .register("system_mysharecallback", { isSkipShareCard: true, type: 2 })
@@ -501,6 +503,7 @@ export function registerDefaultCommands(reg) {
     .register("book_claimpointreward")
     .register("nightmare_getroleinfo")
     .register("hero_exchange", { heroId: 0 })
+    .register("artifact_load", { heroId: 0, itemId: 0, targetHeroId: -1, pearlId: 0 })
     .register("legion_exchangeresearch", { researchId: 0 })
     .register("legion_research", { researchId: 0 })
     .register("legion_resetresearch", {})
@@ -1189,6 +1192,8 @@ export class XyzwWebSocketClient {
       system_claimcdkrewardresp: "system_claimcdkreward",
       system_editnameresp: "system_editname",
       common_claimtotalrewardresp: "common_claimtotalreward",
+      saltcup26_openstarpackresp: "saltcup26_openstarpack",
+      saltcup26_placebetresp: "saltcup26_placebet",
       activity_exchangeresp: "activity_exchange",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
       bottlehelper_claimresp: "bottlehelper_claim",
@@ -1322,6 +1327,7 @@ export class XyzwWebSocketClient {
         "dungeon_selecthero",
         "artifact_exchange",
         "hero_exchange",
+        "artifact_load",
       ],
     };
 

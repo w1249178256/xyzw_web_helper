@@ -29,6 +29,18 @@
         <!-- 操作按钮区域 -->
         <CustomizedCard mode="container">
           <CustomizedCard 
+            mode="button-switch"
+            name="阵容一"
+            :switch-value="team1Enabled"
+            @update:switch-value="(val) => team1Enabled = val"
+          />
+          <CustomizedCard 
+            mode="button-switch"
+            name="阵容二"
+            :switch-value="team2Enabled"
+            @update:switch-value="(val) => team2Enabled = val"
+          />
+          <CustomizedCard 
             mode="button"
             :name="isBatchReplacingHero ? '批量换将中...' : '批量换将'"
             @button-click="handleBatchReplaceHero"
@@ -94,8 +106,12 @@
             @button-click="handleBatchHeroSynthetic"
           />
           <CustomizedCard 
-            mode="button"
-            :name="isUpgradingChiYu ? '购买升级赤羽中...' : '购买升级赤羽'"
+            mode="button-with-select"
+            :button-text="isUpgradingChiYu ? '购买升级鱼灵中...' : '购买升级鱼灵'"
+            :select-value="selectedFishSpiritAction"
+            @update:select-value="(val) => selectedFishSpiritAction = val"
+            :select-options="fishSpiritOptions"
+            placeholder="选择操作"
             @button-click="handleUpgradeChiYu"
             :disabled="isUpgradingChiYu"
             :loading="isUpgradingChiYu"
@@ -135,7 +151,8 @@
               { label: '主动', value: 'active' },
               { label: '被动一', value: 'passive1' },
               { label: '被动二', value: 'passive2' },
-              { label: '被动三', value: 'passive3' }
+              { label: '被动三', value: 'passive3' },
+              { label: '被动四', value: 'passive4' }
             ]"
             placeholder="选择模式"
             @button-click="handleBatchUpgradeToys"
@@ -198,7 +215,7 @@ import CustomizedCard from '@/diy/CustomizedCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { People } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
-import { HERO_DICT, STAR_DICT } from '@/utils/HeroList'
+import { HERO_DICT, STAR_DICT, weapon } from '@/utils/HeroList'
 
 const tokenStore = useTokenStore()
 const logStore = useOperationLogStore()
@@ -349,6 +366,10 @@ const isBatchHeroBattle = ref(false)
 const isBatchUnloadingHeroes = ref(false)
 const isBatchReplacingHero = ref(false)
 
+// 阵容切换开关
+const team1Enabled = ref(false)
+const team2Enabled = ref(false)
+
 // 下拉选择状态
 const selectedUniversalRedHero = ref(null)
 const selectedCrystalHero = ref(null)
@@ -360,6 +381,14 @@ const selectedUpgradeMode = ref('story')
 const selectedBatchHero = ref('107')
 const selectedUnloadHero = ref('all')
 const selectedSingleHero = ref('107')
+const selectedFishSpiritAction = ref('equip_shigu')
+
+// 鱼灵操作选项
+const fishSpiritOptions = [
+  { label: '装备蚀骨', value: 'equip_shigu' },
+  { label: '升级蚀骨', value: 'upgrade_shigu' },
+  { label: '升级赤羽', value: 'upgrade_chiyu' }
+]
 
 // 阵容选择状态
 const selectedHeroes = ref(['', '', '', '', ''])
@@ -699,8 +728,8 @@ const handleUseUniversalRed = async () => {
           heroFragmentCount = roleInfo.role.items[String(heroId)].quantity || 0
         }
 
-        // 确定目标星级：吕布(107)、太史慈(120)、郭嘉(102)最多30星，其他红将最多28星
-        const targetStar = (heroId === 107 || heroId === 120 || heroId === 102) ? 30 : 28
+        // 确定目标星级：吕布(107)最多30星，其他红将最多28星
+        const targetStar = heroId === 107 ? 30 : 28
 
         // 在控制台和操作日志中显示获取的信息
         console.log(`[序号${tokenIndex}] 获取的信息：${selectedHeroName}：${heroStar}星，碎片：${heroFragmentCount}，万能红：${universalRedCount}，目标：${targetStar}星`)
@@ -739,10 +768,10 @@ const handleUseUniversalRed = async () => {
           message: `【序号${tokenIndex}】[${token.name || token.id}]计算结果：升${targetStar}星需${totalFragmentNeeded}碎片，缺${universalRedNeeded}万能红，实际使用${actualUseCount}个`
         })
 
-        // 判断是否是吕布、太史慈或郭嘉
-        const isSpecialHero = selectedUniversalRedHero.value === 107 || selectedUniversalRedHero.value === 120 || selectedUniversalRedHero.value === 102
+        // 判断是否是吕布
+        const isSpecialHero = selectedUniversalRedHero.value === 107
 
-        // 条件判断：吕布/太史慈/郭嘉>=30星停止，非吕布>=28星停止
+        // 条件判断：吕布>=30星停止，其他红将>=28星停止
         if (isSpecialHero && heroStar >= 30) {
           message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${selectedHeroName}已${heroStar}星（>=30星），停止使用万能红`)
           logStore.addLog({
@@ -1247,7 +1276,7 @@ const handleBatchHeroSynthetic = async () => {
   }
 }
 
-// 5. 购买升级赤羽
+// 5. 购买升级鱼灵
 const handleUpgradeChiYu = async () => {
   const tokenIndices = parseTokenRange(executionTokens.value)
   const targetTokens = getTargetTokens(tokenIndices)
@@ -1258,17 +1287,19 @@ const handleUpgradeChiYu = async () => {
   }
 
   const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+  const action = selectedFishSpiritAction.value
+  const actionLabel = fishSpiritOptions.find(opt => opt.value === action)?.label || '未知操作'
 
   try {
     isUpgradingChiYu.value = true
 
-    message.info(`开始购买升级赤羽（${rangeText}），共${targetTokens.length}个Token...`)
+    message.info(`开始${actionLabel}（${rangeText}），共${targetTokens.length}个Token...`)
 
     // 逐个处理Token
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       const tokenIndex = getTokenIndex(token)
-      message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始购买升级赤羽...`)
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始${actionLabel}...`)
 
       try {
         // 连接Token
@@ -1288,66 +1319,111 @@ const handleUpgradeChiYu = async () => {
           }
         }
 
-        // 执行activity_buygoods 2次
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 执行activity_buygoods 2次`)
-        for (let j = 0; j < 2; j++) {
+        // 根据选择的操作执行不同的命令
+        if (action === 'equip_shigu') {
+          // 购买并装备蚀骨
+          // 1. 购买蚀骨
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨`)
+          try {
+            await tokenStore.sendActivityBuyGoods(token.id, {
+              type: 1,
+              goodsId: 8212
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨失败:`, error.message)
+          }
+          await waitCommandDelay()
+
+          // 2. 装备蚀骨
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 装备蚀骨`)
+          try {
+            await tokenStore.sendArtifactLoad(token.id, {
+              heroId: 107,
+              itemId: 12121,
+              targetHeroId: -1,
+              pearlId: 0
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 装备蚀骨成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 装备蚀骨失败:`, error.message)
+          }
+        } else if (action === 'upgrade_shigu') {
+          // 购买并升级蚀骨
+          // 1. 购买蚀骨
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨`)
+          try {
+            await tokenStore.sendActivityBuyGoods(token.id, {
+              type: 1,
+              goodsId: 8212
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 购买蚀骨失败:`, error.message)
+          }
+          await waitCommandDelay()
+
+          // 2. 升级蚀骨
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 升级蚀骨`)
+          try {
+            await tokenStore.sendArtifactUpgradeStar(token.id, {
+              heroId: 107,
+              itemId: 12121
+            })
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 升级蚀骨成功`)
+          } catch (error) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 升级蚀骨失败:`, error.message)
+          }
+        } else if (action === 'upgrade_chiyu') {
+          // 购买并升级赤羽
+          // 1. 购买赤羽
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买赤羽`)
           try {
             await tokenStore.sendActivityBuyGoods(token.id, {
               type: 1,
               goodsId: 8304
             })
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次购买赤羽成功`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 购买赤羽成功`)
           } catch (error) {
-            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次购买赤羽失败:`, error.message)
-            // 失败也继续执行
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 购买赤羽失败:`, error.message)
           }
-          // 每次执行间隔500ms
-          if (j < 1) {
-            await waitCommandDelay()
-          }
-        }
+          await waitCommandDelay()
 
-        // 执行artifact_upgradestar 2次
-        message.info(`[序号${tokenIndex}] ${token.name || token.id} - 执行artifact_upgradestar 2次`)
-        for (let j = 0; j < 2; j++) {
+          // 2. 升级赤羽
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} - 升级赤羽`)
           try {
             await tokenStore.sendArtifactUpgradeStar(token.id, {
               heroId: 107,
               itemId: 13041
             })
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次升级赤羽成功`)
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} - 升级赤羽成功`)
           } catch (error) {
-            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 第${j + 1}次升级赤羽失败:`, error.message)
-            // 失败也继续执行
-          }
-          // 每次执行间隔500ms
-          if (j < 1) {
-            await waitCommandDelay()
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} - 升级赤羽失败:`, error.message)
           }
         }
 
-        message.success(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽完成`)
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} - ${actionLabel}完成`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '武将',
-          operation: '购买升级赤羽',
+          operation: '购买升级鱼灵',
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: `【序号${tokenIndex}】[${token.name || token.id}]购买升级赤羽完成`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${actionLabel}完成`
         })
 
       } catch (error) {
-        console.error(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽失败:`, error)
-        message.warning(`[序号${tokenIndex}] ${token.name || token.id} - 购买升级赤羽失败：${error.message || '未知错误'}`)
+        console.error(`[序号${tokenIndex}] ${token.name || token.id} - ${actionLabel}失败:`, error)
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} - ${actionLabel}失败：${error.message || '未知错误'}`)
         logStore.addLog({
           page: 'fish-helper',
           cardType: '武将',
-          operation: '购买升级赤羽',
+          operation: '购买升级鱼灵',
           tokenId: token.id,
           tokenName: token.name,
           status: 'warning',
-          message: `【序号${tokenIndex}】[${token.name || token.id}]购买升级赤羽失败：${error.message || '未知错误'}`
+          message: `【序号${tokenIndex}】[${token.name || token.id}]${actionLabel}失败：${error.message || '未知错误'}`
         })
       } finally {
         // 关闭WebSocket连接
@@ -1363,24 +1439,24 @@ const handleUpgradeChiYu = async () => {
       }
     }
 
-    message.success(`购买升级赤羽完成，共处理${targetTokens.length}个Token`)
+    message.success(`${actionLabel}完成，共处理${targetTokens.length}个Token`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '武将',
-      operation: '购买升级赤羽',
+      operation: '购买升级鱼灵',
       status: 'success',
-      message: `购买升级赤羽完成，共处理${targetTokens.length}个Token`
+      message: `${actionLabel}完成，共处理${targetTokens.length}个Token`
     })
 
   } catch (error) {
-    console.error('购买升级赤羽失败:', error)
-    message.error(`购买升级赤羽失败：${error.message || '未知错误'}`)
+    console.error(`${actionLabel}失败:`, error)
+    message.error(`${actionLabel}失败：${error.message || '未知错误'}`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '武将',
-      operation: '购买升级赤羽',
+      operation: '购买升级鱼灵',
       status: 'error',
-      message: `购买升级赤羽失败：${error.message || '未知错误'}`
+      message: `${actionLabel}失败：${error.message || '未知错误'}`
     })
   } finally {
     isUpgradingChiYu.value = false
@@ -2734,7 +2810,7 @@ const handleBatchUpgradeLord = async () => {
   }
 }
 
-// 8. 批量激活玩具阵容
+// 8. 批量激活玩具阵容 - 获取红将和紫将星级最高的4个武将上阵到slot1-slot4
 const handleBatchActivateToyTeam = async () => {
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase()
@@ -2773,14 +2849,6 @@ const handleBatchActivateToyTeam = async () => {
   try {
     isBatchActivatingToyTeam.value = true
     
-    // 玩具阵容配置：阵容 1-4 对应的武将（位置 1-4，不换 0 号的吕布）
-    const toyTeamConfig = [
-      { team: 1, heroId: 309, heroName: '陆绩' },
-      { team: 2, heroId: 303, heroName: '于禁' },
-      { team: 3, heroId: 308, heroName: '张昭' },
-      { team: 4, heroId: 312, heroName: '邢道荣' }
-    ]
-    
     const results = await connectionPool.batchOperate(
       targetTokens,
       async (token, globalIndex) => {
@@ -2798,30 +2866,63 @@ const handleBatchActivateToyTeam = async () => {
             message: `[序号${tokenIndex}] 开始激活玩具阵容`
           })
           
-          // 1. 使用 fight_startlevel 获取当前阵容
-          const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
+          // 0. 先切换到阵容1
+          try {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 切换到阵容1...`)
+            await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
+            await waitCommandDelay()
+          } catch (switchError) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} 切换阵容失败，继续执行:`, switchError)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 切换阵容失败，继续执行`)
+          }
+          
+          // 1. 使用 role_getroleinfo 获取角色信息
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
           await waitCommandDelay()
           
-          // 2. 解析阵容数据（兼容多种响应格式）
-          let battleTeam = null
-          if (fightResult && fightResult.body && fightResult.body.battleData && fightResult.body.battleData.leftTeam && fightResult.body.battleData.leftTeam.team) {
-            battleTeam = fightResult.body.battleData.leftTeam.team
-          } else if (fightResult && fightResult._raw && fightResult._raw.body && fightResult._raw.body.battleData && fightResult._raw.body.battleData.leftTeam && fightResult._raw.body.battleData.leftTeam.team) {
-            battleTeam = fightResult._raw.body.battleData.leftTeam.team
-          } else if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam && fightResult.battleData.leftTeam.team) {
-            battleTeam = fightResult.battleData.leftTeam.team
+          // 2. 解析武将数据（兼容多种响应格式）
+          let heroesData = null
+          if (roleInfo && roleInfo.role && roleInfo.role.heroes) {
+            heroesData = roleInfo.role.heroes
+          } else if (roleInfo && roleInfo._raw && roleInfo._raw.body && roleInfo._raw.body.role && roleInfo._raw.body.role.heroes) {
+            heroesData = roleInfo._raw.body.role.heroes
+          } else if (roleInfo && roleInfo.body && roleInfo.body.role && roleInfo.body.role.heroes) {
+            heroesData = roleInfo.body.role.heroes
+          } else if (roleInfo && roleInfo.heroes) {
+            heroesData = roleInfo.heroes
           }
           
-          // 获取阵容 1-4 的武将 ID（位置 1-4，不换 0 号的吕布）
-          let currentTeamHeroes = []
-          for (let i = 1; i <= 4; i++) {
-            const hero = battleTeam?.[String(i)] || battleTeam?.[i]
-            if (hero && hero.id) {
-              currentTeamHeroes.push(hero.id)
-            } else {
-              currentTeamHeroes.push(0)
+          if (!heroesData) {
+            throw new Error('获取角色信息失败')
+          }
+          
+          // 3. 收集红将(101-121，排除吕布107)和紫将(301-314)的星级
+          const heroStars = []
+          
+          // 红将：101-121，排除吕布(107)
+          for (let i = 101; i <= 121; i++) {
+            if (i === 107) continue // 排除吕布
+            const hero = heroesData[String(i)] || heroesData[i]
+            if (hero) {
+              const star = hero.star || 0
+              const heroName = HERO_DICT[i]?.name || `武将${i}`
+              heroStars.push({ heroId: i, heroName, star })
             }
           }
+          
+          // 紫将：301-314
+          for (let i = 301; i <= 314; i++) {
+            const hero = heroesData[String(i)] || heroesData[i]
+            if (hero) {
+              const star = hero.star || 0
+              const heroName = HERO_DICT[i]?.name || `武将${i}`
+              heroStars.push({ heroId: i, heroName, star })
+            }
+          }
+          
+          // 4. 按星级降序排序，选出星级最高的4个
+          heroStars.sort((a, b) => b.star - a.star)
+          const top4Heroes = heroStars.slice(0, 4)
           
           logStore.addLog({
             page: 'fish-helper',
@@ -2830,12 +2931,13 @@ const handleBatchActivateToyTeam = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'info',
-            message: `[序号${tokenIndex}] 当前阵容武将：${JSON.stringify(currentTeamHeroes)}`
+            message: `[序号${tokenIndex}] 星级最高的4个武将：${top4Heroes.map((h, i) => `${h.heroName}(${h.star}星)→slot${i+1}`).join('，')}`
           })
           
-          // 3. 对每个阵容执行 hero_exchange 命令
-          for (const config of toyTeamConfig) {
-            const currentHeroId = currentTeamHeroes[config.team - 1] || config.heroId
+          // 5. 对每个武将执行 hero_gointobattle 命令，上阵到 slot1-slot4
+          for (let i = 0; i < top4Heroes.length; i++) {
+            const hero = top4Heroes[i]
+            const slot = i + 1
             
             logStore.addLog({
               page: 'fish-helper',
@@ -2844,16 +2946,13 @@ const handleBatchActivateToyTeam = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `[序号${tokenIndex}] 切换阵容${config.team}：${currentHeroId} → ${config.heroName}(ID:${config.heroId})`
+              message: `[序号${tokenIndex}] 上阵${hero.heroName}(${hero.star}星)到slot${slot}`
             })
             
             await tokenStore.sendMessageWithPromise(
               token.id,
-              'hero_exchange',
-              {
-                heroId: currentHeroId,
-                targetHeroId: config.heroId
-              },
+              'hero_gointobattle',
+              { heroId: hero.heroId, slot: slot },
               5000
             )
             await waitCommandDelay()
@@ -2865,7 +2964,7 @@ const handleBatchActivateToyTeam = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `[序号${tokenIndex}] 阵容${config.team}切换为${config.heroName}成功`
+              message: `[序号${tokenIndex}] ${hero.heroName}上阵到slot${slot}成功`
             })
           }
           
@@ -2986,6 +3085,7 @@ const handleBatchUpgradeToys = async () => {
   else if (upgradeMode === 'passive1') modeName = '被动一'
   else if (upgradeMode === 'passive2') modeName = '被动二'
   else if (upgradeMode === 'passive3') modeName = '被动三'
+  else if (upgradeMode === 'passive4') modeName = '被动四'
   
   message.info(`开始批量升级玩具-${modeName}（${rangeText}），共${targetTokens.length}个Token...`)
   logStore.addLog({
@@ -3015,6 +3115,15 @@ const handleBatchUpgradeToys = async () => {
             status: 'info',
             message: `【序号${tokenIndex}】[${token.name || token.id}]开始升级玩具-${modeName}`
           })
+          
+          // 先执行 lordweapon_get 获取玩具信息
+          await tokenStore.sendMessageWithPromise(
+            token.id,
+            'lordweapon_get',
+            {},
+            5000
+          )
+          await waitCommandDelay()
           
           if (upgradeMode === 'activate') {
             await tokenStore.sendMessageWithPromise(
@@ -3081,7 +3190,7 @@ const handleBatchUpgradeToys = async () => {
               status: 'success',
               message: `玩具主动升级完成，共执行${upgradeCount}次`
             })
-          } else if (upgradeMode === 'passive1' || upgradeMode === 'passive2' || upgradeMode === 'passive3') {
+          } else if (upgradeMode === 'passive1' || upgradeMode === 'passive2' || upgradeMode === 'passive3' || upgradeMode === 'passive4') {
             let skillId = 9
             let skillName = '被动一'
             if (upgradeMode === 'passive2') {
@@ -3090,6 +3199,9 @@ const handleBatchUpgradeToys = async () => {
             } else if (upgradeMode === 'passive3') {
               skillId = 11
               skillName = '被动三'
+            } else if (upgradeMode === 'passive4') {
+              skillId = 12
+              skillName = '被动四'
             }
             
             let upgradeCount = 0
@@ -4016,6 +4128,23 @@ const handleBatchReplaceHero = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
+          
+          // 根据阵容切换开关切换阵容
+          try {
+            if (team1Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容一...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
+              await waitCommandDelay()
+            } else if (team2Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容二...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 2 })
+              await waitCommandDelay()
+            }
+          } catch (switchError) {
+            console.warn(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行:`, switchError)
+            message.warning(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行`)
+          }
+          
           message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
           
           // 获取当前阵容
@@ -4042,7 +4171,7 @@ const handleBatchReplaceHero = async () => {
                 tokenId: token.id,
                 tokenName: token.name,
                 status: 'info',
-                message: `位置${slot}武将相同(${HERO_DICT[targetHeroId]?.name || targetHeroId})，跳过`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]位置${slot}武将相同(${HERO_DICT[targetHeroId]?.name || targetHeroId})，跳过`
               })
               continue
             }
@@ -4062,6 +4191,21 @@ const handleBatchReplaceHero = async () => {
             await waitCommandDelay()
             exchangeCount++
             
+            // 更新currentTeam，反映换将后的实际阵容
+            // hero_exchange会交换两个武将的位置，需要找到targetHeroId在currentTeam中的位置
+            let targetHeroSlot = -1
+            for (let s = 0; s < 5; s++) {
+              if (currentTeam[s] === targetHeroId) {
+                targetHeroSlot = s
+                break
+              }
+            }
+            if (targetHeroSlot !== -1) {
+              // 交换slot和targetHeroSlot的武将
+              currentTeam[slot] = targetHeroId
+              currentTeam[targetHeroSlot] = currentHeroId
+            }
+            
             logStore.addLog({
               page: 'fish-helper',
               cardType: '武将',
@@ -4069,11 +4213,11 @@ const handleBatchReplaceHero = async () => {
               tokenId: token.id,
               tokenName: token.name,
               status: 'success',
-              message: `位置${slot}: ${currentName} → ${targetName}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]位置${slot}: ${currentName} → ${targetName}`
             })
           }
           
-          message.success(`[${tokenIndex}] ${token.name || token.id} 换将完成，共换${exchangeCount}个`)
+          message.success(`【序号${tokenIndex}】[${token.name || token.id}]换将完成，共换${exchangeCount}个`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '武将',
@@ -4081,7 +4225,7 @@ const handleBatchReplaceHero = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `换将完成，共换${exchangeCount}个`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]换将完成，共换${exchangeCount}个`
           })
           
         } catch (error) {
@@ -4158,6 +4302,23 @@ const handleBatchHeroBattle = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
+          
+          // 根据阵容切换开关切换阵容
+          try {
+            if (team1Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容一...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
+              await waitCommandDelay()
+            } else if (team2Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容二...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 2 })
+              await waitCommandDelay()
+            }
+          } catch (switchError) {
+            console.warn(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行:`, switchError)
+            message.warning(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行`)
+          }
+          
           message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
           
           // 获取当前阵容
@@ -4314,6 +4475,23 @@ const handleBatchUnloadHeroes = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
+          
+          // 根据阵容切换开关切换阵容
+          try {
+            if (team1Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容一...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 1 })
+              await waitCommandDelay()
+            } else if (team2Enabled.value) {
+              message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在切换到阵容二...`)
+              await tokenStore.sendPresetteamSaveTeam(token.id, { teamId: 2 })
+              await waitCommandDelay()
+            }
+          } catch (switchError) {
+            console.warn(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行:`, switchError)
+            message.warning(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 切换阵容失败，继续执行`)
+          }
+          
           message.info(`[${tokenIndex}/${targetTokens.length}] ${token.name || token.id} 正在获取当前阵容...`)
           
           // 获取当前阵容
@@ -4438,19 +4616,42 @@ const handleExportDetails = async () => {
 
           const role = roleInfo.role
           
-          // 获取玩具被动激活情况
+          // 获取玩具被动激活情况 - lordWeapon 是对象，包含多个玩具
           const lordWeapon = role.lordWeapon || {}
-          const passiveSkill = lordWeapon.passiveSkill || {}
-          const passiveLevels = Object.values(passiveSkill).map(skill => skill.level || 0)
-          const maxPassiveLevel = passiveLevels.length > 0 ? Math.max(...passiveLevels) : 0
-          const passiveActivated = maxPassiveLevel > 0
+          const toyPassiveInfo = []
           
-          const toyPassiveInfo = [{
-            toyId: lordWeapon.weaponId || 0,
-            toyName: getToyName(lordWeapon.weaponId || 0),
-            passiveLevel: maxPassiveLevel,
-            passiveActivated: passiveActivated
-          }]
+          // 遍历所有玩具
+          for (const [toyIndex, toyData] of Object.entries(lordWeapon)) {
+            if (!toyData || !toyData.weaponId) continue
+            
+            const passiveSkill = toyData.passiveSkill || {}
+            const passiveEntries = Object.entries(passiveSkill)
+            
+            // 找出最后一个被动技能（skillId最大的）
+            let maxPassiveSkillId = 0
+            let maxPassiveLevel = 0
+            for (const [skillIndex, skillData] of passiveEntries) {
+              const skillId = skillData.skillId || parseInt(skillIndex)
+              if (skillId > maxPassiveSkillId) {
+                maxPassiveSkillId = skillId
+                maxPassiveLevel = skillData.level || 0
+              }
+            }
+            
+            // 计算被动序号：skillId 9=被动一, 10=被动二, 11=被动三...
+            const passiveIndex = maxPassiveSkillId >= 9 ? maxPassiveSkillId - 8 : 0
+            const passiveIndexName = passiveIndex > 0 ? `被动${passiveIndex}` : '无'
+            
+            const passiveActivated = maxPassiveLevel > 0
+            
+            toyPassiveInfo.push({
+              toyId: toyData.weaponId || 0,
+              toyName: getToyName(toyData.weaponId || 0),
+              maxPassiveName: passiveIndexName,
+              passiveLevel: maxPassiveLevel,
+              passiveActivated: passiveActivated
+            })
+          }
 
           // 获取所有武将及其星级
           const heroes = role.heroes || {}
@@ -4495,15 +4696,17 @@ const handleExportDetails = async () => {
       }
     )
 
-    // 过滤成功的结果
-    const successResults = results.filter(r => r.success)
+    // 过滤成功的结果（batchOperate返回格式：{success, result: {实际数据}}）
+    const successResults = results.filter(r => r.success && r.result)
     const failureCount = results.filter(r => !r.success).length
 
     // 生成CSV内容
     let csvContent = '\uFEFF' // BOM for Excel UTF-8
-    csvContent += '账号,序号,玩具名称,被动等级,是否激活,最高星级武将1,星级1,最高星级武将2,星级2,最高星级武将3,星级3,最高星级武将4,星级4,最高星级武将5,星级5,星级之和\n'
+    csvContent += '账号,序号,玩具名称,最高被动,被动等级,是否激活,最高星级武将1,星级1,最高星级武将2,星级2,最高星级武将3,星级3,最高星级武将4,星级4,最高星级武将5,星级5,星级之和\n'
 
-    for (const result of successResults) {
+    for (const r of successResults) {
+      // 从 r.result 中获取实际数据
+      const result = r.result
       // 玩具被动信息（可能有多个玩具）
       const toyPassiveInfo = result.toyPassiveInfo || []
       const top5Heroes = result.top5Heroes || []
@@ -4511,7 +4714,7 @@ const handleExportDetails = async () => {
       
       if (toyPassiveInfo.length > 0) {
         for (const toy of toyPassiveInfo) {
-          csvContent += `${result.tokenName},${result.tokenIndex},${toy.toyName},${toy.passiveLevel},${toy.passiveActivated ? '已激活' : '未激活'},`
+          csvContent += `${result.tokenName},${result.tokenIndex},${toy.toyName},${toy.maxPassiveName},${toy.passiveLevel},${toy.passiveActivated ? '已激活' : '未激活'},`
           // 添加武将信息
           for (let i = 0; i < 5; i++) {
             if (top5Heroes[i]) {
@@ -4523,7 +4726,7 @@ const handleExportDetails = async () => {
           csvContent += `${totalStars}\n`
         }
       } else {
-        csvContent += `${result.tokenName},${result.tokenIndex},无玩具数据,,,,`
+        csvContent += `${result.tokenName},${result.tokenIndex},无玩具数据,,,,,`
         for (let i = 0; i < 5; i++) {
           if (top5Heroes[i]) {
             csvContent += `${top5Heroes[i].heroName},${top5Heroes[i].star},`
@@ -4572,14 +4775,7 @@ const handleExportDetails = async () => {
 
 // 辅助函数：获取玩具名称
 const getToyName = (toyId) => {
-  const toyNames = {
-    1: '青龙',
-    2: '白虎',
-    3: '朱雀',
-    4: '玄武',
-    5: '麒麟'
-  }
-  return toyNames[toyId] || `玩具${toyId}`
+  return weapon[toyId] || `玩具${toyId}`
 }
 </script>
 
