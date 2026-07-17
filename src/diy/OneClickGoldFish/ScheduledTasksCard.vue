@@ -993,7 +993,7 @@ const handleExecuteScheduledTasks = async () => {
       cardType: '定时任务',
       operation: '执行定时任务',
       status: 'error',
-      message: `批量执行定时任务失败: ${error.message}`
+      message: `【批量】批量执行定时任务失败: ${error.message}`
     })
   } finally {
     isExecutingScheduledTasks.value = false
@@ -1322,7 +1322,7 @@ const handleBatchBlackMarket = async () => {
       cardType: '定时任务',
       operation: '批量黑市周',
       status: 'success',
-      message: `批量黑市周执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量黑市周执行完成：成功 ${successCount} 个，失败 ${failureCount} 个`
     })
   } catch (error) {
     console.error('批量黑市周失败:', error)
@@ -1333,7 +1333,7 @@ const handleBatchBlackMarket = async () => {
       cardType: '定时任务',
       operation: '批量黑市周',
       status: 'error',
-      message: `批量黑市周失败: ${error.message}`
+      message: `【批量】批量黑市周失败: ${error.message}`
     })
   } finally {
     isBatchBlackMarketRunning.value = false

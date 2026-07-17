@@ -2486,7 +2486,7 @@ const batchRecruitWeek = async () => {
       cardType: '金鱼资源',
       operation: '批量招募',
       status: successCount > 0 ? 'success' : 'error',
-      message: `批量招募完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量招募完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量招募周失败:', error)
@@ -3000,7 +3000,7 @@ const batchClaimRewards = async () => {
       cardType: '金鱼资源',
       operation: '批量领取奖励',
       status: 'success',
-      message: `批量领取奖励完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量领取奖励完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量领取奖励失败:', error)
@@ -4101,7 +4101,7 @@ const batchChangeGoldFish = async () => {
       cardType: '金鱼资源',
       operation: '批量换金鱼',
       status: 'info',
-      message: `批量换金鱼完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量换金鱼完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量换金鱼失败:', error)

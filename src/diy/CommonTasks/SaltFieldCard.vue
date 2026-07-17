@@ -710,7 +710,7 @@ const batchSwitchTeam1 = async () => {
       cardType: '盐场',
       operation: '批量切换阵1',
       status: 'success',
-      message: `批量切换阵1完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+      message: `【批量】批量切换阵1完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
     })
   } catch (error) {
     console.error('批量切换阵1失败:', error)
@@ -720,7 +720,7 @@ const batchSwitchTeam1 = async () => {
       cardType: '盐场',
       operation: '批量切换阵1',
       status: 'error',
-      message: `批量切换阵1失败：${error.message}`
+      message: `【批量】批量切换阵1失败：${error.message}`
     })
   } finally {
     isRunning.value = false
@@ -864,7 +864,7 @@ const batchSwitchTeam2 = async () => {
       cardType: '盐场',
       operation: '批量切换阵2',
       status: 'success',
-      message: `批量切换阵2完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
+      message: `【批量】批量切换阵2完成（${rangeText}），成功: ${successCount}，失败: ${failCount}`
     })
   } catch (error) {
     console.error('批量切换阵2失败:', error)
@@ -874,7 +874,7 @@ const batchSwitchTeam2 = async () => {
       cardType: '盐场',
       operation: '批量切换阵2',
       status: 'error',
-      message: `批量切换阵2失败：${error.message}`
+      message: `【批量】批量切换阵2失败：${error.message}`
     })
   } finally {
     isRunning.value = false

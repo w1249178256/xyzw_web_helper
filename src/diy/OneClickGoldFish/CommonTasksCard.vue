@@ -575,7 +575,7 @@ const batchUseResources = async () => {
       tokenId: null,
       tokenName: null,
       status: 'success',
-      message: `批量使用资源完成：成功${successCount}个${failedTokensStr}`
+      message: `【批量】批量使用资源完成：成功${successCount}个${failedTokensStr}`
     })
   } catch (error) {
     console.error('批量使用资源失败:', error)
@@ -585,7 +585,7 @@ const batchUseResources = async () => {
       tokenId: null,
       tokenName: null,
       status: 'error',
-      message: `批量使用资源失败: ${error.message || '未知错误'}`
+      message: `【批量】批量使用资源失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUsingResources.value = false

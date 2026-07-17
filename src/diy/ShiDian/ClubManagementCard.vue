@@ -372,7 +372,7 @@ const handleBatchCollectPrivilege = async () => {
     logOperation('shidian', '批量收集特权', {
       cardType: '俱乐部管理',
       status: 'success',
-      message: `批量收集特权完成，共处理${targetTokens.length}个Token，赠送成功${successCount}个，跳过${skipCount}个，失败${errorCount}个`
+      message: `【批量】批量收集特权完成，共处理${targetTokens.length}个Token，赠送成功${successCount}个，跳过${skipCount}个，失败${errorCount}个`
     })
   } catch (error) {
     console.error('批量收集特权失败:', error)
@@ -380,7 +380,7 @@ const handleBatchCollectPrivilege = async () => {
     logOperation('shidian', '批量收集特权', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量收集特权失败：${error.message || error}`
+      message: `【批量】批量收集特权失败：${error.message || error}`
     })
   } finally {
     isBatchCollectPrivilegeRunning.value = false
@@ -526,7 +526,7 @@ const handleBatchPetEgg = async () => {
     logOperation('shidian', '批量宠物蛋', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量宠物蛋失败: ${error.message || error}`
+      message: `【批量】批量宠物蛋失败: ${error.message || error}`
     })
   } finally {
     isBatchPetEggRunning.value = false
@@ -2017,7 +2017,7 @@ const handleBatchLegacyClaimGift = async () => {
     logOperation('shidian', '批量赠送功法', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量赠送功法失败: ${error.message || error}`
+      message: `【批量】批量赠送功法失败: ${error.message || error}`
     })
   } finally {
     isLegacyClaimGiftRunning.value = false
@@ -2172,7 +2172,7 @@ const handleBatchAcceptGift = async () => {
     logOperation('shidian', '批量接受礼物', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量接受礼物失败: ${error.message || error}`
+      message: `【批量】批量接受礼物失败: ${error.message || error}`
     })
   } finally {
     isBatchAcceptGiftRunning.value = false
@@ -3324,7 +3324,7 @@ const handleBatchRecruitWeek = async () => {
     logOperation('shidian', '批量招募周', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量招募周失败: ${error.message || '未知错误'}`
+      message: `【批量】批量招募周失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchRecruitWeekRunning.value = false
@@ -3440,14 +3440,14 @@ const handleBatchLegacyBeginHangup = async () => {
       logOperation('shidian', '批量开启功法挂机', {
         cardType: '俱乐部管理',
         status: 'success',
-        message: `批量开启功法挂机完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
+        message: `【批量】批量开启功法挂机完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
       })
     } else {
       message.success(`批量开启功法挂机完成：成功${successCount}个，失败${failCount}个`)
       logOperation('shidian', '批量开启功法挂机', {
         cardType: '俱乐部管理',
         status: 'success',
-        message: `批量开启功法挂机完成：成功${successCount}个，失败${failCount}个`
+        message: `【批量】批量开启功法挂机完成：成功${successCount}个，失败${failCount}个`
       })
     }
   } catch (error) {
@@ -3456,7 +3456,7 @@ const handleBatchLegacyBeginHangup = async () => {
     logOperation('shidian', '批量开启功法挂机', {
       cardType: '俱乐部管理',
       status: 'error',
-      message: `批量开启功法挂机失败：${error.message || error}`
+      message: `【批量】批量开启功法挂机失败：${error.message || error}`
     })
   } finally {
     isBatchLegacyBeginHangupRunning.value = false

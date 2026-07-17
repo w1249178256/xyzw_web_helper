@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -2550,7 +2550,7 @@ const handleBatchClaimFreeKey = async () => {
       tokenId: '',
       tokenName: '',
       status: 'success',
-      message: `批量领取免费钥匙完成（成功: ${successCount}, 失败: ${failCount}）`
+      message: `【批量】批量领取免费钥匙完成（成功: ${successCount}, 失败: ${failCount}）`
     })
   } catch (error) {
     console.error('批量领取免费钥匙失败:', error)

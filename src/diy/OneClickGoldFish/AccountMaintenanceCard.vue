@@ -1316,7 +1316,7 @@ const handleBatchClaimHangupReward = async () => {
       cardType: '养号',
       operation: '领取推图层数奖励',
       status: 'success',
-      message: `批量领取推图层数奖励完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量领取推图层数奖励完成，成功 ${successCount} 个，失败 ${failureCount} 个`
     })
 
     results.forEach(r => {
@@ -1331,7 +1331,7 @@ const handleBatchClaimHangupReward = async () => {
       cardType: '养号',
       operation: '领取推图层数奖励',
       status: 'error',
-      message: `批量领取推图层数奖励失败: ${error.message || '未知错误'}`
+      message: `【批量】批量领取推图层数奖励失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchClaimingHangupReward.value = false
@@ -1448,7 +1448,7 @@ const handleBatchRename = async () => {
       cardType: '养号',
       operation: '批量重命名',
       status: 'success',
-      message: `批量重命名完成，成功 ${successCount} 个，跳过 ${skippedCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量重命名完成，成功 ${successCount} 个，跳过 ${skippedCount} 个，失败 ${failureCount} 个`
     })
 
   } catch (error) {
@@ -1459,7 +1459,7 @@ const handleBatchRename = async () => {
       cardType: '养号',
       operation: '批量重命名',
       status: 'error',
-      message: `批量重命名失败: ${error.message || '未知错误'}`
+      message: `【批量】批量重命名失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchRenaming.value = false
@@ -1756,7 +1756,7 @@ const handleUseUniversalRed = async () => {
       cardType: '养号',
       operation: '使用万能红',
       status: 'success',
-      message: `批量使用万能红完成，目标英雄: ${selectedHeroName}，共处理${targetTokens.length}个Token`
+      message: `【批量】批量使用万能红完成，目标英雄: ${selectedHeroName}，共处理${targetTokens.length}个Token`
     })
 
   } catch (error) {
@@ -1767,7 +1767,7 @@ const handleUseUniversalRed = async () => {
       cardType: '养号',
       operation: '使用万能红',
       status: 'error',
-      message: `批量使用万能红失败: ${error.message || '未知错误'}`
+      message: `【批量】批量使用万能红失败: ${error.message || '未知错误'}`
     })
   } finally {
     isUsingUniversalRed.value = false
@@ -1972,7 +1972,7 @@ const handleUpgradeLuBuStar = async () => {
         cardType: '养号',
         operation: '批量升星',
         status: 'success',
-        message: `批量升星被动紫将完成，共处理${targetTokens.length}个 Token`
+        message: `【批量】批量升星被动紫将完成，共处理${targetTokens.length}个 Token`
       })
     } else {
       const selectedHeroName = HERO_DICT[selectedUpgradeStarHero.value]?.name || '未知英雄'
@@ -1982,7 +1982,7 @@ const handleUpgradeLuBuStar = async () => {
         cardType: '养号',
         operation: '批量升星',
         status: 'success',
-        message: `批量升星${selectedHeroName}完成，共处理${targetTokens.length}个 Token`
+        message: `【批量】批量升星${selectedHeroName}完成，共处理${targetTokens.length}个 Token`
       })
     }
 
@@ -1995,7 +1995,7 @@ const handleUpgradeLuBuStar = async () => {
         cardType: '养号',
         operation: '批量升星',
         status: 'error',
-        message: `批量升星被动紫将失败：${error.message || '未知错误'}`
+        message: `【批量】批量升星被动紫将失败：${error.message || '未知错误'}`
       })
     } else {
       console.error('批量升星失败:', error)
@@ -2005,7 +2005,7 @@ const handleUpgradeLuBuStar = async () => {
         cardType: '养号',
         operation: '批量升星',
         status: 'error',
-        message: `批量升星失败：${error.message || '未知错误'}`
+        message: `【批量】批量升星失败：${error.message || '未知错误'}`
       })
     }
   } finally {
@@ -2174,7 +2174,7 @@ const handleBatchHeroSynthetic = async () => {
       cardType: '养号',
       operation: '批量英雄合成',
       status: 'success',
-      message: `批量英雄合成完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量英雄合成完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量英雄合成出错:', error)
@@ -2184,7 +2184,7 @@ const handleBatchHeroSynthetic = async () => {
       cardType: '养号',
       operation: '批量英雄合成',
       status: 'error',
-      message: `批量英雄合成出错：${error.message || error}`
+      message: `【批量】批量英雄合成出错：${error.message || error}`
     })
   } finally {
     isBatchHeroSynthetic.value = false
@@ -2427,7 +2427,7 @@ const handleBatchLuBuBattle = async (slotType) => {
       cardType: '养号',
       operation: '批量上阵',
       status: 'error',
-      message: `批量上阵吕布出错：${error.message || error}`
+      message: `【批量】批量上阵吕布出错：${error.message || error}`
     })
   } finally {
     isBatchHeroBattle.value = false
@@ -2769,7 +2769,7 @@ const handleBatchHeroBattle = async () => {
       cardType: '养号',
       operation: '批量上阵',
       status: 'success',
-      message: `批量上阵${heroName}完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量上阵${heroName}完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量上阵出错:', error)
@@ -2779,7 +2779,7 @@ const handleBatchHeroBattle = async () => {
       cardType: '养号',
       operation: '批量上阵',
       status: 'error',
-      message: `批量上阵出错：${error.message || error}`
+      message: `【批量】批量上阵出错：${error.message || error}`
     })
   } finally {
     isBatchHeroBattle.value = false
@@ -2925,7 +2925,7 @@ const handleBatchTowerTeamInternal = async () => {
       cardType: '养号',
       operation: '批量上阵爬塔',
       status: 'success',
-      message: `批量上阵爬塔完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量上阵爬塔完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量上阵爬塔出错:', error)
@@ -2935,7 +2935,7 @@ const handleBatchTowerTeamInternal = async () => {
       cardType: '养号',
       operation: '批量上阵爬塔',
       status: 'error',
-      message: `批量上阵爬塔出错：${error.message || error}`
+      message: `【批量】批量上阵爬塔出错：${error.message || error}`
     })
   } finally {
     isBatchHeroBattle.value = false
@@ -3081,7 +3081,7 @@ const handleBatchStoryTeamInternal = async () => {
       cardType: '养号',
       operation: '批量上阵推图',
       status: 'success',
-      message: `批量上阵推图完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量上阵推图完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量上阵推图出错:', error)
@@ -3091,7 +3091,7 @@ const handleBatchStoryTeamInternal = async () => {
       cardType: '养号',
       operation: '批量上阵推图',
       status: 'error',
-      message: `批量上阵推图出错：${error.message || error}`
+      message: `【批量】批量上阵推图出错：${error.message || error}`
     })
   } finally {
     isBatchHeroBattle.value = false
@@ -3219,7 +3219,7 @@ const handleBatchMayDayExchange = async () => {
       cardType: '养号',
       operation: '批量五一万能兑换',
       status: 'success',
-      message: `批量五一万能兑换完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量五一万能兑换完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量五一万能兑换出错:', error)
@@ -3229,7 +3229,7 @@ const handleBatchMayDayExchange = async () => {
       cardType: '养号',
       operation: '批量五一万能兑换',
       status: 'error',
-      message: `批量五一万能兑换出错：${error.message || error}`
+      message: `【批量】批量五一万能兑换出错：${error.message || error}`
     })
   } finally {
     isBatchMayDayExchange.value = false
@@ -3318,7 +3318,7 @@ const handleBatchClaimCDK = async () => {
       cardType: '养号',
       operation: '批量兑换码',
       status: 'success',
-      message: `批量兑换码完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+      message: `【批量】批量兑换码完成，成功 ${successCount} 个，失败 ${failureCount} 个`
     })
 
   } catch (error) {
@@ -3329,7 +3329,7 @@ const handleBatchClaimCDK = async () => {
       cardType: '养号',
       operation: '批量兑换码',
       status: 'error',
-      message: `批量兑换码失败: ${error.message || '未知错误'}`
+      message: `【批量】批量兑换码失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchClaimingCDK.value = false
@@ -4558,7 +4558,7 @@ const handleBatchBoxWeek = async () => {
       cardType: '养号',
       operation: '批量宝箱周',
       status: 'success',
-      message: `批量宝箱周完成，共处理${targetTokens.length}个Token`
+      message: `【批量】批量宝箱周完成，共处理${targetTokens.length}个Token`
     })
     
   } catch (error) {
@@ -4570,7 +4570,7 @@ const handleBatchBoxWeek = async () => {
       cardType: '养号',
       operation: '批量宝箱周',
       status: 'error',
-      message: `批量宝箱周失败: ${error.message || '未知错误'}`
+      message: `【批量】批量宝箱周失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchBoxWeekRunning.value = false
@@ -4757,9 +4757,9 @@ const handleBatchRecruitWeek = async () => {
           
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 可用招募${usableRecruits}个>400，开始执行招募周`)
           
-          // 计算轮数
-          const maxRounds = Math.floor(usableRecruits / 400)
-          console.log(`[批量招募周] 计划轮数：${maxRounds}`)
+          // 计算轮数（最多使用400个招募令，即最多1轮）
+          const maxRounds = Math.min(1, Math.floor(usableRecruits / 400))
+          console.log(`[批量招募周] 计划轮数：${maxRounds}（最多1轮，400个招募令）`)
           
           const theoreticalUsed = maxRounds * 400
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募令对比：计划使用${maxRounds}轮，理论使用${theoreticalUsed}个，已用${usedRecruitCount}个`)
@@ -5070,7 +5070,7 @@ const handleBatchRecruitWeek = async () => {
       cardType: '养号',
       operation: '批量招募周',
       status: 'error',
-      message: `批量招募周失败：${error.message}`
+      message: `【批量】批量招募周失败：${error.message}`
     })
   } finally {
     isBatchRecruitWeekRunning.value = false
@@ -5229,7 +5229,7 @@ const handleBatchUnloadHeroes = async () => {
       cardType: '养号',
       operation: '批量下阵',
       status: 'success',
-      message: `批量下阵完成，成功：${successCount}，失败：${failCount}`
+      message: `【批量】批量下阵完成，成功：${successCount}，失败：${failCount}`
     })
     
   } catch (error) {
@@ -5240,7 +5240,7 @@ const handleBatchUnloadHeroes = async () => {
       cardType: '养号',
       operation: '批量下阵',
       status: 'error',
-      message: `批量下阵失败：${error.message}`
+      message: `【批量】批量下阵失败：${error.message}`
     })
   } finally {
     isBatchUnloadingHeroes.value = false
@@ -5619,7 +5619,7 @@ const handleBatchUpgrade900 = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'success',
-      message: `批量升级完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级完成：成功${successCount}个，失败${failCount}个`
     })
     
     results.forEach(r => {
@@ -5924,7 +5924,7 @@ const handleBatchUpgradeTower = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'success',
-      message: `批量升级爬塔完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级爬塔完成：成功${successCount}个，失败${failCount}个`
     })
     
     results.forEach(r => {
@@ -5938,7 +5938,7 @@ const handleBatchUpgradeTower = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'error',
-      message: `批量升级爬塔失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级爬塔失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgrading900.value = false
@@ -6287,7 +6287,7 @@ const handleBatchUpgradeSingleHero = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'success',
-      message: `批量升级${heroName}完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级${heroName}完成：成功${successCount}个，失败${failCount}个`
     })
     
     results.forEach(r => {
@@ -6301,7 +6301,7 @@ const handleBatchUpgradeSingleHero = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'error',
-      message: `批量升级${heroName}失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级${heroName}失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgrading900.value = false
@@ -6656,7 +6656,7 @@ const handleBatchUpgradeQunxiong = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'success',
-      message: `批量升级群雄完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级群雄完成：成功${successCount}个，失败${failCount}个`
     })
     
     results.forEach(r => {
@@ -6670,7 +6670,7 @@ const handleBatchUpgradeQunxiong = async () => {
       cardType: '养号',
       operation: '批量升级',
       status: 'error',
-      message: `批量升级群雄失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级群雄失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgrading900.value = false
@@ -7089,7 +7089,7 @@ const handleBatchClaimBoxRewards = async () => {
       cardType: '养号',
       operation: '批量领取宝箱奖励',
       status: 'success',
-      message: `批量领取宝箱奖励完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量领取宝箱奖励完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量领取宝箱奖励出错:', error)
@@ -7099,7 +7099,7 @@ const handleBatchClaimBoxRewards = async () => {
       cardType: '养号',
       operation: '批量领取宝箱奖励',
       status: 'error',
-      message: `批量领取宝箱奖励出错：${error.message || error}`
+      message: `【批量】批量领取宝箱奖励出错：${error.message || error}`
     })
   } finally {
     isBatchClaimingBoxRewards.value = false
@@ -7207,7 +7207,7 @@ const handleBatchClaimEmails = async () => {
       cardType: '养号',
       operation: '批量领取邮件',
       status: 'success',
-      message: `批量领取邮件完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量领取邮件完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量领取邮件出错:', error)
@@ -7217,7 +7217,7 @@ const handleBatchClaimEmails = async () => {
       cardType: '养号',
       operation: '批量领取邮件',
       status: 'error',
-      message: `批量领取邮件出错：${error.message || error}`
+      message: `【批量】批量领取邮件出错：${error.message || error}`
     })
   } finally {
     isBatchClaimingEmails.value = false
@@ -7619,7 +7619,7 @@ const handleBatchUpgradeToys = async () => {
       cardType: '养号',
       operation: '批量升级玩具',
       status: 'success',
-      message: `批量升级玩具-${modeName}完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级玩具-${modeName}完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量升级玩具出错:', error)
@@ -7629,7 +7629,7 @@ const handleBatchUpgradeToys = async () => {
       cardType: '养号',
       operation: '批量升级玩具',
       status: 'error',
-      message: `批量升级玩具出错：${error.message || error}`
+      message: `【批量】批量升级玩具出错：${error.message || error}`
     })
   } finally {
     isBatchUpgradingToys.value = false
@@ -7846,7 +7846,7 @@ const handleBatchActivateToyTeam = async () => {
       cardType: '养号',
       operation: '批量激活玩具阵容',
       status: 'success',
-      message: `批量激活玩具阵容完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量激活玩具阵容完成：成功${successCount}个，失败${failCount}个`
     })
     
     // 清空过程日志，只保留结果日志
@@ -7861,7 +7861,7 @@ const handleBatchActivateToyTeam = async () => {
       cardType: '养号',
       operation: '批量激活玩具阵容',
       status: 'error',
-      message: `批量激活玩具阵容失败：${error.message || '未知错误'}`
+      message: `【批量】批量激活玩具阵容失败：${error.message || '未知错误'}`
     })
   } finally {
     isBatchActivatingToyTeam.value = false
@@ -8521,7 +8521,7 @@ const handleBatchUpgradeLord = async () => {
       cardType: '养号',
       operation: '批量升级主公武将',
       status: 'success',
-      message: `批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级主公武将完成：成功${successCount}个，失败${failCount}个`
     })
     
     // 清空过程日志，只保留结果日志
@@ -8536,7 +8536,7 @@ const handleBatchUpgradeLord = async () => {
       cardType: '养号',
       operation: '批量升级主公武将',
       status: 'error',
-      message: `批量升级主公武将失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级主公武将失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchUpgradingLord.value = false

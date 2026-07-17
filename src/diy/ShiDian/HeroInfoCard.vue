@@ -967,7 +967,7 @@ const batchSwitchTower = async () => {
     logOperation('shidian', '批量切换爬塔', {
       cardType: '武将信息',
       status: 'success',
-      message: `批量切换爬塔完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量切换爬塔完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量切换爬塔失败:', error)
@@ -975,7 +975,7 @@ const batchSwitchTower = async () => {
     logOperation('shidian', '批量切换爬塔', {
       cardType: '武将信息',
       status: 'error',
-      message: `批量切换爬塔失败: ${error.message || '未知错误'}`
+      message: `【批量】批量切换爬塔失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchSwitchTowerRunning.value = false
@@ -1096,7 +1096,7 @@ const batchSwitchStory = async () => {
     logOperation('shidian', '批量切换推图', {
       cardType: '武将信息',
       status: 'success',
-      message: `批量切换推图完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量切换推图完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量切换推图失败:', error)
@@ -1104,7 +1104,7 @@ const batchSwitchStory = async () => {
     logOperation('shidian', '批量切换推图', {
       cardType: '武将信息',
       status: 'error',
-      message: `批量切换推图失败: ${error.message || '未知错误'}`
+      message: `【批量】批量切换推图失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchSwitchStoryRunning.value = false
@@ -1245,7 +1245,7 @@ const batchUpgradeOne = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量升级阵容1失败: ${error.message || '未知错误'}`
+            message: `【批量】批量升级阵容1失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1285,7 +1285,7 @@ const batchUpgradeOne = async () => {
     logOperation('shidian', '批量升级阵容1', {
       cardType: '武将信息',
       status: 'success',
-      message: `批量升级阵容1完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级阵容1完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量升级阵容1失败:', error)
@@ -1293,7 +1293,7 @@ const batchUpgradeOne = async () => {
     logOperation('shidian', '批量升级阵容1', {
       cardType: '武将信息',
       status: 'error',
-      message: `批量升级阵容1失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级阵容1失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -1402,7 +1402,7 @@ const batchUpgradeTwo = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量升级阵容2失败: ${error.message || '未知错误'}`
+            message: `【批量】批量升级阵容2失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1442,7 +1442,7 @@ const batchUpgradeTwo = async () => {
     logOperation('shidian', '批量升级阵容2', {
       cardType: '武将信息',
       status: 'success',
-      message: `批量升级阵容2完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级阵容2完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量升级阵容2失败:', error)
@@ -1450,7 +1450,7 @@ const batchUpgradeTwo = async () => {
     logOperation('shidian', '批量升级阵容2', {
       cardType: '武将信息',
       status: 'error',
-      message: `批量升级阵容2失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级阵容2失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -2175,7 +2175,7 @@ const batchUpgrade = async (teamId) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量升级失败: ${error.message || '未知错误'}`
+            message: `【批量】批量升级失败: ${error.message || '未知错误'}`
           })
         }
         
@@ -2187,7 +2187,7 @@ const batchUpgrade = async (teamId) => {
     logOperation('shidian', `批量升级阵容${teamId}`, {
       cardType: '武将信息',
       status: 'success',
-      message: `批量升级阵容${teamId}完成`
+      message: `【批量】批量升级阵容${teamId}完成`
     })
   } catch (error) {
     console.error('批量升级失败:', error)
@@ -2195,7 +2195,7 @@ const batchUpgrade = async (teamId) => {
     logOperation('shidian', `批量升级阵容${teamId}`, {
       cardType: '武将信息',
       status: 'error',
-      message: `批量升级失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级失败: ${error.message || '未知错误'}`
     })
   }
 }

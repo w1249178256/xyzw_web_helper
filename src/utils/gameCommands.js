@@ -2093,6 +2093,70 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 世界杯报名
+   */
+  saltcup26_signupleague(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+          ...params
+      }),
+      cmd: "saltcup26_signupleague",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 世界杯详情
+   */
+  saltcup26_getinfo(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+          ...params
+      }),
+      cmd: "saltcup26_getinfo",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 世界杯领取周球星卡
+   */
+  saltcup26_claimweeklypack(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  weekId:params.weekId,
+          ...params
+      }),
+      cmd: "saltcup26_claimweeklypack",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 世界杯选择球星
+   */
+  saltcup26_selectstar(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  formationId:1,
+      	  starIdList:[[0,0,0],[0,0,0],[0,0,0,0],[0]],
+          ...params
+      }),
+      cmd: "saltcup26_selectstar",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 世界杯开卡
    */
   saltcup26_openstarpack(ack = 0, seq = 0, params = {}) {
@@ -2127,6 +2191,21 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
     }
   }
 
+  /**
+   * 世界杯领奖
+   */
+  saltcup26_claimmatchreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  scheduleId:params.scheduleId,
+          ...params
+      }),
+      cmd: "saltcup26_claimmatchreward",
+      seq,
+      time: Date.now()
+    }
+  }
 
   /**
    * 领取五一累充道具

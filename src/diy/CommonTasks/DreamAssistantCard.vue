@@ -77,18 +77,44 @@
               v-model:input-value="batchGachaCount"
               @button-click="handleBatchGacha"
             />
-            <CustomizedCard 
+            <CustomizedCard
+              mode="button"
+              name="批量报名"
+              :disabled="isBatchSignupRunning || !tokenStore.hasTokens"
+              @button-click="handleBatchSignupLeague"
+            />
+            <CustomizedCard
+              mode="button"
+              name="批量上阵球星"
+              :disabled="isBatchSelectStarRunning || !tokenStore.hasTokens"
+              @button-click="handleBatchSelectStar"
+            />
+            <CustomizedCard
               mode="button"
               name="批量开卡"
               :disabled="isBatchOpenCardRunning || !tokenStore.hasTokens"
               @button-click="handleBatchOpenCard"
             />
-            <CustomizedCard 
+            <CustomizedCard
               mode="button-with-input"
               name="批量竞猜"
               :disabled="isBatchBetRunning || !tokenStore.hasTokens"
               v-model:input-value="betInput"
               @button-click="handleBatchBet"
+            />
+            <CustomizedCard
+              mode="button-with-input"
+              name="批量领奖"
+              :disabled="isBatchClaimRunning || !tokenStore.hasTokens"
+              v-model:input-value="claimScheduleIdInput"
+              @button-click="handleBatchClaimMatchReward"
+            />
+            <CustomizedCard
+              mode="button-with-input"
+              name="批量周球星"
+              :disabled="isBatchClaimWeeklyPackRunning || !tokenStore.hasTokens"
+              v-model:input-value="weeklyPackInput"
+              @button-click="handleBatchClaimWeeklyPack"
             />
           </CustomizedCard>
         </div>
@@ -98,7 +124,7 @@
       <OperationLogCard 
         page="fish-helper" 
         card-type="梦境助手"
-        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战']"
+        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战', '批量报名', '批量上阵球星', '批量开卡', '批量竞猜', '批量领奖', '批量周球星']"
       />
     </template>
   </MyCard>
@@ -148,7 +174,24 @@ watch(batchGachaCount, (val) => {
 })
 const isBatchOpenCardRunning = ref(false)
 const isBatchBetRunning = ref(false)
-const betInput = ref('')
+const isBatchClaimRunning = ref(false)
+const isBatchSignupRunning = ref(false)
+const isBatchSelectStarRunning = ref(false)
+const isBatchClaimWeeklyPackRunning = ref(false)
+const betInput = ref(localStorage.getItem('dreamBetInput') || '')
+const claimScheduleIdInput = ref(localStorage.getItem('dreamClaimScheduleIdInput') || '')
+const weeklyPackInput = ref(localStorage.getItem('dreamWeeklyPackInput') || '')
+
+// 持久化输入框
+watch(betInput, (val) => {
+  localStorage.setItem('dreamBetInput', val)
+})
+watch(claimScheduleIdInput, (val) => {
+  localStorage.setItem('dreamClaimScheduleIdInput', val)
+})
+watch(weeklyPackInput, (val) => {
+  localStorage.setItem('dreamWeeklyPackInput', val)
+})
 
 // 英雄选项（红将及指定橙将）
 const heroOptions = computed(() => {
@@ -1218,7 +1261,7 @@ const batchSwitchTower = async () => {
     logOperation('shidian', '批量切换爬塔', {
       cardType: '梦境助手',
       status: 'success',
-      message: `批量切换爬塔完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量切换爬塔完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量切换爬塔失败:', error)
@@ -1226,7 +1269,7 @@ const batchSwitchTower = async () => {
     logOperation('shidian', '批量切换爬塔', {
       cardType: '梦境助手',
       status: 'error',
-      message: `批量切换爬塔失败: ${error.message || '未知错误'}`
+      message: `【批量】批量切换爬塔失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchSwitchTowerRunning.value = false
@@ -1333,7 +1376,7 @@ const batchSwitchStory = async () => {
     logOperation('shidian', '批量切换推图', {
       cardType: '梦境助手',
       status: 'success',
-      message: `批量切换推图完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量切换推图完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量切换推图失败:', error)
@@ -1341,7 +1384,7 @@ const batchSwitchStory = async () => {
     logOperation('shidian', '批量切换推图', {
       cardType: '梦境助手',
       status: 'error',
-      message: `批量切换推图失败: ${error.message || '未知错误'}`
+      message: `【批量】批量切换推图失败: ${error.message || '未知错误'}`
     })
   } finally {
     isBatchSwitchStoryRunning.value = false
@@ -1450,7 +1493,7 @@ const batchUpgradeOne = async () => {
     logOperation('fish-helper', '批量升级阵容1', {
       cardType: '梦境助手',
       status: 'success',
-      message: `批量升级阵容1完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级阵容1完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量升级阵容1失败:', error)
@@ -1458,7 +1501,7 @@ const batchUpgradeOne = async () => {
     logOperation('fish-helper', '批量升级阵容1', {
       cardType: '梦境助手',
       status: 'error',
-      message: `批量升级阵容1失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级阵容1失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -1526,7 +1569,7 @@ const batchUpgradeTwo = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'error',
-            message: `批量升级阵容2失败: ${error.message || '未知错误'}`
+            message: `【批量】批量升级阵容2失败: ${error.message || '未知错误'}`
           })
           return { success: false, token: token, error: error.message || '未知错误' }
         }
@@ -1565,7 +1608,7 @@ const batchUpgradeTwo = async () => {
     logOperation('fish-helper', '批量升级阵容2', {
       cardType: '梦境助手',
       status: 'success',
-      message: `批量升级阵容2完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量升级阵容2完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量升级阵容2失败:', error)
@@ -1573,7 +1616,7 @@ const batchUpgradeTwo = async () => {
     logOperation('fish-helper', '批量升级阵容2', {
       cardType: '梦境助手',
       status: 'error',
-      message: `批量升级阵容2失败: ${error.message || '未知错误'}`
+      message: `【批量】批量升级阵容2失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -2053,7 +2096,7 @@ const handleBatchGacha = async () => {
       cardType: '梦境助手',
       operation: '批量扭蛋',
       status: 'success',
-      message: `批量扭蛋完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量扭蛋完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量扭蛋出错:', error)
@@ -2063,7 +2106,7 @@ const handleBatchGacha = async () => {
       cardType: '梦境助手',
       operation: '批量扭蛋',
       status: 'error',
-      message: `批量扭蛋出错：${error.message || error}`
+      message: `【批量】批量扭蛋出错：${error.message || error}`
     })
   } finally {
     isBatchGachaRunning.value = false
@@ -2114,17 +2157,18 @@ const handleBatchOpenCard = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
           let openCount = 0
           
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始开卡...`)
+          message.info(`【序号${tokenIndex}】[${tokenName}] 开始开卡...`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量开卡',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'info',
-            message: `[序号${tokenIndex}] 开始开卡`
+            message: `【序号${tokenIndex}】[${tokenName}] 开始开卡`
           })
           
           // 循环执行直到失败
@@ -2139,30 +2183,31 @@ const handleBatchOpenCard = async () => {
             }
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 开卡完成，共开${openCount}次`)
+          message.success(`【序号${tokenIndex}】[${tokenName}] 开卡完成，共开${openCount}次`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量开卡',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'success',
-            message: `[序号${tokenIndex}] 开卡完成，共开${openCount}次`
+            message: `【序号${tokenIndex}】[${tokenName}] 开卡完成，共开${openCount}次`
           })
           
           return { success: true, openCount }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 开卡失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 开卡失败：${error.message || '未知错误'}`)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 开卡失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 开卡失败：${error.message || '未知错误'}`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量开卡',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'error',
-            message: `[序号${tokenIndex}] 开卡失败：${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${tokenName}] 开卡失败：${error.message || '未知错误'}`
           })
           
           return { success: false, error: error.message || '未知错误' }
@@ -2172,10 +2217,14 @@ const handleBatchOpenCard = async () => {
         batchSize: 20,
         delayBetween: 500,
         onProgress: (progress) => {
-          if (progress.tokenName) {
-            if (progress.status === 'success') {
-              message.success(`${progress.tokenName} ${progress.message}`)
-            } else if (progress.status === 'warning') {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
               message.warning(`${progress.tokenName} ${progress.message}`)
             } else {
               message.error(`${progress.tokenName} ${progress.message}`)
@@ -2184,17 +2233,17 @@ const handleBatchOpenCard = async () => {
         }
       }
     )
-    
+
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
-    
+
     message.success(`批量开卡完成，成功${successCount}个，失败${failCount}个`)
     logStore.addLog({
       page: 'fish-helper',
       cardType: '梦境助手',
       operation: '批量开卡',
       status: 'success',
-      message: `批量开卡完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量开卡完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量开卡出错:', error)
@@ -2204,7 +2253,7 @@ const handleBatchOpenCard = async () => {
       cardType: '梦境助手',
       operation: '批量开卡',
       status: 'error',
-      message: `批量开卡出错：${error.message || error}`
+      message: `【批量】批量开卡出错：${error.message || error}`
     })
   } finally {
     isBatchOpenCardRunning.value = false
@@ -2274,45 +2323,47 @@ const handleBatchBet = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = getTokenIndex(token)
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在竞猜...`)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在竞猜...`)
           
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量竞猜',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'info',
-            message: `[序号${tokenIndex}] 开始竞猜，matchId=${matchId}，pick=${pick}`
+            message: `【序号${tokenIndex}】[${tokenName}] 开始竞猜，matchId=${matchId}，pick=${pick}`
           })
           
           await tokenStore.sendSaltcup26PlaceBet(token.id, { matchId, pick })
           await new Promise(resolve => setTimeout(resolve, 500))
           
-          message.success(`[序号${tokenIndex}] ${token.name || token.id} 竞猜完成`)
+          message.success(`【序号${tokenIndex}】[${tokenName}] 竞猜完成`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量竞猜',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'success',
-            message: `[序号${tokenIndex}] 竞猜完成`
+            message: `【序号${tokenIndex}】[${tokenName}] 竞猜完成`
           })
           
           return { success: true }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name || token.id} 竞猜失败:`, error)
-          message.error(`[序号${tokenIndex}] ${token.name || token.id} 竞猜失败：${error.message || '未知错误'}`)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 竞猜失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 竞猜失败：${error.message || '未知错误'}`)
           logStore.addLog({
             page: 'fish-helper',
             cardType: '梦境助手',
             operation: '批量竞猜',
             tokenId: token.id,
-            tokenName: token.name,
+            tokenName: tokenName,
             status: 'error',
-            message: `[序号${tokenIndex}] 竞猜失败：${error.message || '未知错误'}`
+            message: `【序号${tokenIndex}】[${tokenName}] 竞猜失败：${error.message || '未知错误'}`
           })
           
           return { success: false, error: error.message || '未知错误' }
@@ -2322,10 +2373,14 @@ const handleBatchBet = async () => {
         batchSize: 20,
         delayBetween: 500,
         onProgress: (progress) => {
-          if (progress.tokenName) {
-            if (progress.status === 'success') {
-              message.success(`${progress.tokenName} ${progress.message}`)
-            } else if (progress.status === 'warning') {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
               message.warning(`${progress.tokenName} ${progress.message}`)
             } else {
               message.error(`${progress.tokenName} ${progress.message}`)
@@ -2344,7 +2399,7 @@ const handleBatchBet = async () => {
       cardType: '梦境助手',
       operation: '批量竞猜',
       status: 'success',
-      message: `批量竞猜完成，成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量竞猜完成，成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量竞猜出错:', error)
@@ -2354,10 +2409,691 @@ const handleBatchBet = async () => {
       cardType: '梦境助手',
       operation: '批量竞猜',
       status: 'error',
-      message: `批量竞猜出错：${error.message || error}`
+      message: `【批量】批量竞猜出错：${error.message || error}`
     })
   } finally {
     isBatchBetRunning.value = false
+  }
+}
+
+// 批量领奖
+const handleBatchClaimMatchReward = async () => {
+  if (!claimScheduleIdInput.value) {
+    message.warning('请输入scheduleId')
+    return
+  }
+
+  const scheduleId = parseInt(claimScheduleIdInput.value)
+  if (isNaN(scheduleId)) {
+    message.warning('scheduleId必须是数字')
+    return
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量领奖（${rangeText}），共${targetTokens.length}个Token，scheduleId=${scheduleId}...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量领奖',
+    status: 'info',
+    message: `开始批量领奖，${rangeText}，共${targetTokens.length}个Token，scheduleId=${scheduleId}`
+  })
+
+  try {
+    isBatchClaimRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在领奖...`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量领奖',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'info',
+            message: `[序号${tokenIndex}] 开始领奖，scheduleId=${scheduleId}`
+          })
+
+          await tokenStore.sendSaltcup26ClaimMatchReward(token.id, { scheduleId })
+          await new Promise(resolve => setTimeout(resolve, 500))
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 领奖完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量领奖',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `[序号${tokenIndex}] 领奖完成`
+          })
+
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          console.error(`[序号${tokenIndex}] ${token.name || token.id} 领奖失败:`, error)
+          message.error(`[序号${tokenIndex}] ${token.name || token.id} 领奖失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量领奖',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `[序号${tokenIndex}] 领奖失败：${error.message || '未知错误'}`
+          })
+
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+
+    message.success(`批量领奖完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量领奖',
+      status: 'success',
+      message: `【批量】批量领奖完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量领奖出错:', error)
+    message.error(`批量领奖出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量领奖',
+      status: 'error',
+      message: `【批量】批量领奖出错：${error.message || error}`
+    })
+  } finally {
+    isBatchClaimRunning.value = false
+  }
+}
+
+// 批量报名
+const handleBatchSignupLeague = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量报名（${rangeText}），共${targetTokens.length}个Token...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量报名',
+    status: 'info',
+    message: `开始批量报名，${rangeText}，共${targetTokens.length}个Token`
+  })
+
+  try {
+    isBatchSignupRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在报名...`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量报名',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${tokenName}] 开始报名`
+          })
+
+          await tokenStore.sendSaltcup26SignupLeague(token.id, {})
+          await new Promise(resolve => setTimeout(resolve, 500))
+
+          message.success(`【序号${tokenIndex}】[${tokenName}] 报名完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量报名',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${tokenName}] 报名完成`
+          })
+
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 报名失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 报名失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量报名',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${tokenName}] 报名失败：${error.message || '未知错误'}`
+          })
+
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+
+    message.success(`批量报名完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量报名',
+      status: 'success',
+      message: `【批量】批量报名完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量报名出错:', error)
+    message.error(`批量报名出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量报名',
+      status: 'error',
+      message: `【批量】批量报名出错：${error.message || error}`
+    })
+  } finally {
+    isBatchSignupRunning.value = false
+  }
+}
+
+// 批量上阵球星
+const handleBatchSelectStar = async () => {
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量上阵球星（${rangeText}），共${targetTokens.length}个Token...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量上阵球星',
+    status: 'info',
+    message: `开始批量上阵球星，${rangeText}，共${targetTokens.length}个Token`
+  })
+
+  try {
+    isBatchSelectStarRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在获取球星信息...`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量上阵球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${tokenName}] 开始获取球星信息`
+          })
+
+          // 获取球星信息
+          const infoResult = await tokenStore.sendSaltcup26GetInfo(token.id, {})
+          const roleData = infoResult.roleData || infoResult
+
+          // 检查是否需要选星
+          const starIdList = roleData.starIdList
+          const starCards = roleData.starCards
+
+          if (!starCards || Object.keys(starCards).length === 0) {
+            message.warning(`【序号${tokenIndex}】[${tokenName}] 没有球星卡`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '梦境助手',
+              operation: '批量上阵球星',
+              tokenId: token.id,
+              tokenName: tokenName,
+              status: 'warning',
+              message: `【序号${tokenIndex}】[${tokenName}] 没有球星卡`
+            })
+            return { success: false, error: '没有球星卡' }
+          }
+
+          // 检查是否需要选星：starIdList有0或没有starIdList字段
+          let needSelect = false
+          if (!starIdList) {
+            needSelect = true
+          } else {
+            for (const row of starIdList) {
+              if (row.some(id => id === 0)) {
+                needSelect = true
+                break
+              }
+            }
+          }
+
+          if (!needSelect) {
+            message.success(`【序号${tokenIndex}】[${tokenName}] 球星已上阵，无需操作`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '梦境助手',
+              operation: '批量上阵球星',
+              tokenId: token.id,
+              tokenName: tokenName,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${tokenName}] 球星已上阵，无需操作`
+            })
+            return { success: true, skipped: true }
+          }
+
+          // 获取所有starId，按顺序排列
+          const starIds = Object.keys(starCards).map(Number)
+
+          // 渐进式选星顺序：[1],[2,5,8],[3,6,9],[4,7,10,11]
+          // 第1次：四排索引0(守门员) → row3,col0
+          // 第2-4次：各排索引0 → row0col0, row1col0, row2col0
+          // 第5-7次：各排索引1 → row0col1, row1col1, row2col1
+          // 第8-11次：各排索引2,2,2,3 → row0col2, row1col2, row2col2, row2col3
+          const slotOrder = [
+            { row: 3, col: 0 },
+            { row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 },
+            { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 },
+            { row: 0, col: 2 }, { row: 1, col: 2 }, { row: 2, col: 2 }, { row: 2, col: 3 }
+          ]
+
+          // 初始参数：全0，累积式上阵
+          const currentStarIdList = [[0, 0, 0], [0, 0, 0], [0, 0, 0, 0], [0]]
+
+          // 渐进式选星，每次在上一次基础上增加一个
+          for (let i = 0; i < Math.min(11, starIds.length); i++) {
+            const slot = slotOrder[i]
+            const starId = starIds[i]
+
+            // 在现有阵容基础上增加一个球星
+            currentStarIdList[slot.row][slot.col] = starId
+
+            await tokenStore.sendSaltcup26SelectStar(token.id, {
+              formationId: 1,
+              starIdList: JSON.parse(JSON.stringify(currentStarIdList))
+            })
+
+            await new Promise(resolve => setTimeout(resolve, 300))
+          }
+
+          message.success(`【序号${tokenIndex}】[${tokenName}] 球星上阵完成，共上阵${Math.min(11, starIds.length)}个`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量上阵球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${tokenName}] 球星上阵完成，共上阵${Math.min(11, starIds.length)}个`
+          })
+
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 球星上阵失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 球星上阵失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量上阵球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${tokenName}] 球星上阵失败：${error.message || '未知错误'}`
+          })
+
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+
+    message.success(`批量上阵球星完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量上阵球星',
+      status: 'success',
+      message: `【批量】批量上阵球星完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量上阵球星出错:', error)
+    message.error(`批量上阵球星出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量上阵球星',
+      status: 'error',
+      message: `【批量】批量上阵球星出错：${error.message || error}`
+    })
+  } finally {
+    isBatchSelectStarRunning.value = false
+  }
+}
+
+// 批量周球星
+const handleBatchClaimWeeklyPack = async () => {
+  if (!weeklyPackInput.value) {
+    message.warning('请输入weekId')
+    return
+  }
+
+  const weekId = parseInt(weeklyPackInput.value)
+  if (isNaN(weekId)) {
+    message.warning('weekId必须是数字')
+    return
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量周球星（${rangeText}），共${targetTokens.length}个Token，weekId=${weekId}...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '批量周球星',
+    status: 'info',
+    message: `开始批量周球星，${rangeText}，共${targetTokens.length}个Token，weekId=${weekId}`
+  })
+
+  try {
+    isBatchClaimWeeklyPackRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在领取周球星...`)
+
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量周球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${tokenName}] 开始领取周球星，weekId=${weekId}`
+          })
+
+          let claimSuccess = false
+          try {
+            await tokenStore.sendSaltcup26ClaimWeeklyPack(token.id, { weekId })
+            await new Promise(resolve => setTimeout(resolve, 500))
+            claimSuccess = true
+
+            message.success(`【序号${tokenIndex}】[${tokenName}] 周球星领取完成`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '梦境助手',
+              operation: '批量周球星',
+              tokenId: token.id,
+              tokenName: tokenName,
+              status: 'success',
+              message: `【序号${tokenIndex}】[${tokenName}] 周球星领取完成`
+            })
+          } catch (error) {
+            console.error(`【序号${tokenIndex}】[${tokenName}] 周球星领取失败:`, error)
+            message.warning(`【序号${tokenIndex}】[${tokenName}] 周球星领取失败，继续开包：${error.message || '未知错误'}`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '梦境助手',
+              operation: '批量周球星',
+              tokenId: token.id,
+              tokenName: tokenName,
+              status: 'warning',
+              message: `【序号${tokenIndex}】[${tokenName}] 周球星领取失败，继续开包：${error.message || '未知错误'}`
+            })
+          }
+
+          // 无论领取成功失败，都执行两次开包
+          for (let i = 0; i < 2; i++) {
+            await tokenStore.sendSaltcup26OpenStarPack(token.id, { packId: 5502, starId: 0, cnt: 1 })
+            await new Promise(resolve => setTimeout(resolve, 300))
+          }
+
+          message.success(`【序号${tokenIndex}】[${tokenName}] 开包完成（2次）`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量周球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${tokenName}] 开包完成（2次）`
+          })
+
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 周球星操作失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 周球星操作失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '批量周球星',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${tokenName}] 周球星操作失败：${error.message || '未知错误'}`
+          })
+
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+
+    message.success(`批量周球星完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量周球星',
+      status: 'success',
+      message: `【批量】批量周球星完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量周球星出错:', error)
+    message.error(`批量周球星出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '批量周球星',
+      status: 'error',
+      message: `【批量】批量周球星出错：${error.message || error}`
+    })
+  } finally {
+    isBatchClaimWeeklyPackRunning.value = false
   }
 }
 

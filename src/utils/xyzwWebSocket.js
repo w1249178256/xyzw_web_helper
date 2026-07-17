@@ -164,8 +164,13 @@ export function registerDefaultCommands(reg) {
     .register("system_claimcdkreward")
     .register("system_editname")
     .register("common_claimtotalreward")
+    .register("saltcup26_getinfo")
+    .register("saltcup26_selectstar", { formationId: 1, starIdList: [[0,0,0],[0,0,0],[0,0,0,0],[0]] })
     .register("saltcup26_openstarpack", { packId: 5501, starId: 0, cnt: 1 })
     .register("saltcup26_placebet")
+    .register("saltcup26_signupleague")
+    .register("saltcup26_claimmatchreward")
+    .register("saltcup26_claimweeklypack")
     .register("activity_exchange")
     .register("system_signinreward")
     .register("system_mysharecallback", { isSkipShareCard: true, type: 2 })
@@ -1192,8 +1197,13 @@ export class XyzwWebSocketClient {
       system_claimcdkrewardresp: "system_claimcdkreward",
       system_editnameresp: "system_editname",
       common_claimtotalrewardresp: "common_claimtotalreward",
+      saltcup26_getinforesp: "saltcup26_getinfo",
+      saltcup26_selectstarresp: "saltcup26_selectstar",
       saltcup26_openstarpackresp: "saltcup26_openstarpack",
       saltcup26_placebetresp: "saltcup26_placebet",
+      saltcup26_signupleagueresp: "saltcup26_signupleague",
+      saltcup26_claimmatchrewardresp: "saltcup26_claimmatchreward",
+      saltcup26_claimweeklypackresp: "saltcup26_claimweeklypack",
       activity_exchangeresp: "activity_exchange",
       item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
       bottlehelper_claimresp: "bottlehelper_claim",

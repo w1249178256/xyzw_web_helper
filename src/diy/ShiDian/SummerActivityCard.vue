@@ -1877,14 +1877,14 @@ const batchUseItem = async () => {
       logOperation('shidian', '批量使用道具', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量使用道具完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
+        message: `【批量】批量使用道具完成：成功${successCount}个，失败${failCount}个。失败的 Token：${failedTokensStr}`
       });
     } else {
       message.success(`批量使用道具完成：成功${successCount}个，失败${failCount}个`);
       logOperation('shidian', '批量使用道具', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量使用道具完成：成功${successCount}个，失败${failCount}个`
+        message: `【批量】批量使用道具完成：成功${successCount}个，失败${failCount}个`
       });
     }
   } catch (error) {
@@ -1893,7 +1893,7 @@ const batchUseItem = async () => {
     logOperation('shidian', '批量使用道具', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量使用道具失败：${error.message || error}`
+      message: `【批量】批量使用道具失败：${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -2025,14 +2025,14 @@ const batchActivity = async () => {
       logOperation('shidian', '批量活动', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量活动完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
+        message: `【批量】批量活动完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
       });
     } else {
       message.success(`批量活动完成：成功${successCount}个，失败${failCount}个`);
       logOperation('shidian', '批量活动', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量活动完成：成功${successCount}个，失败${failCount}个`
+        message: `【批量】批量活动完成：成功${successCount}个，失败${failCount}个`
       });
     }
   } catch (error) {
@@ -2041,7 +2041,7 @@ const batchActivity = async () => {
     logOperation('shidian', '批量活动', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量活动失败: ${error.message || error}`
+      message: `【批量】批量活动失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -2349,14 +2349,14 @@ const batchMayDayActivity = async () => {
       logOperation('shidian', '批量五一', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量五一活动完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
+        message: `【批量】批量五一活动完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
       });
     } else {
       message.success(`批量五一活动完成：成功${successCount}个，失败${failCount}个`);
       logOperation('shidian', '批量五一', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量五一活动完成：成功${successCount}个，失败${failCount}个`
+        message: `【批量】批量五一活动完成：成功${successCount}个，失败${failCount}个`
       });
     }
   } catch (error) {
@@ -2365,7 +2365,7 @@ const batchMayDayActivity = async () => {
     logOperation('shidian', '批量五一', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量五一活动失败: ${error.message || error}`
+      message: `【批量】批量五一活动失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3082,14 +3082,14 @@ const batchBattle = async () => {
       logOperation('shidian', '批量战斗', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量战斗完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
+        message: `【批量】批量战斗完成：成功${successCount}个，失败${failCount}个。失败的Token：${failedTokensStr}`
       });
     } else {
       message.success(`批量战斗完成：成功${successCount}个，失败${failCount}个`);
       logOperation('shidian', '批量战斗', {
         cardType: '暑期活动',
         status: 'success',
-        message: `批量战斗完成：成功${successCount}个，失败${failCount}个`
+        message: `【批量】批量战斗完成：成功${successCount}个，失败${failCount}个`
       });
     }
   } catch (error) {
@@ -3098,7 +3098,7 @@ const batchBattle = async () => {
     logOperation('shidian', '批量战斗', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量战斗失败: ${error.message || error}`
+      message: `【批量】批量战斗失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3303,7 +3303,7 @@ const batchExportItemCount = async () => {
     logOperation('shidian', '批量导出活动详情', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量导出活动详情完成，共导出${results.length}个Token`
+      message: `【批量】批量导出活动详情完成，共导出${results.length}个Token`
     });
 
   } catch (error) {
@@ -3312,7 +3312,7 @@ const batchExportItemCount = async () => {
     logOperation('shidian', '批量导出活动详情', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量导出活动详情失败: ${error.message || error}`
+      message: `【批量】批量导出活动详情失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3694,7 +3694,7 @@ const batchUseFuCoin = async () => {
     logOperation('shidian', '批量使用10福币', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量使用10福币完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量使用10福币完成：成功${successCount}个，失败${failCount}个`
     });
   } catch (error) {
     console.error("批量使用10福币失败:", error);
@@ -3702,7 +3702,7 @@ const batchUseFuCoin = async () => {
     logOperation('shidian', '批量使用10福币', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量使用10福币失败: ${error.message || error}`
+      message: `【批量】批量使用10福币失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3832,7 +3832,7 @@ const batchUseSingleFuCoin = async () => {
     logOperation('shidian', '批量使用单个福币', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量使用单个福币完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量使用单个福币完成：成功${successCount}个，失败${failCount}个`
     });
   } catch (error) {
     console.error("批量使用单个福币失败:", error);
@@ -3840,7 +3840,7 @@ const batchUseSingleFuCoin = async () => {
     logOperation('shidian', '批量使用单个福币', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量使用单个福币失败: ${error.message || error}`
+      message: `【批量】批量使用单个福币失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -3972,7 +3972,7 @@ const batchUseCdk = async () => {
     logOperation('shidian', '批量使用兑换码', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量使用兑换码完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量使用兑换码完成：成功${successCount}个，失败${failCount}个`
     });
   } catch (error) {
     console.error("批量使用兑换码失败:", error);
@@ -3980,7 +3980,7 @@ const batchUseCdk = async () => {
     logOperation('shidian', '批量使用兑换码', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量使用兑换码失败: ${error.message || error}`
+      message: `【批量】批量使用兑换码失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -4112,7 +4112,7 @@ const batchClaimFreeGoods = async () => {
     logOperation('shidian', '批量领取免费道具', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量领取免费道具完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量领取免费道具完成：成功${successCount}个，失败${failCount}个`
     });
   } catch (error) {
     console.error("批量领取免费道具失败:", error);
@@ -4120,7 +4120,7 @@ const batchClaimFreeGoods = async () => {
     logOperation('shidian', '批量领取免费道具', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量领取免费道具失败: ${error.message || error}`
+      message: `【批量】批量领取免费道具失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;
@@ -4257,7 +4257,7 @@ const batchClaimTotalCharge = async () => {
     logOperation('shidian', '批量领取累充道具', {
       cardType: '暑期活动',
       status: 'success',
-      message: `批量领取累充道具完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量领取累充道具完成：成功${successCount}个，失败${failCount}个`
     });
   } catch (error) {
     console.error("批量领取累充道具失败:", error);
@@ -4265,7 +4265,7 @@ const batchClaimTotalCharge = async () => {
     logOperation('shidian', '批量领取累充道具', {
       cardType: '暑期活动',
       status: 'error',
-      message: `批量领取累充道具失败: ${error.message || error}`
+      message: `【批量】批量领取累充道具失败: ${error.message || error}`
     });
   } finally {
     isRunning.value = false;

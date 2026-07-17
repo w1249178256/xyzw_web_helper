@@ -832,7 +832,7 @@ const batchClaimNightmareRewards = async () => {
     logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
       status: 'success',
-      message: `批量领取完成！成功: ${successCount}个，失败: ${failCount}个`
+      message: `【批量】批量领取完成！成功: ${successCount}个，失败: ${failCount}个`
     })
   } catch (error) {
     console.error('批量领取过程中发生错误:', error)
@@ -840,7 +840,7 @@ const batchClaimNightmareRewards = async () => {
     logOperation('shidian', '批量领取', {
       cardType: '十殿 TeamID',
       status: 'error',
-      message: `批量领取失败: ${error.message}`
+      message: `【批量】批量领取失败: ${error.message}`
     })
   } finally {
     isBatchClaiming.value = false

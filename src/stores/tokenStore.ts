@@ -1707,6 +1707,31 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "saltcup26_placebet", params);
   };
 
+  // 发送世界杯详情
+  const sendSaltcup26GetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_getinfo", params);
+  };
+
+  // 发送世界杯选择球星
+  const sendSaltcup26SelectStar = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_selectstar", params);
+  };
+
+  // 发送报名联赛（世界杯活动）
+  const sendSaltcup26SignupLeague = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_signupleague", params);
+  };
+
+  // 发送领取比赛奖励（世界杯活动）
+  const sendSaltcup26ClaimMatchReward = (tokenId: string, params: { scheduleId: number }) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_claimmatchreward", params);
+  };
+
+  // 发送领取周球星卡（世界杯活动）
+  const sendSaltcup26ClaimWeeklyPack = (tokenId: string, params: { weekId: number }) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_claimweeklypack", params);
+  };
+
   // 发送武将上阵/下阵
   const sendHeroGoIntoBattle = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "hero_gointobattle", params);
@@ -2366,8 +2391,13 @@ export const useTokenStore = defineStore("tokens", () => {
     sendClaimCdkReward,
     sendSystemClaimCdkReward,
     sendClaimTotalReward,
+    sendSaltcup26GetInfo,
+    sendSaltcup26SelectStar,
     sendSaltcup26OpenStarPack,
     sendSaltcup26PlaceBet,
+    sendSaltcup26SignupLeague,
+    sendSaltcup26ClaimMatchReward,
+    sendSaltcup26ClaimWeeklyPack,
     sendHeroGoIntoBattle,
     sendHeroGoBackBattle,
     sendHeroRebirth,

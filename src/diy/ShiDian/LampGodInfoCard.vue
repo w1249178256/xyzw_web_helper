@@ -1956,7 +1956,7 @@ const batchLampGodFight = async () => {
     logOperation('shidian', '批量灯神按钮', {
       cardType: '灯神信息',
       status: 'success',
-      message: `批量灯神按钮完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量灯神按钮完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量灯神按钮失败:', error)
@@ -1964,7 +1964,7 @@ const batchLampGodFight = async () => {
     logOperation('shidian', '批量灯神按钮', {
       cardType: '灯神信息',
       status: 'error',
-      message: `批量灯神按钮失败: ${error.message || '未知错误'}`
+      message: `【批量】批量灯神按钮失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -2090,7 +2090,7 @@ const batchChangeTech = async () => {
     logOperation('shidian', '批量更换科技', {
       cardType: '灯神信息',
       status: 'success',
-      message: `批量更换科技完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量更换科技完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量更换科技失败:', error)
@@ -2098,7 +2098,7 @@ const batchChangeTech = async () => {
     logOperation('shidian', '批量更换科技', {
       cardType: '灯神信息',
       status: 'error',
-      message: `批量更换科技失败: ${error.message || '未知错误'}`
+      message: `【批量】批量更换科技失败: ${error.message || '未知错误'}`
     })
   }
 }
@@ -2219,7 +2219,7 @@ const batchSweepAction = async () => {
     logOperation('shidian', '批量扫荡', {
       cardType: '灯神信息',
       status: 'success',
-      message: `批量扫荡完成：成功${successCount}个，失败${failCount}个`
+      message: `【批量】批量扫荡完成：成功${successCount}个，失败${failCount}个`
     })
   } catch (error) {
     console.error('批量扫荡失败:', error)
@@ -2227,7 +2227,7 @@ const batchSweepAction = async () => {
     logOperation('shidian', '批量扫荡', {
       cardType: '灯神信息',
       status: 'error',
-      message: `批量扫荡失败: ${error.message || '未知错误'}`
+      message: `【批量】批量扫荡失败: ${error.message || '未知错误'}`
     })
   }
 }
