@@ -4621,69 +4621,46 @@ const handleBatchRecruitWeek = async () => {
       async (token, globalIndex) => {
         try {
           const tokenIndex = globalIndex + 1
-          
+
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取角色信息...`)
-          
-          // 1. 获取角色信息（包含图鉴点数、招募数量、爬塔信息）
+
+          // 1. 获取角色信息（包含图鉴点数、招募数量、爬塔信息、玩具信息）
+          // 连接池建立连接时已经调用过 role_getroleinfo，直接从缓存读取
           let bookPoint = 0
           let currentRecruitCount = 0
           let towerFloor = 0
-          try {
-            const roleInfo = await tokenStore.sendMessageWithPromise(
-              token.id,
-              'role_getroleinfo',
-              {},
-              5000
-            )
-            
-            const role = roleInfo?.role || {}
-            
-            // 获取图鉴点数
-            bookPoint = role.book?.bookPoint || 0
-            
-            // 获取招募令数量
-            const items = role.items || {}
-            if (items['1001']) {
-              currentRecruitCount = items['1001'].quantity || items['1001'].num || 0
-            }
-            
-            // 获取爬塔层数
-            const tower = role.tower
-            if (tower && tower.id) {
-              towerFloor = Math.floor(tower.id / 10)
-            }
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 图鉴点数：${bookPoint}`)
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 现有招募令数量：${currentRecruitCount}`)
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前爬塔层数：${towerFloor}层`)
-          } catch (error) {
-            console.error(`获取角色信息失败：${error.message}`, error)
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取角色信息失败，继续执行`)
-          }
-          
-          // 2. 获取玩具信息，检查被动3（skillId 11）
           let passive3Level = 0
-          try {
-            const lordWeaponInfo = await tokenStore.sendMessageWithPromise(
-              token.id,
-              'lordweapon_get',
-              {},
-              5000
-            )
-            
-            const lordWeapon = lordWeaponInfo?.lordWeapon || {}
-            const toy3 = lordWeapon['3'] || {}
-            const passiveSkill = toy3.passiveSkill || {}
-            const passive3 = passiveSkill['11'] || {}
-            passive3Level = passive3.level || 0
-            
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 玩具被动3等级：${passive3Level}`)
-          } catch (error) {
-            console.error(`获取玩具信息失败：${error.message}`, error)
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取玩具信息失败，继续执行`)
+
+          const role = tokenStore.gameData?.roleInfo?.role || {}
+
+          // 获取图鉴点数
+          bookPoint = role.book?.bookPoint || 0
+
+          // 获取招募令数量
+          const items = role.items || {}
+          if (items['1001']) {
+            currentRecruitCount = items['1001'].quantity || items['1001'].num || 0
           }
+
+          // 获取爬塔层数
+          const tower = role.tower
+          if (tower && tower.id) {
+            towerFloor = Math.floor(tower.id / 10)
+          }
+
+          // 获取玩具被动3等级（skillId 11）
+          const lordWeapon = role.lordWeapon || {}
+          const toy3 = lordWeapon['3'] || {}
+          const passiveSkill = toy3.passiveSkill || {}
+          const passive3 = passiveSkill['11'] || {}
+          passive3Level = passive3.level || 0
+
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 图鉴点数：${bookPoint}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 现有招募令数量：${currentRecruitCount}`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前爬塔层数：${towerFloor}层`)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 玩具被动3等级：${passive3Level}`)
           
-          // 如果被动3等级不为0，跳过执行
+          // 被动3已激活，跳过执行
           if (passive3Level !== 0) {
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3已激活(${passive3Level}级)，跳过招募周`)
             logStore.addLog({
@@ -4698,74 +4675,42 @@ const handleBatchRecruitWeek = async () => {
             return { success: false, reason: 'passive3_activated', passive3Level }
           }
           
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3未激活，执行1轮招募（400个招募令）`)
+          
           await waitCommandDelay()
           
-          // 3. 计算还能获取的招募令数量
-          // 图鉴奖励计算（从400开始，每150点增加20个招募令）
-          const calculateBookRewards = (point) => {
-            if (point < 400) return 0
-            const levels = Math.floor((point - 400) / 150) + 1
-            return levels * 20
-          }
-          
-          // 爬塔奖励计算（1-100层每层10个，101-200层每层20个）
-          const calculateTowerRewards = (level) => {
-            if (level <= 0) return 0
-            if (level <= 100) {
-              return level * 10
-            } else if (level <= 200) {
-              return 100 * 10 + (level - 100) * 20
-            } else {
-              return 100 * 10 + 100 * 20
+          // 获取当前已使用的招募令数量
+          let usedRecruitCount = 0
+          try {
+            const activityInfo = await tokenStore.sendMessageWithPromise(
+              token.id,
+              'activity_get',
+              {},
+              5000
+            )
+            
+            if (activityInfo?.activity?.myTotalInfo?.['1']?.num !== undefined) {
+              usedRecruitCount = activityInfo.activity.myTotalInfo['1'].num
             }
+            
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前已用招募令数量：${usedRecruitCount}`)
+          } catch (error) {
+            console.error(`获取活动信息失败：${error.message}`, error)
+            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取活动信息失败，继续执行`)
           }
           
-          // 图鉴：目标2100点
-          const currentBookRewards = calculateBookRewards(bookPoint)
-          const targetBookRewards = calculateBookRewards(2100)
-          const bookRemainingRewards = targetBookRewards - currentBookRewards
+          // 固定执行1轮（400个招募令）
+          const maxRounds = 1
+          const theoreticalUsed = 400
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 计划执行1轮招募（400个招募令），已用${usedRecruitCount}个`)
           
-          // 爬塔：目标200层
-          const currentTowerRewards = calculateTowerRewards(towerFloor)
-          const targetTowerRewards = calculateTowerRewards(200)
-          const towerRemainingRewards = targetTowerRewards - currentTowerRewards
+          // 检查是否已达到目标
+          let completedRounds = 0
+          let totalRecruits = 0
+          let mailClaimCount = 0
+          let remainingRecruits = currentRecruitCount
           
-          // 还能获取的招募令总数
-          const potentialRecruits = bookRemainingRewards + towerRemainingRewards
-          
-          // 计算使用招募数量 SYZM = ZM + LZM - 3000
-          const totalRecruitCount = currentRecruitCount + potentialRecruits
-          const usableRecruits = totalRecruitCount - 3000
-          
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 图鉴可获${bookRemainingRewards}, 爬塔可获${towerRemainingRewards}, 可用招募：${usableRecruits}`)
-          console.log(`[批量招募周] 当前招募：${currentRecruitCount}, 还能获取：${potentialRecruits}, 可用：${usableRecruits}`)
-          
-          // 4. 如果可用招募数量大于400，执行招募周；否则跳过
-          if (usableRecruits <= 400) {
-            message.info(`[序号${tokenIndex}] ${token.name || token.id} 可用招募${usableRecruits}个<=400，跳过招募周`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量招募周',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'warning',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]可用招募${usableRecruits}个<=400，跳过招募周`
-            })
-            return { success: false, reason: 'insufficient_recruits', usableRecruits }
-          }
-          
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 可用招募${usableRecruits}个>400，开始执行招募周`)
-          
-          // 计算轮数（最多使用400个招募令，即最多1轮）
-          const maxRounds = Math.min(1, Math.floor(usableRecruits / 400))
-          console.log(`[批量招募周] 计划轮数：${maxRounds}（最多1轮，400个招募令）`)
-          
-          const theoreticalUsed = maxRounds * 400
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募令对比：计划使用${maxRounds}轮，理论使用${theoreticalUsed}个，已用${usedRecruitCount}个`)
-          console.log(`[批量招募周] 招募令对比：理论使用=${theoreticalUsed}, 已用=${usedRecruitCount}`)
-          
-          if (usedRecruitCount >= theoreticalUsed && theoreticalUsed > 0) {
+          if (usedRecruitCount >= theoreticalUsed) {
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 已用招募令数量已达理论值，不再执行招募，直接领取奖励`)
             logStore.addLog({
               page: 'fish-helper',
@@ -4776,40 +4721,16 @@ const handleBatchRecruitWeek = async () => {
               status: 'info',
               message: `【序号${tokenIndex}】[${token.name || token.id}]已用招募令数量已达理论值，不再执行招募`
             })
-          }
+            // 跳过招募，直接领取奖励
+          } else {
+            // 需要执行招募 - 只执行1轮（400个招募令）
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 计划执行 ${maxRounds} 轮招募周`)
           
-          if (maxRounds === 0) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募令数量不足，无法完成一轮招募周（需要 400 个）`)
-            logStore.addLog({
-              page: 'fish-helper',
-              cardType: '养号',
-              operation: '批量招募周',
-              tokenId: token.id,
-              tokenName: token.name,
-              status: 'warning',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]招募令数量不足，无法完成一轮招募周`
-            })
-            return { success: false, reason: 'insufficient_recruits' }
-          }
-          
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 计划执行 ${maxRounds} 轮招募周`)
-          
-          let completedRounds = 0
-          let totalRecruits = 0
-          let mailClaimCount = 0
-          let remainingRecruits = currentRecruitCount
-          
-          // 阶段3：执行招募 - 使用验证逻辑确保Y刚刚超过SY
-          const SY = maxRounds * 400
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行招募，目标已用招募令数量：${SY}`)
-          
-          let recruitLoop = 0
-          const MAX_RECRUIT_LOOPS = maxRounds + 2 // 最大循环轮数+2次
-          
-          while (recruitLoop < MAX_RECRUIT_LOOPS) {
-            recruitLoop++
+            // 阶段3：执行招募 - 只执行1轮
+            const SY = maxRounds * 400  // 400
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始执行招募，目标已用招募令数量：${SY}`)
             
-            // 3.1 获取活动信息
+            // 获取当前已用数量
             let currentUsedCount = 0
             try {
               const activityInfo = await tokenStore.sendMessageWithPromise(
@@ -4823,99 +4744,92 @@ const handleBatchRecruitWeek = async () => {
                 currentUsedCount = activityInfo.activity.myTotalInfo['1'].num
               }
               
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募第${recruitLoop}次：已用招募令数量 ${currentUsedCount}，目标 ${SY}`)
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 当前已用招募令数量：${currentUsedCount}，目标：${SY}`)
             } catch (error) {
               console.error(`获取活动信息失败：${error.message}`, error)
               message.warning(`[序号${tokenIndex}] ${token.name || token.id} 获取活动信息失败，跳过招募`)
-              break
             }
             
-            // 3.2 验证已用招募数量
-            if (currentUsedCount >= SY) {
-              message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募完成：已用招募令数量 ${currentUsedCount} >= 目标 ${SY}`)
-              completedRounds = maxRounds
-              break
-            }
-            
-            // 3.3 执行招募
+            // 计算需要招募的次数（最多40次 = 400个）
             const diff = SY - currentUsedCount
-            const recruitCount = Math.min(40 * maxRounds, Math.floor(diff / 10) + 1) // 每次最多招募40*轮数次
+            const recruitCount = Math.min(40, Math.floor(diff / 10))
             message.info(`[序号${tokenIndex}] ${token.name || token.id} 需要招募 ${recruitCount} 次（${recruitCount * 10}个）`)
             
-            for (let i = 0; i < recruitCount; i++) {
-              try {
-                await tokenStore.sendMessageWithPromise(
-                  token.id,
-                  'hero_recruit',
-                  {
-                    byClub: false,
-                    recruitNumber: 10,
-                    recruitType: 1
-                  },
-                  5000
-                )
-                
-                totalRecruits += 10
-                remainingRecruits -= 10
-                
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量招募周',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'info',
-                  message: `【序号${tokenIndex}】[${token.name || token.id}]第${recruitLoop}轮第${i + 1}次招募，已招募${totalRecruits}个`
-                })
-                
-                // 每使用100个招募令，领取一次邮件附件
-                if ((i + 1) % 10 === 0) {
-                  try {
-                    await tokenStore.sendMessageWithPromise(
-                      token.id,
-                      'mail_claimallattachment',
-                      {},
-                      5000
-                    )
-                    mailClaimCount++
-                    message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取邮件附件成功（第${mailClaimCount}次）`)
-                    logStore.addLog({
-                      page: 'fish-helper',
-                      cardType: '养号',
-                      operation: '批量招募周',
-                      tokenId: token.id,
-                      tokenName: token.name,
-                      status: 'success',
-                      message: `【序号${tokenIndex}】[${token.name || token.id}]领取邮件附件成功（第${mailClaimCount}次）`
-                    })
-                  } catch (mailError) {
-                    console.error(`领取邮件失败：${mailError.message}`, mailError)
+            if (recruitCount > 0) {
+              // 执行招募 - 只执行一轮，最多40次
+              for (let i = 0; i < recruitCount; i++) {
+                try {
+                  await tokenStore.sendMessageWithPromise(
+                    token.id,
+                    'hero_recruit',
+                    {
+                      byClub: false,
+                      recruitNumber: 10,
+                      recruitType: 1
+                    },
+                    5000
+                  )
+                  
+                  totalRecruits += 10
+                  remainingRecruits -= 10
+                  
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量招募周',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]第${i + 1}次招募，已招募${totalRecruits}个`
+                  })
+                  
+                  // 每使用100个招募令，领取一次邮件附件
+                  if ((i + 1) % 10 === 0) {
+                    try {
+                      await tokenStore.sendMessageWithPromise(
+                        token.id,
+                        'mail_claimallattachment',
+                        {},
+                        5000
+                      )
+                      mailClaimCount++
+                      message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取邮件附件成功（第${mailClaimCount}次）`)
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '养号',
+                        operation: '批量招募周',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `【序号${tokenIndex}】[${token.name || token.id}]领取邮件附件成功（第${mailClaimCount}次）`
+                      })
+                    } catch (mailError) {
+                      console.error(`领取邮件失败：${mailError.message}`, mailError)
+                    }
                   }
+                  
+                  await waitCommandDelay()
+                } catch (recruitError) {
+                  console.error(`招募失败：${recruitError.message}`, recruitError)
+                  message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募失败：${recruitError.message}`)
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '养号',
+                    operation: '批量招募周',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'warning',
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]招募失败：${recruitError.message}`
+                  })
+                  break
                 }
-                
-                await waitCommandDelay()
-              } catch (recruitError) {
-                console.error(`招募失败：${recruitError.message}`, recruitError)
-                message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募失败：${recruitError.message}`)
-                logStore.addLog({
-                  page: 'fish-helper',
-                  cardType: '养号',
-                  operation: '批量招募周',
-                  tokenId: token.id,
-                  tokenName: token.name,
-                  status: 'warning',
-                  message: `【序号${tokenIndex}】[${token.name || token.id}]招募失败：${recruitError.message}`
-                })
-                break
               }
+              
+              completedRounds = maxRounds
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 招募完成：共招募${totalRecruits}个`)
+            } else {
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} 无需招募，直接领取奖励`)
             }
-            
-            // 跳转回3.1重新获取活动信息验证
-            await waitCommandDelay()
-          }
-          
-          if (recruitLoop >= MAX_RECRUIT_LOOPS) {
-            message.warning(`[序号${tokenIndex}] ${token.name || token.id} 招募阶段达到最大循环次数(${MAX_RECRUIT_LOOPS})，停止招募`)
           }
           
           // 阶段6：领取招募周奖励

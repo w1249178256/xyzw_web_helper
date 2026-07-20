@@ -2461,6 +2461,7 @@ const handleExportClubInfo = async () => {
           const realServerId = roleInfo?.role?.realServerId || 0
           const roleId = roleInfo?.role?.roleId || 0
           const legacyFragmentCount = roleInfo?.role?.items?.[37007]?.quantity || 0
+          const vipLevel = roleInfo?.role?.vip || 0
           
           const A = realServerId - 27
           const combined = String(A) + '+' + String(roleId)
@@ -2471,7 +2472,8 @@ const handleExportClubInfo = async () => {
             serverId: realServerId,
             roleId,
             combined,
-            legacyFragmentCount
+            legacyFragmentCount,
+            vipLevel
           })
 
           message.success(`[${tokenIndex}] ${nickname} 获取成功`)
@@ -2487,10 +2489,10 @@ const handleExportClubInfo = async () => {
     }
 
     const lines = []
-    lines.push('昵称,俱乐部名称,服务器号,角色号,综合,残卷数量')
+    lines.push('昵称,俱乐部名称,服务器号,角色号,综合,残卷数量,VIP等级')
     
     clubInfoList.forEach(info => {
-      lines.push(`${info.nickname},${info.clubName},${info.serverId},${info.roleId},${info.combined},${info.legacyFragmentCount}`)
+      lines.push(`${info.nickname},${info.clubName},${info.serverId},${info.roleId},${info.combined},${info.legacyFragmentCount},${info.vipLevel}`)
     })
 
     const content = lines.join('\n')

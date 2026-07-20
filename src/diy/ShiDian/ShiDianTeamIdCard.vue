@@ -633,18 +633,7 @@ const findItemCount = (items, itemId) => {
 // 领取十殿奖励
 const claimNightmareRewardsForCard = async (token) => {
   try {
-    tokenStore.selectToken(token.id)
-    if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
-      tokenStore.selectToken(token.id)
-      let count = 0
-      while (tokenStore.getWebSocketStatus(token.id) !== 'connected' && count < 10) {
-        await waitCommandDelay()
-        count++
-      }
-      if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
-        throw new Error('WebSocket连接失败')
-      }
-    }
+    // 连接池会自动建立WebSocket连接，无需手动检查
     
     // 获取角色信息
     let roleId = null
@@ -790,17 +779,19 @@ const batchClaimNightmareRewards = async () => {
   }
 
   isBatchClaiming.value = true
-  message.info('开始单线程批量领取十殿奖励...')
+  message.info('开始批量领取十殿奖励...')
   
   try {
-    const tokenIds = parseTokenRange(resourceExportRange.value) || gameTokens.map(t => t.id)
-    let tokens = gameTokens.filter(t => tokenIds.includes(t.id))
-    
-    tokens.sort((a, b) => {
+    // 先按名称排序
+    const sortedTokens = [...gameTokens].sort((a, b) => {
       const nameA = a.name || a.id || ''
       const nameB = b.name || b.id || ''
       return nameA.localeCompare(nameB, 'zh-CN')
     })
+    
+    // 获取执行范围
+    const tokenIndices = parseTokenRange(resourceExportRange.value)
+    let tokens = getTargetTokens(tokenIndices)
     
     if (tokens.length === 0) {
       message.warning('没有符合执行范围的Token')
@@ -808,22 +799,32 @@ const batchClaimNightmareRewards = async () => {
       return
     }
     
-    const results = []
-    
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i]
-      try {
-        message.info(`处理Token ${i + 1}/${tokens.length}: ${token.name || token.id}`)
-        
-        await claimNightmareRewardsForCard(token)
-        
-        results.push({ tokenId: token.id, tokenName: token.name || token.id, success: true })
-        message.success(`Token ${token.name || token.id} 领取成功 (${i + 1}/${tokens.length})`)
-      } catch (error) {
-        results.push({ tokenId: token.id, tokenName: token.name || token.id, success: false, error: error.message })
-        message.warning(`Token ${token.name || token.id} 领取失败: ${error.message}`)
+    // 使用连接池批量操作
+    const results = await connectionPool.batchOperate(
+      tokens,
+      async (token, globalIndex) => {
+        try {
+          message.info(`处理Token ${globalIndex + 1}/${tokens.length}: ${token.name || token.id}`)
+          await claimNightmareRewardsForCard(token)
+          return { success: true, message: '领取成功' }
+        } catch (error) {
+          return { success: false, message: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetween: 1000,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`正在处理: ${progress.tokenName} (${progress.globalIndex}/${progress.totalTokens})`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 处理成功`)
+          } else if (progress.type === 'token-error') {
+            message.error(`${progress.tokenName} 处理失败: ${progress.message}`)
+          }
+        }
       }
-    }
+    )
     
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
