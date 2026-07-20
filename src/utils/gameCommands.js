@@ -2093,6 +2093,57 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 对战助威
+   */
+  apex_vote(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  teamId:params.teamId,
+      	  round:1,
+      	  voteCnt:150,
+          ...params
+      }),
+      cmd: "apex_vote",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 对战名单
+   */
+  apex_getguesslist(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  scheduleId:20,
+      	  idx:20,
+          ...params
+      }),
+      cmd: "apex_getguesslist",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 对战竞猜
+   */
+  apex_guess(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  teamId:params.teamId,
+      	            ...params
+      }),
+      cmd: "apex_guess",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
    * 世界杯报名
    */
   saltcup26_signupleague(ack = 0, seq = 0, params = {}) {

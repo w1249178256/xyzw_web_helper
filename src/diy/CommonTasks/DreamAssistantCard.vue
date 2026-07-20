@@ -116,15 +116,31 @@
               v-model:input-value="weeklyPackInput"
               @button-click="handleBatchClaimWeeklyPack"
             />
+            <CustomizedCard
+              mode="button-with-input"
+              name="对战助威"
+              :disabled="isBatchVoteRunning || !tokenStore.hasTokens"
+              v-model:input-value="voteTeamIdInput"
+              placeholder="输入teamId"
+              @button-click="handleBatchVote"
+            />
+            <CustomizedCard
+              mode="button-with-input"
+              name="对战竞猜"
+              :disabled="isBatchGuessRunning || !tokenStore.hasTokens"
+              v-model:input-value="guessTeamIdsInput"
+              placeholder="输入teamId，逗号隔开，最多14个"
+              @button-click="handleBatchGuess"
+            />
           </CustomizedCard>
         </div>
       </div>
-      
+
       <!-- 操作日志 -->
-      <OperationLogCard 
-        page="fish-helper" 
+      <OperationLogCard
+        page="fish-helper"
         card-type="梦境助手"
-        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战', '批量报名', '批量上阵球星', '批量开卡', '批量竞猜', '批量领奖', '批量周球星']"
+        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战', '批量报名', '批量上阵球星', '批量开卡', '批量竞猜', '批量领奖', '批量周球星', '对战助威', '对战竞猜']"
       />
     </template>
   </MyCard>
@@ -176,6 +192,16 @@ const isBatchOpenCardRunning = ref(false)
 const isBatchBetRunning = ref(false)
 const isBatchClaimRunning = ref(false)
 const isBatchSignupRunning = ref(false)
+const isBatchVoteRunning = ref(false)
+const isBatchGuessRunning = ref(false)
+const voteTeamIdInput = ref(localStorage.getItem('dreamVoteTeamIdInput') || '')
+const guessTeamIdsInput = ref(localStorage.getItem('dreamGuessTeamIdsInput') || '')
+watch(voteTeamIdInput, (val) => {
+  localStorage.setItem('dreamVoteTeamIdInput', val)
+})
+watch(guessTeamIdsInput, (val) => {
+  localStorage.setItem('dreamGuessTeamIdsInput', val)
+})
 const isBatchSelectStarRunning = ref(false)
 const isBatchClaimWeeklyPackRunning = ref(false)
 const betInput = ref(localStorage.getItem('dreamBetInput') || '')
@@ -3099,6 +3125,346 @@ const handleBatchClaimWeeklyPack = async () => {
     })
   } finally {
     isBatchClaimWeeklyPackRunning.value = false
+  }
+}
+
+// 批量对战助威
+const handleBatchVote = async () => {
+  const inputParts = voteTeamIdInput.value.trim().split(',').map(s => s.trim())
+  if (inputParts.length < 2 || inputParts.length % 2 !== 0) {
+    message.warning('请输入teamId和round，用英文逗号隔开，如：A10000199,1,A10001259,2')
+    return
+  }
+  const voteList = []
+  for (let i = 0; i < inputParts.length; i += 2) {
+    const teamId = inputParts[i]
+    const round = parseInt(inputParts[i + 1])
+    if (!teamId || isNaN(round)) {
+      message.warning(`第${Math.floor(i / 2) + 1}组参数无效，请检查输入`)
+      return
+    }
+    voteList.push({ teamId, round })
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量对战助威（${rangeText}），共${targetTokens.length}个Token，${voteList.length}组参数...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '对战助威',
+    status: 'info',
+    message: `开始批量对战助威，${rangeText}，共${targetTokens.length}个Token，${voteList.length}组参数`
+  })
+
+  try {
+    isBatchVoteRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在助威...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战助威',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${tokenName}] 开始助威，共${voteList.length}组参数`
+          })
+          
+          // 逐个执行每个teamId+round组合
+          for (let v = 0; v < voteList.length; v++) {
+            const vote = voteList[v]
+            message.info(`【序号${tokenIndex}】[${tokenName}] 助威第${v + 1}/${voteList.length}个，teamId=${vote.teamId}，round=${vote.round}`)
+            await tokenStore.sendApexVote(token.id, { teamId: vote.teamId, round: vote.round, voteCnt: 150 })
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+          
+          message.success(`【序号${tokenIndex}】[${tokenName}] 助威完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战助威',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${tokenName}] 助威完成`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 助威失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 助威失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战助威',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${tokenName}] 助威失败：${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量对战助威完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '对战助威',
+      status: 'success',
+      message: `【批量】批量对战助威完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量对战助威出错:', error)
+    message.error(`批量对战助威出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '对战助威',
+      status: 'error',
+      message: `【批量】批量对战助威出错：${error.message || error}`
+    })
+  } finally {
+    isBatchVoteRunning.value = false
+  }
+}
+
+// 批量对战竞猜
+const handleBatchGuess = async () => {
+  if (!guessTeamIdsInput.value) {
+    message.warning('请输入teamId，用英文逗号隔开')
+    return
+  }
+
+  const teamIds = guessTeamIdsInput.value.split(',').map(id => id.trim()).filter(id => id)
+  if (teamIds.length === 0) {
+    message.warning('请输入有效的teamId')
+    return
+  }
+  if (teamIds.length > 16) {
+    message.warning('最多输入16个teamId')
+    return
+  }
+
+  const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+    const nameA = (a.name || '未命名').toLowerCase()
+    const nameB = (b.name || '未命名').toLowerCase()
+    return nameA.localeCompare(nameB)
+  })
+
+  if (sortedTokensList.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const tokenIndices = connectionPool.parseTokenRange(executionRange.value)
+  const targetTokens = connectionPool.getTargetTokens(sortedTokensList, tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('执行范围内没有有效的Token')
+    return
+  }
+
+  const getTokenIndex = (token) => {
+    const index = sortedTokensList.findIndex(t => t.id === token.id)
+    return index + 1
+  }
+
+  const rangeText = executionRange.value ? `范围${executionRange.value}` : "全部"
+  message.info(`开始批量对战竞猜（${rangeText}），共${targetTokens.length}个Token，${teamIds.length}个teamId...`)
+  logStore.addLog({
+    page: 'fish-helper',
+    cardType: '梦境助手',
+    operation: '对战竞猜',
+    status: 'info',
+    message: `开始批量对战竞猜，${rangeText}，共${targetTokens.length}个Token，${teamIds.length}个teamId`
+  })
+
+  try {
+    isBatchGuessRunning.value = true
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          message.info(`【序号${tokenIndex}】[${tokenName}] 正在竞猜...`)
+          
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战竞猜',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'info',
+            message: `【序号${tokenIndex}】[${tokenName}] 开始竞猜，${teamIds.length}个teamId`
+          })
+          
+          // 先获取竞猜名单
+          await tokenStore.sendApexGetGuessList(token.id, { idx: 20 })
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 逐个teamId执行竞猜，单个失败不中断
+          for (let i = 0; i < teamIds.length; i++) {
+            const teamId = teamIds[i]
+            try {
+              message.info(`【序号${tokenIndex}】[${tokenName}] 竞猜第${i + 1}/${teamIds.length}个，teamId=${teamId}`)
+              await tokenStore.sendApexGuess(token.id, { teamId })
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '梦境助手',
+                operation: '对战竞猜',
+                tokenId: token.id,
+                tokenName: tokenName,
+                status: 'success',
+                message: `【序号${tokenIndex}】[${tokenName}] 竞猜成功，teamId=${teamId}`
+              })
+            } catch (err) {
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '梦境助手',
+                operation: '对战竞猜',
+                tokenId: token.id,
+                tokenName: tokenName,
+                status: 'error',
+                message: `【序号${tokenIndex}】[${tokenName}] 竞猜失败，teamId=${teamId}，${err.message || err}`
+              })
+            }
+            await new Promise(resolve => setTimeout(resolve, 500))
+          }
+          
+          message.success(`【序号${tokenIndex}】[${tokenName}] 竞猜完成`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战竞猜',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${tokenName}] 竞猜完成，共${teamIds.length}个teamId`
+          })
+          
+          return { success: true }
+        } catch (error) {
+          const tokenIndex = getTokenIndex(token)
+          const tokenName = token.name || token.id
+          console.error(`【序号${tokenIndex}】[${tokenName}] 竞猜失败:`, error)
+          message.error(`【序号${tokenIndex}】[${tokenName}] 竞猜失败：${error.message || '未知错误'}`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '梦境助手',
+            operation: '对战竞猜',
+            tokenId: token.id,
+            tokenName: tokenName,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${tokenName}] 竞猜失败：${error.message || '未知错误'}`
+          })
+          
+          return { success: false, error: error.message || '未知错误' }
+        }
+      },
+      {
+        batchSize: 20,
+        delayBetween: 500,
+        onProgress: (progress) => {
+          if (progress.type === 'batch-start') {
+            message.info(`正在处理第 ${progress.batchIndex} 组（${progress.batchSize}个Token）...`)
+          } else if (progress.type === 'token-start') {
+            message.info(`${progress.tokenName} 正在获取连接...`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 连接成功`)
+          } else if (progress.type === 'token-error') {
+            if (progress.status === 'warning') {
+              message.warning(`${progress.tokenName} ${progress.message}`)
+            } else {
+              message.error(`${progress.tokenName} ${progress.message}`)
+            }
+          }
+        }
+      }
+    )
+    
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+    
+    message.success(`批量对战竞猜完成，成功${successCount}个，失败${failCount}个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '对战竞猜',
+      status: 'success',
+      message: `【批量】批量对战竞猜完成，成功${successCount}个，失败${failCount}个`
+    })
+  } catch (error) {
+    console.error('批量对战竞猜出错:', error)
+    message.error(`批量对战竞猜出错：${error.message || error}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '梦境助手',
+      operation: '对战竞猜',
+      status: 'error',
+      message: `【批量】批量对战竞猜出错：${error.message || error}`
+    })
+  } finally {
+    isBatchGuessRunning.value = false
   }
 }
 

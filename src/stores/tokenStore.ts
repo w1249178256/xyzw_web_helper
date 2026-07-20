@@ -1712,6 +1712,21 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "saltcup26_getbetinfo", params);
   };
 
+  // 发送对战助威
+  const sendApexVote = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "apex_vote", params);
+  };
+
+  // 发送对战竞猜名单
+  const sendApexGetGuessList = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "apex_getguesslist", params);
+  };
+
+  // 发送对战竞猜
+  const sendApexGuess = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "apex_guess", params);
+  };
+
   // 发送世界杯详情
   const sendSaltcup26GetInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "saltcup26_getinfo", params);
@@ -2401,6 +2416,9 @@ export const useTokenStore = defineStore("tokens", () => {
     sendSaltcup26OpenStarPack,
     sendSaltcup26PlaceBet,
     sendSaltcup26GetBetInfo,
+    sendApexVote,
+    sendApexGetGuessList,
+    sendApexGuess,
     sendSaltcup26SignupLeague,
     sendSaltcup26ClaimMatchReward,
     sendSaltcup26ClaimWeeklyPack,

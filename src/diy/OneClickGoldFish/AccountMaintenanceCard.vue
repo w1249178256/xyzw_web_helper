@@ -4675,7 +4675,21 @@ const handleBatchRecruitWeek = async () => {
             return { success: false, reason: 'passive3_activated', passive3Level }
           }
           
-          message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3未激活，执行1轮招募（400个招募令）`)
+          // 被动3未激活，检查招募令是否>=400
+          if (currentRecruitCount < 400) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3未激活，招募令不足400（当前${currentRecruitCount}），继续执行招募周`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '养号',
+              operation: '批量招募周',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]被动3未激活，招募令不足400（当前${currentRecruitCount}），继续执行招募周`
+            })
+          } else {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 被动3未激活，招募令${currentRecruitCount}>=400，执行1轮招募（400个招募令）`)
+          }
           
           await waitCommandDelay()
           

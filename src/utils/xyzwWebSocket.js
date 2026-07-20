@@ -169,12 +169,15 @@ export function registerDefaultCommands(reg) {
     .register("saltcup26_openstarpack", { packId: 5501, starId: 0, cnt: 1 })
     .register("saltcup26_placebet")
     .register("saltcup26_getbetinfo")
+    .register("apex_vote", { teamId: "", round: 1, voteCnt: 150 })
+    .register("apex_getguesslist", { scheduleId: 20, idx: 20 })
+    .register("apex_guess", { teamId: "" })
     .register("saltcup26_signupleague")
     .register("saltcup26_claimmatchreward")
     .register("saltcup26_claimweeklypack")
     .register("activity_exchange")
     .register("system_signinreward")
-    .register("system_mysharecallback", { isSkipShareCard: true, type: 2 })
+    .register("system_mysharecallback", { isSkipShareCard: true, type: 3 })
     .register("system_custom", { key: "", value: 0 })
 
     // 任务相关
@@ -1206,6 +1209,9 @@ export class XyzwWebSocketClient {
       saltcup26_openstarpackresp: "saltcup26_openstarpack",
       saltcup26_placebetresp: "saltcup26_placebet",
       saltcup26_getbetinforesp: "saltcup26_getbetinfo",
+      apex_voteresp: "apex_vote",
+      apex_getguesslistresp: "apex_getguesslist",
+      apex_guessresp: "apex_guess",
       saltcup26_signupleagueresp: "saltcup26_signupleague",
       saltcup26_claimmatchrewardresp: "saltcup26_claimmatchreward",
       saltcup26_claimweeklypackresp: "saltcup26_claimweeklypack",
