@@ -2336,6 +2336,11 @@ const handleBatchBet = async () => {
             message: `【序号${tokenIndex}】[${tokenName}] 开始竞猜，matchId=${matchId}，pick=${pick}`
           })
           
+          // 先获取竞猜信息
+          await tokenStore.sendSaltcup26GetBetInfo(token.id, {})
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 再执行下注
           await tokenStore.sendSaltcup26PlaceBet(token.id, { matchId, pick })
           await new Promise(resolve => setTimeout(resolve, 500))
           

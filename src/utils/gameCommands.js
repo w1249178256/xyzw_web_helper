@@ -2175,6 +2175,21 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 世界杯竞猜详情
+   */
+  saltcup26_getbetinfo(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+          ...params
+      }),
+      cmd: "saltcup26_getbetinfo",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
    * 世界杯竞猜
    */
   saltcup26_placebet(ack = 0, seq = 0, params = {}) {

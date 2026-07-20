@@ -168,6 +168,7 @@ export function registerDefaultCommands(reg) {
     .register("saltcup26_selectstar", { formationId: 1, starIdList: [[0,0,0],[0,0,0],[0,0,0,0],[0]] })
     .register("saltcup26_openstarpack", { packId: 5501, starId: 0, cnt: 1 })
     .register("saltcup26_placebet")
+    .register("saltcup26_getbetinfo")
     .register("saltcup26_signupleague")
     .register("saltcup26_claimmatchreward")
     .register("saltcup26_claimweeklypack")
@@ -1077,12 +1078,15 @@ export class XyzwWebSocketClient {
         // 发送前日志（仅标准五段）
         if (raw && raw.cmd !== "_sys/ack") {
           const decodedBody = this.decodeBodyForLog(raw.body);
+          const bodyDisplay = decodedBody
+            ? JSON.stringify(decodedBody)  // 使用 JSON 格式显示，字符串会显示为双引号
+            : formatBodyForLog(raw.body);
           wsLogger.info("📤 发送报文", {
             cmd: raw.cmd,
             ack: raw.ack ?? 0,
             seq: raw.seq ?? 0,
             time: raw.time,
-            body: decodedBody ?? formatBodyForLog(raw.body),
+            body: bodyDisplay,
           });
         }
 
@@ -1201,6 +1205,7 @@ export class XyzwWebSocketClient {
       saltcup26_selectstarresp: "saltcup26_selectstar",
       saltcup26_openstarpackresp: "saltcup26_openstarpack",
       saltcup26_placebetresp: "saltcup26_placebet",
+      saltcup26_getbetinforesp: "saltcup26_getbetinfo",
       saltcup26_signupleagueresp: "saltcup26_signupleague",
       saltcup26_claimmatchrewardresp: "saltcup26_claimmatchreward",
       saltcup26_claimweeklypackresp: "saltcup26_claimweeklypack",

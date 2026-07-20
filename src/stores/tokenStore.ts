@@ -1707,6 +1707,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "saltcup26_placebet", params);
   };
 
+  // 发送获取竞猜信息（世界杯活动）
+  const sendSaltcup26GetBetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "saltcup26_getbetinfo", params);
+  };
+
   // 发送世界杯详情
   const sendSaltcup26GetInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "saltcup26_getinfo", params);
@@ -2395,6 +2400,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendSaltcup26SelectStar,
     sendSaltcup26OpenStarPack,
     sendSaltcup26PlaceBet,
+    sendSaltcup26GetBetInfo,
     sendSaltcup26SignupLeague,
     sendSaltcup26ClaimMatchReward,
     sendSaltcup26ClaimWeeklyPack,
