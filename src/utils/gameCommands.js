@@ -762,7 +762,7 @@ export class GameCommands {
         heroId:params.heroId,
         itemId:params.itemId,
         targetHeroId:-1,
-        pearlId:0
+        pearlId:0,
         ...params,
       }),
       cmd: "artifact_load",
