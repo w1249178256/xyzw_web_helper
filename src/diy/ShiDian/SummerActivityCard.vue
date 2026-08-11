@@ -1185,12 +1185,12 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
       );
     } catch (error) {
       console.error("获取塔数据失败:", error);
-      return false;
+      return { success: false, skipReason: '获取塔数据失败' };
     }
 
     if (!towersInfo || !towersInfo.towerData || !towersInfo.towerData.towerData) {
       console.error("无法获取塔数据");
-      return false;
+      return { success: false, skipReason: '无法获取塔数据' };
     }
 
     // 计算X：BOSSes with 活动次数为0 的数量
@@ -1235,7 +1235,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     
     if (x === 0) {
       console.log("没有层数小于6的BOSS，跳过执行");
-      return false;
+      return { success: false, skipReason: '没有层数小于6的BOSS' };
     }
 
     // 计算Y = Math.floor(11/X)
@@ -1471,7 +1471,7 @@ const oneKeyBattleInternal = async (tokenId, towerTypeValue) => {
     // 5. 检查活动次数，如果大于7次，跳过执行
     if (todayUseTickCnt > 7) {
       console.log(`活动次数(${todayUseTickCnt})大于7次，跳过执行开始、战斗循环`);
-      return false;
+      return { success: false, skipReason: `活动次数(${todayUseTickCnt})大于7次` };
     }
 
     // 6. 执行战斗逻辑
@@ -3008,9 +3008,9 @@ const batchBattle = async () => {
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行一键战斗...`);
           
           // 执行一键战斗（使用内部函数，避免isRunning冲突）
-          const success = await oneKeyBattleInternal(token.id, bossSelect.value);
-          
-          if (success) {
+          const result = await oneKeyBattleInternal(token.id, bossSelect.value);
+
+          if (result === true) {
             console.log(`Token ${token.name} 一键战斗成功`);
             logOperation('shidian', '批量战斗', {
               cardType: '暑期活动',
@@ -3021,16 +3021,17 @@ const batchBattle = async () => {
             });
             return { success: true, token: token };
           } else {
-            console.log(`Token ${token.name} 一键战斗跳过执行`);
-            message.info(`序号 ${tokenIndex} ${token.name || token.id} 没有活动次数为0的BOSS，跳过执行`);
+            const skipReason = (result && result.skipReason) ? result.skipReason : '未知原因';
+            console.log(`Token ${token.name} 一键战斗跳过执行，原因：${skipReason}`);
+            message.info(`序号 ${tokenIndex} ${token.name || token.id} ${skipReason}，跳过执行`);
             logOperation('shidian', '批量战斗', {
               cardType: '暑期活动',
               tokenId: token.id,
               tokenName: token.name,
               status: 'info',
-              message: `【序号${tokenIndex}】[${token.name || token.id}]没有活动次数为0的BOSS，跳过执行`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${skipReason}，跳过执行`
             });
-            return { success: false, token: token, error: '没有活动次数为0的BOSS，跳过执行' };
+            return { success: false, token: token, error: skipReason };
           }
         } catch (error) {
           console.error(`Token ${token.name} 一键战斗失败:`, error);

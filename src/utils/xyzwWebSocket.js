@@ -172,6 +172,8 @@ export function registerDefaultCommands(reg) {
     .register("apex_vote", { teamId: "", round: 1, voteCnt: 150 })
     .register("apex_getguesslist", { scheduleId: 20, idx: 20 })
     .register("apex_guess", { teamId: "" })
+    .register("pet_activatebook", { petId: 0 })
+    .register("pet_claimbookreward", { petId: 0 })
     .register("saltcup26_signupleague")
     .register("saltcup26_claimmatchreward")
     .register("saltcup26_claimweeklypack")
@@ -1212,6 +1214,8 @@ export class XyzwWebSocketClient {
       apex_voteresp: "apex_vote",
       apex_getguesslistresp: "apex_getguesslist",
       apex_guessresp: "apex_guess",
+      pet_activatebookresp: "pet_activatebook",
+      pet_claimbookrewardresp: "pet_claimbookreward",
       saltcup26_signupleagueresp: "saltcup26_signupleague",
       saltcup26_claimmatchrewardresp: "saltcup26_claimmatchreward",
       saltcup26_claimweeklypackresp: "saltcup26_claimweeklypack",

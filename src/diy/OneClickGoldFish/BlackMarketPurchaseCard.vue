@@ -42,10 +42,17 @@
             placeholder="0-10"
           />
           
-          <CustomizedCard 
+          <CustomizedCard
             mode="name-input"
             name="金竿"
             v-model:inputValue="goldenRodDiscount"
+            placeholder="0-10"
+          />
+
+          <CustomizedCard
+            mode="name-input"
+            name="紫碎"
+            v-model:inputValue="purpleFragmentDiscount"
             placeholder="0-10"
           />
         </CustomizedCard>
@@ -133,6 +140,7 @@ const bronzeBoxDiscount = ref('0')
 const goldenBoxDiscount = ref('0')
 const platinumBoxDiscount = ref('0')
 const goldenRodDiscount = ref('0')
+const purpleFragmentDiscount = ref('0')
 
 // 操作状态
 const isSetting = ref(false)
@@ -187,7 +195,8 @@ const saveSettings = async () => {
       bronzeBoxDiscount: Number(bronzeBoxDiscount.value) || 0,
       goldenBoxDiscount: Number(goldenBoxDiscount.value) || 0,
       platinumBoxDiscount: Number(platinumBoxDiscount.value) || 0,
-      goldenRodDiscount: Number(goldenRodDiscount.value) || 0
+      goldenRodDiscount: Number(goldenRodDiscount.value) || 0,
+      purpleFragmentDiscount: Number(purpleFragmentDiscount.value) || 0
     }
   })
 }
@@ -201,6 +210,7 @@ const loadSettings = async () => {
     goldenBoxDiscount.value = String(data.blackMarketSettings.goldenBoxDiscount ?? 0)
     platinumBoxDiscount.value = String(data.blackMarketSettings.platinumBoxDiscount ?? 0)
     goldenRodDiscount.value = String(data.blackMarketSettings.goldenRodDiscount ?? 0)
+    purpleFragmentDiscount.value = String(data.blackMarketSettings.purpleFragmentDiscount ?? 0)
   }
 }
 
@@ -236,30 +246,33 @@ const handleSetBlackMarket = async () => {
   const goldenBoxDiscountNum = Number(goldenBoxDiscount.value)
   const platinumBoxDiscountNum = Number(platinumBoxDiscount.value)
   const goldenRodDiscountNum = Number(goldenRodDiscount.value)
-  
+  const purpleFragmentDiscountNum = Number(purpleFragmentDiscount.value)
+
   if (isNaN(purchaseCountNum) || purchaseCountNum < 0 || purchaseCountNum > 999) {
     message.error('购买次数必须在0-999之间')
     return
   }
-  
+
   if (isNaN(bronzeBoxDiscountNum) || bronzeBoxDiscountNum < 0 || bronzeBoxDiscountNum > 10 ||
       isNaN(goldenBoxDiscountNum) || goldenBoxDiscountNum < 0 || goldenBoxDiscountNum > 10 ||
       isNaN(platinumBoxDiscountNum) || platinumBoxDiscountNum < 0 || platinumBoxDiscountNum > 10 ||
-      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10) {
+      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10 ||
+      isNaN(purpleFragmentDiscountNum) || purpleFragmentDiscountNum < 0 || purpleFragmentDiscountNum > 10) {
     message.error('折扣值必须在0-10之间')
     return
   }
-  
+
   try {
     isSetting.value = true
-    
-    // 构建购买清单
+
+    // 构建购买清单（折扣为0的不列入购买清单）
     const purchaseItemList = [
       { discount: bronzeBoxDiscountNum, itemId: 2002 }, // 青铜宝箱
       { discount: goldenBoxDiscountNum, itemId: 2003 }, // 黄金宝箱
       { discount: platinumBoxDiscountNum, itemId: 2004 }, // 铂金宝箱
-      { discount: goldenRodDiscountNum, itemId: 1012 }  // 金鱼竿
-    ]
+      { discount: goldenRodDiscountNum, itemId: 1012 },  // 金鱼竿
+      { discount: purpleFragmentDiscountNum, itemId: 3005 }  // 紫碎
+    ].filter(item => item.discount > 0)
     
     // 发送设置黑市购买命令
     const result = await tokenStore.sendStoreSetPurchase(
@@ -316,36 +329,38 @@ const handleBatchSetBlackMarket = async () => {
   const goldenBoxDiscountNum = Number(goldenBoxDiscount.value)
   const platinumBoxDiscountNum = Number(platinumBoxDiscount.value)
   const goldenRodDiscountNum = Number(goldenRodDiscount.value)
-  
+  const purpleFragmentDiscountNum = Number(purpleFragmentDiscount.value)
+
   if (isNaN(purchaseCountNum) || purchaseCountNum < 0 || purchaseCountNum > 999) {
     message.error('购买次数必须在0-999之间')
     return
   }
-  
+
   if (isNaN(bronzeBoxDiscountNum) || bronzeBoxDiscountNum < 0 || bronzeBoxDiscountNum > 10 ||
       isNaN(goldenBoxDiscountNum) || goldenBoxDiscountNum < 0 || goldenBoxDiscountNum > 10 ||
       isNaN(platinumBoxDiscountNum) || platinumBoxDiscountNum < 0 || platinumBoxDiscountNum > 10 ||
-      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10) {
+      isNaN(goldenRodDiscountNum) || goldenRodDiscountNum < 0 || goldenRodDiscountNum > 10 ||
+      isNaN(purpleFragmentDiscountNum) || purpleFragmentDiscountNum < 0 || purpleFragmentDiscountNum > 10) {
     message.error('折扣值必须在0-10之间')
     return
   }
-  
+
   // 按token昵称排序的token列表（与页面显示顺序一致）
   const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
     const nameA = (a.name || '未命名').toLowerCase()
     const nameB = (b.name || '未命名').toLowerCase()
     return nameA.localeCompare(nameB)
   })
-  
+
   if (sortedTokensList.length === 0) {
     message.warning('没有可用的Token')
     return
   }
-  
+
   // 解析执行范围（如果为空则执行全部）
   const tokenIndices = parseTokenRange(blackMarketTokens.value)
   let targetTokens = []
-  
+
   if (tokenIndices === null || tokenIndices.length === 0) {
     // 留空执行全部
     targetTokens = sortedTokensList
@@ -361,48 +376,49 @@ const handleBatchSetBlackMarket = async () => {
       .sort((a, b) => a.index - b.index)
       .map(item => item.token)
   }
-  
+
   if (targetTokens.length === 0) {
     message.warning('执行范围内没有有效的Token')
     return
   }
-  
+
   if (isBatchSetting.value) {
     isBatchSetting.value = false
     message.info('批量设置已停止')
     return
   }
-  
+
   try {
     isBatchSetting.value = true
-    
+
     // 获取每个token在sortedTokens中的序号（用于显示）
     const getTokenIndex = (token) => {
       const index = sortedTokensList.findIndex(t => t.id === token.id)
       return index + 1
     }
-    
+
     const rangeText = tokenIndices === null || tokenIndices.length === 0 ? '全部' : `范围${tokenIndices.join(',')}`
     message.info(`开始批量设置黑市购买（${rangeText}），共${targetTokens.length}个Token...`)
-    
+
     let successCount = 0
     let failCount = 0
     const failedTokens = [] // 记录失败的token
-    
-    // 构建购买清单
+
+    // 构建购买清单（折扣为0的不列入购买清单）
     const purchaseItemList = [
       { discount: bronzeBoxDiscountNum, itemId: 2002 },
       { discount: goldenBoxDiscountNum, itemId: 2003 },
       { discount: platinumBoxDiscountNum, itemId: 2004 },
-      { discount: goldenRodDiscountNum, itemId: 1012 }
-    ]
-    
+      { discount: goldenRodDiscountNum, itemId: 1012 },
+      { discount: purpleFragmentDiscountNum, itemId: 3005 }
+    ].filter(item => item.discount > 0)
+
     for (let i = 0; i < targetTokens.length; i++) {
       const token = targetTokens[i]
       const tokenIndex = getTokenIndex(token)
-      
+
       if (!isBatchSetting.value) break
-      
+
       try {
         // 连接Token
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在连接...`)
@@ -581,7 +597,8 @@ const exportBlackMarketSettings = async () => {
             bronzeDiscount: '连接失败',
             goldenDiscount: '连接失败',
             platinumDiscount: '连接失败',
-            rodDiscount: '连接失败'
+            rodDiscount: '连接失败',
+            purpleFragmentDiscount: '连接失败'
           })
           continue
         }
@@ -597,7 +614,8 @@ const exportBlackMarketSettings = async () => {
             bronzeDiscount: '获取失败',
             goldenDiscount: '获取失败',
             platinumDiscount: '获取失败',
-            rodDiscount: '获取失败'
+            rodDiscount: '获取失败',
+            purpleFragmentDiscount: '获取失败'
           })
           continue
         }
@@ -616,14 +634,16 @@ const exportBlackMarketSettings = async () => {
         const goldenDiscount = findDiscount(2003) // 黄金宝箱
         const platinumDiscount = findDiscount(2004) // 铂金宝箱
         const rodDiscount = findDiscount(1012) // 金鱼竿
-        
+        const purpleFragmentDiscount = findDiscount(3005) // 紫碎
+
         results.push({
           nickname: token.name || token.id,
           purchaseCnt: String(purchaseCnt),
           bronzeDiscount: String(bronzeDiscount),
           goldenDiscount: String(goldenDiscount),
           platinumDiscount: String(platinumDiscount),
-          rodDiscount: String(rodDiscount)
+          rodDiscount: String(rodDiscount),
+          purpleFragmentDiscount: String(purpleFragmentDiscount)
         })
         
         await new Promise(resolve => setTimeout(resolve, 500))
@@ -635,15 +655,16 @@ const exportBlackMarketSettings = async () => {
           bronzeDiscount: '获取失败',
           goldenDiscount: '获取失败',
           platinumDiscount: '获取失败',
-          rodDiscount: '获取失败'
+          rodDiscount: '获取失败',
+          purpleFragmentDiscount: '获取失败'
         })
       }
     }
     
     // 生成CSV文件
-    const header = '昵称,购买次数,青铜折扣,黄金折扣,铂金折扣,金竿折扣\n'
-    const content = results.map(r => 
-      `${r.nickname},${r.purchaseCnt},${r.bronzeDiscount},${r.goldenDiscount},${r.platinumDiscount},${r.rodDiscount}`
+    const header = '昵称,购买次数,青铜折扣,黄金折扣,铂金折扣,金竿折扣,紫碎折扣\n'
+    const content = results.map(r =>
+      `${r.nickname},${r.purchaseCnt},${r.bronzeDiscount},${r.goldenDiscount},${r.platinumDiscount},${r.rodDiscount},${r.purpleFragmentDiscount}`
     ).join('\n')
     
     const fullContent = header + content

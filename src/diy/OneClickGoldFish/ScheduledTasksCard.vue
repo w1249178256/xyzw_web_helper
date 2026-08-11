@@ -1379,6 +1379,26 @@ const handleBatchBuyRecruit = async () => {
           const tokenIndex = getTokenIndex(token)
           message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始批量购买招募...`)
           
+          // 检查金砖数量是否大于300000
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
+          const goldBrick = roleInfo?.role?.items?.[37003]?.quantity || 0
+          
+          if (goldBrick <= 300000) {
+            message.info(`[序号${tokenIndex}] ${token.name || token.id} 金砖数量${goldBrick}<=300000，跳过购买`)
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '定时任务',
+              operation: '批量购买招募',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]金砖数量${goldBrick}<=300000，跳过购买`
+            })
+            return { success: false, tokenId: token.id, skipReason: `金砖数量${goldBrick}<=300000` }
+          }
+          
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 金砖数量${goldBrick}>300000，开始购买`)
+          
           const goodsIndices = [1, 2, 5]
           for (const goodsIndex of goodsIndices) {
             try {

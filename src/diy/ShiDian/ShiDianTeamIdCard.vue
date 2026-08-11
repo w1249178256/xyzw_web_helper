@@ -76,11 +76,17 @@
           :disabled="isExportingResources"
           @button-click="exportResources()"
         />
-        <CustomizedCard 
+        <CustomizedCard
           mode="button-placeholder"
           button-text="批量领取"
           :disabled="tokenStore.gameTokens.length === 0 || isBatchClaiming"
           @button-click="batchClaimNightmareRewards()"
+        />
+        <CustomizedCard
+          mode="button-placeholder"
+          button-text="刷新枕头"
+          :disabled="tokenStore.gameTokens.length === 0 || isRefreshingPillow"
+          @button-click="batchRefreshPillowCount()"
         />
       </CustomizedCard>
       
@@ -104,6 +110,7 @@ import CustomizedCard from '@/diy/CustomizedCard.vue'
 import MyCard from '@/components/Common/MyCard.vue'
 import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import ConnectionPoolManager from '@/utils/connectionPoolManager.js'
+import { PET_DICT } from '@/utils/herolist'
 
 const props = defineProps({
   selectedTokenId: {
@@ -449,8 +456,8 @@ const autoJoinShiDian = async () => {
     return
   }
 
-  // 触发事件，让父组件执行自动加入十殿
-  emit('auto-join-shidian')
+  // 触发事件，让父组件执行自动加入十殿，传递执行范围
+  emit('auto-join-shidian', resourceExportRange.value)
 }
 
 // 停止自动加入十殿
@@ -605,9 +612,15 @@ const executeNightmare8 = async () => {
 // ========== 导出资源和批量领取相关 ==========
 
 // 状态变量
-const resourceExportRange = ref('')
+const resourceExportRange = ref(localStorage.getItem('shidian_resourceExportRange') || '')
 const isExportingResources = ref(false)
 const isBatchClaiming = ref(false)
+const isRefreshingPillow = ref(false)
+
+// 监听执行范围变化，持久化保存
+watch(resourceExportRange, (newValue) => {
+  localStorage.setItem('shidian_resourceExportRange', newValue)
+})
 
 // 辅助函数：格式化数值
 const formatValue = (value) => {
@@ -848,6 +861,92 @@ const batchClaimNightmareRewards = async () => {
   }
 }
 
+// 批量刷新枕头数量
+const batchRefreshPillowCount = async () => {
+  if (isRefreshingPillow.value) {
+    message.warning('刷新正在进行中，请稍候...')
+    return
+  }
+
+  isRefreshingPillow.value = true
+  try {
+    const gameTokens = toRaw(tokenStore.gameTokens)
+    const tokenIndices = parseTokenRange(resourceExportRange.value)
+    let tokens = getTargetTokens(tokenIndices)
+
+    if (tokens.length === 0) {
+      message.warning('没有符合执行范围的Token')
+      isRefreshingPillow.value = false
+      return
+    }
+
+    message.info(`开始刷新枕头数量，共${tokens.length}个Token...`)
+
+    const results = await connectionPool.batchOperate(
+      tokens,
+      async (token, globalIndex) => {
+        try {
+          message.info(`处理Token ${globalIndex + 1}/${tokens.length}: ${token.name || token.id}`)
+
+          // 获取角色信息
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+
+          if (roleInfo && roleInfo.role && roleInfo.role.items) {
+            const pillowItem = roleInfo.role.items['5054']
+
+            if (pillowItem && pillowItem.quantity !== undefined) {
+              // 发送事件更新枕头数量
+              emit('update-pillow-count', token.id, pillowItem.quantity)
+              return { success: true, message: `枕头数量: ${pillowItem.quantity}` }
+            } else {
+              emit('update-pillow-count', token.id, 0)
+              return { success: false, message: '未找到枕头信息' }
+            }
+          } else {
+            emit('update-pillow-count', token.id, 0)
+            return { success: false, message: '未获取到角色信息' }
+          }
+        } catch (error) {
+          return { success: false, message: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetween: 1000,
+        onProgress: (progress) => {
+          if (progress.type === 'token-start') {
+            message.info(`正在处理: ${progress.tokenName} (${progress.globalIndex}/${progress.totalTokens})`)
+          } else if (progress.type === 'token-success') {
+            message.success(`${progress.tokenName} 处理成功`)
+          } else if (progress.type === 'token-error') {
+            message.error(`${progress.tokenName} 处理失败: ${progress.message}`)
+          }
+        }
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failCount = results.filter(r => !r.success).length
+
+    message.success(`刷新枕头数量完成！成功: ${successCount}个，失败: ${failCount}个`)
+    logOperation('shidian', '刷新枕头', {
+      cardType: '十殿 TeamID',
+      status: 'success',
+      message: `【批量】刷新枕头数量完成！成功: ${successCount}个，失败: ${failCount}个`
+    })
+  } catch (error) {
+    console.error('刷新枕头数量过程中发生错误:', error)
+    message.error(`刷新枕头数量失败: ${error.message}`)
+    logOperation('shidian', '刷新枕头', {
+      cardType: '十殿 TeamID',
+      status: 'error',
+      message: `【批量】刷新枕头数量失败: ${error.message}`
+    })
+  } finally {
+    isRefreshingPillow.value = false
+  }
+}
+
 // 导出资源
 const exportResources = async () => {
   if (isExportingResources.value) {
@@ -857,31 +956,24 @@ const exportResources = async () => {
 
   isExportingResources.value = true
   try {
-    const gameTokens = toRaw(tokenStore.gameTokens)
-    const tokenIds = parseTokenRange(resourceExportRange.value) || gameTokens.map(t => t.id)
-    
-    if (tokenIds.length === 0) {
-      message.warning('没有可导出的Token')
+    const tokenIndices = parseTokenRange(resourceExportRange.value)
+    const targetTokens = getTargetTokens(tokenIndices)
+
+    if (targetTokens.length === 0) {
+      message.warning('没有符合执行范围的Token')
+      isExportingResources.value = false
       return
     }
 
-    message.info(`开始导出资源，共${tokenIds.length}个Token...`)
+    message.info(`开始导出资源，共${targetTokens.length}个Token...`)
 
     const results = []
-    const sortedTokens = tokenStore.gameTokens.slice().sort((a, b) => {
-      const nameA = (a.name || '未命名').toLowerCase()
-      const nameB = (b.name || '未命名').toLowerCase()
-      return nameA.localeCompare(nameB)
-    })
 
-    for (let i = 0; i < tokenIds.length; i++) {
-      const tokenId = tokenIds[i]
-      const token = sortedTokens.find(t => t.id === tokenId)
-      
-      if (!token) continue
+    for (let i = 0; i < targetTokens.length; i++) {
+      const token = targetTokens[i]
 
       try {
-        message.info(`正在处理Token ${i + 1}/${tokenIds.length}: ${token.name || token.id}`)
+        message.info(`正在处理Token ${i + 1}/${targetTokens.length}: ${token.name || token.id}`)
 
         // 连接token
         const connectionStatus = tokenStore.getWebSocketStatus(token.id)
@@ -899,7 +991,7 @@ const exportResources = async () => {
               tokenId: token.id, tokenName: token.name || token.id,
               whiteJade: '-', colorJade: '-', spiritShell: '-', goldBrick: '-',
               goldenRod: '-', chestScore: '-', recruitOrder: '-',
-              roleId: '连接失败', maxNightmareLevel: '-', success: false, error: '连接失败'
+              roleId: '连接失败', maxNightmareLevel: '-', petName: '-', success: false, error: '连接失败'
             })
             continue
           }
@@ -929,6 +1021,10 @@ const exportResources = async () => {
         const chestScoreDisplay = chestScore > 0 ? chestScore : '-'
         const roleId = roleInfo?.role?.roleId || '未获取到'
         
+        // 获取宠物名称
+        const petId = roleInfo?.role?.pet?.petId
+        const petName = petId && PET_DICT[petId] ? PET_DICT[petId].name : '-'
+        
         // 获取十殿最高殿级
         let maxNightmareLevel = '-'  
         try {
@@ -956,10 +1052,10 @@ const exportResources = async () => {
           tokenId: token.id, tokenName: token.name || token.id,
           whiteJade, colorJade, spiritShell, goldBrick, goldenRod,
           chestScore: chestScoreDisplay, recruitOrder, roleId,
-          maxNightmareLevel, success: true
+          maxNightmareLevel, petName, success: true
         })
 
-        message.success(`Token ${token.name || token.id} 资源获取成功 (${i + 1}/${tokenIds.length})`)
+        message.success(`Token ${token.name || token.id} 资源获取成功 (${i + 1}/${targetTokens.length})`)
         const tokenIndex = getTokenIndex(token)
         logOperation('shidian', '导出资源', {
           cardType: '十殿 TeamID',
@@ -983,7 +1079,7 @@ const exportResources = async () => {
           tokenId: token.id, tokenName: token.name || token.id,
           whiteJade: '-', colorJade: '-', spiritShell: '-', goldBrick: '-',
           goldenRod: '-', chestScore: '-', recruitOrder: '-',
-          roleId, maxNightmareLevel: '-', success: false, error: error.message || '未知错误'
+          roleId, maxNightmareLevel: '-', petName: '-', success: false, error: error.message || '未知错误'
         })
         message.warning(`Token ${token.name || token.id} 处理失败: ${error.message || '未知错误'}`)
         const tokenIndex = getTokenIndex(token)
@@ -996,7 +1092,7 @@ const exportResources = async () => {
         })
       }
 
-      if (i < tokenIds.length - 1) {
+      if (i < targetTokens.length - 1) {
         await waitCommandDelay()
       }
     }
@@ -1007,15 +1103,15 @@ const exportResources = async () => {
     lines.push("资源导出")
     lines.push(`导出时间: ${new Date().toLocaleString('zh-CN')}`)
     lines.push(`执行范围: ${resourceExportRange.value || '全部Token'}`)
-    lines.push(`Token数量: ${tokenIds.length}`)
+    lines.push(`Token数量: ${targetTokens.length}`)
     lines.push("=".repeat(80))
     lines.push("")
-    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,金竿,宝箱总分数,招募令,十殿最高殿级,状态")
+    lines.push("序号,Token名称,roleId,白玉,彩玉,灵贝,金砖,金竿,宝箱总分数,招募令,宠物名称,十殿最高殿级,状态")
     lines.push("-".repeat(80))
 
     results.forEach((result, index) => {
       const status = result.success ? '成功' : `失败: ${result.error || '未知错误'}`
-      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.goldenRod},${result.chestScore},${result.recruitOrder},${result.maxNightmareLevel},${status}`)
+      lines.push(`${index + 1},${result.tokenName},${result.roleId || '未获取到'},${result.whiteJade},${result.colorJade},${result.spiritShell},${result.goldBrick},${result.goldenRod},${result.chestScore},${result.recruitOrder},${result.petName || '-'},${result.maxNightmareLevel},${status}`)
     })
 
     lines.push("")
@@ -1064,7 +1160,8 @@ defineExpose({
   addMembersToTeams,
   executeNightmare8,
   batchClaimNightmareRewards,
-  exportResources
+  exportResources,
+  batchRefreshPillowCount
 })
 
 // 组件挂载时加载设置

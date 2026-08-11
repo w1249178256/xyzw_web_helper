@@ -50,7 +50,7 @@
           :selected-token-id="selectedTokenId"
           @update-pillow-count="handleUpdatePillowCount"
           @join-token="handleJoinTokenFromTeamIdCard"
-          @auto-join-shidian="autoJoinShiDian"
+          @auto-join-shidian="autoJoinShiDian($event)"
           @clear-nightmare-labels="handleClearNightmareLabels"
         />
 
@@ -947,9 +947,9 @@ const clearAllNightmareLabels = async () => {
 }
 
 // 自动加入十殿
-const autoJoinShiDian = async () => {
-  console.log('autoJoinShiDian 被调用')
-  
+const autoJoinShiDian = async (executionRange = '') => {
+  console.log('autoJoinShiDian 被调用，执行范围:', executionRange)
+
   // 实时从 localStorage 读取 TeamID，确保获取最新值
   try {
     const savedTeamIds = localStorage.getItem('shidian_teamIds')
@@ -963,17 +963,17 @@ const autoJoinShiDian = async () => {
   } catch (error) {
     console.error('读取 shidian_teamIds 失败:', error)
   }
-  
+
   const hasTeamIds = teamIds.value.some(id => id)
   console.log('hasTeamIds:', hasTeamIds, 'teamIds:', teamIds.value)
-  
+
   if (!hasTeamIds) {
     message.warning('请先在十殿 TeamID 卡片中输入至少一个 TeamID')
     return
   }
-  
+
   console.log('准备显示确认对话框')
-  
+
   try {
     // 使用 Promise 等待用户选择
     const userChoice = await new Promise((resolve) => {
@@ -997,20 +997,20 @@ const autoJoinShiDian = async () => {
         }
       })
     })
-    
+
     console.log('用户选择:', userChoice)
-    
+
     if (userChoice !== 'positive') {
       console.log('用户取消了操作')
       return
     }
-    
+
     console.log('开始自动分配 Token 加入十殿...')
     message.info('开始自动分配 Token 加入十殿...')
-    
+
     // 设置运行状态
     isAutoJoinRunning.value = true
-    
+
     try {
       // 导入连接池管理器
       const { ConnectionPoolManager } = await import('@/utils/connectionPoolManager.js')
@@ -1022,12 +1022,24 @@ const autoJoinShiDian = async () => {
         reconnectDelay: 1000,
         maxRetries: 3
       })
-      
+
       // 获取所有 token，排除 02/05/07 前缀
-      const tokens = tokenStore.gameTokens.filter(token => {
+      let tokens = tokenStore.gameTokens.filter(token => {
         const name = token.name || ''
         return !name.startsWith('02') && !name.startsWith('05') && !name.startsWith('07')
       })
+
+      // 按执行范围过滤 token
+      if (executionRange) {
+        const indices = parseTokenRange(executionRange)
+        if (indices && indices.length > 0) {
+          tokens = indices
+            .filter(idx => idx > 0 && idx <= tokenStore.gameTokens.length)
+            .map(idx => tokenStore.gameTokens[idx - 1])
+            .filter(token => token && !token.name?.startsWith('02') && !token.name?.startsWith('05') && !token.name?.startsWith('07'))
+          console.log('按执行范围过滤后的 token 数量:', tokens.length)
+        }
+      }
       
       // 先检查所有 token 的枕头数量，只保留枕头=5 的 token
       const tokensWithPillow5 = []
@@ -1056,11 +1068,15 @@ const autoJoinShiDian = async () => {
           // 获取枕头数量
           const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
           const pillowItem = roleInfo?.role?.items?.['5054']
-          const pillowCount = pillowItem?.quantity ?? 0
+          const currentPillowCount = pillowItem?.quantity ?? 0
           
-          console.log(`Token ${token.name} 枕头数量: ${pillowCount}`)
+          console.log(`Token ${token.name} 枕头数量: ${currentPillowCount}`)
           
-          if (pillowCount === 5) {
+          // 更新枕头数量到响应式状态，使UI自动刷新
+          tokenPillowCount.value[token.id] = currentPillowCount
+          await saveDropdownSettings()
+          
+          if (currentPillowCount === 5) {
             tokensWithPillow5.push(token)
           }
           
@@ -1082,11 +1098,11 @@ const autoJoinShiDian = async () => {
       
       console.log(`找到 ${tokensWithPillow5.length} 个枕头数量为 5 的 Token`)
       
-      // 将枕头=5 的 token 分配到各殿（按殿五到殿一的顺序）
+      // 将枕头=5 的 token 分配到各殿（按殿一到殿五的顺序，token序号从前向后）
       const allTokensToProcess = []
       let tokenIndex = 0
       
-      for (let teamIdx = 5; teamIdx >= 1; teamIdx--) {
+      for (let teamIdx = 1; teamIdx <= 5; teamIdx++) {
         if (!teamIds.value[teamIdx - 1]) continue
         
         // 每殿分配 2 个 token

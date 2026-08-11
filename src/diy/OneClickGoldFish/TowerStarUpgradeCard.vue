@@ -166,6 +166,18 @@ const towerEnergy = computed(() => {
 })
 
 // 开始爬塔（从GameStatus.vue复制）
+
+
+
+
+
+
+
+
+
+
+
+
 const startTowerClimb = async () => {
   if (!props.selectedTokenId) {
     message.warning("请先选择Token");

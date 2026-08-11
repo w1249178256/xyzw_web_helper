@@ -3045,9 +3045,10 @@ const handleBatchClaimWeeklyPack = async () => {
             })
           }
 
-          // 无论领取成功失败，都执行两次开包
+          // 无论领取成功失败，都执行两次开包，packId = 5501 + weekId
+          const packId = 5501 + weekId
           for (let i = 0; i < 2; i++) {
-            await tokenStore.sendSaltcup26OpenStarPack(token.id, { packId: 5502, starId: 0, cnt: 1 })
+            await tokenStore.sendSaltcup26OpenStarPack(token.id, { packId, starId: 0, cnt: 1 })
             await new Promise(resolve => setTimeout(resolve, 300))
           }
 

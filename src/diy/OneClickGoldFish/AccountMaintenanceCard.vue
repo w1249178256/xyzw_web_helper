@@ -105,9 +105,13 @@
             :loading="isExportingDetails"
           />
           <CustomizedCard 
-            mode="button"
-            :name="isBatchBoxWeekRunning ? '批量宝箱周中...' : '批量宝箱周'"
+            mode="button-with-select"
+            :button-text="isBatchBoxWeekRunning ? '批量宝箱周中...' : '批量宝箱周'"
             @button-click="handleBatchBoxWeek"
+            :select-value="boxWeekRewardType"
+            @update:select-value="(val) => boxWeekRewardType = val"
+            :select-options="boxWeekRewardOptions"
+            placeholder="选择奖励"
             :disabled="isAnyOperationRunning || !isBoxWeekAvailable"
             :loading="isBatchBoxWeekRunning"
           />
@@ -248,6 +252,11 @@ const isBatchBoxWeekRunning = ref(false)
 const isBatchBoxWeekCancelled = ref(false)
 const isBatchRecruitWeekRunning = ref(false)
 const enableRecruitWeek = ref(false)
+const boxWeekRewardType = ref('万能')
+const boxWeekRewardOptions = [
+  { label: '万能', value: '万能' },
+  { label: '珍珠', value: '珍珠' }
+]
 
 // 计算是否有任何操作正在运行
 const isAnyOperationRunning = computed(() => {
@@ -4306,7 +4315,8 @@ const executeBoxWeekForToken = async (token) => {
     // 领取宝箱周奖励
     for (let i = 0; i < l + 1; i++) {
       try {
-        await tokenStore.sendActivityClaimWeekActReward(token.id)
+        const rewardParams = boxWeekRewardType.value === '珍珠' ? { selectRewardsMap: { 5: 1 }, typ: 2 } : { selectRewardsMap: { 0: 1 }, typ: 2 }
+        await tokenStore.sendActivityClaimWeekActReward(token.id, rewardParams)
         successfulClaimCount++
         message.info(`${token.name} - 第 ${i + 1} 次领取宝箱周奖励成功`)
         // 添加操作日志

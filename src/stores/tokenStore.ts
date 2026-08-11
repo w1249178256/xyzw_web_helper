@@ -1727,6 +1727,16 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "apex_guess", params);
   };
 
+  // 发送激活宠物图鉴
+  const sendPetActivateBook = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "pet_activatebook", params);
+  };
+
+  // 发送领取宠物图鉴奖励
+  const sendPetClaimBookReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "pet_claimbookreward", params);
+  };
+
   // 发送世界杯详情
   const sendSaltcup26GetInfo = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "saltcup26_getinfo", params);
@@ -2419,6 +2429,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendApexVote,
     sendApexGetGuessList,
     sendApexGuess,
+    sendPetActivateBook,
+    sendPetClaimBookReward,
     sendSaltcup26SignupLeague,
     sendSaltcup26ClaimMatchReward,
     sendSaltcup26ClaimWeeklyPack,

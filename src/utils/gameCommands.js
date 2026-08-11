@@ -2093,6 +2093,39 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 激活宠物图鉴
+   */
+  pet_activatebook(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        petId:params.petId,
+          ...params
+      }),
+      cmd: "pet_activatebook",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 领取宠物图鉴奖励
+   */
+  pet_claimbookreward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        petId:params.petId,
+          ...params
+      }),
+      cmd: "pet_claimbookreward",
+      seq,
+      time: Date.now()
+    }
+  }
+  
+
+  /**
    * 对战助威
    */
   apex_vote(ack = 0, seq = 0, params = {}) {

@@ -83,6 +83,7 @@
           <CustomizedCard mode="button" :name="isBatchCollectPrivilegeRunning ? '批量收集特权中...' : '批量收集特权'" :disabled="isBatchCollectPrivilegeRunning" @button-click="handleBatchCollectPrivilege" />
           <CustomizedCard mode="button" :name="isQuickAcceptGiftRunning ? '一键接受礼物中...' : '一键接受礼物'" :disabled="isQuickAcceptGiftRunning" @button-click="handleQuickAcceptGift" />
           <CustomizedCard mode="button" :name="isBatchPetEggRunning ? '批量宠物蛋中...' : '批量宠物蛋'" :disabled="isBatchPetEggRunning" @button-click="handleBatchPetEgg" />
+          <CustomizedCard mode="button" :name="isBatchPetBookRunning ? '批量宠物图鉴中...' : '批量宠物图鉴'" :disabled="isBatchPetBookRunning" @button-click="handleBatchPetBook" />
         </CustomizedCard>
       </div>
       
@@ -90,7 +91,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物', '批量宠物蛋']"
+        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物', '批量宠物蛋', '批量宠物图鉴']"
       />
     </template>
   </MyCard>
@@ -533,6 +534,169 @@ const handleBatchPetEgg = async () => {
   }
 }
 
+// 批量宠物图鉴
+const handleBatchPetBook = async () => {
+  try {
+    isBatchPetBookRunning.value = true
+    message.info('开始批量宠物图鉴...')
+    logOperation('shidian', '批量宠物图鉴', {
+      cardType: '俱乐部管理',
+      status: 'info',
+      message: '开始批量宠物图鉴...'
+    })
+
+    const tokenIndices = connectionPool.parseTokenRange(legionTokens.value)
+    const targetTokens = connectionPool.getTargetTokens(sortedTokens.value, tokenIndices)
+
+    if (targetTokens.length === 0) {
+      const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
+      message.warning(`执行范围${rangeText}内没有找到Token`)
+      logOperation('shidian', '批量宠物图鉴', {
+        cardType: '俱乐部管理',
+        status: 'warning',
+        message: `执行范围${rangeText}内没有找到Token`
+      })
+      return
+    }
+
+    for (const token of targetTokens) {
+      if (!isBatchPetBookRunning.value) break
+
+      const tokenIndex = getTokenIndex(token)
+      message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在获取宠物信息...`)
+
+      // 获取连接
+      const connectionAcquired = await connectionPool.acquire(token.id)
+      if (!connectionAcquired) {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} 连接失败`)
+        failCount++
+        continue
+      }
+
+      if (tokenStore.getWebSocketStatus(token.id) !== 'connected') {
+        message.warning(`[序号${tokenIndex}] ${token.name || token.id} WebSocket未连接`)
+        await connectionPool.release(token.id, false)
+        failCount++
+        continue
+      }
+
+      try {
+        // 获取角色信息
+        const roleInfo = await tokenStore.sendGetRoleInfo(token.id)
+        const petData = roleInfo?.role?.petData
+
+        if (!petData || !petData.books) {
+          message.warning(`[序号${tokenIndex}] ${token.name || token.id} 未找到宠物图鉴数据`)
+          await connectionPool.release(token.id, false)
+          continue
+        }
+
+        // 找出所有未激活的图鉴（books值为0的）
+        const unactivatedBooks = Object.entries(petData.books)
+          .filter(([petId, status]) => status === 0)
+          .map(([petId]) => parseInt(petId))
+
+        if (unactivatedBooks.length === 0) {
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} 所有宠物图鉴已激活`)
+          await connectionPool.release(token.id, true)
+          continue
+        }
+
+        message.info(`[序号${tokenIndex}] ${token.name || token.id} 发现 ${unactivatedBooks.length} 个未激活图鉴: ${unactivatedBooks.join(', ')}`)
+
+        // 依次执行激活和领取奖励
+        for (const petId of unactivatedBooks) {
+          if (!isBatchPetBookRunning.value) break
+
+          try {
+            // 激活图鉴
+            await tokenStore.sendPetActivateBook(token.id, { petId })
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} 激活宠物图鉴 petId=${petId} 成功`)
+            logOperation('shidian', '批量宠物图鉴', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `激活宠物图鉴 petId=${petId} 成功`
+            })
+          } catch (activateError) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} 激活宠物图鉴 petId=${petId} 失败:`, activateError)
+            logOperation('shidian', '批量宠物图鉴', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `激活宠物图鉴 petId=${petId} 失败: ${activateError.message || activateError}`
+            })
+          }
+
+          await waitCommandDelay()
+
+          try {
+            // 领取奖励
+            await tokenStore.sendPetClaimBookReward(token.id, { petId })
+            message.success(`[序号${tokenIndex}] ${token.name || token.id} 领取宠物图鉴奖励 petId=${petId} 成功`)
+            logOperation('shidian', '批量宠物图鉴', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'success',
+              message: `领取宠物图鉴奖励 petId=${petId} 成功`
+            })
+          } catch (claimError) {
+            console.warn(`[序号${tokenIndex}] ${token.name || token.id} 领取宠物图鉴奖励 petId=${petId} 失败:`, claimError)
+            logOperation('shidian', '批量宠物图鉴', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `领取宠物图鉴奖励 petId=${petId} 失败: ${claimError.message || claimError}`
+            })
+          }
+
+          await waitCommandDelay()
+        }
+
+        message.success(`[序号${tokenIndex}] ${token.name || token.id} 宠物图鉴完成`)
+        logOperation('shidian', '批量宠物图鉴', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'success',
+          message: '宠物图鉴完成'
+        })
+        connectionPool.release(token.id, true)
+      } catch (error) {
+        message.error(`[序号${tokenIndex}] ${token.name || token.id} 宠物图鉴失败: ${error.message || error}`)
+        logOperation('shidian', '批量宠物图鉴', {
+          cardType: '俱乐部管理',
+          tokenId: token.id,
+          tokenName: token.name,
+          status: 'error',
+          message: `宠物图鉴失败: ${error.message || error}`
+        })
+        connectionPool.release(token.id, false)
+      }
+    }
+
+    message.success('批量宠物图鉴完成')
+    logOperation('shidian', '批量宠物图鉴', {
+      cardType: '俱乐部管理',
+      status: 'success',
+      message: '批量宠物图鉴完成'
+    })
+  } catch (error) {
+    message.error(`批量宠物图鉴失败: ${error.message || error}`)
+    logOperation('shidian', '批量宠物图鉴', {
+      cardType: '俱乐部管理',
+      status: 'error',
+      message: `【批量】批量宠物图鉴失败: ${error.message || error}`
+    })
+  } finally {
+    isBatchPetBookRunning.value = false
+  }
+}
+
 // 一键领取的 Token 序号，默认 13
 const isLegacyHangupRunning = ref(false)
 const isLegacyCollectRunning = ref(false)
@@ -554,6 +718,7 @@ const isGetFragmentCountRunning = ref(false)
 const currentFragmentCount = ref(null)
 const isBatchCollectPrivilegeRunning = ref(false)
 const isBatchPetEggRunning = ref(false)
+const isBatchPetBookRunning = ref(false)
 const legacyBookInfo = ref({
   books: {},
   storage: {}
@@ -1017,11 +1182,6 @@ const handleAutoAcceptGift = async () => {
 
 // 批量加入俱乐部（使用连接池，支持执行范围）
 const joinLegion = async () => {
-  if (!legionId.value) {
-    message.warning('请输入俱乐部 ID')
-    return
-  }
-  
   try {
     isAcceptGiftRunning.value = true
     
@@ -1034,6 +1194,7 @@ const joinLegion = async () => {
     if (targetTokens.length === 0) {
       const rangeText = tokenIndices === null ? '全部' : `范围${legionTokens.value}`
       message.warning(`执行范围${rangeText}内没有找到 Token`)
+      isAcceptGiftRunning.value = false
       return
     }
     
@@ -1049,11 +1210,53 @@ const joinLegion = async () => {
         try {
           console.log(`[批量加入俱乐部] [${globalIndex + 1}/${targetTokens.length}] 开始处理 ${token.name || token.id}`)
           
+          // 根据昵称关键字确定俱乐部ID
+          const tokenName = token.name || ''
+          let clubId = null
+          let clubSource = ''
+          
+          if (tokenName.includes('锦衣')) {
+            clubId = 2781636
+            clubSource = '锦衣'
+          } else if (tokenName.includes('空山')) {
+            clubId = 6482066
+            clubSource = '空山'
+          } else if (tokenName.includes('天气')) {
+            clubId = 7413993
+            clubSource = '天气'
+          } else if (tokenName.includes('明月')) {
+            clubId = 6482115
+            clubSource = '明月'
+          } else if (legionId.value) {
+            clubId = parseInt(legionId.value)
+            clubSource = '输入框'
+          }
+          
+          // 没有匹配到任何俱乐部ID，跳过
+          if (!clubId) {
+            const skipMsg = `${token.name || token.id} 昵称未匹配关键字且输入框无参数，跳过`
+            console.warn(`[批量加入俱乐部] ${skipMsg}`)
+            message.warning(skipMsg)
+            
+            const tokenIndex = getTokenIndex(token)
+            logOperation('shidian', '加入俱乐部', {
+              cardType: '俱乐部管理',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${skipMsg.replace(`${token.name || token.id} `, '')}`
+            })
+            
+            return { success: false, status: 'skip', message: skipMsg }
+          }
+          
+          console.log(`[批量加入俱乐部] ${token.name || token.id} 使用俱乐部ID ${clubId}（来源：${clubSource}）`)
+          
           // 使用 sendMessageWithPromise 获取响应
           const response = await tokenStore.sendMessageWithPromise(
             token.id, 
             'legion_applyjoin', 
-            { legionId: parseInt(legionId.value) },
+            { legionId: clubId },
             5000
           )
           
@@ -1063,14 +1266,14 @@ const joinLegion = async () => {
           // 检查响应结果
           if (response && response.code !== undefined) {
             if (response.code === 0) {
-              successMsg = `${token.name || token.id} 成功申请加入俱乐部 ${legionId.value}`
+              successMsg = `${token.name || token.id} 成功申请加入俱乐部 ${clubId}（来源：${clubSource}）`
               message.success(successMsg)
             } else if (response.msg && response.msg.includes('已经加入')) {
-              successMsg = `${token.name || token.id} 已经加入俱乐部`
+              successMsg = `${token.name || token.id} 已经加入俱乐部 ${clubId}`
               message.info(successMsg)
               resultStatus = 'info'
             } else if (response.msg && response.msg.includes('未找到俱乐部')) {
-              successMsg = `${token.name || token.id} 加入失败：未找到俱乐部 ${legionId.value}`
+              successMsg = `${token.name || token.id} 加入失败：未找到俱乐部 ${clubId}`
               message.error(successMsg)
               resultStatus = 'error'
             } else {
@@ -1079,7 +1282,7 @@ const joinLegion = async () => {
               resultStatus = 'error'
             }
           } else {
-            successMsg = `${token.name || token.id} 已申请加入俱乐部 ${legionId.value}`
+            successMsg = `${token.name || token.id} 已申请加入俱乐部 ${clubId}（来源：${clubSource}）`
             message.success(successMsg)
           }
           
@@ -2443,44 +2646,62 @@ const handleExportClubInfo = async () => {
         }
 
         if (status !== 'connected') {
-          message.warning(`[${tokenIndex}] ${token.name || token.id} 连接失败，跳过`)
+          message.warning(`[${tokenIndex}] ${token.name || token.id} 连接失败，保留昵称`)
+          clubInfoList.push({
+            nickname: token.name || token.id,
+            clubName: '',
+            serverId: '',
+            roleId: '',
+            combined: '',
+            legacyFragmentCount: '',
+            vipLevel: ''
+          })
           continue
         }
 
         message.success(`[${tokenIndex}] ${token.name || token.id} 连接成功`)
 
+        let nickname = token.name || token.id
+        let clubName = ''
+        let serverId = ''
+        let roleId = ''
+        let combined = ''
+        let legacyFragmentCount = ''
+        let vipLevel = ''
+
+        try {
+          const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
+          nickname = roleInfo?.role?.name || token.name || token.id
+          serverId = roleInfo?.role?.realServerId || 0
+          roleId = roleInfo?.role?.roleId || 0
+          legacyFragmentCount = roleInfo?.role?.items?.[37007]?.quantity || 0
+          vipLevel = roleInfo?.role?.vip || 0
+          const A = serverId - 27
+          combined = String(A) + '+' + String(roleId)
+        } catch (error) {
+          console.warn(`[${tokenIndex}] ${token.name || token.id} 获取角色信息失败:`, error)
+        }
+
         try {
           const legionInfoRes = await tokenStore.sendLegionGetInfo(token.id, {})
           await waitCommandDelay()
-          
           const legionInfo = legionInfoRes?.legion || legionInfoRes
-          const clubName = legionInfo?.info?.name || '未加入俱乐部'
-          
-          const roleInfo = await tokenStore.sendGetRoleInfo(token.id, {})
-          const nickname = roleInfo?.role?.name || token.name || token.id
-          const realServerId = roleInfo?.role?.realServerId || 0
-          const roleId = roleInfo?.role?.roleId || 0
-          const legacyFragmentCount = roleInfo?.role?.items?.[37007]?.quantity || 0
-          const vipLevel = roleInfo?.role?.vip || 0
-          
-          const A = realServerId - 27
-          const combined = String(A) + '+' + String(roleId)
-
-          clubInfoList.push({
-            nickname,
-            clubName,
-            serverId: realServerId,
-            roleId,
-            combined,
-            legacyFragmentCount,
-            vipLevel
-          })
-
-          message.success(`[${tokenIndex}] ${nickname} 获取成功`)
+          clubName = legionInfo?.info?.name || ''
         } catch (error) {
-          console.error(`[${tokenIndex}] ${token.name || token.id} 获取失败:`, error)
-          message.warning(`[${tokenIndex}] ${token.name || token.id} 获取失败`)
+          console.warn(`[${tokenIndex}] ${token.name || token.id} 获取俱乐部信息失败:`, error)
         }
+
+        clubInfoList.push({
+          nickname,
+          clubName,
+          serverId,
+          roleId,
+          combined,
+          legacyFragmentCount,
+          vipLevel
+        })
+
+        message.success(`[${tokenIndex}] ${nickname} 导出完成`)
 
         await waitCommandDelay()
       } catch (error) {
