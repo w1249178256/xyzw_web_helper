@@ -140,7 +140,7 @@
       <OperationLogCard
         page="fish-helper"
         card-type="梦境助手"
-        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战', '批量报名', '批量上阵球星', '批量开卡', '批量竞猜', '批量领奖', '批量周球星', '对战助威', '对战竞猜']"
+        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '梦境选择', '梦境出战', '批量报名', '批量上阵球星', '批量开卡', '批量竞猜', '批量领奖', '批量周球星', '对战助威', '对战竞猜', '批量切换爬塔', '批量切换推图']"
       />
     </template>
   </MyCard>
@@ -739,7 +739,7 @@ const heroUpgrade = async () => {
     } else if (upgradeCount > 0) {
       message.success(`武将升级完成，共升级${upgradeCount}次`)
       const tokenIndex = token ? getTokenIndex(token) : '?'
-      logOperation('shidian', '武将升级', {
+      logOperation('fish-helper', '武将升级', {
         cardType: '梦境助手',
         tokenId: token.id,
         tokenName: token?.name,
@@ -771,7 +771,7 @@ const heroUpgrade = async () => {
     } else {
       message.error(`武将升级失败: ${error.message || '未知错误'}`)
       const tokenIndex = token ? getTokenIndex(token) : '?'
-      logOperation('shidian', '武将升级', {
+      logOperation('fish-helper', '武将升级', {
         cardType: '梦境助手',
         tokenId: token.id,
         tokenName: token?.name,
@@ -890,6 +890,10 @@ const switchStory = async () => {
 // 处理执行范围输入
 const handleUpgradeTokensInput = (value) => {
   upgradeTokens.value = value
+}
+
+const handleHeroGradeInput = (value) => {
+  heroGrade.value = value
 }
 
 // 内部函数：切换到阵容1（不显示消息）
@@ -1058,13 +1062,28 @@ const heroUpgradeInternal = async (tokenId) => {
     try {
       let currentLevel = hero.level
       
+      // 计算升级数量的函数（与batchUpgrade一致）
+      const calculateUpgradeNum = (level) => {
+        const lastTwoDigits = level % 100
+        if (lastTwoDigits === 0 || lastTwoDigits === 50) {
+          return 50
+        }
+        const diffToNext50 = (50 - lastTwoDigits + 100) % 100
+        const diffToNext00 = (100 - lastTwoDigits + 100) % 100
+        const minDiff = Math.min(diffToNext50, diffToNext00)
+        if (minDiff >= 10) return 10
+        else if (minDiff >= 5) return 5
+        else return 1
+      }
+      
       while (currentLevel < 6000 && !shouldStop) {
         try {
           let upgradeRes
           try {
+            const upgradeNum = calculateUpgradeNum(currentLevel)
             upgradeRes = await tokenStore.sendMessageWithPromise(
               token.id, 'hero_heroupgradelevel',
-              { heroId: hero.heroId, upgradeNum: 50 }, 5000
+              { heroId: hero.heroId, upgradeNum: upgradeNum }, 5000
             )
           } catch (upgradeError) {
             const errorMsg = String(upgradeError.message || upgradeError.hint || upgradeError.error || '').toLowerCase()
@@ -1215,7 +1234,7 @@ const batchSwitchTower = async () => {
   
   const rangeText = upgradeTokens.value ? `范围${upgradeTokens.value}` : "全部"
   message.info(`开始批量切换爬塔（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logOperation('shidian', '批量切换爬塔', {
+  logOperation('fish-helper', '批量切换爬塔', {
     cardType: '梦境助手',
     status: 'info',
     message: `开始批量切换爬塔，${rangeText}，共${targetTokens.length}个Token`
@@ -1231,7 +1250,7 @@ const batchSwitchTower = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行切换爬塔...`)
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 切换爬塔功能待实现`)
-          logOperation('shidian', '批量切换爬塔', {
+          logOperation('fish-helper', '批量切换爬塔', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1243,7 +1262,7 @@ const batchSwitchTower = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换爬塔失败:`, error)
           message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换爬塔失败: ${error.message || '未知错误'}`)
-          logOperation('shidian', '批量切换爬塔', {
+          logOperation('fish-helper', '批量切换爬塔', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1284,7 +1303,7 @@ const batchSwitchTower = async () => {
     const failCount = results.filter(r => !r.success).length
     
     message.success(`批量切换爬塔完成：成功${successCount}个，失败${failCount}个`)
-    logOperation('shidian', '批量切换爬塔', {
+    logOperation('fish-helper', '批量切换爬塔', {
       cardType: '梦境助手',
       status: 'success',
       message: `【批量】批量切换爬塔完成：成功${successCount}个，失败${failCount}个`
@@ -1292,7 +1311,7 @@ const batchSwitchTower = async () => {
   } catch (error) {
     console.error('批量切换爬塔失败:', error)
     message.error(`批量切换爬塔失败: ${error.message || '未知错误'}`)
-    logOperation('shidian', '批量切换爬塔', {
+    logOperation('fish-helper', '批量切换爬塔', {
       cardType: '梦境助手',
       status: 'error',
       message: `【批量】批量切换爬塔失败: ${error.message || '未知错误'}`
@@ -1330,7 +1349,7 @@ const batchSwitchStory = async () => {
   
   const rangeText = upgradeTokens.value ? `范围${upgradeTokens.value}` : "全部"
   message.info(`开始批量切换推图（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logOperation('shidian', '批量切换推图', {
+  logOperation('fish-helper', '批量切换推图', {
     cardType: '梦境助手',
     status: 'info',
     message: `开始批量切换推图，${rangeText}，共${targetTokens.length}个Token`
@@ -1346,7 +1365,7 @@ const batchSwitchStory = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行切换推图...`)
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 切换推图功能待实现`)
-          logOperation('shidian', '批量切换推图', {
+          logOperation('fish-helper', '批量切换推图', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1358,7 +1377,7 @@ const batchSwitchStory = async () => {
           const tokenIndex = getTokenIndexForBatch(token)
           console.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换推图失败:`, error)
           message.error(`序号 ${tokenIndex} ${token.name || token.id} 批量切换推图失败: ${error.message || '未知错误'}`)
-          logOperation('shidian', '批量切换推图', {
+          logOperation('fish-helper', '批量切换推图', {
             cardType: '梦境助手',
             tokenId: token.id,
             tokenName: token.name,
@@ -1399,7 +1418,7 @@ const batchSwitchStory = async () => {
     const failCount = results.filter(r => !r.success).length
     
     message.success(`批量切换推图完成：成功${successCount}个，失败${failCount}个`)
-    logOperation('shidian', '批量切换推图', {
+    logOperation('fish-helper', '批量切换推图', {
       cardType: '梦境助手',
       status: 'success',
       message: `【批量】批量切换推图完成：成功${successCount}个，失败${failCount}个`
@@ -1407,7 +1426,7 @@ const batchSwitchStory = async () => {
   } catch (error) {
     console.error('批量切换推图失败:', error)
     message.error(`批量切换推图失败: ${error.message || '未知错误'}`)
-    logOperation('shidian', '批量切换推图', {
+    logOperation('fish-helper', '批量切换推图', {
       cardType: '梦境助手',
       status: 'error',
       message: `【批量】批量切换推图失败: ${error.message || '未知错误'}`
@@ -1445,7 +1464,7 @@ const batchUpgradeOne = async () => {
   
   const rangeText = upgradeTokens.value ? `范围${upgradeTokens.value}` : "全部"
   message.info(`开始批量升级阵容1（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logOperation('shidian', '批量升级阵容1', {
+  logOperation('fish-helper', '批量升级阵容1', {
     cardType: '梦境助手',
     status: 'info',
     message: `开始批量升级阵容1，${rangeText}，共${targetTokens.length}个Token`
@@ -1460,7 +1479,22 @@ const batchUpgradeOne = async () => {
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行批量升级阵容1...`)
           
           await switchToTeam1Internal(token.id)
+          logOperation('fish-helper', '批量升级阵容1', {
+            cardType: '梦境助手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换阵容1完成`
+          })
+          
           await heroUpgradeInternal(token.id)
+          logOperation('fish-helper', '批量升级阵容1', {
+            cardType: '梦境助手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级完成`
+          })
           
           message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容1升级完成`)
           logOperation('fish-helper', '批量升级阵容1', {
@@ -1560,7 +1594,7 @@ const batchUpgradeTwo = async () => {
   
   const rangeText = upgradeTokens.value ? `范围${upgradeTokens.value}` : "全部"
   message.info(`开始批量升级阵容2（${rangeText}），共${targetTokens.length}个Token，按序号顺序执行...`)
-  logOperation('shidian', '批量升级阵容2', {
+  logOperation('fish-helper', '批量升级阵容2', {
     cardType: '梦境助手',
     status: 'info',
     message: `开始批量升级阵容2，${rangeText}，共${targetTokens.length}个Token`
@@ -1575,7 +1609,22 @@ const batchUpgradeTwo = async () => {
           message.info(`序号 ${tokenIndex} ${token.name || token.id} 正在执行批量升级阵容2...`)
           
           await switchToTeam2Internal(token.id)
+          logOperation('fish-helper', '批量升级阵容2', {
+            cardType: '梦境助手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]切换阵容2完成`
+          })
+          
           await heroUpgradeInternal(token.id)
+          logOperation('fish-helper', '批量升级阵容2', {
+            cardType: '梦境助手',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]武将升级完成`
+          })
           
           message.success(`序号 ${tokenIndex} ${token.name || token.id} 阵容2升级完成`)
           logOperation('fish-helper', '批量升级阵容2', {
@@ -1583,7 +1632,7 @@ const batchUpgradeTwo = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '阵容2升级完成'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容2升级完成`
           })
           return { success: true, token: token }
         } catch (error) {

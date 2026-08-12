@@ -62,7 +62,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="灯神信息"
-        :filter-operations="['刷新灯神信息', '灯神按钮', '切换灯神阵容', '更换科技', '灯神战斗', '批量灯神战斗', '导出灯神信息']"
+        :filter-operations="['刷新灯神信息', '灯神按钮', '切换灯神阵容', '更换科技', '灯神战斗', '批量灯神战斗', '导出灯神信息', '刷新阵容', '切换阵容', '扫荡', '批量灯神按钮', '批量更换科技', '批量扫荡']"
       />
     </template>
   </MyCard>
@@ -1503,7 +1503,7 @@ const lampGodAction = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '灯神按钮执行完成'
+      message: `【${token.name || token.id}】灯神按钮执行完成`
     })
   } catch (error) {
     console.error('灯神按钮执行失败:', error)
@@ -1753,7 +1753,7 @@ const lampGodFight = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '灯神战斗完成'
+      message: `【${token.name || token.id}】灯神战斗完成`
     })
   } catch (error) {
     console.error('灯神战斗失败:', error)
@@ -1904,7 +1904,7 @@ const batchLampGodFight = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '灯神按钮执行完成'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]灯神按钮执行完成`
           })
           return { success: true, token: token }
         } catch (error) {

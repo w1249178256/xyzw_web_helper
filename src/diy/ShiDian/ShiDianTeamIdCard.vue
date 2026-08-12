@@ -94,7 +94,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="十殿 TeamID"
-        :filter-operations="['导出资源', '批量领取']"
+        :filter-operations="['导出资源', '批量领取', '清空十殿标签', '加入成员', '十殿 8', '刷新枕头']"
       />
     </template>
   </MyCard>

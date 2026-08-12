@@ -82,7 +82,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="武将信息"
-        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2']"
+        :filter-operations="['武将升级', '批量升级阵容1', '批量升级阵容2', '批量切换爬塔', '批量切换推图']"
       />
     </template>
   </MyCard>
@@ -1233,7 +1233,7 @@ const batchUpgradeOne = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '阵容1升级完成'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容1升级完成`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1390,7 +1390,7 @@ const batchUpgradeTwo = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '阵容2升级完成'
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容2升级完成`
           })
           return { success: true, token: token }
         } catch (error) {
@@ -1554,10 +1554,24 @@ const heroUpgradeInternal = async (tokenId) => {
     try {
       let currentLevel = hero.level
       
+      // 计算升级数量的函数（与batchUpgrade一致）
+      const calculateUpgradeNum = (level) => {
+        const lastTwoDigits = level % 100
+        if (lastTwoDigits === 0 || lastTwoDigits === 50) {
+          return 50
+        }
+        const diffToNext50 = (50 - lastTwoDigits + 100) % 100
+        const diffToNext00 = (100 - lastTwoDigits + 100) % 100
+        const minDiff = Math.min(diffToNext50, diffToNext00)
+        if (minDiff >= 10) return 10
+        else if (minDiff >= 5) return 5
+        else return 1
+      }
+      
       // 循环升级，直到达到6000级或遇到错误
       while (currentLevel < 6000 && !shouldStop) {
         try {
-          // 尝试执行武将升级
+          const upgradeNum = calculateUpgradeNum(currentLevel)
           let upgradeRes
           try {
             upgradeRes = await tokenStore.sendMessageWithPromise(
@@ -1565,7 +1579,7 @@ const heroUpgradeInternal = async (tokenId) => {
               'hero_heroupgradelevel',
               {
                 heroId: hero.heroId,
-                upgradeNum: 50
+                upgradeNum: upgradeNum
               },
               5000
             )
@@ -2149,7 +2163,7 @@ const batchUpgrade = async (teamId) => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: `阵容${teamId}升级完成，共升级${upgradeCount}次`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]阵容${teamId}升级完成，共升级${upgradeCount}次`
           })
         } else {
           message.info(`序号 ${tokenIndex} ${token.name || token.id}: 阵容${teamId}无需升级`)

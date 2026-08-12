@@ -91,7 +91,7 @@
       <OperationLogCard 
         page="shidian" 
         card-type="俱乐部管理"
-        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物', '批量宠物蛋', '批量宠物图鉴']"
+        :filter-operations="['批量赠送功法', '导出功法详情', '导出俱乐部信息', '刷新图鉴信息', '激活功法图鉴', '批量功法图鉴', '加入俱乐部', '批量招募周', '批量开启功法挂机', '批量收集特权', '一键接受礼物', '批量宠物蛋', '批量宠物图鉴', '一键送功法', '一键领取', '批量功法挂机', '批量收集功法', '接受礼物', '批量接受礼物', '图鉴', '获取残卷数量']"
       />
     </template>
   </MyCard>
@@ -500,7 +500,7 @@ const handleBatchPetEgg = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: '宠物蛋完成'
+          message: `【序号${tokenIndex}】[${token.name || token.id}]宠物蛋完成`
         })
         connectionPool.release(token.id, true)
       } catch (error) {
@@ -663,7 +663,7 @@ const handleBatchPetBook = async () => {
           tokenId: token.id,
           tokenName: token.name,
           status: 'success',
-          message: '宠物图鉴完成'
+          message: `【序号${tokenIndex}】[${token.name || token.id}]宠物图鉴完成`
         })
         connectionPool.release(token.id, true)
       } catch (error) {
@@ -780,7 +780,7 @@ const handleQuickAcceptGift = async () => {
       tokenId: connectedToken.id,
       tokenName: connectedToken.name,
       status: 'success',
-      message: '一键接受礼物完成，共执行 3 次'
+      message: `【${connectedToken.name || connectedToken.id}】一键接受礼物完成，共执行 3 次`
     })
   } catch (error) {
     console.error('一键接受礼物失败:', error)
@@ -2279,7 +2279,7 @@ const handleAcceptGift = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '接受礼物成功'
+      message: `【序号${tokenIndex}】[${token.name || token.id}]接受礼物成功`
     })
   } catch (error) {
     console.error('接受礼物失败:', error)
@@ -2831,7 +2831,7 @@ const handleBookUpgrade = async () => {
       tokenId: token.id,
       tokenName: token.name,
       status: 'success',
-      message: '图鉴升星和领取奖励完成'
+      message: `【${token.name || token.id}】图鉴升星和领取奖励完成`
     })
   } catch (error) {
     console.error('图鉴升星失败:', error)
@@ -2912,7 +2912,7 @@ const handleBatchBookUpgrade = async () => {
             tokenId: token.id,
             tokenName: token.name,
             status: 'success',
-            message: '图鉴升星和领取奖励完成'
+            message: `【序号${globalIndex + 1}】[${token.name || token.id}]图鉴升星和领取奖励完成`
           })
           return { success: true }
         } catch (error) {
