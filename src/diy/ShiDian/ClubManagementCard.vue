@@ -1215,7 +1215,14 @@ const joinLegion = async () => {
           let clubId = null
           let clubSource = ''
           
-          if (tokenName.includes('锦衣')) {
+          // 输入框参数为"00"时，查找昵称包含"蟠桃"的token
+          if (legionId.value === '00') {
+            if (tokenName.includes('蟠桃')) {
+              clubId = 2781636
+              clubSource = '蟠桃(00)'
+            }
+            // 不包含"蟠桃"则跳过
+          } else if (tokenName.includes('锦衣')) {
             clubId = 2781636
             clubSource = '锦衣'
           } else if (tokenName.includes('空山')) {
