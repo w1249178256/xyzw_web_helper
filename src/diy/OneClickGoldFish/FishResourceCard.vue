@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <MyCard class="helper" status-class="active">
     <template #icon>
       <n-icon size="24">
@@ -1086,7 +1086,7 @@ const batchStartFishing = async () => {
                 cardType: '金鱼资源',
                 operation: '批量金竿',
                 status: 'warn',
-                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]重新获取活动信息失败，跳过该token`
               })
               return { success: false, token, error: '重新获取活动信息失败' }
             }
@@ -1101,7 +1101,7 @@ const batchStartFishing = async () => {
                 cardType: '金鱼资源',
                 operation: '批量金竿',
                 status: 'warn',
-                message: `${token.name} - 使用金竿后已用金竿仍不存在，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]使用金竿后已用金竿仍不存在，跳过该token`
               })
               return { success: false, token, error: '使用金竿后已用金竿仍不存在' }
             }
@@ -1141,7 +1141,7 @@ const batchStartFishing = async () => {
             cardType: '金鱼资源',
             operation: '批量金竿',
             status: 'info',
-            message: `${token.name} - 已用金竿: ${usedFishing}, 起始任务ID: ${startMissionId}, 现有金竿: ${currentGoldRod}, 需要次数: ${needCount}, 金竿可执行: ${rodCount}, 执行次数: ${executeCount}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]已用金竿: ${usedFishing}, 起始任务ID: ${startMissionId}, 现有金竿: ${currentGoldRod}, 需要次数: ${needCount}, 金竿可执行: ${rodCount}, 执行次数: ${executeCount}`
           })
           
           // 已用金竿大于等于1600，跳转到领取奖励阶段
@@ -1153,7 +1153,7 @@ const batchStartFishing = async () => {
               cardType: '金鱼资源',
               operation: '批量金竿',
               status: 'info',
-              message: `${token.name} - 已用金竿${usedFishing}已达到目标1600，跳过金竿，直接领取奖励`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]已用金竿${usedFishing}已达到目标1600，跳过金竿，直接领取奖励`
             })
             skipFishing = true
           }
@@ -1182,7 +1182,7 @@ const batchStartFishing = async () => {
                   cardType: '金鱼资源',
                   operation: '批量金竿',
                   status: 'error',
-                  message: `${token.name} - artifact_lottery 失败: ${errorMsg}`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]artifact_lottery 失败: ${errorMsg}`
                 })
                 break
               }
@@ -1194,7 +1194,7 @@ const batchStartFishing = async () => {
                   cardType: '金鱼资源',
                   operation: '批量金竿',
                   status: 'success',
-                  message: `${token.name} - artifact_lottery { type: 2, lotteryNumber: 10, newFree: true } 成功 (第${i + 1}/${executeCount}次)`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]artifact_lottery { type: 2, lotteryNumber: 10, newFree: true } 成功 (第${i + 1}/${executeCount}次)`
                 })
               }
             } catch (error) {
@@ -1204,7 +1204,7 @@ const batchStartFishing = async () => {
                 cardType: '金鱼资源',
                 operation: '批量金竿',
                 status: 'error',
-                message: `${token.name} - artifact_lottery 异常: ${error.message}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]artifact_lottery 异常: ${error.message}`
               })
               break
             }
@@ -1223,7 +1223,7 @@ const batchStartFishing = async () => {
             cardType: '金鱼资源',
             operation: '批量金竿',
             status: 'info',
-            message: `${token.name} - 开始领取任务奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取任务奖励`
           })
           
           // 重新获取活动信息以获取最新records
@@ -1252,7 +1252,7 @@ const batchStartFishing = async () => {
                   cardType: '金鱼资源',
                   operation: '批量金竿',
                   status: 'success',
-                  message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 成功`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 成功`
                 })
               } else {
                 // 领取失败，停止
@@ -1261,7 +1261,7 @@ const batchStartFishing = async () => {
                   cardType: '金鱼资源',
                   operation: '批量金竿',
                   status: 'info',
-                  message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
                 })
                 break
               }
@@ -1271,7 +1271,7 @@ const batchStartFishing = async () => {
                 cardType: '金鱼资源',
                 operation: '批量金竿',
                 status: 'error',
-                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}，停止`
               })
               break
             }
@@ -1437,7 +1437,7 @@ const batchBoxWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量宝箱',
                 status: 'warn',
-                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]重新获取活动信息失败，跳过该token`
               })
               return { success: false, token, error: '重新获取活动信息失败' }
             }
@@ -1452,7 +1452,7 @@ const batchBoxWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量宝箱',
                 status: 'warn',
-                message: `${token.name} - 开箱后已用宝箱分仍不存在，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]开箱后已用宝箱分仍不存在，跳过该token`
               })
               return { success: false, token, error: '开箱后已用宝箱分仍不存在' }
             }
@@ -1493,7 +1493,7 @@ const batchBoxWeek = async () => {
           // 目标分数固定为100000
           const ZY = 100000
           console.log(`${token.name || token.id} 已用宝箱分: ${Y}, 起始任务ID: ${startMissionId}, 现有宝箱: 木质${M}个, 青铜${Q}个, 黄金${H}个, 铂金${B}个`)
-          message.info(`[序号${tokenIndex}] ${token.name} - 已用宝箱分: ${Y}, 起始任务ID: ${startMissionId}, 目标分数ZY: ${ZY}`)
+          message.info(`[序号${tokenIndex}] 【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分: ${Y}, 起始任务ID: ${startMissionId}, 目标分数ZY: ${ZY}`)
           
           // 已用宝箱分大于等于100000，跳转到领取奖励阶段
           let skipBoxOpening = false
@@ -1504,7 +1504,7 @@ const batchBoxWeek = async () => {
               cardType: '金鱼资源',
               operation: '批量宝箱',
               status: 'info',
-              message: `${token.name} - 已用宝箱分${Y}已达到目标100000，跳过开箱，直接领取奖励`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分${Y}已达到目标100000，跳过开箱，直接领取奖励`
             })
             skipBoxOpening = true
           }
@@ -1566,7 +1566,7 @@ const batchBoxWeek = async () => {
               await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
               if (actInfo?.activity?.commonActivityInfo?.['2606191']?.task?.['2']) {
                 Y = actInfo.activity.commonActivityInfo['2606191'].task['2']
-                message.info(`${token.name} - 已用宝箱分Y=${Y}`)
+                message.info(`【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分Y=${Y}`)
               }
             } catch (error) {
               console.error('获取Y值失败:', error)
@@ -1620,7 +1620,7 @@ const batchBoxWeek = async () => {
             
             const diff = ZY - Y
             
-            const openBoxLog = `${token.name} - 开${boxTypeName}宝箱${count}个，已用宝箱分Y: ${Y}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
+            const openBoxLog = `【序号${tokenIndex}】[${token.name || token.id}]开${boxTypeName}宝箱${count}个，已用宝箱分Y: ${Y}，距离目标差值: ${diff}，累计开箱：木质${MK}个，青铜${QK}个，黄金${HK}个，铂金${BK}个`
             message.info(openBoxLog)
             
             logStore.addLog({
@@ -1633,7 +1633,7 @@ const batchBoxWeek = async () => {
             
             // 检查是否达到目标
             if (Y >= ZY || Y > 100000) {
-              const stopLog = `${token.name} - 已用宝箱分Y ${Y} 达到目标${Y > 100000 ? '或超过最大限制' : ''}，停止开箱`
+              const stopLog = `【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分Y ${Y} 达到目标${Y > 100000 ? '或超过最大限制' : ''}，停止开箱`
               message.info(stopLog)
               logStore.addLog({
                 page: 'fish-helper',
@@ -1657,13 +1657,13 @@ const batchBoxWeek = async () => {
               } catch (e) {
                 // 400122错误：宝箱数量已发生变化，停止领取但继续后续命令
                 if (e && e.code === 400122) {
-                  message.info(`${token.name} - 宝箱数量已发生变化(400122)，停止领取宝箱奖励，继续后续命令`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]宝箱数量已发生变化(400122)，停止领取宝箱奖励，继续后续命令`)
                   logStore.addLog({
                     page: 'fish-helper',
                     cardType: '金鱼资源',
                     operation: '批量宝箱',
                     status: 'warn',
-                    message: `${token.name} - 宝箱数量已发生变化(400122)，停止领取宝箱奖励`
+                    message: `【序号${tokenIndex}】[${token.name || token.id}]宝箱数量已发生变化(400122)，停止领取宝箱奖励`
                   })
                   break
                 }
@@ -1682,7 +1682,7 @@ const batchBoxWeek = async () => {
             
             // 检查是否已经超过目标分数
             if (Y >= ZY) {
-              message.info(`${token.name} - 已达到目标分数 ${ZY}`)
+              message.info(`【序号${tokenIndex}】[${token.name || token.id}]已达到目标分数 ${ZY}`)
               console.log(`[批量宝箱] ${token.name || token.id} Y>=ZY，退出开箱循环`)
               break
             }
@@ -1695,7 +1695,7 @@ const batchBoxWeek = async () => {
                 
                 while (Y < ZY && claimAttempt < maxClaimAttempts) {
                   claimAttempt++
-                  message.info(`${token.name} - 宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]宝箱数量不足，Y(${Y})<ZY(${ZY})，第${claimAttempt}次领取宝箱奖励和邮件`)
                   logStore.addLog({
                     page: 'fish-helper',
                     cardType: '金鱼资源',
@@ -1708,7 +1708,7 @@ const batchBoxWeek = async () => {
                   await claimBoxReward3Times()
                   
                   // 领取邮件
-                  message.info(`${token.name} - 领取邮件`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]领取邮件`)
                   await tokenStore.sendMessageWithPromise(token.id, 'mail_claimallattachment', { category: 0 }, 10000)
                   await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
                   
@@ -1717,7 +1717,7 @@ const batchBoxWeek = async () => {
                   
                   // 检查Y是否达到目标
                   if (Y >= ZY) {
-                    message.info(`${token.name} - 领取奖励后Y(${Y})达到目标ZY(${ZY})，进入最终阶段`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]领取奖励后Y(${Y})达到目标ZY(${ZY})，进入最终阶段`)
                     break
                   }
                   
@@ -1731,17 +1731,17 @@ const batchBoxWeek = async () => {
                   
                   // 如果有宝箱了，退出领取循环，继续开箱
                   if (M >= 10 || Q >= 10 || H >= 10 || B >= 10) {
-                    message.info(`${token.name} - 领取奖励后获得宝箱，继续开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]领取奖励后获得宝箱，继续开箱`)
                     break
                   }
                   
                   // 如果达到最大尝试次数，退出循环
                   if (claimAttempt >= maxClaimAttempts) {
-                    message.info(`${token.name} - 已尝试${maxClaimAttempts}次领取奖励，仍无宝箱可开，进入最终阶段`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已尝试${maxClaimAttempts}次领取奖励，仍无宝箱可开，进入最终阶段`)
                     break
                   }
                   
-                  message.info(`${token.name} - 领取后仍无宝箱且Y(${Y})<ZY(${ZY})，继续领取...`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]领取后仍无宝箱且Y(${Y})<ZY(${ZY})，继续领取...`)
                 }
                 
                 // 如果有宝箱，继续下一轮开箱
@@ -1749,7 +1749,7 @@ const batchBoxWeek = async () => {
                   continue
                 }
                 // 否则进入最终阶段
-                message.info(`${token.name} - 宝箱数量不足，进入最终阶段`)
+                message.info(`【序号${tokenIndex}】[${token.name || token.id}]宝箱数量不足，进入最终阶段`)
                 break
               }
             }
@@ -1757,11 +1757,11 @@ const batchBoxWeek = async () => {
             // 动态计算本轮需要开的宝箱数量
             const targetCount = calculateBoxOpenCount(ZY)
             
-            message.info(`${token.name} - 动态计算开箱数量：铂金${targetCount.BK}个，黄金${targetCount.HK}个，青铜${targetCount.QK}个，木质${targetCount.MK}个`)
+            message.info(`【序号${tokenIndex}】[${token.name || token.id}]动态计算开箱数量：铂金${targetCount.BK}个，黄金${targetCount.HK}个，青铜${targetCount.QK}个，木质${targetCount.MK}个`)
             
             // 如果计算结果都是0，说明无法达到目标，退出循环
             if (targetCount.BK === 0 && targetCount.HK === 0 && targetCount.QK === 0 && targetCount.MK === 0) {
-              message.info(`${token.name} - 宝箱数量不足，无法达到目标分数`)
+              message.info(`【序号${tokenIndex}】[${token.name || token.id}]宝箱数量不足，无法达到目标分数`)
               break
             }
             
@@ -1782,7 +1782,7 @@ const batchBoxWeek = async () => {
                 while (H >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1802,7 +1802,7 @@ const batchBoxWeek = async () => {
                 while (Q >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1823,7 +1823,7 @@ const batchBoxWeek = async () => {
                 while (B >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1843,7 +1843,7 @@ const batchBoxWeek = async () => {
                 while (H >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1863,7 +1863,7 @@ const batchBoxWeek = async () => {
                 while (Q >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1883,7 +1883,7 @@ const batchBoxWeek = async () => {
                 while (M >= 10) {
                   const diff = ZY - Y
                   if (diff <= 0) {
-                    message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                    message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                     shouldBreak = true
                     break
                   }
@@ -1905,7 +1905,7 @@ const batchBoxWeek = async () => {
               while (B >= 10) {
                 const diff = ZY - Y
                 if (diff <= 0) {
-                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                   shouldBreak = true
                   break
                 }
@@ -1926,7 +1926,7 @@ const batchBoxWeek = async () => {
               while (H >= 10) {
                 const diff = ZY - Y
                 if (diff <= 0) {
-                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                   shouldBreak = true
                   break
                 }
@@ -1947,7 +1947,7 @@ const batchBoxWeek = async () => {
               while (Q >= 10) {
                 const diff = ZY - Y
                 if (diff <= 0) {
-                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                   shouldBreak = true
                   break
                 }
@@ -1968,7 +1968,7 @@ const batchBoxWeek = async () => {
               while (M >= 10) {
                 const diff = ZY - Y
                 if (diff <= 0) {
-                  message.info(`${token.name} - 已超过目标分数，停止开箱`)
+                  message.info(`【序号${tokenIndex}】[${token.name || token.id}]已超过目标分数，停止开箱`)
                   shouldBreak = true
                   break
                 }
@@ -1988,13 +1988,13 @@ const batchBoxWeek = async () => {
             
             // 检查是否还需要继续开箱
             if (Y >= ZY) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 达到目标 ${ZY}，进入最终阶段`)
+              message.info(`【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分Y ${Y} 达到目标 ${ZY}，进入最终阶段`)
               break
             }
             
             // Y小于ZY，宝箱分数不够了，领取宝箱奖励后继续开箱
             if (Y < ZY) {
-              message.info(`${token.name} - 已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
+              message.info(`【序号${tokenIndex}】[${token.name || token.id}]已用宝箱分Y ${Y} 小于目标 ${ZY}，领取宝箱奖励后继续开箱`)
               logStore.addLog({
                 page: 'fish-helper',
                 cardType: '金鱼资源',
@@ -2017,7 +2017,7 @@ const batchBoxWeek = async () => {
               
               // 如果仍然没有宝箱可开，进入领取循环
               if (M < 10 && Q < 10 && H < 10 && B < 10) {
-                message.info(`${token.name} - 领取奖励后仍无宝箱可开，进入领取循环`)
+                message.info(`【序号${tokenIndex}】[${token.name || token.id}]领取奖励后仍无宝箱可开，进入领取循环`)
                 continue // 回到主循环开头，会进入领取循环逻辑
               }
               
@@ -2046,7 +2046,7 @@ const batchBoxWeek = async () => {
             cardType: '金鱼资源',
             operation: '批量宝箱',
             status: 'info',
-            message: `${token.name} - 领取宝箱奖励完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取宝箱奖励完成`
           })
           
           // 领取邮件
@@ -2058,7 +2058,7 @@ const batchBoxWeek = async () => {
             cardType: '金鱼资源',
             operation: '批量宝箱',
             status: 'info',
-            message: `${token.name} - 领取邮件完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取邮件完成`
           })
           
           // 执行活动奖励领取（从currentMissionId开始，直到40或出错）
@@ -2069,7 +2069,7 @@ const batchBoxWeek = async () => {
             cardType: '金鱼资源',
             operation: '批量宝箱',
             status: 'info',
-            message: `${token.name} - 开始领取任务奖励，起始任务ID: ${currentMissionId}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取任务奖励，起始任务ID: ${currentMissionId}`
           })
           
           for (let missionId = currentMissionId; missionId <= 40; missionId++) {
@@ -2089,7 +2089,7 @@ const batchBoxWeek = async () => {
                   cardType: '金鱼资源',
                   operation: '批量宝箱',
                   status: 'info',
-                  message: `${token.name} - 任务ID ${missionId} 奖励领取完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]任务ID ${missionId} 奖励领取完成或出错，停止`
                 })
                 break
               }
@@ -2100,7 +2100,7 @@ const batchBoxWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量宝箱',
                 status: 'success',
-                message: `${token.name} - 任务ID ${missionId} 奖励领取成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]任务ID ${missionId} 奖励领取成功`
               })
             } catch (error) {
               console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
@@ -2109,7 +2109,7 @@ const batchBoxWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量宝箱',
                 status: 'error',
-                message: `${token.name} - 任务ID ${missionId} 奖励领取出错，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]任务ID ${missionId} 奖励领取出错，停止`
               })
               break
             }
@@ -2146,15 +2146,15 @@ const batchBoxWeek = async () => {
               cardType: '金鱼资源',
               operation: '批量宝箱',
               status: 'info',
-              message: `${token.name} - 开钻石宝箱${diamondOpenCount}个`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开钻石宝箱${diamondOpenCount}个`
             })
           }
           
-          message.success(`[序号${tokenIndex}] ${token.name} 宝箱周完成`)
+          message.success(`[序号${tokenIndex}] 【序号${tokenIndex}】[${token.name || token.id}]宝箱周完成`)
           return { success: true, token }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name} 宝箱周失败:`, error)
+          console.error(`[序号${tokenIndex}] 【序号${tokenIndex}】[${token.name || token.id}]宝箱周失败:`, error)
           return { success: false, token, error: error.message || '未知错误' }
         }
       },
@@ -2268,7 +2268,7 @@ const batchRecruitWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量招募',
                 status: 'warn',
-                message: `${token.name} - 重新获取活动信息失败，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]重新获取活动信息失败，跳过该token`
               })
               return { success: false, token, error: '重新获取活动信息失败' }
             }
@@ -2283,7 +2283,7 @@ const batchRecruitWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量招募',
                 status: 'warn',
-                message: `${token.name} - 使用招募令后已用招募令仍不存在，跳过该token`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]使用招募令后已用招募令仍不存在，跳过该token`
               })
               return { success: false, token, error: '使用招募令后已用招募令仍不存在' }
             }
@@ -2326,7 +2326,7 @@ const batchRecruitWeek = async () => {
             cardType: '金鱼资源',
             operation: '批量招募',
             status: 'info',
-            message: `${token.name} - 已用招募: ${usedRecruitCount}, 起始任务ID: ${startMissionId}, 现有招募令: ${currentRecruitCount}, 需要次数: ${needCount}, 招募令可执行: ${recruitCount}, 执行次数: ${executeCount}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]已用招募: ${usedRecruitCount}, 起始任务ID: ${startMissionId}, 现有招募令: ${currentRecruitCount}, 需要次数: ${needCount}, 招募令可执行: ${recruitCount}, 执行次数: ${executeCount}`
           })
           
           // 已用招募令大于等于4000，跳转到领取奖励阶段
@@ -2338,7 +2338,7 @@ const batchRecruitWeek = async () => {
               cardType: '金鱼资源',
               operation: '批量招募',
               status: 'info',
-              message: `${token.name} - 已用招募令${usedRecruitCount}已达到目标4000，跳过招募，直接领取奖励`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]已用招募令${usedRecruitCount}已达到目标4000，跳过招募，直接领取奖励`
             })
             skipRecruit = true
           }
@@ -2367,7 +2367,7 @@ const batchRecruitWeek = async () => {
                   cardType: '金鱼资源',
                   operation: '批量招募',
                   status: 'error',
-                  message: `${token.name} - hero_recruit { recruitType: 1, recruitNumber: 10 } 失败: ${errorMsg}`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]hero_recruit { recruitType: 1, recruitNumber: 10 } 失败: ${errorMsg}`
                 })
                 break
               }
@@ -2379,7 +2379,7 @@ const batchRecruitWeek = async () => {
                   cardType: '金鱼资源',
                   operation: '批量招募',
                   status: 'success',
-                  message: `${token.name} - hero_recruit { recruitType: 1, recruitNumber: 10 } 成功 (第${i + 1}/${executeCount}次)`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]hero_recruit { recruitType: 1, recruitNumber: 10 } 成功 (第${i + 1}/${executeCount}次)`
                 })
               }
             } catch (error) {
@@ -2389,7 +2389,7 @@ const batchRecruitWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量招募',
                 status: 'error',
-                message: `${token.name} - hero_recruit 异常: ${error.message}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]hero_recruit 异常: ${error.message}`
               })
               break
             }
@@ -2408,7 +2408,7 @@ const batchRecruitWeek = async () => {
             cardType: '金鱼资源',
             operation: '批量招募',
             status: 'info',
-            message: `${token.name} - 开始领取任务奖励，起始任务ID: ${currentMissionId}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取任务奖励，起始任务ID: ${currentMissionId}`
           })
           
           for (let missionId = currentMissionId; missionId <= 20; missionId++) {
@@ -2427,7 +2427,7 @@ const batchRecruitWeek = async () => {
                   cardType: '金鱼资源',
                   operation: '批量招募',
                   status: 'info',
-                  message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 完成或出错，停止`
                 })
                 break
               }
@@ -2438,7 +2438,7 @@ const batchRecruitWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量招募',
                 status: 'success',
-                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 成功`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 成功`
               })
             } catch (error) {
               console.log(`${token.name || token.id} 任务ID ${missionId} 奖励领取出错，停止`)
@@ -2447,7 +2447,7 @@ const batchRecruitWeek = async () => {
                 cardType: '金鱼资源',
                 operation: '批量招募',
                 status: 'error',
-                message: `${token.name} - activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]activity_claimtaskreward { missionId: ${missionId} } 出错: ${error.message}`
               })
               break
             }
@@ -2462,7 +2462,7 @@ const batchRecruitWeek = async () => {
           return { success: true, token, rounds: executeCount }
         } catch (error) {
           const tokenIndex = getTokenIndex(token)
-          console.error(`[序号${tokenIndex}] ${token.name} 招募周失败:`, error)
+          console.error(`[序号${tokenIndex}] 【序号${tokenIndex}】[${token.name || token.id}]招募周失败:`, error)
           return { success: false, token, error: error.message || '未知错误' }
         }
       },
@@ -2585,7 +2585,7 @@ const batchCheer = async () => {
               cardType: '金鱼资源',
               operation: '批量助威',
               status: 'success',
-              message: `${token.name} - 助威完成，使用助威道具 x${useCount}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]助威完成，使用助威道具 x${useCount}`
             })
             return { success: true, token: token }
           } catch (error) {
@@ -2944,7 +2944,7 @@ const batchClaimRewards = async () => {
               cardType: '金鱼资源',
               operation: '批量领取奖励',
               status: 'info',
-              message: `${token.name} - ${group.name}组领取完成，领取${groupClaimed}个`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]${group.name}组领取完成，领取${groupClaimed}个`
             })
           }
           
@@ -2954,7 +2954,7 @@ const batchClaimRewards = async () => {
             cardType: '金鱼资源',
             operation: '批量领取奖励',
             status: 'success',
-            message: `${token.name} - 领取完成，共领取${totalClaimed}个奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]领取完成，共领取${totalClaimed}个奖励`
           })
           
           return { success: true, token }
@@ -3080,7 +3080,7 @@ const batch38Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '38+1600',
             status: 'info',
-            message: `${token.name} - 已用招募: ${usedRecruit}, 已用宝箱: ${usedBoxScore}, 已用金砖: ${usedGoldBrick}, 已用金竿: ${usedGoldRod}, 现有金砖: ${currentGoldBrick}, 现有金竿: ${currentGoldRod}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]已用招募: ${usedRecruit}, 已用宝箱: ${usedBoxScore}, 已用金砖: ${usedGoldBrick}, 已用金竿: ${usedGoldRod}, 现有金砖: ${currentGoldBrick}, 现有金竿: ${currentGoldRod}`
           })
           
           // 判断条件：已用招募 > 4000 且 已用宝箱 > 100000
@@ -3091,7 +3091,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'info',
-              message: `${token.name} - 不满足条件，跳过`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]不满足条件，跳过`
             })
             return { success: true, token }
           }
@@ -3108,7 +3108,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'info',
-              message: `${token.name} - 购买金竿: ${buyNum}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿: ${buyNum}`
             })
             
             const buyResult = await tokenStore.sendSystemBuyItem(token.id, { itemId: 1012, buyNum })
@@ -3120,7 +3120,7 @@ const batch38Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '38+1600',
                 status: 'error',
-                message: `${token.name} - 购买金竿失败: ${errorMsg}`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿失败: ${errorMsg}`
               })
               return { success: false, token, error: errorMsg }
             }
@@ -3130,7 +3130,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'success',
-              message: `${token.name} - 购买金竿成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿成功`
             })
             
             await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
@@ -3155,7 +3155,7 @@ const batch38Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '38+1600',
             status: 'info',
-            message: `${token.name} - 金竿使用计算: 已用金竿=${newUsedGoldRod}, 现有金竿=${newGoldRod}, 需要次数=${needRodCount}, 可执行=${rodCount}, 最终执行=${executeCount}次`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]金竿使用计算: 已用金竿=${newUsedGoldRod}, 现有金竿=${newGoldRod}, 需要次数=${needRodCount}, 可执行=${rodCount}, 最终执行=${executeCount}次`
           })
           
           if (executeCount > 0) {
@@ -3165,7 +3165,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'info',
-              message: `${token.name} - 使用金竿: ${executeCount}次`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]使用金竿: ${executeCount}次`
             })
             for (let i = 0; i < executeCount; i++) {
               const rodResult = await tokenStore.sendMessageWithPromise(token.id, 'artifact_lottery', { type: 2, lotteryNumber: 10, newFree: true }, 10000)
@@ -3176,7 +3176,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'success',
-              message: `${token.name} - 使用金竿完成: ${executeCount}次`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]使用金竿完成: ${executeCount}次`
             })
           }
           
@@ -3187,7 +3187,7 @@ const batch38Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '38+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金砖奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金砖奖励`
           })
           
           // 获取活动信息以获取records
@@ -3214,7 +3214,7 @@ const batch38Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '38+1600',
                   status: 'info',
-                  message: `${token.name} - 金砖奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3224,7 +3224,7 @@ const batch38Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '38+1600',
                 status: 'error',
-                message: `${token.name} - 金砖奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3235,7 +3235,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'success',
-              message: `${token.name} - 领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
             })
           }
           
@@ -3246,7 +3246,7 @@ const batch38Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '38+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金竿奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金竿奖励`
           })
           
           // 获取活动信息以获取records
@@ -3273,7 +3273,7 @@ const batch38Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '38+1600',
                   status: 'info',
-                  message: `${token.name} - 金竿奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3283,7 +3283,7 @@ const batch38Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '38+1600',
                 status: 'error',
-                message: `${token.name} - 金竿奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3294,7 +3294,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'success',
-              message: `${token.name} - 领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
             })
           }
           
@@ -3312,7 +3312,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'info',
-              message: `${token.name} - 开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
             })
             
             for (let i = 0; i < fullOpenTimes; i++) {
@@ -3332,7 +3332,7 @@ const batch38Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '38+1600',
               status: 'success',
-              message: `${token.name} - 开道具完成: ${finalFishItem}个`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具完成: ${finalFishItem}个`
             })
           }
           
@@ -3342,7 +3342,7 @@ const batch38Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '38+1600',
             status: 'success',
-            message: `${token.name} - 38+1600完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]38+1600完成`
           })
           return { success: true, token }
         } catch (error) {
@@ -3455,7 +3455,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'info',
-              message: `${token.name} - 不满足条件，跳过`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]不满足条件，跳过`
             })
             return { success: true, token }
           }
@@ -3471,7 +3471,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'info',
-              message: `${token.name} - 购买金竿: ${buyNum}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿: ${buyNum}`
             })
             const buyResult = await tokenStore.sendSystemBuyItem(token.id, { itemId: 1012, buyNum })
             if (!(buyResult && (buyResult.code === 0 || buyResult.code === undefined || buyResult.success === true))) {
@@ -3480,7 +3480,7 @@ const batch42Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '42+1600',
                 status: 'error',
-                message: `${token.name} - 购买金竿失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿失败`
               })
               return { success: false, token, error: buyResult?.hint || buyResult?.message || '购买失败' }
             }
@@ -3489,7 +3489,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'success',
-              message: `${token.name} - 购买金竿成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿成功`
             })
             await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           }
@@ -3501,7 +3501,7 @@ const batch42Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '42+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金砖奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金砖奖励`
           })
           
           // 获取活动信息以获取records
@@ -3528,7 +3528,7 @@ const batch42Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '42+1600',
                   status: 'info',
-                  message: `${token.name} - 金砖奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3538,7 +3538,7 @@ const batch42Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '42+1600',
                 status: 'error',
-                message: `${token.name} - 金砖奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3549,7 +3549,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'success',
-              message: `${token.name} - 领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
             })
           }
           
@@ -3560,7 +3560,7 @@ const batch42Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '42+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金竿奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金竿奖励`
           })
           
           // 获取活动信息以获取records
@@ -3587,7 +3587,7 @@ const batch42Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '42+1600',
                   status: 'info',
-                  message: `${token.name} - 金竿奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3597,7 +3597,7 @@ const batch42Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '42+1600',
                 status: 'error',
-                message: `${token.name} - 金竿奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3608,7 +3608,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'success',
-              message: `${token.name} - 领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
             })
           }
           
@@ -3626,7 +3626,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'info',
-              message: `${token.name} - 开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
             })
             
             for (let i = 0; i < fullOpenTimes; i++) {
@@ -3646,7 +3646,7 @@ const batch42Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '42+1600',
               status: 'success',
-              message: `${token.name} - 开道具完成: ${finalFishItem}个`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具完成: ${finalFishItem}个`
             })
           }
           
@@ -3656,7 +3656,7 @@ const batch42Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '42+1600',
             status: 'success',
-            message: `${token.name} - 42+1600完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]42+1600完成`
           })
           return { success: true, token }
         } catch (error) {
@@ -3769,7 +3769,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'info',
-              message: `${token.name} - 不满足条件，跳过`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]不满足条件，跳过`
             })
             return { success: true, token }
           }
@@ -3785,7 +3785,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'info',
-              message: `${token.name} - 购买金竿: ${buyNum}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿: ${buyNum}`
             })
             const buyResult = await tokenStore.sendSystemBuyItem(token.id, { itemId: 1012, buyNum })
             if (!(buyResult && (buyResult.code === 0 || buyResult.code === undefined || buyResult.success === true))) {
@@ -3794,7 +3794,7 @@ const batch46Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '46+1600',
                 status: 'error',
-                message: `${token.name} - 购买金竿失败`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿失败`
               })
               return { success: false, token, error: buyResult?.hint || buyResult?.message || '购买失败' }
             }
@@ -3803,7 +3803,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'success',
-              message: `${token.name} - 购买金竿成功`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]购买金竿成功`
             })
             await new Promise(resolve => setTimeout(resolve, COMMAND_DELAY))
           }
@@ -3815,7 +3815,7 @@ const batch46Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '46+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金砖奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金砖奖励`
           })
           
           // 获取活动信息以获取records
@@ -3842,7 +3842,7 @@ const batch46Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '46+1600',
                   status: 'info',
-                  message: `${token.name} - 金砖奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3852,7 +3852,7 @@ const batch46Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '46+1600',
                 status: 'error',
-                message: `${token.name} - 金砖奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金砖奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3863,7 +3863,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'success',
-              message: `${token.name} - 领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金砖奖励: ${claimedGoldBrickRewards.join(', ')}`
             })
           }
           
@@ -3874,7 +3874,7 @@ const batch46Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '46+1600',
             status: 'info',
-            message: `${token.name} - 开始领取金竿奖励`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]开始领取金竿奖励`
           })
           
           // 获取活动信息以获取records
@@ -3901,7 +3901,7 @@ const batch46Plus1600 = async () => {
                   cardType: '金鱼资源',
                   operation: '46+1600',
                   status: 'info',
-                  message: `${token.name} - 金竿奖励${i}完成或出错，停止`
+                  message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}完成或出错，停止`
                 })
                 break
               }
@@ -3911,7 +3911,7 @@ const batch46Plus1600 = async () => {
                 cardType: '金鱼资源',
                 operation: '46+1600',
                 status: 'error',
-                message: `${token.name} - 金竿奖励${i}出错: ${error.message}，停止`
+                message: `【序号${tokenIndex}】[${token.name || token.id}]金竿奖励${i}出错: ${error.message}，停止`
               })
               break
             }
@@ -3922,7 +3922,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'success',
-              message: `${token.name} - 领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]领取金竿奖励: ${claimedGoldRodRewards.join(', ')}`
             })
           }
           
@@ -3940,7 +3940,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'info',
-              message: `${token.name} - 开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具: ${finalFishItem}个（12一开，${fullOpenTimes}次 + 剩余${remainder}个）`
             })
             
             for (let i = 0; i < fullOpenTimes; i++) {
@@ -3960,7 +3960,7 @@ const batch46Plus1600 = async () => {
               cardType: '金鱼资源',
               operation: '46+1600',
               status: 'success',
-              message: `${token.name} - 开道具完成: ${finalFishItem}个`
+              message: `【序号${tokenIndex}】[${token.name || token.id}]开道具完成: ${finalFishItem}个`
             })
           }
           
@@ -3970,7 +3970,7 @@ const batch46Plus1600 = async () => {
             cardType: '金鱼资源',
             operation: '46+1600',
             status: 'success',
-            message: `${token.name} - 46+1600完成`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]46+1600完成`
           })
           return { success: true, token }
         } catch (error) {
@@ -4072,7 +4072,7 @@ const batchChangeGoldFish = async () => {
             cardType: '金鱼资源',
             operation: '批量换金鱼',
             status: 'success',
-            message: `${token.name} - 换金鱼完成，位置: ${fishPosition}`
+            message: `【序号${tokenIndex}】[${token.name || token.id}]换金鱼完成，位置: ${fishPosition}`
           })
           return { success: true, token }
         } catch (error) {
@@ -4619,7 +4619,7 @@ const batchExportItems = async () => {
         message: `【序号${tokenIndex}】[${token.name || token.id}] 导出成功：助威${cheerCount}，任务${taskCount}，金鱼${fishCount}，宝箱分${usedBoxScore}，金竿${usedGoldRod}，招募${usedRecruit}，盐罐${usedSaltJar}，金砖${usedGoldBrick}`
       })
     } catch (error) {
-      console.error(`${token.name} 导出道具数量失败:`, error)
+      console.error(`【序号${tokenIndex}】[${token.name || token.id}]导出道具数量失败:`, error)
       message.error(`[序号${tokenIndex}] ${token.name || token.id} 导出失败：${error.message}`)
       failCount++
       logStore.addLog({
