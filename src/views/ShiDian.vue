@@ -1023,30 +1023,38 @@ const autoJoinShiDian = async (executionRange = '') => {
         maxRetries: 3
       })
 
-      // 获取所有 token，排除 02/05/07 前缀
-      let tokens = tokenStore.gameTokens.filter(token => {
-        const name = token.name || ''
-        return !name.startsWith('02') && !name.startsWith('05') && !name.startsWith('07')
-      })
-
-      // 按执行范围过滤 token
+      // 按执行范围过滤 token（使用 sortedTokens 顺序，与 UI 显示一致）
+      let tokens
       if (executionRange) {
         const indices = parseTokenRange(executionRange)
         if (indices && indices.length > 0) {
           tokens = indices
-            .filter(idx => idx > 0 && idx <= tokenStore.gameTokens.length)
-            .map(idx => tokenStore.gameTokens[idx - 1])
-            .filter(token => token && !token.name?.startsWith('02') && !token.name?.startsWith('05') && !token.name?.startsWith('07'))
+            .filter(idx => idx > 0 && idx <= sortedTokens.value.length)
+            .map(idx => sortedTokens.value[idx - 1])
+            .filter(token => token && !token.name?.includes('十殿'))
           console.log('按执行范围过滤后的 token 数量:', tokens.length)
+        } else {
+          tokens = []
         }
+      } else {
+        tokens = [...sortedTokens.value].filter(token => !token.name?.includes('十殿'))
       }
+      
+      // 计算需要多少个枕头=5的token（每个TeamID需要3个）
+      const validTeamIdsCount = teamIds.value.filter(id => id).length
+      const requiredTokensCount = validTeamIdsCount * 3
+      console.log(`需要 ${requiredTokensCount} 个枕头=5的token（${validTeamIdsCount}个TeamID × 3）`)
       
       // 先检查所有 token 的枕头数量，只保留枕头=5 的 token
       const tokensWithPillow5 = []
       for (const token of tokens) {
         if (!token || !token.id) continue
         
-        // 检查是否已加入十殿
+        // 跳过昵称包含"十殿"的 token
+        const tokenName = token.name || ''
+        if (tokenName.includes('十殿')) continue
+        
+        // 跳过十殿状态为"一"到"五"(1-5)和"已打"(0)的 token，防止重复检查枕头
         const currentTeam = tokenNightmareTeam.value[token.id]
         if (currentTeam !== null && currentTeam !== undefined) continue
         
@@ -1078,6 +1086,13 @@ const autoJoinShiDian = async (executionRange = '') => {
           
           if (currentPillowCount === 5) {
             tokensWithPillow5.push(token)
+            
+            // 找到足够数量后提前停止
+            if (tokensWithPillow5.length >= requiredTokensCount) {
+              console.log(`已找到 ${requiredTokensCount} 个枕头=5的token，停止检查`)
+              await connectionPool.release(token.id, true)
+              break
+            }
           }
           
           await connectionPool.release(token.id, true)
@@ -1097,6 +1112,13 @@ const autoJoinShiDian = async (executionRange = '') => {
       }
       
       console.log(`找到 ${tokensWithPillow5.length} 个枕头数量为 5 的 Token`)
+      console.log(`需要 ${requiredTokensCount} 个，实际找到 ${tokensWithPillow5.length} 个`)
+      
+      // 检查数量是否足够
+      if (tokensWithPillow5.length < requiredTokensCount) {
+        console.warn(`枕头=5的token数量不足！需要${requiredTokensCount}个，只找到${tokensWithPillow5.length}个`)
+        message.warning(`枕头=5的token数量不足！需要${requiredTokensCount}个，只找到${tokensWithPillow5.length}个，部分殿可能无法分配满3个`)
+      }
       
       // 将枕头=5 的 token 分配到各殿（按殿一到殿五的顺序，token序号从前向后）
       const allTokensToProcess = []
@@ -1105,8 +1127,8 @@ const autoJoinShiDian = async (executionRange = '') => {
       for (let teamIdx = 1; teamIdx <= 5; teamIdx++) {
         if (!teamIds.value[teamIdx - 1]) continue
         
-        // 每殿分配 2 个 token
-        for (let i = 0; i < 2 && tokenIndex < tokensWithPillow5.length; i++) {
+        // 每殿分配 3 个 token
+        for (let i = 0; i < 3 && tokenIndex < tokensWithPillow5.length; i++) {
           allTokensToProcess.push({ token: tokensWithPillow5[tokenIndex], teamIndex: teamIdx })
           tokenIndex++
         }

@@ -978,31 +978,31 @@ const executeHeroUpgrade = async (token) => {
   return upgradableHeroes
 }
 
-// 执行图鉴升星（单个token），使用英雄升星获取的可升星武将列表
-const executeBookUpgrade = async (token, upgradableHeroes) => {
-  if (!upgradableHeroes || upgradableHeroes.length === 0) {
-    console.log(`${token.name || token.id} 没有武将碎片足够升图鉴`)
-    return
-  }
+// 执行图鉴批量升星（单个token），依次执行各组参数直至出错
+const executeBookUpgrade = async (token) => {
+  const batchParams = [
+    { club: 1, isArtifact: false, isSkin: false },
+    { club: 2, isArtifact: false, isSkin: false },
+    { club: 3, isArtifact: false, isSkin: false },
+    { club: 4, isArtifact: false, isSkin: false },
+    { club: 0, isArtifact: true, isSkin: false },
+    { club: 0, isArtifact: false, isSkin: true },
+  ]
 
-  for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
-    // 计算最多可升次数
-    const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost))
-
-    for (let i = 1; i <= maxUpgrades; i++) {
+  for (const params of batchParams) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
       try {
         await tokenStore.sendMessageWithPromise(
           token.id,
-          'book_upgrade',
-          { heroId },
+          'book_batchupgrade',
+          params,
           8000
         )
       } catch (err) {
-        // 失败后也执行延迟1秒
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // 出错则跳出当前组，进入下一组
         break
       }
-      // 每次升星后延迟1秒（无论成功还是失败）
       await new Promise(resolve => setTimeout(resolve, 500))
     }
   }
@@ -1146,7 +1146,7 @@ const handleBatchUpgrade = async () => {
           message: `【序号${tokenIndex}】[${token.name || token.id}]开始图鉴升星...`
         })
         message.info(`序号 ${tokenIndex} ${token.name || token.id} 开始图鉴升星...`)
-        await executeBookUpgrade(token, upgradableHeroes)
+        await executeBookUpgrade(token)
         message.success(`序号 ${tokenIndex} ${token.name || token.id} 图鉴升星完成`)
         logStore.addLog({
           page: 'fish-helper',

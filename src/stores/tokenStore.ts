@@ -1597,6 +1597,11 @@ export const useTokenStore = defineStore("tokens", () => {
     return sendMessageWithPromise(tokenId, "book_upgrade", params);
   };
 
+  // 发送图鉴批量升级
+  const sendBookBatchUpgrade = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "book_batchupgrade", params);
+  };
+
   // 发送图鉴领取积分奖励
   const sendBookClaimPointReward = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "book_claimpointreward", params);

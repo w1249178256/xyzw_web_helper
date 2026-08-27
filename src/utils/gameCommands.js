@@ -2723,6 +2723,25 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   * 图鉴批量升级
+   */
+  book_batchupgrade(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        club:params.club,
+        isArtifact:params.isArtifact,
+        isSkin:params.isskin
+        ...params
+      }),
+      cmd: "book_batchupgrade",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    * 图鉴领取积分奖励
    */
   book_claimpointreward(ack = 0, seq = 0, params = {}) {

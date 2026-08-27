@@ -332,6 +332,7 @@ export function registerDefaultCommands(reg) {
     // 升星相关
     .register("hero_heroupgradestar")
     .register("book_upgrade")
+    .register("book_batchupgrade")
     .register("book_claimpointreward")
 
     // 排名相关
@@ -510,6 +511,7 @@ export function registerDefaultCommands(reg) {
     .register("hero_simulation")
     .register("hero_heroupgradeorder")
     .register("book_upgrade")
+    .register("book_batchupgrade")
     .register("book_bookupgradestar")
     .register("book_claimpointreward")
     .register("nightmare_getroleinfo")
@@ -1288,6 +1290,7 @@ export class XyzwWebSocketClient {
       hero_heroupgradeorderresp: "hero_heroupgradeorder",
       hero_syntheticresp: "hero_synthetic",
       book_upgraderesp: "book_upgrade",
+      book_batchupgraderesp: "book_batchupgrade",
       book_claimpointrewardresp: "book_claimpointreward",
       // 军团信息
       legion_getinforesp: "legion_getinfo",
