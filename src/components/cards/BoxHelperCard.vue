@@ -16,7 +16,12 @@
       </div>
       <div class="container">
         <div class="list">
-          <div class="item" v-for="item in boxDataList" :key="item.type">
+          <div
+            class="item"
+            v-for="item in boxDataList"
+            :key="item.type"
+            :data-testid="`box-count-${item.itemId}`"
+          >
             <img :src="item.img" :alt="item.type" />
             <div class="box-info">
               <div class="box-type">{{ item.type }}</div>
@@ -25,8 +30,18 @@
           </div>
         </div>
         <div class="selects">
-          <n-select v-model:value="type" :options="typeOptions" />
-          <n-select v-model:value="number" :options="numberOptions" />
+          <n-select
+            v-model:value="type"
+            :options="typeOptions"
+            :disabled="state.isRunning"
+            data-testid="box-type-select"
+          />
+          <n-select
+            v-model:value="number"
+            :options="numberOptions"
+            :disabled="state.isRunning"
+            data-testid="box-number-select"
+          />
         </div>
       </div>
     </template>
@@ -37,21 +52,35 @@
         secondary
         size="small"
         block
+        data-testid="box-open-button"
         @click="handleBoxHelper"
       >
         {{ state.isRunning ? "运行中" : "开启宝箱" }}
       </a-button>
-      <a-button type="primary" size="small" @click="batchclaimboxpointreward"
-        >领取宝箱积分</a-button
+      <a-button
+        type="primary"
+        size="small"
+        :disabled="state.isRunning"
+        data-testid="box-claim-points-button"
+        @click="batchclaimboxpointreward"
       >
+        {{ claimBoxPointButtonText }}
+      </a-button>
     </template>
   </MyCard>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, watchEffect } from "vue";
+import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
+import {
+  HELPER_BATCH_DELAY_MS,
+  HELPER_COMMAND_TIMEOUT_MS,
+  getClaimableBoxPoints,
+  getErrorMessage,
+  runInventoryVerifiedGameCommand,
+} from "@/utils/helperTaskRunner";
 import MyCard from "../Common/MyCard.vue";
 
 const tokenStore = useTokenStore();
@@ -67,21 +96,25 @@ const boxDataList = computed(() => {
   return [
     {
       type: "木质宝箱",
+      itemId: 2001,
       img: getImgPath("/box/mzbx.png"),
       count: roleInfo.value?.role?.items?.[2001]?.quantity || 0,
     },
     {
       type: "青铜宝箱",
+      itemId: 2002,
       img: getImgPath("/box/qtbx.png"),
       count: roleInfo.value?.role?.items?.[2002]?.quantity || 0,
     },
     {
       type: "黄金宝箱",
+      itemId: 2003,
       img: getImgPath("/box/hjbx.png"),
       count: roleInfo.value?.role?.items?.[2003]?.quantity || 0,
     },
     {
       type: "铂金宝箱",
+      itemId: 2004,
       img: getImgPath("/box/bjbx.png"),
       count: roleInfo.value?.role?.items?.[2004]?.quantity || 0,
     },
@@ -96,6 +129,13 @@ const totalPoints = computed(() => {
 
   return wooden * 1 + bronze * 10 + gold * 20 + platinum * 50;
 });
+
+const claimableBoxPoints = computed(() => getClaimableBoxPoints(roleInfo.value));
+const claimBoxPointButtonText = computed(() =>
+  claimableBoxPoints.value > 1000
+    ? `领取${claimableBoxPoints.value}宝箱积分`
+    : "领取宝箱积分",
+);
 
 const type = ref(2001);
 const typeOptions = [
@@ -132,38 +172,43 @@ const batchclaimboxpointreward = async () => {
 };
 
 const handleBoxHelper = async () => {
+  if (state.value.isRunning) {
+    return;
+  }
+
   if (!tokenStore.selectedToken) {
     message.warning("请先选择Token");
     return;
   }
+
   const tokenId = tokenStore.selectedToken.id;
+  const selectedType = type.value;
+  const selectedNumber = number.value;
+
   state.value.isRunning = true;
   message.info("宝箱开启中");
-  if (number.value >= 10) {
-    const batches = Math.floor(number.value / 10);
-    const remainder = number.value % 10;
-    for (let i = 0; i < batches; i++) {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "item_openbox",
-        { itemId: type.value, number: 10 },
-      );
-    }
-    if (remainder > 0) {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "item_openbox",
-        { itemId: type.value, number: remainder },
-      );
-    }
-    await tokenStore.sendMessage(tokenId, "item_batchclaimboxpointreward");
-    await new Promise((r) => setTimeout(r, 500));
+
+  try {
+    await runInventoryVerifiedGameCommand({
+      tokenStore,
+      tokenId,
+      cmd: "item_openbox",
+      itemId: selectedType,
+      total: selectedNumber,
+      timeout: HELPER_COMMAND_TIMEOUT_MS,
+      delayMs: HELPER_BATCH_DELAY_MS,
+      createParams: (amount) => ({ itemId: selectedType, number: amount }),
+      queryInventory: () => tokenStore.sendGetRoleInfo(tokenId),
+    });
+
     await tokenStore.sendMessage(tokenId, "role_getroleinfo");
     // 更新活动进度
     tokenStore.sendMessage(tokenId, "activity_get");
     message.success("宝箱开启完毕");
+  } catch (error) {
+    message.error(`宝箱开启失败：${getErrorMessage(error)}`);
+  } finally {
     state.value.isRunning = false;
-    return;
   }
 };
 </script>

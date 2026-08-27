@@ -12,7 +12,12 @@
     <template #default>
       <div class="container">
         <div class="list">
-          <div class="item" v-for="item in dataList" :key="item.type">
+          <div
+            class="item"
+            v-for="item in dataList"
+            :key="item.type"
+            :data-testid="`recruit-count-${item.itemId}`"
+          >
             <img :src="item.img" :alt="item.type" />
             <div class="box-info">
               <div class="box-type">{{ item.type }}</div>
@@ -21,7 +26,12 @@
           </div>
         </div>
         <div class="selects">
-          <n-select v-model:value="number" :options="numberOptions" />
+          <n-select
+            v-model:value="number"
+            :options="numberOptions"
+            :disabled="state.isRunning"
+            data-testid="recruit-number-select"
+          />
         </div>
       </div>
     </template>
@@ -32,6 +42,7 @@
         secondary
         size="small"
         block
+        data-testid="recruit-start-button"
         @click="handleHelper"
       >
         {{ state.isRunning ? "运行中" : "开始招募" }}
@@ -41,9 +52,15 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, watchEffect } from "vue";
+import { ref, computed } from "vue";
 import { useMessage } from "naive-ui";
 import { useTokenStore } from "@/stores/tokenStore";
+import {
+  HELPER_BATCH_DELAY_MS,
+  HELPER_COMMAND_TIMEOUT_MS,
+  getErrorMessage,
+  runInventoryVerifiedGameCommand,
+} from "@/utils/helperTaskRunner";
 import MyCard from "../Common/MyCard.vue";
 
 const tokenStore = useTokenStore();
@@ -59,6 +76,7 @@ const dataList = computed(() => {
   return [
     {
       type: "招募令",
+      itemId: 1001,
       img: getImgPath("/icons/zml.png"),
       count: roleInfo.value?.role?.items?.[1001]?.quantity || 0,
     },
@@ -79,36 +97,42 @@ const state = ref({
 });
 
 const handleHelper = async () => {
+  if (state.value.isRunning) {
+    return;
+  }
+
   if (!tokenStore.selectedToken) {
     message.warning("请先选择Token");
     return;
   }
+
   const tokenId = tokenStore.selectedToken.id;
+  const selectedNumber = number.value;
+
   state.value.isRunning = true;
   message.info("招募助手运行中");
-  if (number.value >= 10) {
-    const batches = Math.floor(number.value / 10);
-    const remainder = number.value % 10;
-    for (let i = 0; i < batches; i++) {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "hero_recruit",
-        { recruitType: 1, recruitNumber: 10 },
-      );
-    }
-    if (remainder > 0) {
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "hero_recruit",
-        { recruitType: 1, recruitNumber: remainder },
-      );
-    }
+
+  try {
+    await runInventoryVerifiedGameCommand({
+      tokenStore,
+      tokenId,
+      cmd: "hero_recruit",
+      itemId: 1001,
+      total: selectedNumber,
+      timeout: HELPER_COMMAND_TIMEOUT_MS,
+      delayMs: HELPER_BATCH_DELAY_MS,
+      createParams: (amount) => ({ recruitType: 1, recruitNumber: amount }),
+      queryInventory: () => tokenStore.sendGetRoleInfo(tokenId),
+    });
+
     await tokenStore.sendMessage(tokenId, "role_getroleinfo");
     // 更新活动进度
     tokenStore.sendMessage(tokenId, "activity_get");
     message.success("招募完毕");
+  } catch (error) {
+    message.error(`招募失败：${getErrorMessage(error)}`);
+  } finally {
     state.value.isRunning = false;
-    return;
   }
 };
 </script>

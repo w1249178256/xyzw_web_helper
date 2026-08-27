@@ -441,6 +441,19 @@
                   一键购买梦境商品
                 </n-button>
               </n-space>
+                <n-popselect
+                  :value="footballPick"
+                  :options="footballPickOptions"
+                  trigger="click"
+                  @update:value="onFootballPickChange"
+                >
+                  <n-button
+                    size="small"
+                    :disabled="isRunning || selectedTokens.length === 0"
+                  >
+                    一键竞猜({{ footballPickLabel }})
+                  </n-button>
+                </n-popselect>
             </n-tab-pane>
             <n-tab-pane name="baoku" tab="宝库">
               <n-space>
@@ -470,6 +483,17 @@
             </n-tab-pane>
             <n-tab-pane name="weirdTower" tab="怪异塔">
               <n-space>
+                <n-input-number
+                  v-model:value="weirdTowerMaxClimb"
+                  class="weird-tower-count-input"
+                  size="small"
+                  :min="1"
+                  :precision="0"
+                  :show-button="false"
+                  placeholder="次数"
+                  :disabled="isRunning"
+                />
+                <span class="weird-tower-count-unit">次</span>
                 <n-button
                   size="small"
                   @click="climbWeirdTower"
@@ -2820,6 +2844,7 @@ import { DailyTaskRunner } from "@/utils/dailyTaskRunner";
 import { preloadQuestions } from "@/utils/studyQuestionsFromJSON.js";
 import { useMessage } from "naive-ui";
 import { Settings } from "@vicons/ionicons5";
+import { DEFAULT_WEIRD_TOWER_MAX_CLIMB } from "@/utils/towerClimbLimit.js";
 
 // Import batch task modules
 import {
@@ -2873,6 +2898,7 @@ import {
   createTasksArena,
   createTasksStore,
   createTasksLegacy,
+  createTasksFootball,
 } from "@/utils/batch";
 
 import { merchantConfig, goldItemsConfig } from "@/utils/dreamConstants";
@@ -2880,6 +2906,7 @@ import { merchantConfig, goldItemsConfig } from "@/utils/dreamConstants";
 // Initialize token store, message service, and task runner
 const tokenStore = useTokenStore();
 const message = useMessage();
+const weirdTowerMaxClimb = ref(DEFAULT_WEIRD_TOWER_MAX_CLIMB);
 
 // 排序配置（从localStorage读取，与TokenImport共享）
 const savedSortConfig = localStorage.getItem("tokenSortConfig");
@@ -5686,6 +5713,7 @@ const createTaskDeps = () => ({
   // 设置相关
   currentSettings,
   helperSettings,
+  weirdTowerMaxClimb,
   // 功法赠送相关
   recipientIdInput,
   recipientInfo,
@@ -5757,6 +5785,24 @@ const {
 
 const tasksLegacy = createTasksLegacy(createTaskDeps());
 const { batchLegacyClaim, batchLegacyGiftSendEnhanced } = tasksLegacy;
+
+const tasksFootball = createTasksFootball(createTaskDeps());
+const { batchFootballBet } = tasksFootball;
+
+// 盐杯竞猜 pick 选择
+const footballPick = ref(3);
+const footballPickOptions = [
+  { label: "主胜", value: 1 },
+  { label: "平局", value: 2 },
+  { label: "客胜", value: 3 },
+];
+const footballPickLabel = computed(() => {
+  return footballPickOptions.find((o) => o.value === footballPick.value)?.label || "";
+});
+const onFootballPickChange = async (val) => {
+  footballPick.value = val;
+  await batchFootballBet(val);
+};
 
 const startBatch = async () => {
   if (selectedTokens.value.length === 0) return;
@@ -6090,6 +6136,19 @@ const stopBatch = () => {
 .switch-label {
   font-size: 14px;
   color: #666;
+}
+
+.weird-tower-count-input {
+  width: 86px;
+  flex-shrink: 0;
+}
+
+.weird-tower-count-unit {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  color: #666;
+  font-size: 14px;
 }
 
 /* Responsive Design */

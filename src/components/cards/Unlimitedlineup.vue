@@ -86,23 +86,27 @@
               @drop="onDrop($event, hero)"
             >
               <div class="hero-position">{{ hero.position + 1 }}</div>
-              <div class="hero-avatar" @click="showHeroRefineModal(hero)">
-                <img
-                  v-if="getHeroAvatar(hero.heroId)"
-                  :src="getHeroAvatar(hero.heroId)"
-                  :alt="getHeroName(hero.heroId)"
-                />
-                <div v-else class="hero-placeholder">
-                  {{ getHeroName(hero.heroId)?.substring(0, 2) || "?" }}
+              <div class="hero-left" @click="showHeroRefineModal(hero)">
+                <div class="hero-avatar">
+                  <img
+                    v-if="getHeroAvatar(hero.heroId)"
+                    :src="getHeroAvatar(hero.heroId)"
+                    :alt="getHeroName(hero.heroId)"
+                  />
+                  <div v-else class="hero-placeholder">
+                    {{ getHeroName(hero.heroId)?.substring(0, 2) || "?" }}
+                  </div>
+                </div>
+                <div class="hero-avatar-info">
+                  <div class="hero-name-small-inline">
+                    {{ getHeroName(hero.heroId) || `武将${hero.heroId}` }}
+                  </div>
+                  <div class="hero-level-small-inline" v-if="hero.level">
+                    Lv.{{ hero.level }}
+                  </div>
                 </div>
               </div>
               <div class="hero-info" @click="showHeroRefineModal(hero)">
-                <div class="hero-name">
-                  {{ getHeroName(hero.heroId) || `武将${hero.heroId}` }}
-                </div>
-                <div class="hero-level" v-if="hero.level">
-                  Lv.{{ hero.level }}
-                </div>
                 <div class="hero-fish" v-if="getFishInfo(hero.artifactId)">
                   {{ getFishInfo(hero.artifactId).name }}
                   <span
@@ -124,6 +128,24 @@
                       :style="{ backgroundColor: color }"
                     ></span>
                   </span>
+                </div>
+                <div class="hero-stats" v-if="hero.power">
+                  <div class="stat-row">
+                    <span class="stat-power"
+                      >战力{{ formatPower(hero.power) }}</span
+                    >
+                    <span class="stat-speed" v-if="hero.speed"
+                      >速度{{ hero.speed }}</span
+                    >
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-attack" v-if="hero.attack"
+                      >攻击{{ formatPower(hero.attack) }}</span
+                    >
+                    <span class="stat-hp" v-if="hero.hp"
+                      >血量{{ formatPower(hero.hp) }}</span
+                    >
+                  </div>
                 </div>
               </div>
               <div class="hero-actions">
@@ -153,7 +175,7 @@
         v-model:show="savedLineupsModalVisible"
         preset="card"
         title="已保存的阵容"
-        style="width: 600px; max-width: 90vw"
+        style="width: 900px; max-width: 90vw"
         :bordered="false"
       >
         <div v-if="savedLineups.length === 0" class="empty-tip">
@@ -263,29 +285,58 @@
                     <div v-else class="hero-avatar-placeholder">
                       {{ getHeroName(hero.heroId)?.[0] || "?" }}
                     </div>
-                    <div class="hero-name-small">
-                      {{ getHeroName(hero.heroId) || `武将${hero.heroId}` }}
-                    </div>
-                    <div v-if="hero.level" class="hero-level-small">
-                      Lv.{{ formatLevel(hero.level) }}
-                    </div>
-                    <div v-if="hero.fishId" class="hero-fish-info">
-                      <span class="hero-fish-name">
-                        {{ getFishNameById(hero.fishId) }}
-                        <span v-if="hero.skillId" class="hero-fish-skill-name">
-                          {{ getPearlSkillNameById(hero.skillId) }}
-                        </span>
-                      </span>
-                      <div
-                        v-if="getSlotColors(hero.slotMap)"
-                        class="hero-fish-slots"
-                      >
-                        <span
-                          v-for="(color, idx) in getSlotColors(hero.slotMap)"
-                          :key="idx"
-                          class="slot-dot"
-                          :style="{ backgroundColor: color }"
-                        ></span>
+                    <div class="hero-info-small">
+                      <div class="hero-header-small">
+                        <div class="hero-name-small">
+                          {{ getHeroName(hero.heroId) || `武将${hero.heroId}` }}
+                        </div>
+                        <div v-if="hero.level" class="hero-level-small">
+                          Lv.{{ formatLevel(hero.level) }}
+                        </div>
+                      </div>
+                      <div v-if="hero.fishId" class="hero-fish-info">
+                        <div class="hero-fish-row">
+                          <span class="hero-fish-name">
+                            {{ getFishNameById(hero.fishId) }}
+                            <span
+                              v-if="hero.skillId"
+                              class="hero-fish-skill-name"
+                            >
+                              {{ getPearlSkillNameById(hero.skillId) }}
+                            </span>
+                          </span>
+                          <div
+                            v-if="getSlotColors(hero.slotMap)"
+                            class="hero-fish-slots"
+                          >
+                            <span
+                              v-for="(color, idx) in getSlotColors(
+                                hero.slotMap,
+                              )"
+                              :key="idx"
+                              class="slot-dot"
+                              :style="{ backgroundColor: color }"
+                            ></span>
+                          </div>
+                        </div>
+                      </div>
+                      <div v-if="hero.power" class="hero-stats-small">
+                        <div class="stat-row-small">
+                          <span class="stat-power"
+                            >战力{{ formatPower(hero.power) }}</span
+                          >
+                          <span class="stat-speed" v-if="hero.speed"
+                            >速度{{ hero.speed }}</span
+                          >
+                        </div>
+                        <div class="stat-row-small">
+                          <span class="stat-attack" v-if="hero.attack"
+                            >攻击{{ formatPower(hero.attack) }}</span
+                          >
+                          <span class="stat-hp" v-if="hero.hp"
+                            >血量{{ formatPower(hero.hp) }}</span
+                          >
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -523,6 +574,7 @@ import {
   PearlMap,
   LEGION_TECH_MAX_LEVEL,
   LEGION_TECH_TYPE_MAP,
+  LEGION_TECH_RESET_TYPE_MAP,
   LEGION_TECH_TYPE_NAME,
   LEGION_TECH_NAME,
   getTechType,
@@ -551,6 +603,17 @@ const REFRESH_DEBOUNCE = 3000;
 const COMMAND_DELAY = 500;
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const formatPower = (power) => {
+  if (!power) return "0";
+  if (power >= 100000000) {
+    return (power / 100000000).toFixed(2) + "亿";
+  }
+  if (power >= 10000) {
+    return (power / 10000).toFixed(2) + "万";
+  }
+  return power.toString();
+};
 
 const generateLineupId = () => {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -604,26 +667,42 @@ const syncLegionResearch = async (tokenId, targetResearch) => {
   const currentResearch = role?.legionResearch || {};
 
   const typesToReset = new Set();
+  const typesToResetResearch = new Set();
 
   for (const type of [1, 2, 3, 4, 5, 6]) {
-    const techIds = LEGION_TECH_TYPE_MAP[type];
+    const techIds = LEGION_TECH_RESET_TYPE_MAP[type];
     for (const techId of techIds) {
       const currentLevel = currentResearch[techId] || 0;
       const targetLevel = targetResearch[techId] || 0;
-      if (currentLevel !== targetLevel) {
+      if (
+        currentLevel !== targetLevel &&
+        (currentLevel > 0 || targetLevel > 0)
+      ) {
+        typesToResetResearch.add(type);
+        break;
+      }
+    }
+    const techIds2 = LEGION_TECH_TYPE_MAP[type];
+    for (const techId of techIds2) {
+      const currentLevel = currentResearch[techId] || 0;
+      const targetLevel = targetResearch[techId] || 0;
+      if (
+        currentLevel !== targetLevel &&
+        (currentLevel > 0 || targetLevel > 0)
+      ) {
         typesToReset.add(type);
         break;
       }
     }
   }
 
-  if (typesToReset.size === 0) {
+  if (typesToResetResearch.size === 0 && typesToReset.size === 0) {
     return { success: true, message: "科技配置已匹配，无需调整" };
   }
 
   const errors = [];
 
-  for (const type of typesToReset) {
+  for (const type of typesToResetResearch) {
     try {
       await tokenStore.sendMessageWithPromise(tokenId, "legion_resetresearch", {
         advanced: false,
@@ -634,13 +713,14 @@ const syncLegionResearch = async (tokenId, targetResearch) => {
   }
 
   const sortedTypes = [...typesToReset].sort((a, b) => a - b);
+  console.log(sortedTypes);
 
   for (const type of sortedTypes) {
-    const techIds = LEGION_TECH_TYPE_MAP[type];
-    for (const techId of techIds) {
+    const techIds2 = LEGION_TECH_TYPE_MAP[type];
+    for (const techId of techIds2) {
       const targetLevel = targetResearch[techId] || 0;
       if (targetLevel > 0) {
-        const maxLevel = LEGION_TECH_MAX_LEVEL[techId] || 20;
+        const maxLevel = LEGION_TECH_MAX_LEVEL[techId];
         const isMax = targetLevel >= maxLevel;
         if (isMax) {
           try {
@@ -859,13 +939,20 @@ const currentTeamHeroes = computed(() => {
   if (!currentTeamInfo.value) return [];
   const teamInfo = currentTeamInfo.value;
   return Object.entries(teamInfo)
-    .map(([key, hero]) => ({
-      position: hero?.battleTeamSlot ?? Number(key),
-      heroId: hero?.heroId || hero?.id,
-      level: hero?.level || null,
-      artifactId: hero?.artifactId || null,
-      attachmentUid: hero?.attachmentUid || null,
-    }))
+    .map(([key, hero]) => {
+      const heroData = roleHeroesData.value[String(hero?.heroId || hero?.id)];
+      return {
+        position: hero?.battleTeamSlot ?? Number(key),
+        heroId: hero?.heroId || hero?.id,
+        level: hero?.level || null,
+        artifactId: hero?.artifactId || null,
+        attachmentUid: hero?.attachmentUid || null,
+        power: heroData?.power || null,
+        attack: heroData?.attack || null,
+        hp: heroData?.hp || null,
+        speed: heroData?.speed || null,
+      };
+    })
     .filter((h) => h.heroId)
     .sort((a, b) => a.position - b.position);
 });
@@ -874,13 +961,20 @@ const editingHeroes = computed(() => {
   if (Object.keys(editingTeamHeroes.value).length > 0) {
     return Object.entries(editingTeamHeroes.value)
       .sort((a, b) => Number(a[0]) - Number(b[0]))
-      .map(([pos, hero]) => ({
-        position: Number(pos),
-        heroId: hero?.heroId,
-        level: hero?.level || null,
-        artifactId: hero?.artifactId || null,
-        attachmentUid: hero?.attachmentUid || null,
-      }))
+      .map(([pos, hero]) => {
+        const heroData = roleHeroesData.value[String(hero?.heroId)];
+        return {
+          position: Number(pos),
+          heroId: hero?.heroId,
+          level: hero?.level || null,
+          artifactId: hero?.artifactId || null,
+          attachmentUid: hero?.attachmentUid || null,
+          power: heroData?.power || null,
+          attack: heroData?.attack || null,
+          hp: heroData?.hp || null,
+          speed: heroData?.speed || null,
+        };
+      })
       .filter((h) => h.heroId);
   }
   return currentTeamHeroes.value;
@@ -1412,6 +1506,10 @@ const saveCurrentLineup = async () => {
         pearlId: pearlId,
         skillId: pearlData?.skillId || null,
         slotMap: slotMap,
+        power: heroData?.power || null,
+        attack: heroData?.attack || null,
+        hp: heroData?.hp || null,
+        speed: heroData?.speed || null,
       };
     });
 
@@ -1480,18 +1578,77 @@ const getOrder = (level) => {
   return order;
 };
 
-const applyHeroLevel = async (tokenId, heroId, targetLevel, currentLevel) => {
+const applyHeroLevel = async (
+  tokenId,
+  heroId,
+  targetLevel,
+  currentLevel,
+  currentOrder = 0,
+  slot = -1,
+) => {
   if (!targetLevel || targetLevel <= 0)
     return { success: true, message: "无目标等级" };
 
   let actualCurrentLevel = currentLevel;
+  let actualCurrentOrder = currentOrder;
 
   if (actualCurrentLevel > targetLevel) {
+    if (slot >= 0) {
+      try {
+        await tokenStore.sendMessageWithPromise(tokenId, "hero_gobackbattle", {
+          slot,
+        });
+      } catch (err) {}
+      await delay(COMMAND_DELAY);
+    }
+
     try {
-      await tokenStore.sendMessageWithPromise(tokenId, "hero_rebirth", {
-        heroId,
-      });
-      actualCurrentLevel = 1;
+      const result = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "hero_rebirth",
+        {
+          heroId,
+        },
+      );
+      if (result?.role?.heroes?.[heroId]?.level !== undefined) {
+        actualCurrentLevel = result.role.heroes[heroId].level;
+      } else {
+        actualCurrentLevel = 1;
+      }
+      if (result?.role?.heroes?.[heroId]?.order !== undefined) {
+        actualCurrentOrder = result.role.heroes[heroId].order;
+      } else {
+        actualCurrentOrder = 0;
+      }
+    } catch (err) {}
+    await delay(COMMAND_DELAY);
+
+    if (slot >= 0) {
+      try {
+        await tokenStore.sendMessageWithPromise(tokenId, "hero_gointobattle", {
+          heroId,
+          slot,
+        });
+      } catch (err) {}
+      await delay(COMMAND_DELAY);
+    }
+  }
+
+  const expectedOrder = getOrder(actualCurrentLevel);
+  if (actualCurrentOrder < expectedOrder) {
+    try {
+      const result = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "hero_heroupgradeorder",
+        {
+          heroId,
+        },
+      );
+      if (result?.role?.heroes?.[heroId]?.order !== undefined) {
+        actualCurrentOrder = result.role.heroes[heroId].order;
+      } else {
+        actualCurrentOrder = expectedOrder;
+      }
     } catch (err) {}
     await delay(COMMAND_DELAY);
   }
@@ -1531,13 +1688,18 @@ const applyHeroLevel = async (tokenId, heroId, targetLevel, currentLevel) => {
 
     if (nextOrderLevel && actualCurrentLevel >= nextOrderLevel) {
       try {
-        await tokenStore.sendMessageWithPromise(
+        const result = await tokenStore.sendMessageWithPromise(
           tokenId,
           "hero_heroupgradeorder",
           {
             heroId,
           },
         );
+        if (result?.role?.heroes?.[heroId]?.order !== undefined) {
+          actualCurrentOrder = result.role.heroes[heroId].order;
+        } else {
+          actualCurrentOrder++;
+        }
       } catch (err) {}
       await delay(COMMAND_DELAY);
     }
@@ -1770,6 +1932,7 @@ const applyLineup = async (lineup) => {
 
         const heroData = currentHeroesData[String(targetHero.heroId)];
         const currentLevel = heroData?.level || 1;
+        const currentOrder = heroData?.order || 0;
 
         if (currentLevel !== targetHero.level) {
           const result = await applyHeroLevel(
@@ -1777,6 +1940,8 @@ const applyLineup = async (lineup) => {
             targetHero.heroId,
             targetHero.level,
             currentLevel,
+            currentOrder,
+            targetHero.position,
           );
 
           if (result.success) {
@@ -1797,11 +1962,12 @@ const applyLineup = async (lineup) => {
       message.success(`阵容 "${lineup.name}" 已应用`);
     }
 
-    const hasFishData = lineup.heroes.some((h) => h.pearlId);
+    const hasFishData = lineup.heroes.some((h) => h.pearlId || h.fishId);
     if (hasFishData) {
       const fishData = await fetchLatestData();
       const currentHeroes = fishData.heroes;
       const pearlMap = fishData.pearlMap || {};
+      const artifactBooks = fishData.artifactBooks || {};
 
       const artifactToHero = {};
       for (const [heroId, hero] of Object.entries(currentHeroes)) {
@@ -1810,19 +1976,40 @@ const applyLineup = async (lineup) => {
         }
       }
 
+      const fishToArtifact = {};
+      for (const [fishId, book] of Object.entries(artifactBooks)) {
+        if (book.artifactId && book.artifactId !== -1) {
+          fishToArtifact[Number(fishId)] = book.artifactId;
+        }
+      }
+
       let fishApplied = 0;
       for (const targetHero of targetHeroes) {
-        if (!targetHero.pearlId) continue;
+        if (!targetHero.fishId && !targetHero.pearlId) continue;
 
-        const pearlData = pearlMap[targetHero.pearlId];
-        if (!pearlData) continue;
+        let artifactId = null;
+        let pearlId = targetHero.pearlId || 0;
 
-        const artifactId = pearlData.artifactId;
-        if (!artifactId || artifactId === -1) continue;
+        if (targetHero.fishId) {
+          artifactId = fishToArtifact[targetHero.fishId];
+        }
+
+        if (!artifactId && targetHero.pearlId) {
+          const pearlData = pearlMap[targetHero.pearlId];
+          if (pearlData?.artifactId && pearlData.artifactId !== -1) {
+            artifactId = pearlData.artifactId;
+          }
+        }
+
+        if (!artifactId) continue;
 
         const currentHolderId = artifactToHero[artifactId];
 
-        if (currentHolderId && currentHolderId !== targetHero.heroId) {
+        if (currentHolderId === targetHero.heroId) {
+          continue;
+        }
+
+        if (currentHolderId) {
           try {
             await tokenStore.sendMessageWithPromise(
               tokenId,
@@ -1839,7 +2026,7 @@ const applyLineup = async (lineup) => {
           await tokenStore.sendMessageWithPromise(tokenId, "artifact_load", {
             heroId: targetHero.heroId,
             itemId: artifactId,
-            pearlId: targetHero.pearlId,
+            pearlId: pearlId,
           });
           fishApplied++;
         } catch (err) {}
@@ -1854,84 +2041,74 @@ const applyLineup = async (lineup) => {
       const skillData = await fetchLatestData();
       const latestPearlMap = skillData.pearlMap || {};
 
-      const heroesNeedSkillChange = targetHeroes.filter((targetHero) => {
-        if (!targetHero.pearlId) return false;
-        const currentPearlData = latestPearlMap[targetHero.pearlId];
-        const currentSkillId = currentPearlData?.skillId || null;
-        const targetSkillId = targetHero.skillId || null;
-        return currentSkillId !== targetSkillId;
-      });
-
       const processedPearlIds = new Set();
+      const pearlIdsToHandle = targetHeroes
+        .filter((h) => h.pearlId)
+        .map((h) => h.pearlId);
 
-      for (const targetHero of heroesNeedSkillChange) {
-        if (processedPearlIds.has(targetHero.pearlId)) continue;
+      for (const pearlId of pearlIdsToHandle) {
+        if (processedPearlIds.has(pearlId)) continue;
 
-        const currentPearlData = latestPearlMap[targetHero.pearlId];
+        const targetHero = targetHeroes.find((h) => h.pearlId === pearlId);
+        const currentPearlData = latestPearlMap[pearlId];
         const currentSkillId = currentPearlData?.skillId || null;
-        const targetSkillId = targetHero.skillId || null;
+        const targetSkillId = targetHero?.skillId || null;
 
-        if (!targetSkillId && currentSkillId) {
-          try {
-            await tokenStore.sendMessageWithPromise(
-              tokenId,
-              "pearl_unloadskill",
-              {
-                pearlId: targetHero.pearlId,
-              },
-            );
-            skillApplied++;
-            processedPearlIds.add(targetHero.pearlId);
-          } catch (err) {}
-          await delay(COMMAND_DELAY);
-          continue;
-        }
-
-        if (targetSkillId && currentSkillId) {
-          const exchangeTarget = heroesNeedSkillChange.find((h) => {
-            if (h.pearlId === targetHero.pearlId) return false;
-            if (!h.skillId) return false;
-            const hPearlData = latestPearlMap[h.pearlId];
-            const hCurrentSkillId = hPearlData?.skillId || null;
-            return (
-              hCurrentSkillId === targetSkillId && h.skillId === currentSkillId
-            );
-          });
-
-          if (
-            exchangeTarget &&
-            !processedPearlIds.has(exchangeTarget.pearlId)
-          ) {
+        if (!targetSkillId) {
+          if (currentSkillId) {
             try {
               await tokenStore.sendMessageWithPromise(
                 tokenId,
-                "pearl_exchangeskill",
+                "pearl_unloadskill",
                 {
-                  pearlId1: targetHero.pearlId,
-                  pearlId2: exchangeTarget.pearlId,
+                  pearlId: pearlId,
                 },
               );
-              skillApplied += 2;
-              processedPearlIds.add(targetHero.pearlId);
-              processedPearlIds.add(exchangeTarget.pearlId);
+              skillApplied++;
+              processedPearlIds.add(pearlId);
             } catch (err) {}
             await delay(COMMAND_DELAY);
-            continue;
           }
+          continue;
         }
 
-        if (targetSkillId && !processedPearlIds.has(targetHero.pearlId)) {
+        if (currentSkillId === targetSkillId) {
+          continue;
+        }
+
+        const holderPearlId = Object.keys(latestPearlMap).find((pid) => {
+          if (Number(pid) === pearlId) return false;
+          const data = latestPearlMap[pid];
+          return data?.skillId === targetSkillId;
+        });
+
+        if (holderPearlId && !processedPearlIds.has(Number(holderPearlId))) {
+          try {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "pearl_exchangeskill",
+              {
+                pearlId1: pearlId,
+                pearlId2: Number(holderPearlId),
+              },
+            );
+            skillApplied += 2;
+            processedPearlIds.add(pearlId);
+            processedPearlIds.add(Number(holderPearlId));
+          } catch (err) {}
+          await delay(COMMAND_DELAY);
+        } else {
           try {
             await tokenStore.sendMessageWithPromise(
               tokenId,
               "pearl_replaceskill",
               {
-                pearlId: targetHero.pearlId,
-                skillId: targetHero.skillId,
+                pearlId: pearlId,
+                skillId: targetSkillId,
               },
             );
             skillApplied++;
-            processedPearlIds.add(targetHero.pearlId);
+            processedPearlIds.add(pearlId);
           } catch (err) {}
           await delay(COMMAND_DELAY);
         }
@@ -2370,10 +2547,11 @@ onMounted(() => {
 
 .hero-actions {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-xs);
   margin-left: auto;
-  min-width: 100px;
-  justify-content: flex-end;
+  min-width: 60px;
+  justify-content: center;
 }
 
 .hero-position {
@@ -2413,12 +2591,61 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.hero-avatar-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.hero-name-small-inline {
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-level-small-inline {
+  font-size: 10px;
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 2px 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(240, 147, 251, 0.3);
+}
+
 .hero-info {
   display: flex;
   flex-direction: column;
   gap: 2px;
   cursor: pointer;
   flex: 1;
+}
+
+.hero-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .hero-name {
@@ -2430,37 +2657,96 @@ onMounted(() => {
 .hero-level {
   font-size: var(--font-size-xs);
   color: var(--text-accent);
-  margin-top: 2px;
+  font-weight: 500;
 }
 
 .hero-fish {
   font-size: var(--font-size-xs);
   color: var(--primary-color);
-  background: rgba(var(--primary-color-rgb), 0.1);
-  padding: 1px 4px;
-  border-radius: var(--border-radius-small);
+  background: linear-gradient(
+    135deg,
+    rgba(114, 46, 209, 0.15) 0%,
+    rgba(114, 46, 209, 0.08) 100%
+  );
+  border: 1px solid rgba(114, 46, 209, 0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
   align-self: flex-start;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.hero-stats {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .stat-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  span {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 90px;
+    text-align: center;
+  }
+
+  .stat-power {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+    color: white;
+    font-size: 12px;
+  }
+
+  .stat-attack {
+    background: linear-gradient(135deg, #ffa940 0%, #fa8c16 100%);
+    color: white;
+  }
+
+  .stat-hp {
+    background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+    color: white;
+  }
+
+  .stat-speed {
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    color: white;
+  }
 }
 
 .hero-fish-skill-inline {
-  color: var(--success-color);
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  color: white;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
 }
 
 .hero-fish-slots-inline {
   display: inline-flex;
-  gap: 2px;
-  margin-left: 2px;
+  gap: 3px;
+  margin-left: 4px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(114, 46, 209, 0.2);
 }
 
 .slot-dot-small {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   display: inline-block;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 .hero-artifact {
@@ -2469,10 +2755,12 @@ onMounted(() => {
 
 .exchange-btn {
   flex-shrink: 0;
+  width: 100%;
 }
 
 .remove-btn {
   flex-shrink: 0;
+  width: 100%;
 }
 
 .saved-lineups-section {
@@ -2539,20 +2827,23 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 60px;
+  min-width: 110px;
+  padding: 8px 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--border-radius-small);
 }
 
 .hero-avatar {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--border-radius-small);
   object-fit: cover;
   border: 2px solid var(--border-color);
 }
 
 .hero-avatar-placeholder {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   border-radius: var(--border-radius-small);
   background: var(--bg-tertiary);
   display: flex;
@@ -2564,44 +2855,136 @@ onMounted(() => {
   border: 2px solid var(--border-color);
 }
 
+.hero-info-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.hero-header-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
 .hero-name-small {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  margin-top: 2px;
-  max-width: 60px;
+  font-size: 13px;
+  color: var(--text-primary);
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 600;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-level-small {
-  font-size: var(--font-size-xs);
-  color: var(--text-accent);
-  margin-top: 2px;
+  font-size: 12px;
+  color: white;
+  font-weight: 600;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  padding: 2px 6px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(240, 147, 251, 0.3);
 }
 
 .hero-fish-info {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 4px;
+  margin-bottom: 4px;
   gap: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(114, 46, 209, 0.12) 0%,
+    rgba(114, 46, 209, 0.06) 100%
+  );
+  border: 1px solid rgba(114, 46, 209, 0.18);
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: 100%;
+}
+
+.hero-fish-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.hero-stats-small {
+  font-size: 10px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+
+  .stat-row-small {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  span {
+    padding: 3px 5px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 70px;
+    text-align: center;
+  }
+
+  .stat-power {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+    color: white;
+  }
+
+  .stat-attack {
+    background: linear-gradient(135deg, #ffa940 0%, #fa8c16 100%);
+    color: white;
+  }
+
+  .stat-hp {
+    background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+    color: white;
+  }
+
+  .stat-speed {
+    background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+    color: white;
+  }
 }
 
 .hero-fish-name {
-  font-size: var(--font-size-xs);
-  color: var(--success-color);
+  font-size: 11px;
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
 .hero-fish-skill-name {
-  font-size: var(--font-size-xs);
-  color: var(--primary-color);
+  font-size: 10px;
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  font-weight: 500;
 }
 
 .hero-fish-slots {
   display: flex;
-  gap: 2px;
+  gap: 4px;
   justify-content: center;
+  padding-top: 3px;
 }
 
 .lineup-actions {
@@ -2623,8 +3006,8 @@ onMounted(() => {
 }
 
 .refine-modal-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-md);
 }
 
@@ -3057,10 +3440,11 @@ onMounted(() => {
 }
 
 .slot-dot {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   display: inline-block;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
 .tech-modal-content {

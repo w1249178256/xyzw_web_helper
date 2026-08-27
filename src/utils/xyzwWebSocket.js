@@ -324,6 +324,9 @@ export function registerDefaultCommands(reg) {
     .register("collection_claimfreereward")
     .register("collection_goodslist")
 
+    // 扭蛋相关
+    .register("gacha_drawreward", { num: 1, isGroup: false })
+    
     // 车辆相关
     .register("car_getrolecar")
     .register("car_refresh", { carId: 0 })
@@ -381,7 +384,14 @@ export function registerDefaultCommands(reg) {
     .register("towers_fight")
 
     //发送游戏内消息
-    .register("system_sendchatmessage");
+    .register("system_sendchatmessage")
+
+    // 盐杯竞猜
+    .register("saltcup26_getbetinfo")
+    .register("saltcup26_placebet", { matchId: "", pick: 0 })
+
+    // 换皮闯关领奖
+    .register("activity_startactegame", { actId: 0 });
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1090,8 +1100,6 @@ export class XyzwWebSocketClient {
       league_getgroupopponentresp: "league_getgroupopponent",
       legion_signupresp: "legion_signup",
       legion_payloadsignupresp: "legion_payloadsignup",
-      legion_researchresp: "legion_research",
-      legion_resetresearchresp: "legion_resetresearch",
       pearl_replaceskillresp: "pearl_replaceskill",
       pearl_exchangeskillresp: "pearl_exchangeskill",
       pearl_unloadskillresp: "pearl_unloadskill",
@@ -1103,7 +1111,6 @@ export class XyzwWebSocketClient {
       discount_getdiscountinforesp: "discount_getdiscountinfo",
       // 升星相关响应映射
       hero_heroupgradestarresp: "hero_heroupgradestar",
-      hero_rebirthresp: "hero_rebirth",
       hero_heroupgradelevelresp: "hero_heroupgradelevel",
       hero_heroupgradeorderresp: "hero_heroupgradeorder",
       book_upgraderesp: "book_upgrade",
@@ -1129,6 +1136,10 @@ export class XyzwWebSocketClient {
       legacy_claimhangupresp: "legacy_claimhangup",
       legacy_sendgiftresp: "legacy_sendgift",
       legacy_getgiftsresp: "legacy_getgifts",
+      // 盐杯竞猜响应映射
+      saltcup26_getbetinforesp: "saltcup26_getbetinfo",
+      saltcup26_placebetresp: "saltcup26_placebet",
+      activity_takeegamerewardresp: "activity_startactegame",
       // 换皮闯关相关响应映射
       towers_getinforesp: "towers_getinfo",
       towers_startresp: "towers_start",
@@ -1138,6 +1149,8 @@ export class XyzwWebSocketClient {
       task_claimweekrewardresp: "task_claimweekreward",
 
       // 同步响应映射（优先级低）
+
+      legion_researchresp: ["legion_research", "legion_resetresearch"],
       syncresp: [
         "system_mysharecallback",
         "task_claimdailypoint",
@@ -1157,6 +1170,7 @@ export class XyzwWebSocketClient {
         "dungeon_selecthero",
         "artifact_exchange",
         "hero_exchange",
+        "hero_rebirth",
       ],
     };
 
