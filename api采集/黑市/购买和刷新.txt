@@ -1,0 +1,502 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/4/18 08:32:07
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 7
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/4/18 08:32:05
+服务: StoreService
+方法: buy
+参数: [{"goodsId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 53,
+    "ack": 0,
+    "time": 1776472326161,
+    "resp": 47,
+    "cmd": "store_buyresp",
+    "body": {
+      "role": {
+        "diamond": 380,
+        "freeDiamond": 380,
+        "dailyTask": {
+          "complete": {
+            "12": 4
+          }
+        },
+        "items": {
+          "2002": {
+            "quantity": 52
+          }
+        },
+        "achievement": {
+          "12": {
+            "completeValue": 4
+          }
+        },
+        "statistics": {
+          "wa:diamond": 1400
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "goodsList": {
+        "1": {
+          "buy_quantity": 1,
+          "discount": 0.5
+        },
+        "2": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "3": {
+          "buy_quantity": 1,
+          "discount": 0.800000011920929
+        },
+        "4": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "5": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "6": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "7": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "8": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "9": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "10": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "11": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "12": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "13": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "14": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "15": {
+          "buy_quantity": 0,
+          "discount": 0.6000000238418579
+        },
+        "16": {
+          "buy_quantity": 0,
+          "discount": 1
+        }
+      },
+      "refresh": 1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1776472325203_l5gugry85
+
+
+
+记录 #4:
+----------------------------------------
+时间: 2026/4/18 08:31:57
+服务: StoreService
+方法: refresh
+参数: [{"storeId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 47,
+    "ack": 0,
+    "time": 1776472318776,
+    "resp": 44,
+    "cmd": "store_refreshresp",
+    "body": {
+      "goodsList": {
+        "1": {
+          "buy_quantity": 0,
+          "discount": 0.5
+        },
+        "2": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "3": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "4": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "5": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "6": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "7": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "8": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "9": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "10": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "11": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "12": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "13": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "14": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "15": {
+          "buy_quantity": 0,
+          "discount": 0.6000000238418579
+        },
+        "16": {
+          "buy_quantity": 0,
+          "discount": 1
+        }
+      },
+      "refresh": 1
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1776472317822_7kzqj5bll
+
+记录 #5:
+----------------------------------------
+时间: 2026/4/18 08:31:39
+服务: StoreService
+方法: buy
+参数: [{"goodsId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 46,
+    "ack": 43,
+    "time": 1776472300511,
+    "resp": 43,
+    "cmd": "store_buyresp",
+    "body": {
+      "role": {
+        "diamond": 1080,
+        "buyDiamond": 388,
+        "dailyTask": {
+          "complete": {
+            "12": 2
+          }
+        },
+        "items": {
+          "2002": {
+            "quantity": 50
+          }
+        },
+        "achievement": {
+          "12": {
+            "completeValue": 2
+          }
+        },
+        "statistics": {
+          "wa:diamond": 700
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "goodsList": {
+        "1": {
+          "buy_quantity": 1,
+          "discount": 0.5
+        },
+        "2": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "3": {
+          "buy_quantity": 1,
+          "discount": 0.800000011920929
+        },
+        "4": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "5": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "6": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "7": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "8": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "9": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "10": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "11": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "12": {
+          "buy_quantity": 0,
+          "discount": 0.5
+        },
+        "13": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "14": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "15": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "16": {
+          "buy_quantity": 0,
+          "discount": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 46
+}
+异步: 是
+调用ID: call_1776472299550_vzv12cqvc
+
+记录 #6:
+----------------------------------------
+时间: 2026/4/18 08:31:37
+服务: StoreService
+方法: buy
+参数: [{"goodsId":3}]
+结果:
+{
+  "_raw": {
+    "seq": 44,
+    "ack": 0,
+    "time": 1776472298587,
+    "resp": 42,
+    "cmd": "store_buyresp",
+    "body": {
+      "role": {
+        "diamond": 1280,
+        "buyDiamond": 588,
+        "dailyTask": {
+          "complete": {
+            "12": 1
+          }
+        },
+        "items": {
+          "2004": {
+            "itemId": 2004,
+            "quantity": 1,
+            "ext": null
+          }
+        },
+        "achievement": {
+          "12": {
+            "completeValue": 1
+          }
+        },
+        "statistics": {
+          "wa:diamond": 500
+        },
+        "statisticsTime": {
+          "wa:diamond": 1776398400
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "goodsList": {
+        "1": {
+          "buy_quantity": 0,
+          "discount": 0.5
+        },
+        "2": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "3": {
+          "buy_quantity": 1,
+          "discount": 0.800000011920929
+        },
+        "4": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "5": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "6": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "7": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "8": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "9": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "10": {
+          "buy_quantity": 0,
+          "discount": 0.699999988079071
+        },
+        "11": {
+          "buy_quantity": 0,
+          "discount": 0.800000011920929
+        },
+        "12": {
+          "buy_quantity": 0,
+          "discount": 0.5
+        },
+        "13": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "14": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "15": {
+          "buy_quantity": 0,
+          "discount": 1
+        },
+        "16": {
+          "buy_quantity": 0,
+          "discount": 1
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 45
+}
+异步: 是
+调用ID: call_1776472297632_p5dlqisw4
+
+记录 #7:
+----------------------------------------
+时间: 2026/4/18 08:31:33
+服务: StoreService
+方法: getPurchase
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 0,
+    "time": 1776472294855,
+    "resp": 41,
+    "cmd": "store_getpurchaseresp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1776472293906_dgdrghrfj
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

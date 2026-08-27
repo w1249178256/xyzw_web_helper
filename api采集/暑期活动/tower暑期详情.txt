@@ -1,0 +1,164 @@
+
+----------------------------------------
+时间: 2026/7/13 18:57:36
+服务: TowersService
+方法: getInfo
+参数: [{"actId":2607101}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 0,
+    "time": 1783940257485,
+    "resp": 47,
+    "cmd": "towers_getinforesp",
+    "body": {
+      "towerData": {
+        "actId": 2607101,
+        "season": 43,
+        "useTickCnt": 21,
+        "todayUseTickCnt": 0,
+        "towerData": {
+          "1": {
+            "towerType": 1,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "2": {
+            "towerType": 2,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "3": {
+            "towerType": 3,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "4": {
+            "towerType": 4,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "5": {
+            "towerType": 5,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "6": {
+            "towerType": 6,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          }
+        },
+        "levelRewardMap": {
+          "1001": true,
+          "1002": true,
+          "1003": true,
+          "1004": true,
+          "1005": true,
+          "1006": true,
+          "2001": true,
+          "2002": true,
+          "2003": true,
+          "2004": true,
+          "2005": true,
+          "2006": true,
+          "3001": true,
+          "3002": true,
+          "3003": true,
+          "3004": true,
+          "3005": true
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 35
+}
+异步: 是
+调用ID: call_1783940256699_v46878qfz
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

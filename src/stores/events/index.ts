@@ -15,7 +15,15 @@ import { TowerPlugin } from './tower.ts';
 export const $emit = new EventEmitter();
 export const events: Set<string> = new Set<string>();
 $emit.on('$any', (cmd: string, data: XyzwSession) => {
-  gameLogger.warn(`收到未处理事件: ${cmd} TokenID: ${data.tokenId}`, data);
+  // 忽略已知的响应事件，不显示警告
+  const ignoredEvents = [
+    'arena_getareatargetresp',
+    'fight_startlevelresp',
+    'fight_startareaarenaresp',
+  ];
+  if (!ignoredEvents.includes(cmd)) {
+    gameLogger.warn(`收到未处理事件: ${cmd} TokenID: ${data.tokenId}`, data);
+  }
 });
 
 export const onSome = (event: string[], listener: (...args: any[]) => void) => {

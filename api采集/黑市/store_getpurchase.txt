@@ -1,0 +1,50 @@
+{
+  "_raw": {
+    "seq": 3,
+    "ack": 2,
+    "time": 1769433101817,
+    "resp": 3,
+    "cmd": "store_getpurchaseresp",
+    "body": {
+      "purchaseCnt": 2,
+      "purchaseItemList": [
+        {
+          "itemId": 2004,
+          "discount": 8
+        },
+        {
+          "itemId": 1001,
+          "discount": 7
+        },
+        {
+          "itemId": 1022,
+          "discount": 6
+        },
+        {
+          "itemId": 2003,
+          "discount": 5
+        },
+        {
+          "itemId": 1023,
+          "discount": 6
+        },
+        {
+          "itemId": 2002,
+          "discount": 4
+        },
+        {
+          "itemId": 1011,
+          "discount": 1
+        },
+        {
+          "itemId": 1012,
+          "discount": 7
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

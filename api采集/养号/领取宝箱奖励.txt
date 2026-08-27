@@ -1,0 +1,1039 @@
+时间: 2026/2/28 11:56:17
+服务: ItemService
+方法: batchClaimBoxPointReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 176,
+    "ack": 0,
+    "time": 1772250977754,
+    "resp": 108,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "boxPoint": 28,
+        "boxPointLastReward": 8,
+        "items": {
+          "2002": {
+            "quantity": 1096
+          },
+          "2003": {
+            "itemId": 2003,
+            "quantity": 37,
+            "ext": null
+          },
+          "2004": {
+            "quantity": 383
+          },
+          "2005": {
+            "quantity": 35
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2005,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2002,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2003,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 2004,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+异步: 是
+调用ID: call_1772250977006_e6cysrmrk
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

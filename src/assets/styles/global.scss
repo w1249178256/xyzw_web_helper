@@ -79,21 +79,21 @@ img {
 
 // 滚动条样式
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 20px;
+  height: 20px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
+  background: rgba(59, 130, 246, 0.7);
+  border-radius: 10px;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(37, 99, 235, 0.9);
   }
 }
 

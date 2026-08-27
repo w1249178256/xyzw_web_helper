@@ -1,6 +1,5 @@
 import {
   defineConfig,
-  presetAttributify,
   presetIcons,
   presetWind,
 } from "unocss";
@@ -36,13 +35,21 @@ export default defineConfig({
         "src/**.icon.json",
         "src/frames/menus.json",
       ],
+      exclude: [
+        "node_modules",
+        "dist",
+        ".git",
+        "**/*.log",
+        "**/test/**",
+        "**/tests/**",
+      ],
     },
   },
   presets: [
     presetWind(),
-    presetAttributify({
-      /* preset options */
-    }),
+    // presetAttributify({
+    //   /* preset options */
+    // }),
     presetIcons({
       scale: 1.25,
       autoInstall: false,

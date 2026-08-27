@@ -1,0 +1,508 @@
+[ConnectionPool] 释放连接: 067e1e4ec067354e156b0595bd04498b, 断开: false
+connectionPoolManager.js:156 [ConnectionPool] 连接已释放  (队列: 0/5)
+connectionPoolManager.js:35 [ConnectionPool] 请求获取连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+connectionPoolManager.js:55 [ConnectionPool] 正在连接... (队列: 1/5)
+logger.js:82 [18:15:04] [WS] [INFO] 开始创建连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:04] [WS] [DEBUG] 🔐 获取连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (connect)
+logger.js:88 [18:15:04] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [18:15:04] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [18:15:04] [WS] [VERBOSE] WebSocket客户端创建成功: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:94 [18:15:04] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:04] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:82 [18:15:04] [WS] [INFO] 连接成功
+logger.js:82 [18:15:04] [WS] [INFO] 🔗 WebSocket连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:04] [WS] [DEBUG] 🔓 释放连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (connect)
+logger.js:88 [18:15:04] [WS] [DEBUG] 📨 [320d55ccd3ebb42ca2cddc062f46ca3e] _sys/fatal
+logger.js:76 [18:15:04] [GAME] [WARN] 消息处理跳过 [320d55ccd3ebb42ca2cddc062f46ca3e]: token expired
+warn @ logger.js:76
+tokenStore.ts:343 Proxy(Object)
+useIndexedDB.ts:147 ✅ ArrayBuffer 读取成功，键: 320d55ccd3ebb42ca2cddc062f46ca3e, 大小: 1132 字节
+tokenStore.ts:399 读取到的ArrayBuffer: 320d55ccd3ebb42ca2cddc062f46ca3e ArrayBuffer(1132)
+tokenStore.ts:409 Proxy(Object)
+logger.js:82 [18:15:04] [WS] [INFO] Token刷新成功，自动重新连接 [320d55ccd3ebb42ca2cddc062f46ca3e]
+logger.js:82 [18:15:04] [WS] [INFO] 当前页面不自动重连: /admin/fish-helper
+logger.js:82 [18:15:05] [WS] [INFO] WebSocket 连接关闭: 1006 
+logger.js:88 [18:15:05] [WS] [DEBUG] 关闭详情: Object
+logger.js:82 [18:15:05] [WS] [INFO] 🔌 WebSocket断开: 320d55ccd3ebb42ca2cddc062f46ca3e - 异常断开
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+2logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+2logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:05] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:05] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:06] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:06] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+3logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+4logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+6logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:08] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:08] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:09] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:09] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:09] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:09] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:09] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:09] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:09] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:09] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:09] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:09] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:10] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:10] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:11] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:11] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:12] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:12] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:13] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:13] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:14] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:14] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:14] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:14] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:14] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:14] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:14] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:14] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:14] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:14] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:15] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:15] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:16] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:16] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:88 [18:15:17] [WS] [DEBUG] 清理过期跨标签页状态: 4b20cfa2ff37726803e17c15b8071dee
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:17] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:17] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:18] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:18] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:19] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:19] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:19] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:19] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:19] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:19] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:19] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:19] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:19] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:19] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:20] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:20] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:21] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:21] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:22] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:22] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:23] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:23] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:24] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:24] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:24] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:24] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:24] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:24] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:24] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:24] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:24] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:24] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:25] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:25] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:26] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:26] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:27] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:27] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:28] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:28] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:29] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:29] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:29] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:29] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:29] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:29] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:29] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:29] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:29] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:29] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:30] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:30] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:31] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:31] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:32] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:32] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:33] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:33] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:34] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:34] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:34] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:34] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:34] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:34] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:34] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:34] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:34] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:34] [WS] [DEBUG] 📤 [local] heart_beat
+connectionPoolManager.js:65 [ConnectionPool] 连接超时，尝试重连: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:34] [WS] [DEBUG] 🔐 获取连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (disconnect)
+logger.js:88 [18:15:34] [WS] [DEBUG] 开始优雅关闭连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:82 [18:15:34] [WS] [INFO] 连接已优雅关闭: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:34] [WS] [DEBUG] 🔓 释放连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (disconnect)
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+connectionPoolManager.js:70 [ConnectionPool] 正在重连: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:82 [18:15:35] [WS] [INFO] 开始创建连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:35] [WS] [DEBUG] 🔐 获取连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (connect)
+logger.js:88 [18:15:35] [WS] [DEBUG] Token: {"roleToke...":0}
+logger.js:82 [18:15:35] [WS] [INFO] 连接: wss://xxz-xyzw.hortorgames.com/agent
+logger.js:94 [18:15:35] [WS] [VERBOSE] WebSocket客户端创建成功: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:94 [18:15:35] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:35] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:36] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:36] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:82 [18:15:36] [WS] [INFO] 连接成功
+logger.js:82 [18:15:36] [WS] [INFO] 🔗 WebSocket连接: 320d55ccd3ebb42ca2cddc062f46ca3e
+logger.js:88 [18:15:36] [WS] [DEBUG] 🔓 释放连接锁: 320d55ccd3ebb42ca2cddc062f46ca3e (connect)
+logger.js:94 [18:15:36] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:36] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:94 [18:15:36] [WS] [VERBOSE] 发送心跳消息
+logger.js:88 [18:15:36] [WS] [DEBUG] 📤 [local] heart_beat
+logger.js:82 [18:15:36] [WS] [INFO] 📤 发送报文 

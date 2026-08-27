@@ -1,0 +1,163 @@
+时间: 2026/1/26 20:04:24
+服务: NightMareService
+方法: clickTurntable
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 52,
+    "ack": 50,
+    "time": 1769429016822,
+    "resp": 51,
+    "cmd": "nightmare_clickturntableresp",
+    "body": {
+      "role": {
+        "items": {
+          "1022": {
+            "quantity": 496985
+          }
+        },
+        "statistics": {
+          "nm:t:week:cnt": 6,
+          "nm:book:red:dot": 1769429016,
+          "nm:t:red:dot": null
+        },
+        "statisticsTime": {
+          "nm:t:week:cnt": 1769429016
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 1000,
+          "ext": 0
+        }
+      ],
+      "confIdList": [
+        5
+      ],
+      "weekAward": {
+        "maxLevel": 0,
+        "levelReward": {},
+        "turntableReward": {
+          "1": [
+            {
+              "type": 3,
+              "itemId": 1023,
+              "value": 10,
+              "ext": 0
+            }
+          ],
+          "2": [
+            {
+              "type": 3,
+              "itemId": 1022,
+              "value": 5000,
+              "ext": 0
+            }
+          ],
+          "3": [
+            {
+              "type": 3,
+              "itemId": 1022,
+              "value": 2000,
+              "ext": 0
+            }
+          ],
+          "4": [
+            {
+              "type": 3,
+              "itemId": 1023,
+              "value": 50,
+              "ext": 0
+            }
+          ],
+          "5": [
+            {
+              "type": 3,
+              "itemId": 1022,
+              "value": 5000,
+              "ext": 0
+            }
+          ],
+          "6": [
+            {
+              "type": 3,
+              "itemId": 1022,
+              "value": 1000,
+              "ext": 0
+            }
+          ]
+        },
+        "turntableCnt": 0,
+        "turntableLeftCnt": 0
+      },
+      "nightMare": {
+        "weekAward": {
+          "20260126": {
+            "maxLevel": 0,
+            "levelReward": {},
+            "turntableReward": {
+              "1": [
+                {
+                  "type": 3,
+                  "itemId": 1023,
+                  "value": 10,
+                  "ext": 0
+                }
+              ],
+              "2": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 5000,
+                  "ext": 0
+                }
+              ],
+              "3": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 2000,
+                  "ext": 0
+                }
+              ],
+              "4": [
+                {
+                  "type": 3,
+                  "itemId": 1023,
+                  "value": 50,
+                  "ext": 0
+                }
+              ],
+              "5": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 5000,
+                  "ext": 0
+                }
+              ],
+              "6": [
+                {
+                  "type": 3,
+                  "itemId": 1022,
+                  "value": 1000,
+                  "ext": 0
+                }
+              ]
+            },
+            "turntableCnt": 0,
+            "turntableLeftCnt": 0
+          }
+        },
+        "bookScore": 48,
+        "bookRewardConfId": 2
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}

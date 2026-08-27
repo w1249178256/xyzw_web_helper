@@ -1,0 +1,9 @@
+{
+  "ack": 0,
+  "body": {
+    "upgradeNum": 10
+  },
+  "cmd": "system_hangupupgrade",
+  "seq": 6,
+  "time": 1772866597217
+}

@@ -1,0 +1,295 @@
+时间: 2026/2/2 21:14:50
+服务: LegacyService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 43,
+    "ack": 0,
+    "time": 1770038090914,
+    "resp": 41,
+    "cmd": "legacy_getinforesp",
+    "body": {
+      "roleLegacy": {
+        "scheduleId": 1,
+        "exp": 0,
+        "createLevelId": 1,
+        "createLevelEndTime": 0,
+        "createLevelSubTime": 0,
+        "produceLevelId": 5,
+        "produceItemCnt": 7979,
+        "hangUpBeginTime": 1770028939027,
+        "legacyStorage": {
+          "112181075-7393-paw": {
+            "uId": "112181075-7393-paw",
+            "legacyId": 2,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              500000,
+              10000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": true,
+            "fS": false
+          },
+          "112181075-8488-Jdn": {
+            "uId": "112181075-8488-Jdn",
+            "legacyId": 402,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              7400000,
+              122000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "112181075-7665-fPa": {
+            "uId": "112181075-7665-fPa",
+            "legacyId": 201,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              1700000,
+              22000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "112181075-7578-IrT": {
+            "uId": "112181075-7578-IrT",
+            "legacyId": 102,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              900000,
+              16000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "112181075-7785-ajc": {
+            "uId": "112181075-7785-ajc",
+            "legacyId": 202,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              1800000,
+              22000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "112181075-9974-csY": {
+            "uId": "112181075-9974-csY",
+            "legacyId": 401,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              7300000,
+              106000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "112181075-5463-0fE": {
+            "uId": "112181075-5463-0fE",
+            "legacyId": 302,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              5000000,
+              88000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 1769619694822,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          }
+        },
+        "books": {
+          "1": {
+            "uId": "112181075-7824-Es5",
+            "legacyId": 1,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              500000,
+              10000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 0,
+            "isLocked": false,
+            "max": true,
+            "fS": false
+          },
+          "101": {
+            "uId": "112181075-7783-Uom",
+            "legacyId": 101,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              900000,
+              18000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 0,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "301": {
+            "uId": "112181075-3692-yfk",
+            "legacyId": 301,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              4800000,
+              88000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 0,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          },
+          "403": {
+            "uId": "112181075-9637-ljU",
+            "legacyId": 403,
+            "attrs": [
+              1,
+              3
+            ],
+            "attrNums": [
+              5600000,
+              148000000
+            ],
+            "extAttrs": null,
+            "extAttrNums": null,
+            "scheduleId": 1,
+            "cD": 0,
+            "isLocked": false,
+            "max": false,
+            "fS": false
+          }
+        },
+        "usedUId": "",
+        "sendGiftCnt": 2,
+        "sendGiftResetTime": 1769990808,
+        "receivedItemCnt": 0,
+        "receivedLegacyCnt": 11,
+        "sendItemCnt": 27979,
+        "sendLegacyCnt": 0,
+        "shopRecord": {},
+        "sendGoldLegacyCnt": 0,
+        "sendGoldLegacyResetTime": 1769990808,
+        "sendRedLegacyCnt": 0,
+        "sendRedLegacyResetTime": 1769990808,
+        "sendOeLegacyCnt": 0,
+        "sendOeLegacyResetTime": 1769990808,
+        "task": {
+          "1": 6000,
+          "2": 0,
+          "3": 0,
+          "4": 0
+        },
+        "taskClaim": {
+          "1": 5850
+        },
+        "taskResetTime": 1768640482,
+        "giftTask": {
+          "1": 3,
+          "2": 3,
+          "3": 3,
+          "4": 18,
+          "5": 18
+        },
+        "giftTaskClaim": {},
+        "bookHP": 13200000,
+        "bookAttack": 590000,
+        "bossMap": {
+          "1": {
+            "code": "0543811952e91515d8cba80cf45905fe",
+            "fighters": [],
+            "curHp": 814773788000,
+            "claimed": false,
+            "cD": 0
+          },
+          "4": {
+            "code": "1c67ddde8239012f28e240d6cc864b4f",
+            "fighters": [],
+            "curHp": 814773788000,
+            "claimed": false,
+            "cD": 0
+          }
+        },
+        "helpCnt": 0
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1770038090158_4rs5brji4

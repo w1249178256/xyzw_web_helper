@@ -1,0 +1,456 @@
+
+
+记录 #2:
+----------------------------------------
+时间: 2026/6/19 14:52:49
+服务: ActivityService
+方法: claimTaskReward
+参数: [{"activityId":2606191,"missionId":23}]
+结果:
+{
+  "_raw": {
+    "seq": 50,
+    "ack": 0,
+    "time": 1781851972794,
+    "resp": 46,
+    "cmd": "activity_rewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "5278": {
+            "quantity": 217
+          },
+          "5279": {
+            "quantity": 21
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5279,
+          "value": 4,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 8,
+          "ext": 0
+        }
+      ],
+      "activity": {
+        "commonActivityInfo": {
+          "2606191": {
+            "record": {
+              "1": 1781851816,
+              "21": 1781851556,
+              "22": 1781851871,
+              "23": 1781851972,
+              "61": 1781851832
+            },
+            "task": {
+              "1": 80,
+              "2": 6000,
+              "3": 20,
+              "4": 4,
+              "5": 8000
+            },
+            "isBought": false
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 78
+}
+异步: 是
+调用ID: call_1781851969898_r1a7dg7ou
+
+记录 #3:
+----------------------------------------
+时间: 2026/6/19 14:52:43
+服务: ItemService
+方法: openBox
+参数: [{"itemId":2004,"number":10}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 0,
+    "time": 1781851966677,
+    "resp": 45,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "boxPoint": 6364,
+        "items": {
+          "111": {
+            "quantity": 318
+          },
+          "118": {
+            "quantity": 48
+          },
+          "205": {
+            "quantity": 78
+          },
+          "206": {
+            "quantity": 85
+          },
+          "208": {
+            "quantity": 32
+          },
+          "219": {
+            "quantity": 40
+          },
+          "221": {
+            "quantity": 198
+          },
+          "301": {
+            "quantity": 414
+          },
+          "303": {
+            "quantity": 236
+          },
+          "306": {
+            "quantity": 323
+          },
+          "1003": {
+            "quantity": 289328
+          },
+          "2004": {
+            "quantity": 309
+          },
+          "5278": {
+            "quantity": 209
+          }
+        },
+        "achievement": {
+          "11": {
+            "completeValue": 29360
+          }
+        },
+        "statistics": {
+          "task:complete:32": 29360,
+          "task:complete:30": 4283
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 111,
+          "value": 8,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 206,
+          "value": 4,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 205,
+          "value": 4,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 118,
+          "value": 8,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 208,
+          "value": 4,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 306,
+          "value": 1,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 303,
+          "value": 1,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 301,
+          "value": 1,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 219,
+          "value": 4,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 40,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 20,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 221,
+          "value": 4,
+          "ext": 1
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 150,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 30,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 5278,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "openCDTime": 3
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1781851963821_l9gsh8aix
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -1,0 +1,60 @@
+﻿
+> const getHeroOrder = async (token, tokenIndex, heroId) => {
+    try {
+      const roleResult = await tokenStore.sendGetRoleInfo(token.id)
+      await waitCommandDelay()
+      
+      // 娉ㄦ剰锛氬瓧娈靛悕鏄痟eroes鑰屼笉鏄痟eros
+      if (roleResult && roleResult.role && roleResult.role.heroes) {
+        const hero = roleResult.role.heroes[String(heroId)] || roleResult.role.
+heroes[heroId]
+        if (hero) {
+          return hero.order || 0
+        }
+      } else if (roleResult && roleResult._raw && roleResult._raw.body && roleR
+esult._raw.body.role && roleResult._raw.body.role.heroes) {
+        const hero = roleResult._raw.body.role.heroes[String(heroId)] || roleRe
+sult._raw.body.role.heroes[heroId]
+        if (hero) {
+          return hero.order || 0
+        }
+      } else if (roleResult && roleResult.body && roleResult.body.role && roleR
+esult.body.role.heroes) {
+        const hero = roleResult.body.role.heroes[String(heroId)] || roleResult.
+body.role.heroes[heroId]
+        if (hero) {
+          return hero.order || 0
+        }
+      } else if (roleResult && roleResult.heroes) {
+        const hero = roleResult.heroes[String(heroId)] || roleResult.heroes[her
+oId]
+        if (hero) {
+          return hero.order || 0
+        }
+      }
+      
+      return 0
+    } catch (error) {
+      console.error(`鑾峰彇姝﹀皢闃舵暟澶辫触:`, error)
+      return 0
+    }
+  }
+  </script>
+  
+  <style scoped>
+  .account-maintenance {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .scheduled-tasks {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+
+

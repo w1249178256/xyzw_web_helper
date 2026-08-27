@@ -1,0 +1,31 @@
+时间: 2026/1/23 19:28:04
+服务: BossTowerService
+方法: boom
+参数: [{"num":1}]
+结果:
+{
+  "_raw": {
+    "seq": 112,
+    "ack": 99,
+    "time": 1769167637987,
+    "resp": 100,
+    "cmd": "bosstower_boomresp",
+    "body": {
+      "role": {
+        "statistics": {
+          "bt:g": 11,
+          "bt:boom": 0
+        },
+        "statisticsTime": {
+          "bt:g": 1769167637
+        }
+      },
+      "bossTower": {
+        "boxCurHp": 1999999884
+      },
+      "subHp": 750000029
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38

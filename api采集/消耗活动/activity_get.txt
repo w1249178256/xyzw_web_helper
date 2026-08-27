@@ -1,0 +1,2217 @@
+{
+  "_raw": {
+    "seq": 5,
+    "ack": 0,
+    "time": 1781852120359,
+    "resp": 5,
+    "cmd": "activity_getresp",
+    "body": {
+      "activity": {
+        "firstCharge": {
+          "packId": 1006
+        },
+        "activityShop": {
+          "1": {
+            "activityId": 1,
+            "record": {
+              "5": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "6": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "64": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "65": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "66": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "67": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "68": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "69": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "101": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "8": {
+            "activityId": 8,
+            "record": {
+              "8101": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8102": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8103": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8104": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8105": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8106": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8107": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8108": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8109": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8110": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8111": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8112": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8113": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8114": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8115": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8201": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8202": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8203": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8204": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8205": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8206": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8207": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8208": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8209": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8210": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8211": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8212": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8213": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8214": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8215": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8216": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8217": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8218": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8219": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8220": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8221": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8301": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8302": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8303": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8304": {
+                "buyQuantity": 2,
+                "lastBuyTime": 0
+              },
+              "8305": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8999": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "10": {
+            "activityId": 10,
+            "record": {}
+          },
+          "11": {
+            "activityId": 11,
+            "record": {}
+          },
+          "12": {
+            "activityId": 12,
+            "record": {}
+          },
+          "13": {
+            "activityId": 13,
+            "record": {
+              "1301": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1302": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1303": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1304": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1305": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1306": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1307": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1308": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1309": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1310": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1311": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1312": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1313": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1314": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1315": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1316": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1317": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1318": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1319": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1320": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1321": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1322": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1323": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1324": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1325": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1326": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1327": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1328": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1329": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1330": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1331": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1332": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1333": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1334": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1335": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1336": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1337": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1338": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1339": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1340": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1341": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1342": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1343": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1344": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1345": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1346": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1347": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1348": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1349": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1350": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1351": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1352": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1353": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1354": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1355": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1356": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1357": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1358": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1359": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1360": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1361": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1362": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1363": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1364": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1365": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1366": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1367": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1368": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1369": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1370": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1371": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1372": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1373": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1374": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1375": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1376": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1377": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1378": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1379": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1380": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1381": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1382": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1383": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1384": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1385": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1386": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1387": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1388": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1389": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1390": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "15": {
+            "activityId": 15,
+            "record": {
+              "1501": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1502": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1503": {
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1504": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1505": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1506": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1507": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1508": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1509": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1510": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1511": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1512": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1513": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1514": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1515": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1516": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1517": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1518": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1519": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1520": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1521": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1522": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1523": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1524": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1525": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1526": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1527": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1528": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1529": {
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "1530": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1531": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1532": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1533": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1534": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "16": {
+            "activityId": 16,
+            "record": {}
+          },
+          "17": {
+            "activityId": 17,
+            "record": {}
+          },
+          "18": {
+            "activityId": 18,
+            "record": {
+              "1801": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1802": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1803": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1804": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1805": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1806": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1807": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "19": {
+            "activityId": 19,
+            "record": {}
+          }
+        },
+        "pushGoods": {},
+        "dynamicPushGoods": {},
+        "activity": [
+          {
+            "id": 11,
+            "type": 12,
+            "name": "金砖达标",
+            "icon": "activities/icon/xshd_btn_dabiaojinzhuan",
+            "res": "activities/banner/xshd_img_jinzhuandabiao",
+            "module": 0,
+            "data": {
+              "rounds": 1,
+              "rewards": [
+                {
+                  "num": 1000,
+                  "rewardList": [
+                    {
+                      "value": 5,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1001
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50
+                    },
+                    {
+                      "value": 2000,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1016
+                    }
+                  ],
+                  "num": 5000
+                },
+                {
+                  "num": 10000,
+                  "rewardList": [
+                    {
+                      "value": 20,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "num": 15000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 100,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "num": 20000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "value": 1,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013
+                    }
+                  ]
+                },
+                {
+                  "num": 35000,
+                  "rewardList": [
+                    {
+                      "value": 150,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 1,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "value": 50,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3201
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 50000
+                },
+                {
+                  "num": 75000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 300,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 2
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 3201,
+                      "value": 60,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1013,
+                      "value": 2,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 100000
+                }
+              ]
+            },
+            "openTime": "2026-06-19T04:00:00.000Z",
+            "endTime": "2026-06-25T16:00:00.000Z",
+            "updateTime": "2025-06-06T01:59:43.841Z",
+            "createTime": "2025-05-29T22:08:23.661Z",
+            "nameId": "100000944",
+            "resID": "100000944",
+            "resText": "金砖达标"
+          },
+          {
+            "id": 9,
+            "type": 4,
+            "name": "江湖黑市",
+            "icon": "activities/icon/jchd_btn_shijingheishi",
+            "res": "activities/banner/xshd_img_jhhsbanner",
+            "module": -1,
+            "data": {
+              "rewards": [
+                {
+                  "num": 10000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 600,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 600,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 900,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 900
+                    }
+                  ],
+                  "num": 25000
+                },
+                {
+                  "num": 50000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "itemId": 1023,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 75000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 1023,
+                      "value": 3,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 100000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 6001,
+                      "value": 1,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 125000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ],
+                  "num": 150000
+                },
+                {
+                  "num": 175000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1
+                    },
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 200000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 225000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500
+                    }
+                  ]
+                },
+                {
+                  "num": 250000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 2
+                    },
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 275000,
+                  "rewardList": [
+                    {
+                      "itemId": 1022,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3,
+                      "ext": 0
+                    },
+                    {
+                      "value": 1,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 300000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1,
+                      "ext": 0
+                    },
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 325000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 350000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1500
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 375000,
+                  "rewardList": [
+                    {
+                      "itemId": 1022,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 400000,
+                  "rewardList": [
+                    {
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 1,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "rewardList": [
+                    {
+                      "value": 2500,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 4
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2500,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 450000
+                },
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2500,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 1
+                    },
+                    {
+                      "itemId": 6001,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2500,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 500000
+                },
+                {
+                  "num": 550000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2500,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 1023,
+                      "value": 4,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 2500,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 600000,
+                  "rewardList": [
+                    {
+                      "itemId": 1022,
+                      "value": 2500,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "value": 1,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2500,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 700000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 4000,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3
+                    },
+                    {
+                      "itemId": 6001,
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 4000,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 800000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 4000,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 2,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 4000,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 900000,
+                  "rewardList": [
+                    {
+                      "value": 4000,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022
+                    },
+                    {
+                      "itemId": 1023,
+                      "value": 3,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 4000
+                    }
+                  ]
+                },
+                {
+                  "num": 1000000,
+                  "rewardList": [
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 4000
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 3,
+                      "ext": 0
+                    },
+                    {
+                      "value": 2,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 6001
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 4000,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 1250000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 4000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 4,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 6001,
+                      "value": 4,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 4000
+                    }
+                  ]
+                },
+                {
+                  "num": 1500000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 4000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1023,
+                      "value": 4,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 6001,
+                      "value": 4,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 4000
+                    }
+                  ]
+                }
+              ],
+              "buyType": 3,
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "黑市福利",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市见面礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 600,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1006,
+                      "value": 1000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "黑市惊喜礼",
+                  "description": "",
+                  "limit": 1,
+                  "price": 1200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2500,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1003,
+                      "value": 6000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 5000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2003,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 40,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 50,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "顶级鱼竿包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1011,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1012,
+                      "value": 30,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "白玉黑市包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 2000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 2000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级灵贝包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 25000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000711",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "养成补给包",
+                  "description": "",
+                  "limit": 4,
+                  "price": 8000,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1016,
+                      "value": 2000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1026,
+                      "value": 3000,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000945",
+                  "descriptionId": ""
+                }
+              ],
+              "rounds": 1
+            },
+            "openTime": "2026-06-19T04:00:00.000Z",
+            "endTime": "2026-06-25T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:14:56.880Z",
+            "createTime": "2022-04-25T12:40:39.906Z",
+            "nameId": "100000041",
+            "resID": "100000041",
+            "resText": "江湖黑市"
+          },
+          {
+            "id": 5,
+            "type": 4,
+            "name": "金砖商店",
+            "icon": "activities/icon/xshd_btn_inzhuanshangdian",
+            "res": "activities/banner/xshd_img_jzdbbanner",
+            "module": -1,
+            "data": {
+              "buyType": 1,
+              "itemId": 0,
+              "goodsList": [
+                {
+                  "title": "金砖回馈",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 200,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000948",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 3000,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 660,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000949",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 6800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1500,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000950",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级金砖礼包",
+                  "description": "",
+                  "limit": 1,
+                  "price": 12800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2820,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000951",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级金砖礼包",
+                  "description": "",
+                  "limit": 5,
+                  "price": 32800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 7220,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000952",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级金砖礼包",
+                  "description": "",
+                  "limit": 10,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 14260,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000953",
+                  "descriptionId": ""
+                }
+              ]
+            },
+            "openTime": "2026-06-19T04:00:00.000Z",
+            "endTime": "2026-06-25T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:21:06.021Z",
+            "createTime": "2021-12-24T03:30:09.806Z",
+            "nameId": "100000946",
+            "resID": "100000947",
+            "resText": "金砖闪耀 价值永恒|金砖大礼包"
+          }
+        ],
+        "myTotalInfo": {
+          "11": {
+            "num": 8000,
+            "rounds": 1,
+            "complete": {
+              "0": 1,
+              "1": 1
+            },
+            "openTime": 0
+          }
+        },
+        "myMonthInfo": {
+          "2": {
+            "num": 317,
+            "rounds": 1,
+            "complete": {
+              "4": 1,
+              "5": 1,
+              "6": 1
+            },
+            "openTime": 1780243200
+          },
+          "3": {
+            "num": 20,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1780243200
+          }
+        },
+        "myArenaInfo": {
+          "num": 143,
+          "rounds": 1,
+          "complete": {
+            "0": 1,
+            "1": 1
+          },
+          "openTime": 1780243200
+        },
+        "myStoreInfo": {
+          "5": {
+            "complete": {
+              "0": 1
+            }
+          },
+          "9": {
+            "complete": {
+              "0": 1
+            }
+          }
+        },
+        "yearInfo": {},
+        "fiveInfo": {},
+        "commonActivityInfo": {
+          "2606191": {
+            "record": {
+              "1": 1781851816,
+              "21": 1781851556,
+              "22": 1781851871,
+              "23": 1781851972,
+              "61": 1781851832
+            },
+            "task": {
+              "1": 80,
+              "2": 6000,
+              "3": 20,
+              "4": 4,
+              "5": 8000
+            },
+            "isBought": false
+          },
+          "2606192": {
+            "record": {},
+            "task": {},
+            "isBought": false
+          },
+          "2606193": {
+            "record": {},
+            "task": {},
+            "isBought": false
+          },
+          "2606194": {
+            "record": {
+              "26061941": 1
+            },
+            "task": {},
+            "isBought": false
+          },
+          "2606195": {
+            "record": null,
+            "task": {
+              "-2": 0,
+              "-1": 0,
+              "-4": 0,
+              "-5": 0
+            },
+            "isBought": false
+          }
+        },
+        "warOrderActivityInfo": {
+          "1": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1": 1,
+              "2": 1,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "10": 1,
+              "11": 1,
+              "12": 1,
+              "13": 1,
+              "14": 1,
+              "15": 1,
+              "16": 1,
+              "17": 1,
+              "18": 1,
+              "19": 1,
+              "20": 1,
+              "21": 1,
+              "22": 1,
+              "23": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          },
+          "1003": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {},
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 11,
+            "phaseEndTime": 0
+          }
+        },
+        "totalChargeDay": 4,
+        "actBingoInfo": {},
+        "dropReward": {
+          "1": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ],
+          "3": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ],
+          "7": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ],
+          "9": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ],
+          "10": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ],
+          "11": [
+            {
+              "type": 3,
+              "itemId": 5278,
+              "value": 1,
+              "ext": 0
+            }
+          ]
+        },
+        "actCMInfo": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

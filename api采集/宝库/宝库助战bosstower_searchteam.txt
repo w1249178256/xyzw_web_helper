@@ -1,0 +1,28 @@
+时间: 2026/1/23 19:27:47
+服务: BossTowerService
+方法: searchTeam
+参数: [{"teamId":"RXW5478442"}]
+结果:
+{
+  "_raw": {
+    "seq": 78,
+    "ack": 0,
+    "time": 1769167621416,
+    "resp": 71,
+    "cmd": "bosstower_searchteamresp",
+    "body": {
+      "bossTowerRoleInfo": {
+        "id": 438166696,
+        "teamId": "RXW5478442",
+        "name": "影子",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJ073h2p8tKNdEZycuGNN8MPg7ehHicQ3A2dpaYYscQ0E64pdIHB84H1qPYlppYAXsQVW2tspXYeGg/132",
+        "power": 2050783550,
+        "towerId": 5,
+        "legionId": 6482137
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}

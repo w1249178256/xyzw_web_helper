@@ -99,6 +99,7 @@ export function createTasksHangUp(deps) {
           message: `${token.name} 领取挂机奖励失败: ${error.message}`,
           type: "error",
         });
+        // 不抛出异常，继续执行后续命令
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
@@ -169,6 +170,7 @@ export function createTasksHangUp(deps) {
           message: `${token.name} 加钟失败: ${error.message || "未知错误"}`,
           type: "error",
         });
+        // 不抛出异常，继续执行后续命令
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
@@ -348,13 +350,41 @@ export function createTasksHangUp(deps) {
         });
         await ensureConnection(tokenId);
         if (shouldStop.value) return;
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "legion_signin",
+            {},
+            5000,
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 俱乐部签到成功`,
+            type: "success",
+          });
+        } catch (signinError) {
+           // 如果今天已经签到过了或未加入俱乐部，不报错，继续执行
+           if (signinError.message && (signinError.message.includes('今天已经签到过了') || signinError.message.includes('未加入俱乐部'))) {
+             addLog({
+               time: new Date().toLocaleTimeString(),
+               message: `${token.name} ${signinError.message.includes('未加入俱乐部') ? '未加入俱乐部' : '今天已经签到过了'}，继续领取火把`,
+               type: "info",
+             });
+           } else {
+             throw signinError;
+           }
+         }
+        await new Promise((r) => setTimeout(r, 500));
+        
+        // 分享领取火把
         await tokenStore.sendMessageWithPromise(
           tokenId,
-          "legion_signin",
-          {},
+          "system_mysharecallback",
+          { isSkipShareCard: true, type: 1 },
           5000,
         );
         await new Promise((r) => setTimeout(r, 500));
+        
         tokenStatus.value[tokenId] = "completed";
         addLog({
           time: new Date().toLocaleTimeString(),
@@ -544,11 +574,181 @@ export function createTasksHangUp(deps) {
     message.success("批量助威结束");
   };
 
+  /**
+   * 领取挂机奖励 - ForToken版本
+   */
+  const claimHangUpRewardsForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始领取挂机奖励`,
+        type: "info",
+      });
+
+      // 1. Claim reward
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "system_claimhangupreward",
+        {},
+        5000,
+      );
+      await new Promise((r) => setTimeout(r, 500));
+
+      // 2. Add time 4 times
+      for (let i = 0; i < 4; i++) {
+        if (shouldStop.value) break;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 挂机加钟 ${i + 1}/4`,
+          type: "info",
+        });
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "system_mysharecallback",
+          { isSkipShareCard: true, type: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取挂机奖励完成`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 领取挂机奖励失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 一键加钟 - ForToken版本
+   */
+  const batchAddHangUpTimeForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始一键加钟`,
+        type: "info",
+      });
+
+      for (let i = 0; i < 4; i++) {
+        if (shouldStop.value) break;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 执行加钟 ${i + 1}/4`,
+          type: "info",
+        });
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "system_mysharecallback",
+          { isSkipShareCard: true, type: 2 },
+          5000,
+        );
+        await new Promise((r) => setTimeout(r, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 一键加钟完成`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 一键加钟失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 俱乐部签到 - ForToken版本
+   */
+  const batchclubsignForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始俱乐部签到`,
+          type: "info",
+        });
+
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "legion_signin",
+            {},
+            5000,
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 俱乐部签到成功`,
+            type: "success",
+          });
+        } catch (signinError) {
+          // 如果今天已经签到过了或未加入俱乐部，不报错，继续执行
+          if (signinError.message && (signinError.message.includes('今天已经签到过了') || signinError.message.includes('未加入俱乐部'))) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} ${signinError.message.includes('未加入俱乐部') ? '未加入俱乐部' : '今天已经签到过了'}，继续领取火把`,
+              type: "info",
+            });
+          } else {
+            throw signinError;
+          }
+        }
+        await new Promise((r) => setTimeout(r, 500));
+
+      // 分享领取火把
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "system_mysharecallback",
+        { isSkipShareCard: true, type: 1 },
+        5000,
+      );
+      await new Promise((r) => setTimeout(r, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部签到完成`,
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部签到失败: ${error.message || "未知错误"}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
   return {
     claimHangUpRewards,
+    claimHangUpRewardsForToken,
     batchAddHangUpTime,
+    batchAddHangUpTimeForToken,
     batchStudy,
     batchclubsign,
+    batchclubsignForToken,
     batchWarGuessCheer,
   };
 }

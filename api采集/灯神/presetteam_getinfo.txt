@@ -1,0 +1,798 @@
+{
+  "_raw": {
+    "seq": 3,
+    "ack": 0,
+    "time": 1768349814540,
+    "resp": 3,
+    "cmd": "presetteam_getinforesp",
+    "body": {
+      "presetTeamInfo": {
+        "roleId": 111571123,
+        "useTeamId": 2,
+        "presetTeamInfo": {
+          "1": {
+            "teamName": "",
+            "teamInfo": {
+              "0": {
+                "heroId": 110,
+                "level": 6000,
+                "order": 19,
+                "star": 29,
+                "color": 3,
+                "power": 1755357819,
+                "artifactId": 12104,
+                "pearlId": 0,
+                "attachmentUid": 1047,
+                "battleTeamSlot": 0,
+                "skinId": 11001,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 11001,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "1": {
+                "heroId": 109,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1711113363,
+                "artifactId": 11045,
+                "pearlId": 2,
+                "attachmentUid": 1016,
+                "battleTeamSlot": 1,
+                "skinId": 10901,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10901,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "2": {
+                "heroId": 106,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1779877194,
+                "artifactId": 11095,
+                "pearlId": 1,
+                "attachmentUid": 1007,
+                "battleTeamSlot": 2,
+                "skinId": 10601,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10601,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "3": {
+                "heroId": 104,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1911971166,
+                "artifactId": 11185,
+                "pearlId": 7,
+                "attachmentUid": 1026,
+                "battleTeamSlot": 3,
+                "skinId": 10402,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10402,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "4": {
+                "heroId": 101,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1847321824,
+                "artifactId": 11135,
+                "pearlId": 3,
+                "attachmentUid": 1057,
+                "battleTeamSlot": 4,
+                "skinId": 2001,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 2001,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              }
+            },
+            "bagHeroInfo": {
+              "102": {
+                "heroId": 102,
+                "level": 1,
+                "order": 0,
+                "star": 30,
+                "color": 3,
+                "power": 264515189,
+                "artifactId": 13015,
+                "pearlId": 0,
+                "attachmentUid": 1046,
+                "battleTeamSlot": -1,
+                "skinId": 10201,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10201,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "105": {
+                "heroId": 105,
+                "level": 4900,
+                "order": 17,
+                "star": 30,
+                "color": 3,
+                "power": 623699287,
+                "artifactId": 13045,
+                "pearlId": 0,
+                "attachmentUid": 1064,
+                "battleTeamSlot": -1,
+                "skinId": 10501,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10501,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "108": {
+                "heroId": 108,
+                "level": 800,
+                "order": 5,
+                "star": 28,
+                "color": 3,
+                "power": 274949677,
+                "artifactId": -1,
+                "pearlId": 0,
+                "attachmentUid": 1041,
+                "battleTeamSlot": -1,
+                "skinId": 10801,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10801,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "112": {
+                "heroId": 112,
+                "level": 900,
+                "order": 5,
+                "star": 30,
+                "color": 3,
+                "power": 276874615,
+                "artifactId": 12124,
+                "pearlId": 0,
+                "attachmentUid": 1017,
+                "battleTeamSlot": -1,
+                "skinId": 11201,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 11201,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "116": {
+                "heroId": 116,
+                "level": 900,
+                "order": 5,
+                "star": 30,
+                "color": 3,
+                "power": 282900251,
+                "artifactId": 11071,
+                "pearlId": 0,
+                "attachmentUid": 1020,
+                "battleTeamSlot": -1,
+                "skinId": 11601,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 11601,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "120": {
+                "heroId": 120,
+                "level": 1,
+                "order": 0,
+                "star": 28,
+                "color": 3,
+                "power": 264435672,
+                "artifactId": 13025,
+                "pearlId": 5,
+                "attachmentUid": 1031,
+                "battleTeamSlot": -1,
+                "skinId": 12003,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 12003,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              }
+            },
+            "heroSkin": {
+              "101": 2001,
+              "102": 10201,
+              "103": 10301,
+              "104": 10402,
+              "105": 10501,
+              "106": 10601,
+              "107": 10702,
+              "108": 10801,
+              "109": 10901,
+              "110": 11001,
+              "111": 11101,
+              "112": 11201,
+              "113": 11301,
+              "114": 11401,
+              "115": 11501,
+              "116": 11601,
+              "117": 0,
+              "118": 11803,
+              "119": 0,
+              "120": 12003,
+              "201": 0,
+              "202": 0,
+              "203": 0,
+              "204": 0,
+              "205": 0,
+              "206": 0,
+              "207": 0,
+              "208": 0,
+              "209": 0,
+              "210": 0,
+              "211": 0,
+              "212": 0,
+              "213": 0,
+              "214": 0,
+              "215": 0,
+              "216": 0,
+              "217": 0,
+              "218": 0,
+              "219": 0,
+              "220": 0,
+              "221": 0,
+              "222": 0,
+              "223": 0,
+              "224": 0,
+              "225": 0,
+              "226": 0,
+              "227": 0,
+              "228": 0,
+              "301": 0,
+              "302": 0,
+              "303": 0,
+              "304": 0,
+              "305": 0,
+              "306": 0,
+              "307": 0,
+              "308": 0,
+              "309": 0,
+              "310": 0,
+              "311": 0,
+              "312": 0,
+              "313": 0,
+              "314": 0
+            },
+            "weapon": {
+              "weaponId": 8,
+              "attachmentUid": 1003,
+              "level": 116,
+              "passiveSkill": null,
+              "createTime": 0
+            }
+          },
+          "2": {
+            "teamName": "",
+            "teamInfo": {
+              "0": {
+                "heroId": 102,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1746830997,
+                "artifactId": 11155,
+                "pearlId": 6,
+                "attachmentUid": 1026,
+                "battleTeamSlot": 0,
+                "skinId": 10201,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10201,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "1": {
+                "heroId": 118,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1929456228,
+                "artifactId": 11135,
+                "pearlId": 3,
+                "attachmentUid": 1057,
+                "battleTeamSlot": 1,
+                "skinId": 11806,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 11806,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "2": {
+                "heroId": 106,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1784333551,
+                "artifactId": 11095,
+                "pearlId": 1,
+                "attachmentUid": 1016,
+                "battleTeamSlot": 2,
+                "skinId": 10601,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10601,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "3": {
+                "heroId": 116,
+                "level": 900,
+                "order": 5,
+                "star": 30,
+                "color": 3,
+                "power": 303322127,
+                "artifactId": 11185,
+                "pearlId": 7,
+                "attachmentUid": 1017,
+                "battleTeamSlot": 3,
+                "skinId": 11601,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 11601,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "4": {
+                "heroId": 107,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1770783172,
+                "artifactId": 13025,
+                "pearlId": 5,
+                "attachmentUid": 1047,
+                "battleTeamSlot": 4,
+                "skinId": 10702,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 10702,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              }
+            },
+            "bagHeroInfo": {
+              "101": {
+                "heroId": 101,
+                "level": 900,
+                "order": 5,
+                "star": 30,
+                "color": 3,
+                "power": 274183871,
+                "artifactId": -1,
+                "pearlId": 0,
+                "attachmentUid": 1020,
+                "battleTeamSlot": -1,
+                "skinId": 2001,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 2001,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "104": {
+                "heroId": 104,
+                "level": 4900,
+                "order": 17,
+                "star": 30,
+                "color": 3,
+                "power": 632833808,
+                "artifactId": 12065,
+                "pearlId": 4,
+                "attachmentUid": 1064,
+                "battleTeamSlot": -1,
+                "skinId": 10402,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10402,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "108": {
+                "heroId": 108,
+                "level": 800,
+                "order": 5,
+                "star": 28,
+                "color": 3,
+                "power": 263728055,
+                "artifactId": -1,
+                "pearlId": 0,
+                "attachmentUid": 1041,
+                "battleTeamSlot": -1,
+                "skinId": 10801,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10801,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "109": {
+                "heroId": 109,
+                "level": 1,
+                "order": 0,
+                "star": 30,
+                "color": 3,
+                "power": 256640445,
+                "artifactId": 13055,
+                "pearlId": 0,
+                "attachmentUid": 1031,
+                "battleTeamSlot": -1,
+                "skinId": 10901,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 10901,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "110": {
+                "heroId": 110,
+                "level": 1,
+                "order": 0,
+                "star": 29,
+                "color": 3,
+                "power": 256751292,
+                "artifactId": 13015,
+                "pearlId": 0,
+                "attachmentUid": 1046,
+                "battleTeamSlot": -1,
+                "skinId": 11001,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 11001,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "112": {
+                "heroId": 112,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "color": 3,
+                "power": 1517446591,
+                "artifactId": 11071,
+                "pearlId": 0,
+                "attachmentUid": 1007,
+                "battleTeamSlot": -1,
+                "skinId": 11201,
+                "equipment": {
+                  "1": 4000,
+                  "2": 4000,
+                  "3": 4000,
+                  "4": 4000
+                },
+                "skin": null,
+                "useSkin": 11201,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              },
+              "210": {
+                "heroId": 210,
+                "level": 1,
+                "order": 0,
+                "star": 21,
+                "color": 2,
+                "power": 256568024,
+                "artifactId": 13045,
+                "pearlId": 0,
+                "attachmentUid": 1019,
+                "battleTeamSlot": -1,
+                "skinId": 0,
+                "equipment": {
+                  "1": 1,
+                  "2": 1,
+                  "3": 1,
+                  "4": 1
+                },
+                "skin": null,
+                "useSkin": 0,
+                "equipCurQuench": {
+                  "1": 0,
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                }
+              }
+            },
+            "heroSkin": {
+              "101": 2001,
+              "102": 10201,
+              "103": 10301,
+              "104": 10402,
+              "105": 10501,
+              "106": 10601,
+              "107": 10702,
+              "108": 10801,
+              "109": 10901,
+              "110": 11001,
+              "111": 11101,
+              "112": 11201,
+              "113": 11301,
+              "114": 11401,
+              "115": 11501,
+              "116": 11601,
+              "117": 0,
+              "118": 11806,
+              "119": 0,
+              "120": 0,
+              "201": 0,
+              "202": 0,
+              "203": 0,
+              "204": 0,
+              "205": 0,
+              "206": 0,
+              "207": 0,
+              "208": 0,
+              "209": 0,
+              "210": 0,
+              "211": 0,
+              "212": 0,
+              "213": 0,
+              "214": 0,
+              "215": 0,
+              "216": 0,
+              "217": 0,
+              "218": 0,
+              "219": 0,
+              "220": 0,
+              "221": 0,
+              "222": 0,
+              "223": 0,
+              "224": 0,
+              "225": 0,
+              "226": 0,
+              "227": 0,
+              "228": 0,
+              "301": 0,
+              "302": 0,
+              "303": 0,
+              "304": 0,
+              "305": 0,
+              "306": 0,
+              "307": 0,
+              "308": 0,
+              "309": 0,
+              "310": 0,
+              "311": 0,
+              "312": 0,
+              "313": 0,
+              "314": 0
+            },
+            "weapon": {
+              "weaponId": 3,
+              "attachmentUid": 1001,
+              "level": 149,
+              "passiveSkill": null,
+              "createTime": 0
+            }
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

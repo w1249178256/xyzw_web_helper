@@ -1,0 +1,166 @@
+
+时间: 2026/3/11 08:04:24
+服务: DiscountService
+方法: claimReward
+参数: [{"discountId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 0,
+    "time": 1773187466252,
+    "resp": 42,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 275414,
+        "freeDiamond": 275414,
+        "items": {
+          "1003": {
+            "quantity": 75814
+          },
+          "1008": {
+            "quantity": 71
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 66,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1008,
+          "value": 5,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 50,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1773187464800_ihh03dskr
+
+记录 #3:
+----------------------------------------
+时间: 2026/3/11 08:04:17
+服务: SystemService
+方法: signInReward
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 41,
+    "ack": 0,
+    "time": 1773187458716,
+    "resp": 41,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 275348,
+        "freeDiamond": 275348,
+        "items": {
+          "1003": {
+            "quantity": 75764
+          },
+          "1006": {
+            "quantity": 418832
+          },
+          "3201": {
+            "quantity": 22
+          }
+        },
+        "signInReward": {
+          "4": 1773187458,
+          "5": 1773187458,
+          "6": 1773187458,
+          "7": 1773187458,
+          "8": 1773187458,
+          "9": 1773187458,
+          "10": 1773187458,
+          "11": 1773187458,
+          "12": 1773187458
+        }
+      },
+      "reward": [
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 100,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 2,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 200,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 50,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 2,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1006,
+          "value": 200,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 100,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 28
+}
+异步: 是
+调用ID: call_1773187457267_i6ubk3183
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

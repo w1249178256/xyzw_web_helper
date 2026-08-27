@@ -1,0 +1,186 @@
+{
+  "_raw": {
+    "seq": 4,
+    "ack": 0,
+    "time": 1773544532452,
+    "resp": 4,
+    "cmd": "towers_getinforesp",
+    "body": {
+      "towerData": {
+        "actId": 2603131,
+        "season": 39,
+        "useTickCnt": 10,
+        "todayUseTickCnt": 1,
+        "towerData": {
+          "1": {
+            "towerType": 1,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "2": {
+            "towerType": 2,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "3": {
+            "towerType": 3,
+            "fighting": false,
+            "actTowerLv": 4,
+            "winCnt": 0,
+            "maxWinCnt": 3,
+            "curMonsterStateData": {
+              "61": {
+                "id": 250099,
+                "position": 61,
+                "curHp": 2644004903,
+                "curEnergy": 0,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "62": {
+                "id": 250099,
+                "position": 62,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "63": {
+                "id": 250098,
+                "position": 63,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "64": {
+                "id": 250103,
+                "position": 64,
+                "curHp": 2644004903,
+                "curEnergy": 0,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              },
+              "65": {
+                "id": 250100,
+                "position": 65,
+                "curHp": 2644004903,
+                "curEnergy": 100,
+                "damage": 0,
+                "takeDamage": 0,
+                "treatment": 0
+              }
+            },
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 2644004903,
+              "62": 2644004903,
+              "63": 2644004903,
+              "64": 2644004903,
+              "65": 2644004903
+            },
+            "towerScore": 400000047882,
+            "pass": false
+          },
+          "4": {
+            "towerType": 4,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "5": {
+            "towerType": 5,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          },
+          "6": {
+            "towerType": 6,
+            "fighting": false,
+            "actTowerLv": 1,
+            "winCnt": 0,
+            "maxWinCnt": 0,
+            "curMonsterStateData": {},
+            "curHeroStateData": {},
+            "monsterMaxHp": {
+              "61": 3608745,
+              "62": 3608745,
+              "63": 3608745,
+              "64": 3608745,
+              "65": 3608745
+            },
+            "towerScore": 0,
+            "pass": false
+          }
+        },
+        "levelRewardMap": {
+          "1001": true,
+          "1002": true,
+          "2001": true,
+          "2002": true,
+          "3001": true,
+          "3002": true,
+          "3003": true
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 0
+}

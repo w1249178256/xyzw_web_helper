@@ -1,0 +1,32 @@
+时间: 2026/3/17 08:06:52
+服务: EquipmentService
+方法: confirm
+参数: [{"heroId":107,"part":1,"quenches":{},"quenchId":0}]
+结果:
+{
+  "_raw": {
+    "resp": 52,
+    "cmd": "equipment_confirmresp",
+    "body": {
+      "role": {
+        "heroes": {
+          "107": {
+            "equipment": {
+              "1": {
+                "seed": 867222
+              }
+            }
+          }
+        }
+      }
+    },
+    "seq": 52,
+    "ack": 0,
+    "time": 1773706014637,
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1773706012518_q6xahtu30

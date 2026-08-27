@@ -65,6 +65,38 @@ export const HERO_DICT = {
   314: { name: "孟获", type: "蜀国", avatar: "/team/menghuo.png" },
 };
 
+// 宠物字典
+export const PET_DICT = {
+  101: { name: "大眼海胆", type: "海洋" },
+  201: { name: "你真蚌", type: "海洋" },
+  301: { name: "冰灯水母", type: "海洋" },
+  401: { name: "潮兽团", type: "海洋" },
+  501: { name: "武虾", type: "海洋" },
+  601: { name: "甲锅龟", type: "海洋" },
+  701: { name: "黄金章鱼", type: "海洋" },
+  102: { name: "芽芽蛙", type: "陆地" },
+  202: { name: "梨嘴鸭", type: "陆地" },
+  302: { name: "热狗", type: "陆地" },
+  402: { name: "盘牙", type: "陆地" },
+  502: { name: "拳击狐", type: "陆地" },
+  602: { name: "炎鬃狮", type: "陆地" },
+  702: { name: "赤兔马", type: "陆地" },
+  103: { name: "泡泡蝇", type: "天空" },
+  203: { name: "响尾蜂", type: "天空" },
+  303: { name: "幽影蝶", type: "天空" },
+  403: { name: "铁头飞猪", type: "天空" },
+  503: { name: "雷帽绒", type: "天空" },
+  603: { name: "疾风隼", type: "天空" },
+  703: { name: "玄翎鹤", type: "天空" },
+  104: { name: "小幽灵", type: "幻想" },
+  204: { name: "溜溜萝", type: "幻想" },
+  304: { name: "烛灵", type: "幻想" },
+  404: { name: "长颈树", type: "幻想" },
+  504: { name: "灰烬兔", type: "幻想" },
+  604: { name: "蛇尾枭", type: "幻想" },
+  704: { name: "食梦貘", type: "幻想" },
+};
+
 export const LINEUP_RULES = [
   {
     name: "吴国",
@@ -244,6 +276,130 @@ const FishMap = {
   1119: { name: "公琴心" },
   1120: { name: "母琴心" },
   1121: { name: "回响" },
+  1122: { name: "惊雷" },
+};
+
+// 鱼灵对应的 itemId 和 pearlId 映射（用于 artifact_load 命令）
+// 格式: fishmap键 -> { itemId, pearlId }
+export const FISH_ARTIFACT_MAP = {
+  // 龙鱼类 (1201-1220)
+  1201: { itemId: 12010, pearlId: 1 },  // 龙鱼·幽影
+  1202: { itemId: 12020, pearlId: 2 },  // 龙鱼·青龙
+  1203: { itemId: 12030, pearlId: 3 },  // 龙鱼·火镰
+  1204: { itemId: 12040, pearlId: 4 },  // 龙鱼·无双
+  1205: { itemId: 12050, pearlId: 5 },  // 龙鱼·永霜
+  1206: { itemId: 12060, pearlId: 6 },  // 龙鱼·八卦
+  1207: { itemId: 12070, pearlId: 7 },  // 龙鱼·紫电
+  1208: { itemId: 12080, pearlId: 8 },  // 龙鱼·青囊
+  1209: { itemId: 12090, pearlId: 9 },  // 龙鱼·洛神
+  1210: { itemId: 12100, pearlId: 10 }, // 龙鱼·机神
+  1211: { itemId: 12110, pearlId: 11 }, // 龙鱼·霸王
+  1212: { itemId: 12120, pearlId: 12 }, // 龙鱼·蚀骨
+  1213: { itemId: 12130, pearlId: 13 }, // 龙鱼·坚盾
+  1214: { itemId: 12140, pearlId: 14 }, // 龙鱼·麒麟
+  1215: { itemId: 12150, pearlId: 15 }, // 龙鱼·古锭
+  1216: { itemId: 12160, pearlId: 16 }, // 龙鱼·义从
+  1217: { itemId: 12170, pearlId: 17 }, // 龙鱼·恶来
+  1218: { itemId: 12180, pearlId: 18 }, // 龙鱼·龙胆
+  1219: { itemId: 12190, pearlId: 19 }, // 龙鱼·国色
+  1220: { itemId: 12200, pearlId: 20 }, // 龙鱼·天公
+
+  // 月尾鱼类 (1301-1305)
+  1301: { itemId: 13010, pearlId: 21 }, // 月尾
+  1302: { itemId: 13020, pearlId: 22 }, // 焰神
+  1303: { itemId: 13030, pearlId: 23 }, // 红蝶
+  1304: { itemId: 13040, pearlId: 24 }, // 赤羽
+  1305: { itemId: 13050, pearlId: 25 }, // 千年笛
+
+  // 四带鱼类 (1401-1412)
+  1401: { itemId: 14010, pearlId: 26 }, // 四带胡椒
+  1402: { itemId: 14020, pearlId: 27 }, // 鬼狮子鱼
+  1403: { itemId: 14030, pearlId: 28 }, // 黑斑雀鲷
+  1404: { itemId: 14040, pearlId: 29 }, // 诅咒花椒
+  1405: { itemId: 14050, pearlId: 30 }, // 九斑刺豚
+  1406: { itemId: 14060, pearlId: 31 }, // 魔鬼刺镰
+  1407: { itemId: 14070, pearlId: 32 }, // 黄背刺鲷
+  1408: { itemId: 14080, pearlId: 33 }, // 黑鳍刺鲷
+  1409: { itemId: 14090, pearlId: 34 }, // 长棘刺鲷
+  1410: { itemId: 14100, pearlId: 35 }, // 粒突箱鲀
+  1411: { itemId: 14110, pearlId: 36 }, // 大跳跳鱼
+  1412: { itemId: 14120, pearlId: 37 }, // 蓝心胖头
+
+  // 钱胡椒鱼类 (1501-1506)
+  1501: { itemId: 15010, pearlId: 38 }, // 钱胡椒
+  1502: { itemId: 15020, pearlId: 39 }, // 狮子鱼
+  1503: { itemId: 15030, pearlId: 40 }, // 塔雀鲷
+  1504: { itemId: 15040, pearlId: 41 }, // 紫斑鳅
+  1505: { itemId: 15050, pearlId: 42 }, // 密刺豚
+  1506: { itemId: 15060, pearlId: 43 }, // 长鳍镰
+
+  // 胖头鱼类 (1601-1604)
+  1601: { itemId: 16010, pearlId: 44 }, // 胖头鱼
+  1602: { itemId: 16020, pearlId: 45 }, // 青刺鲷
+  1603: { itemId: 16030, pearlId: 46 }, // 跳跳鱼
+  1604: { itemId: 16040, pearlId: 47 }, // 箱豚鱼
+
+  // 黄金锦鲤及特殊鱼类 (1101-1122)
+  1101: { itemId: 11010, pearlId: 48 }, // 黄金锦鲤
+  1102: { itemId: 11020, pearlId: 49 }, // 利刃
+  1103: { itemId: 11030, pearlId: 50 }, // 惊涛
+  1104: { itemId: 11040, pearlId: 51 }, // 骇浪
+  1105: { itemId: 11050, pearlId: 52 }, // 星驰
+  1106: { itemId: 11060, pearlId: 53 }, // 公同心
+  1107: { itemId: 11070, pearlId: 54 }, // 母同心
+  1108: { itemId: 11085, pearlId: 1}, // 公协力
+  1109: { itemId: 11090, pearlId: 56 }, // 母协力
+  1110: { itemId: 11100, pearlId: 57 }, // 月光
+  1111: { itemId: 11110, pearlId: 58 }, // 公铁血
+  1112: { itemId: 11120, pearlId: 59 }, // 母铁血
+  1113: { itemId: 11135, pearlId: 4 }, // 公丹心
+  1114: { itemId: 11145, pearlId: 61 }, // 母丹心
+  1115: { itemId: 11155, pearlId: 62 }, // 巨灵
+  1116: { itemId: 11165, pearlId: 63 }, // 公剑胆
+  1117: { itemId: 11175, pearlId: 64 }, // 母剑胆
+  1118: { itemId: 11185, pearlId: 9}, // 璇玑
+  1119: { itemId: 11195, pearlId: 8 }, // 公琴心
+  1120: { itemId: 11205, pearlId: 67 }, // 母琴心
+  1121: { itemId: 11215, pearlId: 68 }, // 回响
+  1122: { itemId: 11225, pearlId: 10 }, // 惊雷
+};
+
+// 星级字典
+// cost表示从当前星级升级到下一星级所需的碎片数
+// 1-5黄星(8碎片/级), 6-10紫星(40碎片/级), 11-15橙星(80碎片/级), 16-20红星(200碎片/级), 21-25黄冠(400碎片/级), 26-30紫冠(400碎片/级)
+// 5→6需要40, 10→11需要80, 15→16需要200, 20→21需要400, 25→26需要400
+export const STAR_DICT = {
+  0: { name: "0星", cost: 8 },
+  1: { name: "黄星1", cost: 8 },
+  2: { name: "黄星2", cost: 8 },
+  3: { name: "黄星3", cost: 8 },
+  4: { name: "黄星4", cost: 8 },
+  5: { name: "黄星5", cost: 40 },
+  6: { name: "紫星1", cost: 40 },
+  7: { name: "紫星2", cost: 40 },
+  8: { name: "紫星3", cost: 40 },
+  9: { name: "紫星4", cost: 40 },
+  10: { name: "紫星5", cost: 80 },
+  11: { name: "橙星1", cost: 80 },
+  12: { name: "橙星2", cost: 80 },
+  13: { name: "橙星3", cost: 80 },
+  14: { name: "橙星4", cost: 80 },
+  15: { name: "橙星5", cost: 200 },
+  16: { name: "红星1", cost: 200 },
+  17: { name: "红星2", cost: 200 },
+  18: { name: "红星3", cost: 200 },
+  19: { name: "红星4", cost: 200 },
+  20: { name: "红星5", cost: 400 },
+  21: { name: "黄冠1", cost: 400 },
+  22: { name: "黄冠2", cost: 400 },
+  23: { name: "黄冠3", cost: 400 },
+  24: { name: "黄冠4", cost: 400 },
+  25: { name: "黄冠5", cost: 400 },
+  26: { name: "紫冠1", cost: 400 },
+  27: { name: "紫冠2", cost: 400 },
+  28: { name: "紫冠3", cost: 400 },
+  29: { name: "紫冠4", cost: 400 },
+  30: { name: "紫冠5", cost: 0 },
 };
 
 export { FishMap, PearlMap, color };

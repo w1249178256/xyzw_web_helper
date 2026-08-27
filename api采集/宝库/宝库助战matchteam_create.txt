@@ -1,0 +1,279 @@
+时间: 2026/1/23 19:27:48
+服务: MatchTeamService
+方法: create
+参数: [{"teamCfgId":6,"setting":{"name":"","notice":"","secret":0,"apply":0,"applyList":[]},"param":0,"custom":{}}]
+结果:
+{
+  "_raw": {
+    "seq": 79,
+    "ack": 71,
+    "time": 1769167622277,
+    "resp": 72,
+    "cmd": "matchteam_createresp",
+    "body": {
+      "roleMTData": {
+        "gDMTData": {
+          "64989643": {
+            "teamId": "64989643",
+            "teamCfgId": 6
+          }
+        }
+      },
+      "teamInfo": {
+        "teamId": "64989643",
+        "teamCfgId": 6,
+        "state": 0,
+        "stateEndTime": 0,
+        "serverId": 8976,
+        "leaderId": 438166696,
+        "createAt": 1769167622,
+        "fightRoleBase": [
+          {
+            "roleId": 438166696,
+            "name": "影子",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJ073h2p8tKNdEZycuGNN8MPg7ehHicQ3A2dpaYYscQ0E64pdIHB84H1qPYlppYAXsQVW2tspXYeGg/132",
+            "serverId": 8949,
+            "prepared": 0,
+            "power": 2050783550,
+            "legionName": "竹喧归浣女✨",
+            "legionId": 6482137,
+            "battleData": {
+              "roleId": 438166696,
+              "power": 2050783550,
+              "legionName": "",
+              "tapAttack": 77885,
+              "lordAttackTime": null,
+              "lordAutoAttackTime": null,
+              "attributeBonus": null,
+              "team": {
+                "0": {
+                  "id": 107,
+                  "type": 0,
+                  "index": 0,
+                  "level": 6000,
+                  "attack": 515740077,
+                  "defense": 147349704,
+                  "curHp": 4255615468,
+                  "hp": 4255615468,
+                  "curEnergy": -1,
+                  "speed": 4003,
+                  "color": 3,
+                  "star": 30,
+                  "order": 19,
+                  "skin": 10701,
+                  "skinName": "",
+                  "activeSkill": 205,
+                  "attribute": {
+                    "51": 1,
+                    "53": 0.02,
+                    "54": 0.158,
+                    "56": 0.306,
+                    "57": 0.7,
+                    "58": 0.046,
+                    "59": 0.4,
+                    "60": 0.04,
+                    "61": 0.406,
+                    "63": 0.006,
+                    "65": 0.02,
+                    "69": 0.024,
+                    "101": 0,
+                    "102": 0,
+                    "227": 0.1,
+                    "228": 0.13,
+                    "229": 0.16,
+                    "230": 0.15,
+                    "231": 0.17
+                  },
+                  "skill": [
+                    206,
+                    207,
+                    208,
+                    111350
+                  ],
+                  "recordFlag": false
+                },
+                "1": {
+                  "id": 116,
+                  "type": 0,
+                  "index": 1,
+                  "level": 700,
+                  "attack": 30961640,
+                  "defense": 5985060,
+                  "curHp": 509509757,
+                  "hp": 509509757,
+                  "curEnergy": -1,
+                  "speed": 363,
+                  "color": 3,
+                  "star": 29,
+                  "order": 5,
+                  "skin": 11601,
+                  "skinName": "",
+                  "activeSkill": 1165,
+                  "attribute": {
+                    "57": 0.6,
+                    "59": 1,
+                    "101": 0,
+                    "102": 0
+                  },
+                  "skill": [
+                    1166,
+                    1167,
+                    1164
+                  ],
+                  "recordFlag": false
+                },
+                "2": {
+                  "id": 217,
+                  "type": 0,
+                  "index": 2,
+                  "level": 700,
+                  "attack": 24384751,
+                  "defense": 655208,
+                  "curHp": 467115931,
+                  "hp": 467115931,
+                  "curEnergy": -1,
+                  "speed": 482,
+                  "color": 2,
+                  "star": 15,
+                  "order": 5,
+                  "skin": -1,
+                  "skinName": "",
+                  "activeSkill": 20001,
+                  "attribute": {
+                    "51": 0.15,
+                    "57": 0.4,
+                    "59": 0.65,
+                    "61": 0.91,
+                    "101": 0,
+                    "102": 0
+                  },
+                  "skill": [
+                    20002,
+                    20003,
+                    20004
+                  ],
+                  "recordFlag": false
+                },
+                "3": {
+                  "id": 223,
+                  "type": 0,
+                  "index": 3,
+                  "level": 850,
+                  "attack": 23795552,
+                  "defense": 126133,
+                  "curHp": 458427684,
+                  "hp": 458427684,
+                  "curEnergy": -1,
+                  "speed": 377,
+                  "color": 2,
+                  "star": 2,
+                  "order": 5,
+                  "skin": -1,
+                  "skinName": "",
+                  "activeSkill": 2231,
+                  "attribute": {
+                    "51": 0.1,
+                    "57": 0.2,
+                    "59": 0.4,
+                    "101": 0,
+                    "102": 0
+                  },
+                  "skill": [
+                    2232,
+                    2233,
+                    2234
+                  ],
+                  "recordFlag": false
+                },
+                "4": {
+                  "id": 106,
+                  "type": 0,
+                  "index": 4,
+                  "level": 962,
+                  "attack": 29593017,
+                  "defense": 4838371,
+                  "curHp": 526012824,
+                  "hp": 526012824,
+                  "curEnergy": -1,
+                  "speed": 446,
+                  "color": 3,
+                  "star": 19,
+                  "order": 6,
+                  "skin": -1,
+                  "skinName": "",
+                  "activeSkill": 8000001,
+                  "attribute": {
+                    "57": 0.45,
+                    "59": 0.4,
+                    "101": 0,
+                    "102": 0
+                  },
+                  "skill": [
+                    8000002,
+                    8000003,
+                    8000004
+                  ],
+                  "recordFlag": false
+                }
+              },
+              "teamInfo": null,
+              "options": null,
+              "name": "",
+              "headImg": "",
+              "weaponId": 3,
+              "weaponActiveLevelId": 405,
+              "lordSkinId": 0,
+              "lordSkill": [],
+              "avatarFrame": null,
+              "customCard": null,
+              "levelWeaponSkillId": null,
+              "legacyColor": 0
+            },
+            "charmData": {},
+            "charmResetTime": 1769167622,
+            "extParam": {
+              "totalPower": 2050783550
+            },
+            "avatarFrame": null,
+            "customCard": null
+          },
+          {
+            "roleId": 111573257,
+            "name": "锦衣知鱼",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/1ornnGqSaTxvUT2eZrXwUNoBK3gErRKlHiau3wicy6wv01etlVPwFDm70ib2xmBZxiaL0vQWFOrUXlUWIQGXebJd8A/132",
+            "serverId": 8949,
+            "prepared": 0,
+            "power": 10522270077,
+            "legionName": "竹喧归浣女✨",
+            "legionId": 6482137,
+            "battleData": null,
+            "charmData": {},
+            "charmResetTime": 1769167622,
+            "extParam": {
+              "redQuenchCnt": 19,
+              "totalPower": 10522270077
+            },
+            "avatarFrame": null,
+            "customCard": null
+          }
+        ],
+        "setting": {
+          "name": "",
+          "notice": "",
+          "secret": 0,
+          "apply": 0,
+          "applyList": []
+        },
+        "param": 5,
+        "custom": {
+          "teamId": "RXW5478442",
+          "leaderId": "438166696"
+        },
+        "fighting": false
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 63
+}

@@ -1,0 +1,32 @@
+
+时间: 2026/3/5 19:56:15
+服务: ItemService
+方法: consume
+参数: [{"itemId":1008,"quantity":1}]
+结果:
+{
+  "_raw": {
+    "seq": 39,
+    "ack": 0,
+    "time": 1772711775647,
+    "resp": 39,
+    "cmd": "item_openboxresp",
+    "body": {
+      "role": {
+        "autoClickType": 1008,
+        "autoClickTime": 600,
+        "autoClickSettleTime": 1772711775,
+        "items": {
+          "1008": {
+            "quantity": 5115
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1772711775221_4g5901mp7

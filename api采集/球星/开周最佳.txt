@@ -1,0 +1,2058 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/7/17 15:48:27
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1784112406470.A-8950%E6%9C%8D-0-115789831-%E7%9B%B8%E7%AC%A650-1.bin&fromManager=true&viewId=game-window-1784274478412-s1sit2t30
+记录数量: 5
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta3 Chrome/148.0.7778.218 Electron/42.3.2 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/7/17 15:48:25
+服务: SaltCup26Service
+方法: openStarPack
+参数: [{"packId":5502,"starId":0,"cnt":1}]
+结果:
+{
+  "_raw": {
+    "seq": 53,
+    "ack": 0,
+    "time": 1784274506047,
+    "resp": 53,
+    "cmd": "saltcup26_openstarpackresp",
+    "body": {
+      "role": {
+        "items": {
+          "5502": null
+        }
+      },
+      "roleData": {
+        "starCards": {
+          "10609": {
+            "starId": 10609,
+            "getTime": 1784274506,
+            "sourceType": 5502
+          }
+        }
+      },
+      "newCards": [
+        {
+          "starId": 10609,
+          "getTime": 1784274506,
+          "sourceType": 5502
+        }
+      ],
+      "starMap": {
+        "10609": {
+          "roleId": 137863779,
+          "starId": 10609,
+          "name": "欢迎有缘人",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJrgpibFkrAg0csWzkJheZmKshglicXIYk4WA0ORlFLVAuXAXVGXR3DmIxDgjZ4fWlicPG9qtlUagE57BOfQR3ibwYoAbQVYWfwIPpIiayWFdYmYQg/132",
+          "serverName": "10001服",
+          "legionName": "¹ｗ¹礼之用",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2006,
+            "gesture": 3003,
+            "hairstyle": 4002,
+            "background": 5006,
+            "deployment": 2
+          },
+          "redQuench": 93,
+          "power": 18395485775,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 703,
+            "showHeroes": {
+              "0": {
+                "heroId": 121,
+                "skinId": 12104,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3446172411,
+                "redQuench": 19,
+                "artifactId": 11205,
+                "pSkillId": 1033008,
+                "eBuffCnt": 4
+              },
+              "1": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2742269104,
+                "redQuench": 20,
+                "artifactId": 11235,
+                "pSkillId": 1033011,
+                "eBuffCnt": 5
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 4091123014,
+                "redQuench": 18,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 4
+              },
+              "3": {
+                "heroId": 111,
+                "skinId": 11108,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 4727020571,
+                "redQuench": 18,
+                "artifactId": 11075,
+                "pSkillId": 1033007,
+                "eBuffCnt": 5
+              },
+              "4": {
+                "heroId": 105,
+                "skinId": 10503,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3388900675,
+                "redQuench": 18,
+                "artifactId": 11195,
+                "pSkillId": 1033009,
+                "eBuffCnt": 5
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 33
+}
+异步: 是
+调用ID: call_1784274505495_txeuqskk3
+
+记录 #2:
+----------------------------------------
+时间: 2026/7/17 15:48:23
+服务: SaltCup26Service
+方法: openStarPack
+参数: [{"packId":5502,"starId":0,"cnt":1}]
+结果:
+{
+  "_raw": {
+    "seq": 52,
+    "ack": 52,
+    "time": 1784274504165,
+    "resp": 52,
+    "cmd": "saltcup26_openstarpackresp",
+    "body": {
+      "role": {
+        "items": {
+          "5502": {
+            "quantity": 1
+          }
+        }
+      },
+      "roleData": {
+        "starCards": {
+          "10645": {
+            "starId": 10645,
+            "getTime": 1784274504,
+            "sourceType": 5502
+          }
+        }
+      },
+      "newCards": [
+        {
+          "starId": 10645,
+          "getTime": 1784274504,
+          "sourceType": 5502
+        }
+      ],
+      "starMap": {
+        "10645": {
+          "roleId": 653229991,
+          "starId": 10645,
+          "name": "龙愁",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/653229991/1782977822.jpg",
+          "serverName": "26232服",
+          "legionName": "沧澜⁣⁣⁢​",
+          "avatarFrame": {
+            "id": 111403,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2003,
+            "gesture": 3004,
+            "hairstyle": 4004,
+            "background": 5004,
+            "deployment": 6
+          },
+          "redQuench": 89,
+          "power": 21075148264,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 603,
+            "showHeroes": {
+              "0": {
+                "heroId": 109,
+                "skinId": 10909,
+                "level": 5700,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 3277073122,
+                "redQuench": 19,
+                "artifactId": 11015,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 5894060673,
+                "redQuench": 16,
+                "artifactId": 11155,
+                "pSkillId": 1033009,
+                "eBuffCnt": 0
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 5407115653,
+                "redQuench": 20,
+                "artifactId": 11075,
+                "pSkillId": 1033007,
+                "eBuffCnt": 4
+              },
+              "3": {
+                "heroId": 117,
+                "skinId": 11707,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3295067261,
+                "redQuench": 18,
+                "artifactId": 11135,
+                "pSkillId": 1033007,
+                "eBuffCnt": 4
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 3201831555,
+                "redQuench": 16,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+异步: 是
+调用ID: call_1784274503608_y062k6pyn
+
+记录 #3:
+----------------------------------------
+时间: 2026/7/17 15:48:19
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 51,
+    "ack": 50,
+    "time": 1784274500165,
+    "resp": 51,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 19
+}
+异步: 是
+调用ID: call_1784274499625_h5oaal6q0
+
+记录 #4:
+----------------------------------------
+时间: 2026/7/17 15:48:17
+服务: SaltCup26Service
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 50,
+    "ack": 0,
+    "time": 1784274498247,
+    "resp": 50,
+    "cmd": "saltcup26_getinforesp",
+    "body": {
+      "schedule": {
+        "phase": 4,
+        "scheduleId": 260703109,
+        "phaseStart": 1783630800,
+        "phaseEnd": 1786031999,
+        "nextSchId": 260703110,
+        "nextMatchTime": 1784535601
+      },
+      "roleData": {
+        "roleId": 115789831,
+        "name": "相符50-1",
+        "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+        "formationId": 1,
+        "starIdList": [
+          [
+            10100,
+            10391,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            10694
+          ]
+        ],
+        "starCards": {
+          "10074": {
+            "starId": 10074,
+            "getTime": 1784096839,
+            "sourceType": 5501
+          },
+          "10100": {
+            "starId": 10100,
+            "getTime": 1784096843,
+            "sourceType": 5501
+          },
+          "10137": {
+            "starId": 10137,
+            "getTime": 1784096842,
+            "sourceType": 5501
+          },
+          "10174": {
+            "starId": 10174,
+            "getTime": 1784096846,
+            "sourceType": 5501
+          },
+          "10274": {
+            "starId": 10274,
+            "getTime": 1784096842,
+            "sourceType": 5501
+          },
+          "10284": {
+            "starId": 10284,
+            "getTime": 1784096844,
+            "sourceType": 5501
+          },
+          "10304": {
+            "starId": 10304,
+            "getTime": 1784096840,
+            "sourceType": 5501
+          },
+          "10324": {
+            "starId": 10324,
+            "getTime": 1784096841,
+            "sourceType": 5501
+          },
+          "10391": {
+            "starId": 10391,
+            "getTime": 1784096840,
+            "sourceType": 5501
+          },
+          "10417": {
+            "starId": 10417,
+            "getTime": 1784096847,
+            "sourceType": 5501
+          },
+          "10542": {
+            "starId": 10542,
+            "getTime": 1784096845,
+            "sourceType": 5501
+          },
+          "10652": {
+            "starId": 10652,
+            "getTime": 1784096846,
+            "sourceType": 5501
+          },
+          "10694": {
+            "starId": 10694,
+            "getTime": 1784096845,
+            "sourceType": 5501
+          },
+          "10705": {
+            "starId": 10705,
+            "getTime": 1784096841,
+            "sourceType": 5501
+          },
+          "10745": {
+            "starId": 10745,
+            "getTime": 1784096843,
+            "sourceType": 5501
+          }
+        },
+        "weeklyPackClaimed": {
+          "1": 1784274494
+        },
+        "betRecord": {
+          "260703101": {
+            "260703101_10023_19800": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703102": {
+            "260703102_35015_145165": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703103": {
+            "260703103_35015_529427": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703104": {
+            "260703104_704831653_461917922": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703105": {
+            "260703105_485052605_63490259": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703106": {
+            "260703106_548865135_45851485": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703107": {
+            "260703107_45851485_495668608": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          },
+          "260703108": {
+            "260703108_293385155_492828480": {
+              "pick": 0,
+              "pickResult": 0,
+              "betTime": 0,
+              "claimed": false
+            }
+          }
+        }
+      },
+      "starMap": {
+        "10074": {
+          "roleId": 267886279,
+          "starId": 10074,
+          "name": "月、卡曼橘",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEKNAoRcyc3wardj4R6NkAnGgggV8QsVkiaDicR3Gia1XSIrWWr0juPTP3gVYibKJ7icDuicYYibTslYsEVJstQnOCCt4qh4Pibvb8I9G31AmLWV8MX8ibQ/132",
+          "serverName": "6393服",
+          "legionName": "⁶³衔月",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2006,
+            "gesture": 3003,
+            "hairstyle": 4003,
+            "background": 5004,
+            "deployment": 1
+          },
+          "redQuench": 82,
+          "power": 19090904307,
+          "showTeam": {
+            "lordWeaponId": 8,
+            "petId": 601,
+            "showHeroes": {
+              "0": {
+                "heroId": 114,
+                "skinId": 11403,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 3554405493,
+                "redQuench": 14,
+                "artifactId": 11025,
+                "pSkillId": 1033009,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 111,
+                "skinId": 11108,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3633988570,
+                "redQuench": 17,
+                "artifactId": 11075,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 113,
+                "skinId": 11302,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 4852405862,
+                "redQuench": 18,
+                "artifactId": 11155,
+                "pSkillId": 1033010,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 115,
+                "skinId": 11502,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 4376420651,
+                "redQuench": 15,
+                "artifactId": 11175,
+                "pSkillId": 1033017,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2673683731,
+                "redQuench": 18,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10100": {
+          "roleId": 599858933,
+          "starId": 10100,
+          "name": "长安宝宝",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/599858933/1762237133.jpg",
+          "serverName": "25001服",
+          "legionName": "天线宝宝骑士",
+          "avatarFrame": {
+            "id": 1109,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1003,
+            "jersey": 2005,
+            "gesture": 3005,
+            "hairstyle": 4005,
+            "background": 5005,
+            "deployment": 2
+          },
+          "redQuench": 92,
+          "power": 18169653153,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 5500,
+                "order": 18,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2794182982,
+                "redQuench": 18,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 109,
+                "skinId": 10909,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3610103033,
+                "redQuench": 19,
+                "artifactId": 11015,
+                "pSkillId": 1033015,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 5404790062,
+                "redQuench": 17,
+                "artifactId": 11075,
+                "pSkillId": 1033008,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 117,
+                "skinId": 11705,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3472231093,
+                "redQuench": 19,
+                "artifactId": 11135,
+                "pSkillId": 1033016,
+                "eBuffCnt": 3
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2888345983,
+                "redQuench": 19,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10137": {
+          "roleId": 231259700,
+          "starId": 10137,
+          "name": "胧月",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/231259700/1782438282.jpg",
+          "serverName": "13501服",
+          "legionName": "雲上｜冰心",
+          "avatarFrame": {
+            "id": 111403,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2001,
+            "gesture": 3001,
+            "hairstyle": 4001,
+            "background": 5001,
+            "deployment": 2
+          },
+          "redQuench": 62,
+          "power": 14846961952,
+          "showTeam": {
+            "lordWeaponId": 5,
+            "petId": 603,
+            "showHeroes": {
+              "1": {
+                "heroId": 111,
+                "skinId": 11101,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 3831349888,
+                "redQuench": 15,
+                "artifactId": 11075,
+                "pSkillId": 1033012,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 121,
+                "skinId": 12103,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3266385630,
+                "redQuench": 14,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 2
+              },
+              "3": {
+                "heroId": 115,
+                "skinId": 11501,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 4786458600,
+                "redQuench": 16,
+                "artifactId": 11175,
+                "pSkillId": 1033017,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11903,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2962767834,
+                "redQuench": 17,
+                "artifactId": 11235,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              }
+            }
+          },
+          "voteShowMap": null,
+          "tips": "",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10174": {
+          "roleId": 46621187,
+          "starId": 10174,
+          "name": "雪花",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/XelXm5JGKhQIUzDn4FPoq9xgJXBfdQyWPez4REdy5EM29sxIBCNKBphfEMfATsTd7bXclnuV6SumphysK1BxtYZjhPYC9cDeU540QEBlbPQ/132",
+          "serverName": "4061服",
+          "legionName": "Mの哑巴新娘",
+          "avatarFrame": {
+            "id": 3005,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2002,
+            "gesture": 3003,
+            "hairstyle": 4001,
+            "background": 5005,
+            "deployment": 1
+          },
+          "redQuench": 83,
+          "power": 14784338556,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 110,
+                "skinId": 11005,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2605017270,
+                "redQuench": 18,
+                "artifactId": 12105,
+                "pSkillId": 1033008,
+                "eBuffCnt": 0
+              },
+              "1": {
+                "heroId": 118,
+                "skinId": 11807,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2646640914,
+                "redQuench": 18,
+                "artifactId": 11135,
+                "pSkillId": 1033015,
+                "eBuffCnt": 0
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2676352517,
+                "redQuench": 18,
+                "artifactId": 11085,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 104,
+                "skinId": 10408,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3286373218,
+                "redQuench": 16,
+                "artifactId": 11185,
+                "pSkillId": 1033011,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3569954637,
+                "redQuench": 13,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10274": {
+          "roleId": 52007930,
+          "starId": 10274,
+          "name": "吉祥如意",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEI52JgiaEZr3DFibyaMleVrvibpFwII9a7qFibl7mNQtcDEKggjFjdSUz0PtkFqfl8AaIm6cdHhnp2cUJ8Mbu3REr3xr7wia4vsHr3Bal60icfAy6BQ/132",
+          "serverName": "4451服",
+          "legionName": "✨新月⁴⁴",
+          "avatarFrame": {
+            "id": 3005,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2003,
+            "gesture": 3003,
+            "hairstyle": 4002,
+            "background": 5004,
+            "deployment": 3
+          },
+          "redQuench": 81,
+          "power": 17504947511,
+          "showTeam": {
+            "lordWeaponId": 5,
+            "petId": 701,
+            "showHeroes": {
+              "0": {
+                "heroId": 114,
+                "skinId": 11403,
+                "level": 5900,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3549023409,
+                "redQuench": 17,
+                "artifactId": 11025,
+                "pSkillId": 1033009,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 111,
+                "skinId": 11102,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 3842235071,
+                "redQuench": 15,
+                "artifactId": 11075,
+                "pSkillId": 1033012,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 121,
+                "skinId": 12105,
+                "level": 5600,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 2718590939,
+                "redQuench": 16,
+                "artifactId": 11235,
+                "pSkillId": 1033015,
+                "eBuffCnt": 2
+              },
+              "3": {
+                "heroId": 115,
+                "skinId": 11504,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 4779273987,
+                "redQuench": 17,
+                "artifactId": 11175,
+                "pSkillId": 1033017,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2615824105,
+                "redQuench": 16,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10284": {
+          "roleId": 444735772,
+          "starId": 10284,
+          "name": "然",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/444735772/1783230483.jpg",
+          "serverName": "21111服",
+          "legionName": "您那李白吗",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2001,
+            "gesture": 3001,
+            "hairstyle": 4001,
+            "background": 5004,
+            "deployment": 4
+          },
+          "redQuench": 79,
+          "power": 17976717271,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 119,
+                "skinId": 11905,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2817564906,
+                "redQuench": 18,
+                "artifactId": 11015,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 106,
+                "skinId": -1,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 4005986186,
+                "redQuench": 17,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 113,
+                "skinId": -1,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 5154641866,
+                "redQuench": 12,
+                "artifactId": 11065,
+                "pSkillId": 1033009,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 117,
+                "skinId": 11705,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3219774790,
+                "redQuench": 17,
+                "artifactId": 11135,
+                "pSkillId": 1033016,
+                "eBuffCnt": 3
+              },
+              "4": {
+                "heroId": 121,
+                "skinId": -1,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2778749523,
+                "redQuench": 15,
+                "artifactId": 11095,
+                "pSkillId": 1033008,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10304": {
+          "roleId": 57436954,
+          "starId": 10304,
+          "name": "橙汁酸豆角",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/FN7tXXmMWzpO0qAxN7JkBia3bg79Lcn2M1LjFTjvly9z13BPopiaVeia7qJwzThFEmuzkzjk4NDy1dH9Uol7UibLeB8dSvqxuVocpmrfNoafJDo/132",
+          "serverName": "4879服",
+          "legionName": "✨缔造✨",
+          "avatarFrame": {
+            "id": 111403,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1002,
+            "jersey": 2006,
+            "gesture": 3002,
+            "hairstyle": 4006,
+            "background": 5004,
+            "deployment": 3
+          },
+          "redQuench": 72,
+          "power": 18692059041,
+          "showTeam": {
+            "lordWeaponId": 5,
+            "petId": 601,
+            "showHeroes": {
+              "0": {
+                "heroId": 114,
+                "skinId": 11402,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3747110977,
+                "redQuench": 14,
+                "artifactId": 11025,
+                "pSkillId": 1033009,
+                "eBuffCnt": 4
+              },
+              "1": {
+                "heroId": 111,
+                "skinId": 11103,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3954581121,
+                "redQuench": 15,
+                "artifactId": 11075,
+                "pSkillId": 1033012,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 119,
+                "skinId": 3001,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2731906112,
+                "redQuench": 15,
+                "artifactId": 11015,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              },
+              "3": {
+                "heroId": 113,
+                "skinId": -1,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 5065945124,
+                "redQuench": 13,
+                "artifactId": 11155,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 112,
+                "skinId": 11203,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3192515707,
+                "redQuench": 15,
+                "artifactId": 12125,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10324": {
+          "roleId": 457758679,
+          "starId": 10324,
+          "name": "金鳞",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/457758679/1783080067.jpg",
+          "serverName": "21404服",
+          "legionName": "⁣金鳞",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1006,
+            "jersey": 2004,
+            "gesture": 3003,
+            "hairstyle": 4001,
+            "background": 5005,
+            "deployment": 1
+          },
+          "redQuench": 85,
+          "power": 18369013212,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 117,
+                "skinId": 11707,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3095255716,
+                "redQuench": 18,
+                "artifactId": 11135,
+                "pSkillId": 1033016,
+                "eBuffCnt": 4
+              },
+              "1": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 5079871049,
+                "redQuench": 16,
+                "artifactId": 11065,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 5700,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 3947401104,
+                "redQuench": 18,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              },
+              "3": {
+                "heroId": 109,
+                "skinId": 10909,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3566757032,
+                "redQuench": 17,
+                "artifactId": 11115,
+                "pSkillId": 1033007,
+                "eBuffCnt": 4
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2679728311,
+                "redQuench": 16,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 4
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10391": {
+          "roleId": 53648169,
+          "starId": 10391,
+          "name": "雷婵",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/53648169/1782920137.jpg",
+          "serverName": "4573服",
+          "legionName": "百战⸸成诗",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2001,
+            "gesture": 3001,
+            "hairstyle": 4001,
+            "background": 5001,
+            "deployment": 1
+          },
+          "redQuench": 91,
+          "power": 18164465888,
+          "showTeam": {
+            "lordWeaponId": 2,
+            "petId": 603,
+            "showHeroes": {
+              "0": {
+                "heroId": 110,
+                "skinId": 11005,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2882316293,
+                "redQuench": 16,
+                "artifactId": 11025,
+                "pSkillId": 1033009,
+                "eBuffCnt": 0
+              },
+              "1": {
+                "heroId": 120,
+                "skinId": 12005,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2617421536,
+                "redQuench": 19,
+                "artifactId": 11025,
+                "pSkillId": 1033009,
+                "eBuffCnt": 4
+              },
+              "2": {
+                "heroId": 113,
+                "skinId": 11302,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 4721097093,
+                "redQuench": 18,
+                "artifactId": 11095,
+                "pSkillId": 1033009,
+                "eBuffCnt": 0
+              },
+              "3": {
+                "heroId": 104,
+                "skinId": 10403,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 3820561215,
+                "redQuench": 18,
+                "artifactId": 11015,
+                "pSkillId": 1033010,
+                "eBuffCnt": 0
+              },
+              "4": {
+                "heroId": 106,
+                "skinId": 10603,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 4123069751,
+                "redQuench": 20,
+                "artifactId": 11085,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10417": {
+          "roleId": 233555921,
+          "starId": 10417,
+          "name": "磐石⛰️爆炸",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/233555921/1782128740.jpg",
+          "serverName": "12601服",
+          "legionName": "磐石⛰️",
+          "avatarFrame": {
+            "id": 1105,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2002,
+            "gesture": 3006,
+            "hairstyle": 4003,
+            "background": 5005,
+            "deployment": 2
+          },
+          "redQuench": 83,
+          "power": 16970230003,
+          "showTeam": {
+            "lordWeaponId": 5,
+            "petId": 601,
+            "showHeroes": {
+              "0": {
+                "heroId": 121,
+                "skinId": 12104,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 2920380074,
+                "redQuench": 15,
+                "artifactId": 11235,
+                "pSkillId": 1033008,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 119,
+                "skinId": 11905,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2588137574,
+                "redQuench": 16,
+                "artifactId": 11095,
+                "pSkillId": 1033008,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 105,
+                "skinId": 10508,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 3008855784,
+                "redQuench": 19,
+                "artifactId": 11135,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 111,
+                "skinId": 11108,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 4307215232,
+                "redQuench": 17,
+                "artifactId": 11075,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 4145641339,
+                "redQuench": 16,
+                "artifactId": 11155,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10542": {
+          "roleId": 124150067,
+          "starId": 10542,
+          "name": "欢迎乌龟王",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/124150067/1783254554.jpg",
+          "serverName": "9501服",
+          "legionName": "大道峥嵘¹",
+          "avatarFrame": {
+            "id": 1106,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2006,
+            "gesture": 3006,
+            "hairstyle": 4001,
+            "background": 5006,
+            "deployment": 2
+          },
+          "redQuench": 59,
+          "power": 13707552179,
+          "showTeam": {
+            "lordWeaponId": 1,
+            "petId": 702,
+            "showHeroes": {
+              "0": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2601902578,
+                "redQuench": 12,
+                "artifactId": 11015,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              },
+              "1": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 5500,
+                "order": 18,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 2755118946,
+                "redQuench": 6,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              },
+              "2": {
+                "heroId": 103,
+                "skinId": 10301,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3137974260,
+                "redQuench": 18,
+                "artifactId": 11085,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              },
+              "3": {
+                "heroId": 112,
+                "skinId": 11208,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2619181339,
+                "redQuench": 14,
+                "artifactId": 11015,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              },
+              "4": {
+                "heroId": 116,
+                "skinId": 11608,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 2593375056,
+                "redQuench": 9,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 0
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10652": {
+          "roleId": 75190383,
+          "starId": 10652,
+          "name": "屯屯的咩",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PnVz6icF469KQgNghdLhyeUp26KGOTWO2jEia6vURdnIAmZHlC74DphGibxjJVuBR9vLSN7DjdXOzEW37YGLmiaJXekpZuSFRzuO6K1L6cFHlBY/132",
+          "serverName": "6212服",
+          "legionName": "逗⁠比的⁠团",
+          "avatarFrame": {
+            "id": 1117,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2001,
+            "gesture": 3004,
+            "hairstyle": 4005,
+            "background": 5006,
+            "deployment": 4
+          },
+          "redQuench": 71,
+          "power": 18096192148,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 117,
+                "skinId": 11707,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 3221168060,
+                "redQuench": 17,
+                "artifactId": 11135,
+                "pSkillId": 1033009,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 4644539815,
+                "redQuench": 11,
+                "artifactId": 11065,
+                "pSkillId": 1033016,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3793185956,
+                "redQuench": 11,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 109,
+                "skinId": 10909,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 1,
+                "hPower": 3300996827,
+                "redQuench": 14,
+                "artifactId": 11115,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11905,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 3136301490,
+                "redQuench": 18,
+                "artifactId": 11095,
+                "pSkillId": 1033011,
+                "eBuffCnt": 0
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10694": {
+          "roleId": 214762032,
+          "starId": 10694,
+          "name": "哇哇叫",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/214762032/1782015364.jpg",
+          "serverName": "13001服",
+          "legionName": "⭐星盟✨",
+          "avatarFrame": null,
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2003,
+            "gesture": 3003,
+            "hairstyle": 4003,
+            "background": 5002,
+            "deployment": 3
+          },
+          "redQuench": 98,
+          "power": 18992572498,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 704,
+            "showHeroes": {
+              "0": {
+                "heroId": 121,
+                "skinId": 12104,
+                "level": 5600,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3212367186,
+                "redQuench": 19,
+                "artifactId": 11235,
+                "pSkillId": 1033008,
+                "eBuffCnt": 0
+              },
+              "1": {
+                "heroId": 106,
+                "skinId": 10607,
+                "level": 5800,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 30,
+                "hPower": 3923022463,
+                "redQuench": 19,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 3
+              },
+              "2": {
+                "heroId": 113,
+                "skinId": 11307,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 5700014192,
+                "redQuench": 20,
+                "artifactId": 11065,
+                "pSkillId": 1033007,
+                "eBuffCnt": 5
+              },
+              "3": {
+                "heroId": 117,
+                "skinId": 11707,
+                "level": 5600,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3180600695,
+                "redQuench": 20,
+                "artifactId": 11135,
+                "pSkillId": 1033016,
+                "eBuffCnt": 5
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2976567962,
+                "redQuench": 20,
+                "artifactId": 11095,
+                "pSkillId": 1033011,
+                "eBuffCnt": 5
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10705": {
+          "roleId": 61980492,
+          "starId": 10705,
+          "name": "「迈」巴赫",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/61980492/1757068163.jpg",
+          "serverName": "5227服",
+          "legionName": "༒鉴查院༒",
+          "avatarFrame": {
+            "id": 111403,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1001,
+            "jersey": 2004,
+            "gesture": 3003,
+            "hairstyle": 4004,
+            "background": 5004,
+            "deployment": 4
+          },
+          "redQuench": 90,
+          "power": 17826387316,
+          "showTeam": {
+            "lordWeaponId": 7,
+            "petId": 601,
+            "showHeroes": {
+              "0": {
+                "heroId": 114,
+                "skinId": 11409,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3553072544,
+                "redQuench": 19,
+                "artifactId": 11025,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 111,
+                "skinId": 11108,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 4498789487,
+                "redQuench": 18,
+                "artifactId": 11075,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "2": {
+                "heroId": 121,
+                "skinId": 12104,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 20,
+                "hPower": 2964596856,
+                "redQuench": 19,
+                "artifactId": 11235,
+                "pSkillId": 1033015,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 115,
+                "skinId": 11504,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 4164793400,
+                "redQuench": 14,
+                "artifactId": 11175,
+                "pSkillId": 1033017,
+                "eBuffCnt": 1
+              },
+              "4": {
+                "heroId": 119,
+                "skinId": 11904,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2645135029,
+                "redQuench": 20,
+                "artifactId": 11095,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        },
+        "10745": {
+          "roleId": 525837113,
+          "starId": 10745,
+          "name": "青龙",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/525837113/1779859099.jpg",
+          "serverName": "12601服",
+          "legionName": "⭐洞天福地✨",
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "cardInfo": {
+            "variety": 1004,
+            "jersey": 2003,
+            "gesture": 3004,
+            "hairstyle": 4002,
+            "background": 5004,
+            "deployment": 2
+          },
+          "redQuench": 76,
+          "power": 17195989098,
+          "showTeam": {
+            "lordWeaponId": 9,
+            "petId": 604,
+            "showHeroes": {
+              "0": {
+                "heroId": 110,
+                "skinId": 11005,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 0,
+                "hPower": 2788977900,
+                "redQuench": 10,
+                "artifactId": 12105,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "1": {
+                "heroId": 118,
+                "skinId": -1,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 40,
+                "hPower": 3148514527,
+                "redQuench": 18,
+                "artifactId": 11135,
+                "pSkillId": 1033015,
+                "eBuffCnt": 3
+              },
+              "2": {
+                "heroId": 106,
+                "skinId": 10603,
+                "level": 5898,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 3764438001,
+                "redQuench": 15,
+                "artifactId": 11215,
+                "pSkillId": 1033007,
+                "eBuffCnt": 1
+              },
+              "3": {
+                "heroId": 104,
+                "skinId": 10403,
+                "level": 5732,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 50,
+                "hPower": 3186548364,
+                "redQuench": 18,
+                "artifactId": 11185,
+                "pSkillId": 1033011,
+                "eBuffCnt": 3
+              },
+              "4": {
+                "heroId": 113,
+                "skinId": 11302,
+                "level": 6000,
+                "order": 19,
+                "star": 30,
+                "hBOrder": 10,
+                "hPower": 4307510306,
+                "redQuench": 15,
+                "artifactId": 11095,
+                "pSkillId": 1033009,
+                "eBuffCnt": 1
+              }
+            }
+          },
+          "voteShowMap": {},
+          "tips": "全力冲锋，冠军舍我其谁！让这股热血冲破天际，燃爆全场！",
+          "damage": 0,
+          "rank": 0,
+          "score": 0
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1784274497701_7c5ta80px
+
+记录 #5:
+----------------------------------------
+时间: 2026/7/17 15:48:14
+服务: SaltCup26Service
+方法: claimWeeklyPack
+参数: [{"weekId":1}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 0,
+    "time": 1784274494659,
+    "resp": 49,
+    "cmd": "saltcup26_claimweeklypackresp",
+    "body": {
+      "role": {
+        "items": {
+          "5502": {
+            "itemId": 5502,
+            "quantity": 2,
+            "ext": null
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5502,
+          "value": 2,
+          "ext": 0
+        }
+      ],
+      "roleData": {
+        "weeklyPackClaimed": {
+          "1": 1784274494
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1784274494108_u5obsir8d
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

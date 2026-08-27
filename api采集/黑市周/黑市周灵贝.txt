@@ -1,0 +1,71 @@
+定时任务增加批量黑市周按钮，点击后使用role_getroleinfo获取金砖数量 "diamond": 214545,和金竿数量，执行，activity_buystoregoods命令，购买宝箱，参数{"activityId":9,"goodsIndex":4,"buyNum":1}，如果金竿数量少于900，执行，activity_buystoregoods命令，购买金竿，参数{"activityId":9,"goodsIndex":6,"buyNum":1}，如果金砖大于250000，执行activity_buystoregoods命令，购买灵贝，参数{"activityId":9,"goodsIndex":8,"buyNum":1}。如果命令执行，提示错误，继续执行。
+
+宝箱
+{
+  "ack": 0,
+  "body": {
+    "activityId": 9,
+    "buyNum": 1,
+    "goodsIndex": 4
+  },
+  "cmd": "activity_buystoregoods",
+  "seq": 5,
+  "time": 1772796440243
+}
+金竿
+{
+  "ack": 0,
+  "body": {
+    "activityId": 9,
+    "buyNum": 1,
+    "goodsIndex": 6
+  },
+  "cmd": "activity_buystoregoods",
+  "seq": 6,
+  "time": 1772796565117
+}
+
+灵贝
+----------------------------------------
+时间: 2026/3/6 19:16:08
+服务: ActivityService
+方法: buyStoreGoods
+参数: [{"activityId":9,"goodsIndex":8,"buyNum":1}]
+结果:
+{
+  "_raw": {
+    "ack": 0,
+    "time": 1772795768235,
+    "resp": 40,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "diamond": 268698,
+        "buyDiamond": 0,
+        "freeDiamond": 268698,
+        "items": {
+          "1033": {
+            "quantity": 55
+          }
+        },
+        "statistics": {
+          "wa:diamond": 42000
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1033,
+          "value": 10,
+          "ext": 0
+        }
+      ]
+    },
+    "seq": 44,
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 160
+}
+异步: 是
+调用ID: call_1772795768141_6qhz3r4rr

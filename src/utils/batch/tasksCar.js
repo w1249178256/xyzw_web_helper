@@ -595,8 +595,392 @@ export function createTasksCar(deps) {
     message.success("批量一键收车结束");
   };
 
+  /**
+   * 智能收发车：逐个token先收车后发车
+   */
+  const handleSmartSendCar = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    for (const tokenId of selectedTokens.value) {
+      if (shouldStop.value) break;
+
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 开始处理 ${token.name}: 先收车 ===`,
+          type: "info",
+        });
+
+        tokenStatus.value[tokenId] = "running";
+
+        // 先执行收车
+        await ensureConnection(tokenId);
+
+        const res = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "car_getrolecar",
+          {},
+          10000,
+        );
+        let carList = normalizeCars(res?.body ?? res);
+        let refreshlevel = res?.roleCar?.research?.[1] || 0;
+
+        for (const car of carList) {
+          if (shouldStop.value) break;
+          if (canClaim(car)) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "car_claim",
+                { carId: String(car.id) },
+                10000,
+              );
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 收车成功: ${gradeLabel(car.color)}`,
+                type: "success",
+              });
+              const roleRes = await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "role_getroleinfo",
+                {},
+                5000,
+              );
+              let refreshpieces = Number(
+                roleRes?.role?.items?.[35009]?.quantity || 0,
+              );
+              while (
+                refreshlevel < CarresearchItem.length &&
+                refreshpieces >= CarresearchItem[refreshlevel] &&
+                !shouldStop.value
+              ) {
+                try {
+                  await tokenStore.sendMessageWithPromise(
+                    tokenId,
+                    "car_research",
+                    { researchId: 1 },
+                    5000,
+                  );
+                  refreshlevel++;
+
+                  const updatedRoleRes = await tokenStore.sendMessageWithPromise(
+                    tokenId,
+                    "role_getroleinfo",
+                    {},
+                    5000,
+                  );
+                  refreshpieces = Number(
+                    updatedRoleRes?.role?.items?.[35009]?.quantity || 0,
+                  );
+
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 执行车辆改装升级，当前等级: ${refreshlevel}`,
+                    type: "success",
+                  });
+
+                  await new Promise((r) => setTimeout(r, delayConfig.action));
+                } catch (e) {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 车辆改装升级失败: ${e.message}`,
+                    type: "error",
+                  });
+                  break;
+                }
+              }
+
+              try {
+                const rewardRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "car_claimpartconsumereward",
+                  {},
+                  5000,
+                );
+                if (rewardRes && rewardRes.reward) {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 领取改装升级累计奖励成功`,
+                    type: "success",
+                  });
+                }
+              } catch (e) {
+                // 忽略
+              }
+            } catch (e) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 收车失败: ${e.message}`,
+                type: "warning",
+              });
+            }
+            await new Promise((r) => setTimeout(r, delayConfig.action));
+          }
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== ${token.name}: 收车完成，开始发车 ===`,
+          type: "info",
+        });
+
+        // 再执行发车
+        const carRes = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "car_getrolecar",
+          {},
+          10000,
+        );
+        let carList2 = normalizeCars(carRes?.body ?? carRes);
+
+        let refreshTickets = 0;
+        let currentRoleId = null;
+        try {
+          const roleRes = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "role_getroleinfo",
+            {},
+            10000,
+          );
+          const qty = roleRes?.role?.items?.[35002]?.quantity;
+          refreshTickets = Number(qty || 0);
+          currentRoleId = roleRes?.role?.roleId ? String(roleRes.role.roleId) : null;
+        } catch (_) {}
+
+        let helperUsageMap = {};
+        let sortedHelpers = [];
+
+        const updateHelperUsage = async () => {
+          try {
+            const usageRes = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "car_getmemberhelpingcnt",
+              {},
+              5000
+            );
+            helperUsageMap =
+              usageRes?.body?.memberHelpingCntMap ||
+              usageRes?.memberHelpingCntMap ||
+              {};
+          } catch (e) {}
+        };
+
+        try {
+          await updateHelperUsage();
+
+          const legionRes = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "legion_getinfo",
+            {},
+            5000,
+          );
+          const membersMap =
+            legionRes?.body?.info?.members || legionRes?.info?.members || {};
+          
+          sortedHelpers = Object.values(membersMap)
+            .filter(
+              (m) =>
+                !currentRoleId || String(m.roleId) !== currentRoleId
+            )
+            .map((m) => ({
+              id: String(m.roleId),
+              name: m.name || m.nickname || String(m.roleId),
+              redQuench: m.custom?.red_quench_cnt || 0,
+            }))
+            .sort((a, b) => b.redQuench - a.redQuench);
+        } catch (e) {}
+
+        const assignHelperIfNeeded = async (car) => {
+          const color = Number(car.color || 0);
+          if (color < 5) return;
+          if (car.helperId) return;
+
+          await updateHelperUsage();
+
+          if (!sortedHelpers.length) return;
+
+          const bestHelper = sortedHelpers.find((h) => {
+            const used = Number(helperUsageMap[h.id] || 0);
+            return used < 4;
+          });
+
+          if (bestHelper) {
+            car.helperId = bestHelper.id;
+            helperUsageMap[bestHelper.id] = Number(helperUsageMap[bestHelper.id] || 0) + 1;
+          }
+        };
+
+        for (const car of carList2) {
+          if (shouldStop.value) break;
+
+          if (Number(car.sendAt || 0) !== 0) continue;
+
+          try {
+            const effectiveTickets = batchSettings.useGoldRefreshFallback ? 999 : refreshTickets;
+            
+            const customConditions = {
+              gold: batchSettings.smartDepartureGoldThreshold,
+              recruit: batchSettings.smartDepartureRecruitThreshold,
+              jade: batchSettings.smartDepartureJadeThreshold,
+              ticket: batchSettings.smartDepartureTicketThreshold,
+            };
+
+            if (shouldSendCar(car, effectiveTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
+              await assignHelperIfNeeded(car);
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "car_send",
+                {
+                  carId: String(car.id),
+                  helperId: car.helperId ? String(car.helperId) : 0,
+                  text: "",
+                  isUpgrade: false,
+                },
+                10000,
+              );
+              await new Promise((r) => setTimeout(r, delayConfig.action));
+              continue;
+            }
+
+            let shouldRefresh = false;
+            const free = Number(car.refreshCount ?? 0) === 0;
+            const useGoldFallback = batchSettings.useGoldRefreshFallback && !free && refreshTickets < 6;
+            
+            if (refreshTickets >= 6) shouldRefresh = true;
+            else if (free) shouldRefresh = true;
+            else if (useGoldFallback) shouldRefresh = true;
+            else {
+              await assignHelperIfNeeded(car);
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "car_send",
+                {
+                  carId: String(car.id),
+                  helperId: car.helperId ? String(car.helperId) : 0,
+                  text: "",
+                  isUpgrade: false,
+                },
+                10000,
+              );
+              await new Promise((r) => setTimeout(r, delayConfig.action));
+              continue;
+            }
+
+            while (shouldRefresh && !shouldStop.value) {
+              const resp = await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "car_refresh",
+                { carId: String(car.id) },
+                10000,
+              );
+              const data = resp?.car || resp?.body?.car || resp;
+
+              if (data && typeof data === "object") {
+                if (data.color != null) car.color = Number(data.color);
+                if (data.refreshCount != null) car.refreshCount = Number(data.refreshCount);
+                if (data.rewards != null) car.rewards = data.rewards;
+              }
+
+              try {
+                const roleRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "role_getroleinfo",
+                  {},
+                  5000,
+                );
+                refreshTickets = Number(roleRes?.role?.items?.[35002]?.quantity || 0);
+              } catch (_) {}
+
+              if (shouldSendCar(car, batchSettings.useGoldRefreshFallback ? 999 : refreshTickets, batchSettings.carMinColor, customConditions, batchSettings.useGoldRefreshFallback, batchSettings.smartDepartureMatchAll)) {
+                await assignHelperIfNeeded(car);
+                await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "car_send",
+                  {
+                    carId: String(car.id),
+                    helperId: car.helperId ? String(car.helperId) : 0,
+                    text: "",
+                    isUpgrade: false,
+                  },
+                  10000,
+                );
+                await new Promise((r) => setTimeout(r, delayConfig.action));
+                break;
+              }
+
+              const freeNow = Number(car.refreshCount ?? 0) === 0;
+              const useGoldFallback2 = batchSettings.useGoldRefreshFallback && !freeNow && refreshTickets < 6;
+
+              if (refreshTickets >= 6) shouldRefresh = true;
+              else if (freeNow) shouldRefresh = true;
+              else if (useGoldFallback2) shouldRefresh = true;
+              else {
+                await assignHelperIfNeeded(car);
+                await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "car_send",
+                  {
+                    carId: String(car.id),
+                    helperId: car.helperId ? String(car.helperId) : 0,
+                    text: "",
+                    isUpgrade: false,
+                  },
+                  10000,
+                );
+                await new Promise((r) => setTimeout(r, delayConfig.action));
+                break;
+              }
+
+              await new Promise((r) => setTimeout(r, delayConfig.refresh));
+            }
+          } catch (carError) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 车辆处理失败: ${carError.message}，跳过`,
+              type: "error",
+            });
+            continue;
+          }
+        }
+
+        tokenStatus.value[tokenId] = "completed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== ${token.name}: 收发车完成 ===`,
+          type: "success",
+        });
+      } catch (error) {
+        console.error(error);
+        tokenStatus.value[tokenId] = "failed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 智能收发车失败: ${error.message}`,
+          type: "error",
+        });
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭`,
+          type: "info",
+        });
+      }
+    }
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("批量智能收发车结束");
+  };
+
   return {
     batchSmartSendCar,
     batchClaimCars,
+    handleSmartSendCar,
   };
 }

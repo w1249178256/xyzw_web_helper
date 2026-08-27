@@ -1,0 +1,140 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/1/31 14:47:42
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 3
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/1/31 14:47:37
+服务: ActivityService
+方法: actEGameStageClaim
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "seq": 100,
+    "ack": 97,
+    "time": 1769842007466,
+    "resp": 98,
+    "cmd": "activity_actegamestageclaimresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "quantity": 3
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5264,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "nextStageId": 26013024
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 37
+}
+异步: 是
+调用ID: call_1769842057731_vbxy62fvb
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/31 14:47:36
+服务: ActivityService
+方法: actEGameStageClaim
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "seq": 99,
+    "ack": 96,
+    "time": 1769842006418,
+    "resp": 97,
+    "cmd": "activity_actegamestageclaimresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "quantity": 2
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5264,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "nextStageId": 26013023
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+异步: 是
+调用ID: call_1769842056683_v7y4w53xz
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/31 14:47:35
+服务: ActivityService
+方法: actEGameStageClaim
+参数: [{"actId":2601302}]
+结果:
+{
+  "_raw": {
+    "seq": 98,
+    "ack": 0,
+    "time": 1769842005340,
+    "resp": 96,
+    "cmd": "activity_actegamestageclaimresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "itemId": 5264,
+            "quantity": 1,
+            "ext": null
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5264,
+          "value": 1,
+          "ext": 0
+        }
+      ],
+      "nextStageId": 26013022
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 36
+}
+异步: 是
+调用ID: call_1769842055604_ta1lst62a
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

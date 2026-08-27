@@ -1,4 +1,4 @@
-import { HERO_DICT } from "@/utils/HeroList";
+import { HERO_DICT, STAR_DICT } from "@/utils/HeroList";
 import { PEACH_TASKS } from "@/utils/PeachTaskIds";
 
 /**
@@ -42,6 +42,115 @@ export function createTasksItem(deps) {
   const heroIds = Object.keys(HERO_DICT).map(Number);
 
   /**
+   * 批量英雄升星（单个Token）
+   */
+  const batchHeroUpgradeForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始英雄升星`,
+        type: "info",
+      });
+
+      // 获取角色信息
+      const roleInfoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "role_getroleinfo",
+        {},
+        5000
+      );
+      const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
+      const heroes = role.heroes || {};
+      const items = role.items || {};
+
+      // 筛选碎片足够升下一星级的武将
+      const upgradableHeroes = [];
+      for (const [heroIdStr, heroData] of Object.entries(heroes)) {
+        const heroId = Number(heroIdStr);
+        const currentStar = heroData.star || 0;
+        if (currentStar >= 30) continue; // 已满级
+
+        const starInfo = STAR_DICT[currentStar];
+        if (!starInfo || starInfo.cost === 0) continue;
+
+        const fragmentCost = starInfo.cost;
+        // 碎片itemId与heroId相同
+        const fragmentItem = items[heroId];
+        const fragmentCount = fragmentItem?.quantity || 0;
+
+        if (fragmentCount >= fragmentCost) {
+          upgradableHeroes.push({
+            heroId,
+            currentStar,
+            fragmentCount,
+            fragmentCost,
+          });
+          console.log(`${token.name} 可升星武将: ${HERO_DICT[heroId]?.name || heroId}, 当前星级${currentStar}, 碎片${fragmentCount}, 需要${fragmentCost}`);
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 共${upgradableHeroes.length}个武将可升星`,
+        type: "info",
+      });
+
+      // 只对碎片足够的武将执行升星
+      for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
+        if (shouldStop.value) break;
+
+        // 计算最多可升次数
+        const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost));
+
+        for (let i = 1; i <= maxUpgrades; i++) {
+          if (shouldStop.value) break;
+
+          try {
+            const res = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "hero_heroupgradestar",
+              { heroId },
+              5000,
+            );
+            const ok = res && (res.code === 0 || res.success === true || res.result === 0);
+
+            if (ok) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} ${HERO_DICT[heroId]?.name || heroId} 升星成功 (第${i}次)`,
+                type: "success",
+              });
+            } else {
+              throw new Error("升星失败");
+            }
+          } catch (err) {
+            break;
+          }
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 英雄升星完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `英雄升星失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
+  };
+
+  /**
    * 批量英雄升星
    */
   const batchHeroUpgrade = async () => {
@@ -69,11 +178,57 @@ export function createTasksItem(deps) {
 
         await ensureConnection(tokenId);
 
-        for (const heroId of heroIds) {
+        // 获取角色信息
+        const roleInfoRes = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "role_getroleinfo",
+          {},
+          5000
+        );
+        const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
+        const heroes = role.heroes || {};
+        const items = role.items || {};
+
+        // 筛选碎片足够升下一星级的武将
+        const upgradableHeroes = [];
+        for (const [heroIdStr, heroData] of Object.entries(heroes)) {
+          const heroId = Number(heroIdStr);
+          const currentStar = heroData.star || 0;
+          if (currentStar >= 30) continue; // 已满级
+
+          const starInfo = STAR_DICT[currentStar];
+          if (!starInfo || starInfo.cost === 0) continue;
+
+          const fragmentCost = starInfo.cost;
+          // 碎片itemId与heroId相同
+          const fragmentItem = items[heroId];
+          const fragmentCount = fragmentItem?.quantity || 0;
+
+          if (fragmentCount >= fragmentCost) {
+            upgradableHeroes.push({
+              heroId,
+              currentStar,
+              fragmentCount,
+              fragmentCost,
+            });
+            console.log(`${token.name} 可升星武将: ${HERO_DICT[heroId]?.name || heroId}, 当前星级${currentStar}, 碎片${fragmentCount}, 需要${fragmentCost}`);
+          }
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 共${upgradableHeroes.length}个武将可升星`,
+          type: "info",
+        });
+
+        // 只对碎片足够的武将执行升星
+        for (const { heroId, currentStar, fragmentCount, fragmentCost } of upgradableHeroes) {
           if (shouldStop.value) break;
 
-          // 每个英雄尝试最多10次升星（只要成功就继续，失败则跳过该英雄）
-          for (let i = 1; i <= 10; i++) {
+          // 计算最多可升次数
+          const maxUpgrades = Math.min(10, Math.floor(fragmentCount / fragmentCost));
+
+          for (let i = 1; i <= maxUpgrades; i++) {
             if (shouldStop.value) break;
 
             try {
@@ -90,16 +245,13 @@ export function createTasksItem(deps) {
               if (ok) {
                 addLog({
                   time: new Date().toLocaleTimeString(),
-                  message: `${token.name} 英雄ID:${heroId} 升星成功 (第${i}次)`,
+                  message: `${token.name} ${HERO_DICT[heroId]?.name || heroId} 升星成功 (第${i}次)`,
                   type: "success",
                 });
-                // 成功了继续尝试下一级，直到失败或达到10次
               } else {
-                // 失败说明无法继续升星（碎片不足或满星），跳出循环处理下一个英雄
                 throw new Error("升星失败");
               }
             } catch (err) {
-              // 失败则停止当前英雄的升星尝试
               break;
             }
             await new Promise((r) => setTimeout(r, delayConfig.action));
@@ -130,6 +282,72 @@ export function createTasksItem(deps) {
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("批量英雄升星结束");
+  };
+
+  /**
+   * 批量图鉴升星（单个Token）
+   */
+  const batchBookUpgradeForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始图鉴升星`,
+        type: "info",
+      });
+
+      for (const heroId of heroIds) {
+        if (shouldStop.value) break;
+
+        // 每个英雄尝试最多10次图鉴升星
+        for (let i = 1; i <= 10; i++) {
+          if (shouldStop.value) break;
+
+          try {
+            const res = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "book_upgrade",
+              { heroId },
+              5000,
+            );
+            const ok = res && (res.code === 0 || res.success === true || res.result === 0);
+
+            if (ok) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 英雄ID:${heroId} 图鉴升星成功 (第${i}次)`,
+                type: "success",
+              });
+              // 成功了继续尝试下一级
+            } else {
+              // 失败说明无法继续图鉴升星，跳出循环
+              throw new Error("图鉴升星失败");
+            }
+          } catch (err) {
+            // 失败则停止当前英雄的图鉴升星尝试
+            break;
+          }
+          await new Promise((r) => setTimeout(r, delayConfig.action));
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 图鉴升星完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `图鉴升星失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
   };
 
   /**
@@ -221,6 +439,81 @@ export function createTasksItem(deps) {
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("批量图鉴升星结束");
+  };
+
+  /**
+   * 批量领取图鉴奖励（单个Token）
+   */
+  const batchClaimStarRewardsForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始领取图鉴奖励`,
+        type: "info",
+      });
+
+      // 领取图鉴星星奖励
+      const starRewardRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "book_claimstarreward",
+        {},
+        5000
+      );
+      
+      if (starRewardRes?.result === 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴星星奖励领取成功`,
+          type: "success",
+        });
+      } else {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴星星奖励领取失败: ${starRewardRes?.hint || "未知错误"}`,
+          type: "warning",
+        });
+      }
+
+      // 领取图鉴成就奖励
+      const achievementRewardRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "book_claimachievementreward",
+        {},
+        5000
+      );
+      
+      if (achievementRewardRes?.result === 0) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴成就奖励领取成功`,
+          type: "success",
+        });
+      } else {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 图鉴成就奖励领取失败: ${achievementRewardRes?.hint || "未知错误"}`,
+          type: "warning",
+        });
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 图鉴奖励领取完成`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `图鉴奖励领取失败: ${error.message}`,
+        type: "error",
+      });
+      throw error;
+    }
   };
 
   /**
@@ -587,6 +880,66 @@ export function createTasksItem(deps) {
   };
 
   /**
+   * 一键灯神扫荡（单个Token）
+   */
+  const batchGenieSweepForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    await ensureConnection(tokenId);
+    
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `${token.name} 开始灯神扫荡`,
+      type: "info",
+    });
+
+    // 执行3次genie_buysweep命令
+    for (let i = 0; i < 3; i++) {
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'genie_buysweep',
+          {},
+          5000
+        );
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} genie_buysweep ${i + 1}/3 失败: ${error.message}`,
+          type: "warning",
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // 灯神扫荡 - 循环执行4次，每次使用不同的genieId（1-4）
+    for (let genieId = 1; genieId <= 4; genieId++) {
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'genie_sweep',
+          { genieId: genieId, sweepCnt: 1 },
+          5000
+        );
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} genie_sweep 灯神${genieId} 失败: ${error.message}`,
+          type: "warning",
+        });
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `${token.name} 灯神扫荡完成`,
+      type: "success",
+    });
+  };
+
+  /**
    * 一键灯神扫荡
    */
   const batchGenieSweep = async () => {
@@ -614,117 +967,68 @@ export function createTasksItem(deps) {
 
         await ensureConnection(tokenId);
 
-        // 获取最新角色信息
-        const roleInfoRes = await tokenStore.sendMessageWithPromise(
-          tokenId,
-          "role_getroleinfo",
-          {},
-          5000
-        );
-        
-        // 解析灯神进度和扫荡券
-        const role = roleInfoRes?.role || roleInfoRes?.data?.role || {};
-        const genieData = role.genie || {};
-        // 扫荡券 ID 1021
-        const sweepTicketCount = role.items?.[1021]?.quantity || 0;
-
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 当前扫荡券数量: ${sweepTicketCount}`,
-          type: "info",
-        });
-
-        if (sweepTicketCount <= 0) {
-          addLog({
-            time: new Date().toLocaleTimeString(),
-            message: `${token.name} 扫荡券不足，停止扫荡`,
-            type: "warning",
-          });
-          tokenStatus.value[tokenId] = "completed";
-          return;
-        }
-
-        // 计算最高层数
-        // 1-4: 魏蜀吴群 (0-16 -> 1-17层)
-        // 5: 深海 (0-9 -> 1-10层)
-        let maxLayer = -1;
-        let bestGenieId = -1;
-
-        // 检查魏蜀吴群 (1-4)
-        for (let i = 1; i <= 4; i++) {
-          if (genieData[i] !== undefined) {
-            // 数据值 0 代表 1 层? 用户说 0-16 代表 1-17 层
-            // 假设 genieData[i] 是已通过的层数索引
-            const currentLayer = genieData[i] + 1;
-            if (currentLayer > maxLayer) {
-              maxLayer = currentLayer;
-              bestGenieId = i;
-            }
-          }
-        }
-
-        if (bestGenieId === -1) {
-          addLog({
-            time: new Date().toLocaleTimeString(),
-            message: `${token.name} 未找到可扫荡的灯神关卡`,
-            type: "warning",
-          });
-          tokenStatus.value[tokenId] = "completed";
-          return;
-        }
-
-        const genieNames = { 1: "魏国", 2: "蜀国", 3: "吴国", 4: "群雄", 5: "深海" };
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 扫荡: ${genieNames[bestGenieId]}灯神 (第${maxLayer}层)`,
-          type: "info",
-        });
-
-        // 开始扫荡
-        let remainingTickets = sweepTicketCount;
-        
-        while (remainingTickets > 0 && !shouldStop.value) {
-          const sweepCnt = Math.min(remainingTickets, 20);
-          
+        // 执行3次genie_buysweep命令
+        let buysweepSuccess = true;
+        for (let i = 0; i < 3; i++) {
           try {
-            const res = await tokenStore.sendMessageWithPromise(
+            await tokenStore.sendMessageWithPromise(
               tokenId,
-              "genie_sweep",
-              { 
-                genieId: bestGenieId,
-                sweepCnt: sweepCnt 
-              },
+              'genie_buysweep',
+              {},
               5000
             );
-
-            const ok = res && (res.role || res.role.items);
-            
-            if (ok) {
-               addLog({
-                time: new Date().toLocaleTimeString(),
-                message: `${token.name} 扫荡成功 ${sweepCnt} 次`,
-                type: "success",
-              });
-              remainingTickets = res.role.items?.[1021]?.quantity || 0;
-            } else {
-               addLog({
-                time: new Date().toLocaleTimeString(),
-                message: `${token.name} 扫荡失败: ${res.hint || "未知错误"}`,
-                type: "error",
-              });
-              break; // 失败则停止
-            }
-          } catch (err) {
             addLog({
               time: new Date().toLocaleTimeString(),
-              message: `${token.name} 扫荡请求异常: ${err.message}`,
-              type: "error",
+              message: `${token.name} genie_buysweep ${i + 1}/3 成功`,
+              type: "success",
             });
-            break;
+          } catch (error) {
+            if (i === 0) {
+              // 第一次执行失败，跳过剩余命令
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} genie_buysweep 第1次失败，跳过剩余命令`,
+                type: "warning",
+              });
+              buysweepSuccess = false;
+              break;
+            } else {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} genie_buysweep ${i + 1}/3 失败: ${error.message}`,
+                type: "warning",
+              });
+            }
           }
+          if (buysweepSuccess) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
 
-          if (remainingTickets > 0) {
-             await new Promise((r) => setTimeout(r, delayConfig.action));
+        // 如果genie_buysweep成功，执行灯神扫荡
+        if (buysweepSuccess) {
+          // 灯神扫荡 - 循环执行4次，每次使用不同的genieId（1-4）
+          for (let genieId = 1; genieId <= 4; genieId++) {
+            try {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                'genie_sweep',
+                { genieId: genieId, sweepCnt: 1 },
+                5000
+              );
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} genie_sweep 灯神${genieId} 成功`,
+                type: "success",
+              });
+            } catch (error) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} genie_sweep 灯神${genieId} 失败: ${error.message}`,
+                type: "warning",
+              });
+            }
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
         }
 
@@ -756,6 +1060,235 @@ export function createTasksItem(deps) {
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("一键灯神扫荡结束");
+  };
+
+  const getTodayBossId = () => {
+    const DAY_BOSS_MAP = [9904, 9905, 9901, 9902, 9903, 9904, 9905];
+    const dayOfWeek = new Date().getDay();
+    return DAY_BOSS_MAP[dayOfWeek];
+  };
+
+  const batchLegionBoss = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始俱乐部BOSS`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        try {
+          await tokenStore.sendPresetteamSaveTeam(
+            tokenId,
+            { teamId: 1 },
+            5000
+          );
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (switchError) {
+          const switchErrorMsg = switchError.message || switchError.toString();
+          if (!switchErrorMsg.includes('200020')) {
+            throw switchError;
+          }
+        }
+
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'fight_startlegionboss',
+          {},
+          5000
+        );
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 俱乐部BOSS完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 俱乐部BOSS失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键俱乐部BOSS结束");
+  };
+
+  const batchFreeGift = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始每日免费礼包`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'system_signinreward',
+            {},
+            5000
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 签到成功`,
+            type: "success",
+          });
+        } catch (signinError) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 签到跳过: ${signinError.message}`,
+            type: "warning",
+          });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        try {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'discount_claimreward',
+            { discountId: 1 },
+            5000
+          );
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 免费礼包领取成功`,
+            type: "success",
+          });
+        } catch (discountError) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 免费礼包领取失败: ${discountError.message}`,
+            type: "warning",
+          });
+        }
+
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 每日免费礼包异常: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键每日免费礼包结束");
+  };
+
+  const batchDailyBoss = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    const todayBossId = getTodayBossId();
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始每日咸王（BOSS ID: ${todayBossId}）`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        for (let i = 0; i < 3; i++) {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'fight_startboss',
+            { bossId: todayBossId },
+            12000
+          );
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 咸王挑战完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 咸王挑战失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键每日咸王结束");
   };
 
   const batchOpenBox = async (isScheduledTask = false) => {
@@ -1457,6 +1990,174 @@ export function createTasksItem(deps) {
     message.success("按积分开箱结束");
   };
 
+  /**
+   * 俱乐部BOSS - ForToken版本
+   */
+  const batchLegionBossForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      await ensureConnection(tokenId);
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始俱乐部BOSS`,
+        type: "info",
+      });
+
+      try {
+        await tokenStore.sendPresetteamSaveTeam(
+          tokenId,
+          { teamId: 1 },
+          5000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (switchError) {
+        const switchErrorMsg = switchError.message || switchError.toString();
+        if (!switchErrorMsg.includes('200020')) {
+          throw switchError;
+        }
+      }
+
+      await tokenStore.sendMessageWithPromise(
+        tokenId,
+        'fight_startlegionboss',
+        {},
+        5000
+      );
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部BOSS完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 俱乐部BOSS失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 每日免费礼包 - ForToken版本
+   */
+  const batchFreeGiftForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      await ensureConnection(tokenId);
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始每日免费礼包`,
+        type: "info",
+      });
+
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'system_signinreward',
+          {},
+          5000
+        );
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 签到成功`,
+          type: "success",
+        });
+      } catch (signinError) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 签到跳过: ${signinError.message}`,
+          type: "warning",
+        });
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      try {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'discount_claimreward',
+          { discountId: 1 },
+          5000
+        );
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费礼包领取成功`,
+          type: "success",
+        });
+      } catch (discountError) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费礼包领取失败: ${discountError.message}`,
+          type: "warning",
+        });
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 每日免费礼包完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 每日免费礼包异常: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 每日咸王 - ForToken版本
+   */
+  const batchDailyBossForToken = async (tokenId) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    const todayBossId = getTodayBossId();
+
+    try {
+      await ensureConnection(tokenId);
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始每日咸王（BOSS ID: ${todayBossId}）`,
+        type: "info",
+      });
+
+      for (let i = 0; i < 3; i++) {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'fight_startboss',
+          { bossId: todayBossId },
+          12000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 咸王挑战完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 咸王挑战失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
   return {
     batchOpenBox,
     batchOpenBoxByPoints,
@@ -1464,9 +2165,19 @@ export function createTasksItem(deps) {
     batchFish,
     batchRecruit,
     batchHeroUpgrade,
+    batchHeroUpgradeForToken,
     batchBookUpgrade,
+    batchBookUpgradeForToken,
     batchClaimStarRewards,
+    batchClaimStarRewardsForToken,
     batchClaimPeachTasks,
     batchGenieSweep,
+    batchGenieSweepForToken,
+    batchLegionBoss,
+    batchLegionBossForToken,
+    batchFreeGift,
+    batchFreeGiftForToken,
+    batchDailyBoss,
+    batchDailyBossForToken,
   };
 }

@@ -1,0 +1,11 @@
+
+hero_lordupgradelevel
+{
+  "ack": 41,
+  "body": {
+    "upgradeNum": 1
+  },
+  "cmd": "hero_lordupgradelevel",
+  "seq": 41,
+  "time": 1772509280444
+}

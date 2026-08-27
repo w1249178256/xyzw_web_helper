@@ -1,0 +1,587 @@
+﻿
+> //       iv. 寰幆鐩村埌鐗╁搧鏁伴噺涓嶈冻鎴栬揪鍒版渶澶у崌绾ф鏁?// 3. 缁熻缁撴灉骞舵樉绀?const handleBatchU
+pgradeLord = async () => {
+    // 鎸塼oken鏄电О鎺掑簭鐨則oken鍒楄〃
+    const sortedTokensList = [...tokenStore.gameTokens].sort((a, b) => {
+      const nameA = (a.name || '鏈懡鍚?).toLowerCase()
+      const nameB = (b.name || '鏈懡鍚?).toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+    
+    if (sortedTokensList.length === 0) {
+      message.warning('娌℃湁鍙敤鐨凾oken')
+      return
+    }
+    
+    // 瑙ｆ瀽鎵ц鑼冨洿
+    const tokenIndices = connectionPool.parseTokenRange(executionTokens.value)
+    const targetTokens = connectionPool.getTargetTokens(sortedTokensList, token
+Indices)
+    
+    if (targetTokens.length === 0) {
+      message.warning('鎵ц鑼冨洿鍐呮病鏈夋湁鏁堢殑Token')
+      return
+    }
+    
+    // 鑾峰彇姣忎釜token鍦╯ortedTokens涓殑搴忓彿
+    const getTokenIndex = (token) => {
+      const index = sortedTokensList.findIndex(t => t.id === token.id)
+      return index + 1
+    }
+    
+    // 鍗囬樁绛夌骇鍒楄〃
+    const upgradeLevels = [100, 200, 300, 500, 700, 900, 1100, 1300, 1500, 1800
+, 2100, 2400, 2800, 3200, 3600, 4000, 4500, 5000, 5500, 6000]
+    
+    const rangeText = executionTokens.value ? `鑼冨洿${executionTokens.value}` : "
+鍏ㄩ儴"
+    message.info(`寮€濮嬫壒閲忓崌绾т富鍏灏嗭紙${rangeText}锛夛紝鍏?{targetTokens.length}涓猅oken
+锛屾寜搴忓彿椤哄簭鎵ц...`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '鍏诲彿',
+      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+      status: 'info',
+      message: `寮€濮嬫壒閲忓崌绾т富鍏灏嗭紝${rangeText}锛屽叡${targetTokens.length}涓猅oken`
+    })
+    
+    try {
+      isBatchUpgradingLord.value = true
+      
+      // 浣跨敤杩炴帴姹犳墽琛屾壒閲忔搷浣?    const results = await connectionPool.batchOperate
+(
+        targetTokens,
+        async (token, globalIndex) => {
+          try {
+            const tokenIndex = getTokenIndex(token)
+            message.info(`[搴忓彿${tokenIndex}] ${token.name || token.id} 姝ｅ湪鎵ц鍗囩
+骇涓诲叕姝﹀皢...`)
+            
+            // 1. 浣跨敤role_getroleinfo鑾峰彇褰撳墠涓诲叕鍜屽悤甯冪瓑绾?          logStore.addLog
+({
+              page: 'fish-helper',
+              cardType: '鍏诲彿',
+              operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鎵цrole_ge
+troleinfo鍛戒护锛岃幏鍙栦富鍏拰鍚曞竷绛夌骇`
+            })
+            
+            const roleResult = await tokenStore.sendGetRoleInfo(token.id)
+            await waitCommandDelay()
+            
+            // 璋冭瘯鏃ュ織锛氭煡鐪媟oleResult鐨勭粨鏋?          console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] r
+oleResult缁撴瀯:', JSON.stringify(roleResult, null, 2).substring(0, 2000))
+            
+            // 2. 浠庡搷搴斾腑鑾峰彇涓诲叕绛夌骇鍜岄樁鏁?          let lordLevel = 0
+            let lordOrder = 0
+            if (roleResult && roleResult.role && roleResult.role.lord) {
+              lordLevel = roleResult.role.lord.level || 0
+              lordOrder = roleResult.role.lord.order || 0
+            } else if (roleResult && roleResult._raw && roleResult._raw.body &&
+ roleResult._raw.body.role && roleResult._raw.body.role.lord) {
+              lordLevel = roleResult._raw.body.role.lord.level || 0
+              lordOrder = roleResult._raw.body.role.lord.order || 0
+            } else if (roleResult && roleResult.body && roleResult.body.role &&
+ roleResult.body.role.lord) {
+              lordLevel = roleResult.body.role.lord.level || 0
+              lordOrder = roleResult.body.role.lord.order || 0
+            }
+            
+            if (lordLevel === 0) {
+              throw new Error('鏃犳硶鑾峰彇涓诲叕绛夌骇')
+            }
+            
+            // 3. 浠庡搷搴斾腑鑾峰彇鍚曞竷绛夌骇鍜岄樁鏁?          console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 妫€鏌
+eroes缁撴瀯...')
+            
+            let luBuLevel = 0
+            let luBuOrder = 0
+            // 娉ㄦ剰锛氬瓧娈靛悕鏄痟eroes鑰屼笉鏄痟eros
+            if (roleResult && roleResult.role && roleResult.role.heroes) {
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] roleResult.role.heroes:', JSON.string
+ify(roleResult.role.heroes).substring(0, 500))
+              // heroes鏄璞★紝鐩存帴閫氳繃閿幏鍙?            const luBu = roleResult.rol
+e.heroes['107'] || roleResult.role.heroes[107]
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 浠巖oleResult.role.heroes鑾峰彇鐨刲uBu:', lu
+Bu)
+              if (luBu) {
+                luBuLevel = luBu.level || 0
+                luBuOrder = luBu.order || 0
+              }
+            } else if (roleResult && roleResult._raw && roleResult._raw.body &&
+ roleResult._raw.body.role && roleResult._raw.body.role.heroes) {
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] roleResult._raw.body.role.heroes:', J
+SON.stringify(roleResult._raw.body.role.heroes).substring(0, 500))
+              // heroes鏄璞★紝鐩存帴閫氳繃閿幏鍙?            const luBu = roleResult._ra
+w.body.role.heroes['107'] || roleResult._raw.body.role.heroes[107]
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 浠巖oleResult._raw.body.role.heroes鑾峰彇鐨
+刲uBu:', luBu)
+              if (luBu) {
+                luBuLevel = luBu.level || 0
+                luBuOrder = luBu.order || 0
+              }
+            } else if (roleResult && roleResult.body && roleResult.body.role &&
+ roleResult.body.role.heroes) {
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] roleResult.body.role.heroes:', JSON.s
+tringify(roleResult.body.role.heroes).substring(0, 500))
+              // heroes鏄璞★紝鐩存帴閫氳繃閿幏鍙?            const luBu = roleResult.bod
+y.role.heroes['107'] || roleResult.body.role.heroes[107]
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 浠巖oleResult.body.role.heroes鑾峰彇鐨刲uBu:
+', luBu)
+              if (luBu) {
+                luBuLevel = luBu.level || 0
+                luBuOrder = luBu.order || 0
+              }
+            } else if (roleResult && roleResult.heroes) {
+              // 椤跺眰涔熸湁鍙兘
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] roleResult.heroes:', JSON.stringify(r
+oleResult.heroes).substring(0, 500))
+              const luBu = roleResult.heroes['107'] || roleResult.heroes[107]
+              console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 浠巖oleResult.heroes鑾峰彇鐨刲uBu:', luBu)
+              if (luBu) {
+                luBuLevel = luBu.level || 0
+                luBuOrder = luBu.order || 0
+              }
+            }
+            
+            console.log('[鎵归噺鍗囩骇涓诲叕姝﹀皢] 鑾峰彇鍒扮殑luBuLevel:', luBuLevel, 'luBuOrde
+r:', luBuOrder)
+            
+            if (luBuLevel === 0) {
+              throw new Error('鏃犳硶鑾峰彇鍚曞竷绛夌骇')
+            }
+            
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '鍏诲彿',
+              operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'info',
+              message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鑾峰彇绛夌骇鎴愬姛:
+ 涓诲叕${lordLevel}绾э紝鍚曞竷${luBuLevel}绾
+            })
+            
+            // 4. 姣旇緝骞跺崌绾э紝鏍规嵁闃舵暟鍐冲畾鍗囩骇椤哄簭
+            let currentLordLevel = lordLevel
+            let currentLuBuLevel = luBuLevel
+            let currentLordOrder = lordOrder
+            let currentLuBuOrder = luBuOrder
+            let upgradeCount = 0
+            const maxUpgrades = 100 // 鏈€澶氬崌绾ф鏁帮紝闃叉姝诲惊鐜?          
+            // 妫€鏌ユ槸鍚﹂渶瑕佸崌闃?          await checkAndUpgradeOrder(token, tokenIn
+dex, 'lord', currentLordLevel)
+            await checkAndUpgradeOrder(token, tokenIndex, 'hero', currentLuBuLe
+vel, 107)
+            
+            while (upgradeCount < maxUpgrades) {
+              // 姣旇緝闃舵暟
+              if (currentLordOrder > currentLuBuOrder) {
+                // 涓诲叕闃舵暟楂橈紝鍗囩骇鍚曞竷
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '鍏诲彿',
+                  operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]涓诲叕闃舵暟
+${currentLordOrder}楂樹簬鍚曞竷闃舵暟${currentLuBuOrder}锛屽崌绾у悤甯僠
+                })
+                
+                const nextLevel = getNextUpgradeLevel(currentLuBuLevel, upgrade
+Levels)
+                if (nextLevel === null) {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '鍏诲彿',
+                    operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞竷宸
+茶揪鍒版渶楂樼瓑绾?{currentLuBuLevel}锛屽仠姝㈠崌绾
+                  })
+                  break
+                }
+                
+                // 纭繚鍚曞竷绛夌骇涓嶈秴杩囦富鍏瓑绾?              if (currentLuBuLevel >= cu
+rrentLordLevel) {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '鍏诲彿',
+                    operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞竷绛
+夌骇${currentLuBuLevel}宸茶揪鍒颁富鍏瓑绾?{currentLordLevel}锛岀瓑寰呬富鍏崌绾
+                  })
+                  upgradeCount++
+                  continue
+                }
+                
+                // 鐗瑰埆澶勭悊4000绾?              if (currentLuBuLevel === 4000) {
+                  try {
+                    await upgradeHero(token, tokenIndex, 107, 1)
+                    currentLuBuLevel = 4001
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '鍏诲彿',
+                      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞
+竷鍗囩骇鎴愬姛: 4000 鈫?4001`
+                    })
+                  } catch (error) {
+                    const errorMsg = String(error.message || '').toLowerCase()
+                    if (errorMsg.includes('鍗囬樁') || errorMsg.includes('杩涢樁') ||
+ errorMsg.includes('400060')) {
+                      await upgradeHeroOrder(token, tokenIndex, 107)
+                      await upgradeHero(token, tokenIndex, 107, 1)
+                      currentLuBuLevel = 4001
+                      upgradeCount++
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+鍚曞竷鍗囬樁鍚庡崌绾ф垚鍔? 4000 鈫?4001`
+                      })
+                    } else if (errorMsg.includes('鐗╁搧鏁伴噺涓嶈冻')) {
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'warning',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+鍚曞竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻锛屽仠姝㈡墽琛宍
+                      })
+                      throw new Error('鍚曞竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻')
+                    } else {
+                      throw error
+                    }
+                  }
+                  break
+                }
+                
+                const upgradeNum = calculateHeroUpgradeNum(currentLuBuLevel)
+                try {
+                  await upgradeHero(token, tokenIndex, 107, upgradeNum)
+                  currentLuBuLevel = currentLuBuLevel + upgradeNum
+                  upgradeCount++
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '鍏诲彿',
+                    operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞竷鍗
+囩骇鎴愬姛: ${currentLuBuLevel - upgradeNum} 鈫?${currentLuBuLevel}`
+                  })
+                  
+                  // 鍒拌揪鎸囧畾绛夌骇鍚庯紝鎵ц涓€娆″崌闃跺懡浠?                await checkAndUpg
+radeOrder(token, tokenIndex, 'hero', currentLuBuLevel, 107)
+                  
+                  // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                  // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                if (upgradeLevel
+s.includes(currentLuBuLevel)) {
+                    currentLuBuOrder = await getHeroOrder(token, tokenIndex, 10
+7)
+                  }
+                } catch (error) {
+                  const errorMsg = String(error.message || '').toLowerCase()
+                  if (errorMsg.includes('鍗囬樁') || errorMsg.includes('杩涢樁') || e
+rrorMsg.includes('400060')) {
+                    await upgradeHeroOrder(token, tokenIndex, 107)
+                    await upgradeHero(token, tokenIndex, 107, upgradeNum)
+                    currentLuBuLevel = currentLuBuLevel + upgradeNum
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '鍏诲彿',
+                      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞
+竷鍗囬樁鍚庡崌绾ф垚鍔? ${currentLuBuLevel - upgradeNum} 鈫?${currentLuBuLevel}`
+                    })
+                    
+                    // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                    // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                  if (upgradeL
+evels.includes(currentLuBuLevel)) {
+                      currentLuBuOrder = await getHeroOrder(token, tokenIndex, 
+107)
+                    }
+                  } else if (errorMsg.includes('鐗╁搧鏁伴噺涓嶈冻')) {
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '鍏诲彿',
+                      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'warning',
+                      message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞
+竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻锛屽仠姝㈡墽琛宍
+                    })
+                    throw new Error('鍚曞竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻')
+                  } else {
+                    throw error
+                  }
+                }
+              } else if (currentLordOrder === currentLuBuOrder) {
+                // 鍚岄樁锛屽厛鍗囩骇涓诲叕鍒颁笅涓€闃剁瓑绾?              const nextLordLevel = ge
+tNextUpgradeLevel(currentLordLevel, upgradeLevels)
+                logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '鍏诲彿',
+                  operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]涓诲叕鍜屽悤
+甯冨悓闃?{currentLordOrder}锛屽厛鍗囩骇涓诲叕鍒颁笅涓€闃剁瓑绾?{nextLordLevel}绾э紝鍐嶅崌绾у悤甯冦€俙
+                })
+                
+                if (nextLordLevel === null) {
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '鍏诲彿',
+                    operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'info',
+                    message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]涓诲叕宸
+茶揪鍒版渶楂樼瓑绾?{currentLordLevel}锛屽仠姝㈠崌绾
+                  })
+                  break
+                }
+                
+                // 寰幆鍗囩骇锛岀洿鍒拌揪鍒颁笅涓€闃剁瓑绾?              while (currentLordLevel 
+< nextLordLevel) {
+                  // 璁＄畻闇€瑕佸崌绾х殑绾ф暟锛堜娇鐢ㄥ師鏉ョ殑鍗囩骇瑙勫垯锛?                const upgra
+deNum = calculateLordUpgradeNum(currentLordLevel)
+                  
+                  // 鐗瑰埆澶勭悊4000绾?                if (currentLordLevel === 4000)
+ {
+                    try {
+                      await upgradeLord(token, tokenIndex, 1)
+                      currentLordLevel = 4001
+                      upgradeCount++
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+涓诲叕鍗囩骇鎴愬姛: 4000 鈫?4001`
+                      })
+                    } catch (error) {
+                      const errorMsg = String(error.message || '').toLowerCase(
+)
+                      if (errorMsg.includes('鍗囬樁') || errorMsg.includes('杩涢樁') 
+|| errorMsg.includes('400060')) {
+                        await upgradeLordOrder(token, tokenIndex)
+                        await upgradeLord(token, tokenIndex, 1)
+                        currentLordLevel = 4001
+                        upgradeCount++
+                        logStore.addLog({
+                          page: 'fish-helper',
+                          cardType: '鍏诲彿',
+                          operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                          tokenId: token.id,
+                          tokenName: token.name,
+                          status: 'success',
+                          message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id
+}]涓诲叕鍗囬樁鍚庡崌绾ф垚鍔? 4000 鈫?4001`
+                        })
+                      } else if (errorMsg.includes('鐗╁搧鏁伴噺涓嶈冻') || errorMsg.inc
+ludes('閲戝竵鏁伴噺涓嶈冻')) {
+                        logStore.addLog({
+                          page: 'fish-helper',
+                          cardType: '鍏诲彿',
+                          operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                          tokenId: token.id,
+                          tokenName: token.name,
+                          status: 'warning',
+                          message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id
+}]涓诲叕鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻锛屽仠姝㈡墽琛宍
+                        })
+                        throw new Error('涓诲叕鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻')
+                      } else {
+                        throw error
+                      }
+                    }
+                    continue
+                  }
+                  
+                  try {
+                    await upgradeLord(token, tokenIndex, upgradeNum)
+                    currentLordLevel = currentLordLevel + upgradeNum
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '鍏诲彿',
+                      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]涓诲
+叕鍗囩骇鎴愬姛: ${currentLordLevel - upgradeNum} 鈫?${currentLordLevel}`
+                    })
+                    
+                    // 鍒拌揪鎸囧畾绛夌骇鍚庯紝鎵ц涓€娆″崌闃跺懡浠?                  await checkAn
+dUpgradeOrder(token, tokenIndex, 'lord', currentLordLevel)
+                    
+                    // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                    // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                  if (upgradeL
+evels.includes(currentLordLevel)) {
+                      currentLordOrder = await getLordOrder(token, tokenIndex)
+                    }
+                  } catch (error) {
+                    const errorMsg = String(error.message || '').toLowerCase()
+                    if (errorMsg.includes('鍗囬樁') || errorMsg.includes('杩涢樁') ||
+ errorMsg.includes('400060')) {
+                      await upgradeLordOrder(token, tokenIndex)
+                      await upgradeLord(token, tokenIndex, upgradeNum)
+                      currentLordLevel = currentLordLevel + upgradeNum
+                      upgradeCount++
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+涓诲叕鍗囬樁鍚庡崌绾ф垚鍔? ${currentLordLevel - upgradeNum} 鈫?${currentLordLevel}`
+                      })
+                      
+                      // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                      // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                    if (upgr
+adeLevels.includes(currentLordLevel)) {
+                        currentLordOrder = await getLordOrder(token, tokenIndex
+)
+                      }
+                    } else if (errorMsg.includes('鐗╁搧鏁伴噺涓嶈冻') || errorMsg.inclu
+des('閲戝竵鏁伴噺涓嶈冻')) {
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'warning',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+涓诲叕鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻锛屽仠姝㈡墽琛宍
+                      })
+                      throw new Error('涓诲叕鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻')
+                    } else {
+                      throw error
+                    }
+                  }
+                }
+                
+                // 涓诲叕鍗囩骇瀹屾垚鍚庯紝鍗囩骇鍚曞竷鍒颁笌涓诲叕鍚岀瓑绾?              logStore.addLog({
+                  page: 'fish-helper',
+                  cardType: '鍏诲彿',
+                  operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                  tokenId: token.id,
+                  tokenName: token.name,
+                  status: 'info',
+                  message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]涓诲叕鍗囩骇
+瀹屾垚锛岀幇鍦ㄥ崌绾у悤甯冨埌涓庝富鍏悓绛夌骇${currentLordLevel}绾
+                })
+                
+                // 寰幆鍗囩骇锛岀洿鍒板悤甯冭揪鍒颁富鍏瓑绾?              while (currentLuBuLevel
+ < currentLordLevel) {
+                  const luBuUpgradeNum = calculateHeroUpgradeNum(currentLuBuLev
+el)
+                  
+                  // 纭繚涓嶈秴杩囦富鍏瓑绾?                const actualUpgradeNum = Mat
+h.min(luBuUpgradeNum, currentLordLevel - currentLuBuLevel)
+                  
+                  try {
+                    await upgradeHero(token, tokenIndex, 107, actualUpgradeNum)
+                    currentLuBuLevel = currentLuBuLevel + actualUpgradeNum
+                    upgradeCount++
+                    logStore.addLog({
+                      page: 'fish-helper',
+                      cardType: '鍏诲彿',
+                      operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                      tokenId: token.id,
+                      tokenName: token.name,
+                      status: 'success',
+                      message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]鍚曞
+竷鍗囩骇鎴愬姛: ${currentLuBuLevel - actualUpgradeNum} 鈫?${currentLuBuLevel}`
+                    })
+                    
+                    // 鍒拌揪鎸囧畾绛夌骇鍚庯紝鎵ц涓€娆″崌闃跺懡浠?                  await checkAn
+dUpgradeOrder(token, tokenIndex, 'hero', currentLuBuLevel, 107)
+                    
+                    // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                    // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                  if (upgradeL
+evels.includes(currentLuBuLevel)) {
+                      currentLuBuOrder = await getHeroOrder(token, tokenIndex, 
+107)
+                    }
+                  } catch (error) {
+                    const errorMsg = String(error.message || '').toLowerCase()
+                    if (errorMsg.includes('鍗囬樁') || errorMsg.includes('杩涢樁') ||
+ errorMsg.includes('400060')) {
+                      await upgradeHeroOrder(token, tokenIndex, 107)
+                      await upgradeHero(token, tokenIndex, 107, actualUpgradeNu
+m)
+                      currentLuBuLevel = currentLuBuLevel + actualUpgradeNum
+                      upgradeCount++
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'success',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+鍚曞竷鍗囬樁鍚庡崌绾ф垚鍔? ${currentLuBuLevel - actualUpgradeNum} 鈫?${currentLuBuLevel}`
+                      })
+                      
+                      // 鍗囩骇鍚庢洿鏂伴樁鏁帮紙鍙湪寮€濮嬫椂鑾峰彇涓€娆★紝涔嬪悗浣跨敤璁＄畻鍊硷級
+                      // 濡傛灉鍗囩骇鍒颁簡鏂扮殑闃舵暟绛夌骇锛屾洿鏂伴樁鏁?                    if (upgr
+adeLevels.includes(currentLuBuLevel)) {
+                        currentLuBuOrder = await getHeroOrder(token, tokenIndex
+, 107)
+                      }
+                    } else if (errorMsg.includes('鐗╁搧鏁伴噺涓嶈冻') || errorMsg.inclu
+des('閲戝竵鏁伴噺涓嶈冻')) {
+                      logStore.addLog({
+                        page: 'fish-helper',
+                        cardType: '鍏诲彿',
+                        operation: '鎵归噺鍗囩骇涓诲叕姝﹀皢',
+                        tokenId: token.id,
+                        tokenName: token.name,
+                        status: 'warning',
+                        message: `銆愬簭鍙?{tokenIndex}銆慬${token.name || token.id}]
+鍚曞竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻锛屽仠姝㈡墽琛宍
+                      })
+                      throw new Error('鍚曞竷鍗囩骇澶辫触: 鐗╁搧鏁伴噺涓嶈冻')
+                    } else {
+                      throw error
+                    }
+                  }
+
+

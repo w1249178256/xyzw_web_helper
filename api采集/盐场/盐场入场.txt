@@ -1,0 +1,55 @@
+
+记录 #2:
+----------------------------------------
+时间: 2026/1/3 20:15:09
+服务: WarService
+方法: setBattleTeam
+参数: [{"battlefieldId":"WEEK-260103:487","battleTeam":{},"lordWeaponId":3}]
+结果: undefined
+异步: 否
+调用ID: call_1767442509226_xoq5u7vkt
+
+记录 #3:
+----------------------------------------
+时间: 2026/1/3 20:15:07
+服务: WarService
+方法: teamSetBattleTeam
+参数: [{"battlefieldId":"WEEK-260103:487","battleTeam":{},"lordWeaponId":3}]
+结果: undefined
+异步: 否
+调用ID: call_1767442507478_qj39557gz
+
+
+记录 #5:
+----------------------------------------
+时间: 2026/1/3 20:15:04
+服务: HeroService
+方法: calcPowerByTeam
+参数: [{"battleTeam":{},"lordWeaponId":3}]
+结果: Promise<resolved>: {"rtt":210,"_raw":{"seq":40,"ack":0,"time":1767442504003,"resp":40,"cmd":"hero_calcpowerbyteamresp","body":{"0":8,"1":1,"2":5,"3":5,"4":112,"5":111,"6":119,"7":101,"8":114,"9":2,"10":153,"11":40,"12":40,"13":58,"14":0,"15":0,"16":0,"17":0}},"_sendMsg":{"cmd":"hero_calcpowerbyteam","params":{"battleTeam":{},"lordWeaponId":3},"seq":40,"time":1767442504220},"_t":{"typeCode":"Class","base":{"typeCode":"Class","base":{"typeCode":"Object","name":"Object","allPropertiesMap":{},"allPropertiesList":[]},"name":"e","allPropertiesMap":{},"allPropertiesList":[]},"name":"t","ownProperties":{}},"_rawData":{"power":975710361}}
+异步: 是
+调用ID: call_1767442504218_rejt9exva
+
+记录 #6:
+----------------------------------------
+时间: 2026/1/3 20:15:01
+服务: WarService
+方法: enterBattlefield
+参数: [{"battlefieldId":"WEEK-260103:487","useGzip":true}]
+结果: undefined
+异步: 否
+调用ID: call_1767442501110_zpt8nt1el
+
+记录 #7:
+----------------------------------------
+时间: 2026/1/3 20:14:59
+服务: LegionService
+方法: getBattlefield
+参数: [{}]
+结果: 
+"_sendMsg":{"cmd":"legion_getbattlefield",
+"_rawData":{"isInWeekWar":true,"info":{"phase":"WEEK-260103","type":15,"subType":3,"legionWarMapType":13,"signupStartTime":1767398400,"signupEndTime":1767434400,"readyTime":1767441300,"startTime":1767441600,"endTime":1767445200,"battlefieldId":"WEEK-260103:487","battlefieldNumber":487,"canEnterWar":true,"sid":"x2iOOx_NyyoZeJ29MrhY4oYMNw7SgYGN6B8OiCDHpEwsgBY06kF8Y5no1xQOzr4w","domainName":"wss://xxz-xyzw-new.hortorgames.com/agent"}},"_data":{"isInWeekWar":true,"isInMonthWar":false,"info":{"phase":"WEEK-260103","type":15,"subType":3,"legionWarMapType":13,"signupStartTime":1767398400,"signupEndTime":1767434400,"readyTime":1767441300,"startTime":1767441600,"endTime":1767445200,"battlefieldId":"WEEK-260103:487","battlefieldNumber":487,"canEnterWar":true,"sid":"x2iOOx_NyyoZeJ29MrhY4oYMNw7SgYGN6B8OiCDHpEwsgBY06kF8Y5no1xQOzr4w","domainName":"wss://xxz-xyzw-new.hortorgames.com/agent"},"seasonList":[]}}
+异步: 是
+调用ID: call_1767442499264_2ixbmnvcc
+
+

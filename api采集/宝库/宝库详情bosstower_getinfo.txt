@@ -1,0 +1,36 @@
+服务: BossTowerService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 73,
+    "ack": 72,
+    "time": 1769167480487,
+    "resp": 73,
+    "cmd": "bosstower_getinforesp",
+    "body": {
+      "bossTower": {
+        "phase": "260121",
+        "towerId": 1,
+        "boxTotalHp": 0,
+        "boxCurHp": 0,
+        "boxFightCnt": 10,
+        "helpValue": 0,
+        "boxFightCntClaimFlag": {},
+        "hallValidTime": 0,
+        "inviteCnt": 0,
+        "inviteResetTime": 0,
+        "teamId": "RXW5478442",
+        "teamValidTime": 1769169221,
+        "remainHelpCnt": 50,
+        "levelInfoMap": {},
+        "shopRecord": {},
+        "weekType": 1
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}

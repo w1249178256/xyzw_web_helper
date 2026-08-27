@@ -1,0 +1,102 @@
+========================================
+📦 XYZW Web Helper Android 部署包
+========================================
+
+✅ 打包完成！
+
+📂 文件位置:
+   D:\Program Files\xyzw_web_helper\XYZW_Web_Helper_Android_Deploy.zip
+
+📊 文件大小: ~7.3 MB
+
+📋 部署包内容:
+   ✓ dist/              - 构建后的静态文件
+   ✓ nginx.conf         - Nginx 配置
+   ✓ dockerfile         - Docker 配置
+   ✓ install.sh         - Linux/Mac/Termux 安装脚本
+   ✓ install.cmd        - Windows 安装脚本
+   ✓ README.md          - 详细部署说明
+
+========================================
+🚀 快速开始（Android Termux 方式）
+========================================
+
+1️⃣  安装 Termux
+   从 F-Droid 下载：https://f-droid.org/packages/com.termux/
+
+2️⃣  传输文件
+   将 ZIP 文件复制到手机存储
+
+3️⃣  解压文件
+   cd /sdcard/Download
+   unzip XYZW_Web_Helper_Android_Deploy.zip
+
+4️⃣  移动到 Termux 目录
+   mv android-deploy ~/xyzw_web_helper
+   cd ~/xyzw_web_helper
+
+5️⃣  运行安装脚本
+   chmod +x install.sh
+   ./install.sh
+
+6️⃣  访问应用
+   打开浏览器：http://localhost:80
+
+========================================
+🌐 其他部署方式
+========================================
+
+📱 KSWEB (最简单)
+   - 安装 KSWEB (Google Play)
+   - 选择 dist 目录
+   - 启动服务器
+
+🐳 Docker (需要 Root)
+   cd android-deploy
+   docker build -t xyzw-web-helper .
+   docker run -d -p 8080:80 --name xyzw-helper xyzw-web-helper
+
+📂 Acode (开发测试)
+   - 安装 Acode (Google Play)
+   - 打开 dist/index.html
+   - 使用内置浏览器预览
+
+========================================
+📖 详细文档
+========================================
+
+查看以下文档获取详细说明：
+- ANDROID_DEPLOY_GUIDE.md  - 快速部署指南
+- android-deploy/README.md - 完整部署文档
+
+========================================
+🔧 技术支持
+========================================
+
+常见问题排查：
+1. 端口被占用：修改 nginx.conf 中的 listen 端口
+2. 权限问题：chmod -R 755 ~/xyzw_web_helper
+3. Nginx 无法启动：nginx -t 检查配置
+
+========================================
+✨ 功能特性
+========================================
+
+✓ 现代化 UI 设计
+✓ 响应式布局
+✓ 深色主题支持
+✓ Token 管理系统
+✓ WebSocket 通信
+✓ 游戏自动化功能
+✓ 批量操作支持
+
+========================================
+📞 项目信息
+========================================
+
+项目名称：XYZW Web Helper
+版本：2.0.0
+构建时间：2026-04-11
+许可证：CC-BY-NC-SA 4.0
+
+========================================

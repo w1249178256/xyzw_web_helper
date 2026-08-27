@@ -1,0 +1,9 @@
+{
+  "ack": 0,
+  "body": {
+    "weaponId": 3
+  },
+  "cmd": "lordweapon_unlock",
+  "seq": 40,
+  "time": 1772502493994
+}

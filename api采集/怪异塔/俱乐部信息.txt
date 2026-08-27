@@ -1,0 +1,1157 @@
+记录 #2:
+----------------------------------------
+时间: 2026/5/29 19:58:09
+服务: LegionService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 58,
+    "ack": 0,
+    "time": 1780055890944,
+    "resp": 57,
+    "cmd": "legion_getinforesp",
+    "body": {
+      "info": {
+        "id": 2781636,
+        "name": "锦衣、夜行",
+        "serverId": 8976,
+        "announcement": "大联盟，Cyhdwx23\n遇事不决，可问春风，春风不语、既随本心。",
+        "exp": 266505,
+        "level": 30,
+        "dan": 2,
+        "logo": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJuxPx3AibSEuMbKiaUod2hGrzcEgnowR2uBrqYI1Z4wT3gCTyNuRhFIKQ9rayV2yF7zic5X3MvFKuMwYvEUJ8nStONfs9HHac3AGn6n0k0Vs33Q/132",
+        "leaderId": 111573885,
+        "members": {
+          "111572145": {
+            "roleId": 111572145,
+            "name": "锦衣•快乐",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/phnkQcaqXmc8LXqo5QDj5XTZfsdI8mnAn2Eu5mNOFia2LQibpJcJwAdJJicjpibIfZkwOxllVWSyRHWJHCK6icnpJBg/132",
+            "job": 999,
+            "power": 9969991241,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 22,
+              "uid": 101665095,
+              "s_power": 11536012878,
+              "last_sign_in": 1779995208,
+              "red_quench_cnt": 22
+            },
+            "signInTime": 1779995208,
+            "online": 0,
+            "joinTime": "2026-05-17T07:11:35.911Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 3,
+              "color": 0
+            }
+          },
+          "111572720": {
+            "roleId": 111572720,
+            "name": "锦衣·小瓶盖",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL9ggnWTOwgnHibakBWC8V2oAS9kZ4tPvrHibMmpj6ibkTU1kN7AmLCAruClMk4I8apFPMHicSxdfV9gw/132",
+            "job": 999,
+            "power": 9669272066,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "s_power": 11460868491,
+              "last_sign_in": 1779996421,
+              "red_quench_cnt": 30,
+              "battle_red_quench_cnt": 30,
+              "uid": 101665611
+            },
+            "signInTime": 1779996421,
+            "online": 1780052824,
+            "joinTime": "2026-05-10T03:38:19.611Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111573885": {
+            "roleId": 111573885,
+            "name": "锦衣｜等风来",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJuxPx3AibSEuMbKiaUod2hGrzcEgnowR2uBrqYI1Z4wT3gCTyNuRhFIKQ9rayV2yF7zic5X3MvFKuMwYvEUJ8nStONfs9HHac3AGn6n0k0Vs33Q/132",
+            "job": 1,
+            "power": 12719823739,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "red_quench_cnt": 36,
+              "battle_red_quench_cnt": 36,
+              "uid": 100580086,
+              "s_power": 13414947502,
+              "last_sign_in": 1779989358
+            },
+            "signInTime": 1779989358,
+            "online": 1780055220,
+            "joinTime": "2025-09-29T07:39:35.384Z",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111574137": {
+            "roleId": 111574137,
+            "name": "锦衣 · 听风",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/RYSoaAcXDTrlFYQKDVWeYV3EXyD7GwUNAcf32ZRFOYiaxUUFRpMVfYqgwPFFIHWcgsfKfiaGOqiackHabnzDTP0jw/132",
+            "job": 999,
+            "power": 11882999297,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 34,
+              "uid": 101666902,
+              "s_power": 12566771618,
+              "last_sign_in": 1779986451,
+              "red_quench_cnt": 34
+            },
+            "signInTime": 1779986451,
+            "online": 1780054763,
+            "joinTime": "2025-09-29T21:51:04.070Z",
+            "avatarFrame": {
+              "id": 3001,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 6
+            }
+          },
+          "111576243": {
+            "roleId": 111576243,
+            "name": "锦衣•KK",
+            "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111576243/1746699587.jpg",
+            "job": 999,
+            "power": 11576258743,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 40,
+              "uid": 101668867,
+              "s_power": 12135518613,
+              "last_sign_in": 1779991786,
+              "red_quench_cnt": 40
+            },
+            "signInTime": 1779991786,
+            "online": 1780055151,
+            "joinTime": "2026-04-03T13:49:26.407Z",
+            "avatarFrame": {
+              "id": 3004,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111579431": {
+            "roleId": 111579431,
+            "name": "锦衣•南良",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/CED6Q8VjibXaWT3I0iaJKPO6WHClWe2WaEBAWDLJ0kicOicKFT9jGvNsgxpgye6NZH5HCHZQASpOuibEcvg5D1wiaFJw/132",
+            "job": 2,
+            "power": 12815763852,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 101671828,
+              "s_power": 13759484242,
+              "last_sign_in": 1779987992,
+              "red_quench_cnt": 37,
+              "battle_red_quench_cnt": 37
+            },
+            "signInTime": 1779987992,
+            "online": 0,
+            "joinTime": "2025-10-17T04:25:23.961Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 5,
+              "color": 0
+            }
+          },
+          "111579805": {
+            "roleId": 111579805,
+            "name": "锦衣●镇恶",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLj4lU909M1k6oruOnfKLMxIMotnEDhXIfaWntaBXBc8nTicWDPqVWWLm03WwSSqTNSgO5nQPhsr5g/132",
+            "job": 999,
+            "power": 11645280128,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 101672170,
+              "s_power": 12325500238,
+              "last_sign_in": 1779986814,
+              "red_quench_cnt": 36,
+              "battle_red_quench_cnt": 36
+            },
+            "signInTime": 1779986814,
+            "online": 1780054896,
+            "joinTime": "2025-09-29T13:53:04.177Z",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111579959": {
+            "roleId": 111579959,
+            "name": "锦衣·清泽",
+            "headImg": "https://p26.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813c001_osIeUCyArcWpj09lzAENZUfCbAACDgNMhaAAgm.jpeg?from=3782654143",
+            "job": 999,
+            "power": 11732340200,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 101672315,
+              "battle_red_quench_cnt": 25,
+              "s_power": 11776989536,
+              "last_sign_in": 1779988702,
+              "red_quench_cnt": 25
+            },
+            "signInTime": 1779988702,
+            "online": 1780054978,
+            "joinTime": "2026-04-20T04:10:13.668Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111581800": {
+            "roleId": 111581800,
+            "name": "锦衣•YSL",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/6sgdxewDVSQb9WwzpN9FGs1UUyibBckm7Nj6UwnsWsUNhV74UuqeiahgvyjmbGCnrsqqFt7wxiaiaMKicbWIicOiamSFA/132",
+            "job": 999,
+            "power": 12367711723,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "s_power": 13006691851,
+              "last_sign_in": 1779998141,
+              "red_quench_cnt": 37,
+              "uid": 74438519,
+              "battle_red_quench_cnt": 37
+            },
+            "signInTime": 1779998141,
+            "online": 0,
+            "joinTime": "2026-05-10T03:38:18.960Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 3,
+              "color": 0
+            }
+          },
+          "111581974": {
+            "roleId": 111581974,
+            "name": "七夜²⁰",
+            "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111581974/1764852656.jpg",
+            "job": 999,
+            "power": 12208820186,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 24588747,
+              "battle_red_quench_cnt": 49,
+              "s_power": 13839975258,
+              "last_sign_in": 1779996801,
+              "red_quench_cnt": 49
+            },
+            "signInTime": 1779996801,
+            "online": 1780052901,
+            "joinTime": "2026-04-08T04:29:23.163Z",
+            "avatarFrame": {
+              "id": 110403,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 5,
+              "color": 6
+            }
+          },
+          "111581992": {
+            "roleId": 111581992,
+            "name": "烽火₁₉",
+            "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111581992/1766379121.jpg",
+            "job": 999,
+            "power": 10340416969,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 36,
+              "s_power": 13351367790,
+              "last_sign_in": 1779995796,
+              "red_quench_cnt": 36,
+              "uid": 38701375
+            },
+            "signInTime": 1779995796,
+            "online": 1780052810,
+            "joinTime": "2026-04-08T04:22:54.046Z",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 5,
+              "color": 0
+            }
+          },
+          "111582252": {
+            "roleId": 111582252,
+            "name": "阿良很（猛）",
+            "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111582252/1775568241.jpg",
+            "job": 2,
+            "power": 12344184080,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "s_power": 14946006875,
+              "last_sign_in": 1779985432,
+              "red_quench_cnt": 41,
+              "battle_red_quench_cnt": 41,
+              "uid": 101674452
+            },
+            "signInTime": 1779985432,
+            "online": 1780054613,
+            "joinTime": "2025-09-30T09:29:05.181Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "111582562": {
+            "roleId": 111582562,
+            "name": "锦衣·黯涩",
+            "headImg": "",
+            "job": 999,
+            "power": 10799272898,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 36,
+              "uid": 101674737,
+              "s_power": 11984100305,
+              "last_sign_in": 1779997735,
+              "red_quench_cnt": 36
+            },
+            "signInTime": 1779997735,
+            "online": 1780053039,
+            "joinTime": "2025-10-15T07:30:14.379Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 1,
+              "color": 6
+            }
+          },
+          "111583668": {
+            "roleId": 111583668,
+            "name": "五金鱼",
+            "headImg": "",
+            "job": 999,
+            "power": 13606347307,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "last_sign_in": 1779986029,
+              "red_quench_cnt": 44,
+              "battle_red_quench_cnt": 44,
+              "uid": 101675758,
+              "s_power": 13606347307
+            },
+            "signInTime": 1779986029,
+            "online": 1780054690,
+            "joinTime": "2026-01-04T07:34:33.311Z",
+            "avatarFrame": {
+              "id": 3002,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 5,
+              "color": 0
+            }
+          },
+          "112007511": {
+            "roleId": 112007511,
+            "name": "牛易勃",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/6tJXsPnFmTWYfo2u09ccRj7te57h6lHeq3hjfXicHMAzqs0r5anLNlHTiaZGKJEM22JDsrQxt0BDXDWr9AOKTQ9g/132",
+            "job": 999,
+            "power": 12121516385,
+            "originServerId": 9004,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "red_quench_cnt": 25,
+              "battle_red_quench_cnt": 25,
+              "uid": 79573283,
+              "s_power": 12329830970,
+              "last_sign_in": 1779998754
+            },
+            "signInTime": 1779998754,
+            "online": 1780053110,
+            "joinTime": "2025-10-24T14:52:12.213Z",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "112012701": {
+            "roleId": 112012701,
+            "name": "神州、闯",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/m13MgoY2do6rSib0qCJsVPfF6qfWsp7JM6rhKbHDQA7ib6eoFYMbLwFDZQ1sWQV6WdYEPFO8uC4aJzjBBYldVxWQ/132",
+            "job": 999,
+            "power": 10788276075,
+            "originServerId": 9004,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "red_quench_cnt": 37,
+              "battle_red_quench_cnt": 37,
+              "uid": 102066521,
+              "s_power": 11884451553,
+              "last_sign_in": 1780018892
+            },
+            "signInTime": 1780018892,
+            "online": 1780044069,
+            "joinTime": "2025-09-29T13:20:57.229Z",
+            "avatarFrame": {
+              "id": 3003,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 5,
+              "color": 0
+            }
+          },
+          "112018979": {
+            "roleId": 112018979,
+            "name": "神州、坚持",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/8wicwR0fGXkibiaIM3HtBdATsUGRjPFwDW4WEveBgGniaau5pngAicibVY7iaUgePvibYg3fIZBJjIuPCSQQcmvh4t8f27xoVm7jiaJzFj4Bt9XicLprU/132",
+            "job": 999,
+            "power": 10247477723,
+            "originServerId": 9004,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 102072238,
+              "battle_red_quench_cnt": 30,
+              "s_power": 11739015288,
+              "last_sign_in": 1780043844,
+              "red_quench_cnt": 30
+            },
+            "signInTime": 1780043844,
+            "online": 1780052759,
+            "joinTime": "2025-09-29T13:20:56.743Z",
+            "avatarFrame": {
+              "id": 3004,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 1,
+              "color": 6
+            }
+          },
+          "163528587": {
+            "roleId": 163528587,
+            "name": "神州丶随风",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTIZ3amFLGeQhQWghwo9BpSk0SDKeEaypqia0k40Tc7E9bUsIdL1KQMUZoUctR9NtKogkib01ZPNqR6A/132",
+            "job": 999,
+            "power": 12928262861,
+            "originServerId": 9004,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "battle_red_quench_cnt": 39,
+              "uid": 65119749,
+              "s_power": 12998364156,
+              "last_sign_in": 1779993701,
+              "red_quench_cnt": 39
+            },
+            "signInTime": 1779993701,
+            "online": 1780052476,
+            "joinTime": "2026-05-11T14:10:00.928Z",
+            "avatarFrame": {
+              "id": 3004,
+              "expire": -1
+            },
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 2,
+              "color": 0
+            }
+          },
+          "175153809": {
+            "roleId": 175153809,
+            "name": "阿林109",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/YKftaheMscich8GVKiag06cq8QMAhRrmjpcolKJRMf9TeVmLI6vdKpgtCSPeFb2jictBsqUHU4VoCc69tLDsOq8Ew/132",
+            "job": 999,
+            "power": 11793580315,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 57365810,
+              "s_power": 12821272242,
+              "last_sign_in": 1779990124,
+              "red_quench_cnt": 31,
+              "battle_red_quench_cnt": 31
+            },
+            "signInTime": 1779990124,
+            "online": 1780055480,
+            "joinTime": "2026-04-20T04:10:57.672Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 1,
+              "color": 6
+            }
+          },
+          "219582429": {
+            "roleId": 219582429,
+            "name": "阿林229",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/19nIwpicEAZmm0QtA5rPweXia4Qib6p5n4GhXQd7C2t0Cbm8tQYmnOLSjxZAgvNhKxbU9azhfnzPu8K1kG08AfEVw/132",
+            "job": 999,
+            "power": 11299030239,
+            "originServerId": 8976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "uid": 80125652,
+              "battle_red_quench_cnt": 35,
+              "s_power": 11780848041,
+              "last_sign_in": 1779989735,
+              "red_quench_cnt": 35
+            },
+            "signInTime": 1779989735,
+            "online": 1780055360,
+            "joinTime": "2026-05-10T03:37:37.091Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 1,
+              "color": 6
+            }
+          },
+          "611750875": {
+            "roleId": 611750875,
+            "name": "烽火戏诸侯",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/u5EWKPwCVhIO9K1m2MPt6oLJSz4WqUgadeuOKmK7qmjavPOJP4DHoVbj8ciaSdewfypdz7KptLAdmUB2ibOxupIA/132",
+            "job": 999,
+            "power": 8720631623,
+            "originServerId": 1008976,
+            "medallion": null,
+            "medallionStorage": {},
+            "custom": {
+              "s_power": 10130348716,
+              "last_sign_in": 1779998425,
+              "red_quench_cnt": 24,
+              "uid": 225401313,
+              "battle_red_quench_cnt": 24
+            },
+            "signInTime": 1779998425,
+            "online": 1780042809,
+            "joinTime": "2026-04-08T04:22:53.008Z",
+            "avatarFrame": null,
+            "customCard": null,
+            "legacy": {
+              "scheduleId": 1,
+              "color": 5
+            }
+          }
+        },
+        "logs": [],
+        "founder": 392303333,
+        "statistics": {
+          "moon:war:sign:up": 251012,
+          "week:sign:in": 105,
+          "legion:match:show:time": 1757088000,
+          "sign:in": 21,
+          "ex:week:choice:map": 0,
+          "pre:war:type": 15,
+          "boss:set:flag": 1739486876,
+          "is:king": 0,
+          "battle:red:quench": 724,
+          "settlement:time": 1756656000,
+          "l:war:poi": 1779541200,
+          "red:quench": 738,
+          "sky:horse:sign:up": 251019,
+          "send:recruit": 1,
+          "last:is:king": 0,
+          "last:dan": 3,
+          "last:war:rank": 7,
+          "update:time": 1780055908,
+          "sync:logo": 1,
+          "send:mail": 1,
+          "lw:sign:in": 147,
+          "max:power": 370918484113,
+          "match:phase": 250825,
+          "payload:war:sign:up": 260517
+        },
+        "statisticsTime": {
+          "send:recruit": 1699107727,
+          "lw:sign:in": 1779033600,
+          "send:mail": 1735378669,
+          "sync:logo": 1728780957,
+          "sign:in": 1780043844,
+          "week:sign:in": 1779638400,
+          "ex:week:choice:map": 260523
+        },
+        "bossList": {
+          "1": 1699149691,
+          "2": 1699149713,
+          "3": 1699149728,
+          "4": 1699159567,
+          "5": 1699159696,
+          "6": 1699230540,
+          "7": 1699230546,
+          "8": 1699230552,
+          "9": 1699230562,
+          "10": 1699255711,
+          "11": 1699288093,
+          "12": 1699306922,
+          "13": 1699314001,
+          "14": 1699314014,
+          "15": 1699403128,
+          "16": 1699416876,
+          "17": 1699461878,
+          "18": 1699506016,
+          "19": 1699513451,
+          "20": 1699556728,
+          "21": 1699587088,
+          "22": 1699602346,
+          "23": 1699603906,
+          "24": 1699605071,
+          "25": 1699656960,
+          "26": 1699663843,
+          "27": 1699703881,
+          "28": 1699744897,
+          "29": 1699774804,
+          "30": 1699835579,
+          "31": 1699874846,
+          "32": 1699919288,
+          "33": 1699955846,
+          "34": 1700013399,
+          "35": 1700049255,
+          "36": 1700092757,
+          "37": 1700177563,
+          "38": 1700260964,
+          "39": 1700350848,
+          "40": 1700521381,
+          "41": 1700608642,
+          "42": 1700686454,
+          "43": 1700841934,
+          "44": 1700958228,
+          "45": 1701126906,
+          "46": 1701231603,
+          "47": 1701392368,
+          "48": 1701559232,
+          "49": 1701653219,
+          "50": 1701792511,
+          "51": 1701964823,
+          "52": 1702148655,
+          "53": 1702422835,
+          "54": 1702682160,
+          "55": 1702942629,
+          "56": 1703243746,
+          "57": 1703453112,
+          "58": 1703806419,
+          "59": 1704473807,
+          "60": 1704861053,
+          "61": 1705422189,
+          "62": 1705884851,
+          "63": 1706472715,
+          "64": 1707148935,
+          "65": 1707964372,
+          "66": 1708790692,
+          "67": 1709843587,
+          "68": 1710692338,
+          "69": 1711523572,
+          "70": 1712011674,
+          "71": 1712337325,
+          "72": 1713574186,
+          "73": 1715531534,
+          "74": 1718034816,
+          "75": 1720974262,
+          "76": 1723402375,
+          "77": 1723565558,
+          "78": 1723739189,
+          "79": 1723911665,
+          "80": 1724170313,
+          "81": 1724429184,
+          "82": 1724688201,
+          "83": 1724947812,
+          "84": 1725369583,
+          "85": 1725641671,
+          "86": 1726024597,
+          "87": 1726384008,
+          "88": 1726762166,
+          "89": 1727281565,
+          "90": 1727885135,
+          "91": 1728545743,
+          "92": 1729196833,
+          "93": 1730046271,
+          "94": 1730914967,
+          "95": 1732033018,
+          "96": 1733416153,
+          "97": 1734889375,
+          "98": 1736474648,
+          "99": 1738244454,
+          "100": 1740076224,
+          "101": 1742695297,
+          "102": 1746242276,
+          "103": 1748308727,
+          "104": 1750614446,
+          "105": 1752642056,
+          "106": 1756947761,
+          "107": 1759767211,
+          "108": 1761238057,
+          "109": 1763395406,
+          "110": 1764874026,
+          "111": 1766277835,
+          "112": 1767824201,
+          "113": 1770210652,
+          "114": 1773075364,
+          "115": 1776208005,
+          "116": 1778261468
+        },
+        "signUp": {
+          "WEEK-260328": 1774671259,
+          "WEEK-260411": 1775876897,
+          "WEEK-260314": 1773452800,
+          "WEEK-260321": 1774056390,
+          "WEEK-260425": 1777103845,
+          "WEEK-260418": 1776501547,
+          "WEEK-260509": 1778310926,
+          "WEEK-260404": 1775283523,
+          "WEEK-260516": 1778905568,
+          "WEEK-260502": 1777680532,
+          "WEEK-260523": 1779520162,
+          "WEEK-260307": 1772847155
+        },
+        "warRank": [
+          14,
+          6,
+          7,
+          17,
+          10,
+          7
+        ],
+        "currentBoss": {
+          "bossId": 117,
+          "currentHP": 267744073644439,
+          "createTime": 1778261468
+        },
+        "dragonBoat": {
+          "drumNum": 0,
+          "distance": 0,
+          "lastUseItemTime": 0,
+          "lastUseItemNum": 0,
+          "roleItemNum": null
+        },
+        "power": 263394713470,
+        "redQuenchCnt": 724,
+        "isDeleted": false,
+        "custom": {
+          "leader:logo": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJuxPx3AibSEuMbKiaUod2hGrzcEgnowR2uBrqYI1Z4wT3gCTyNuRhFIKQ9rayV2yF7zic5X3MvFKuMwYvEUJ8nStONfs9HHac3AGn6n0k0Vs33Q/132"
+        },
+        "createdTime": "2023-10-28T13:46:41.874Z",
+        "deletedTime": "1677-09-21T00:12:43.146Z",
+        "skyHorseIncId": 564,
+        "itemMap": {
+          "1": {
+            "id": 1,
+            "quantity": 100,
+            "createdTime": 1711803601,
+            "deletedTime": -1
+          }
+        },
+        "skyHorseMap": {},
+        "skinMap": {},
+        "warMap": {
+          "251228": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2025/12/06",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2025/12/13",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2025/12/20",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2025/12/27",
+              "legionWarType": 15
+            }
+          ],
+          "260125": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/01/03",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/01/10",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/01/17",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/01/24",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 2,
+              "warDate": "2026/01/31",
+              "legionWarType": 6
+            }
+          ],
+          "260301": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/02/07",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/02/21",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/02/28",
+              "legionWarType": 15
+            }
+          ],
+          "260329": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/03/07",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/03/14",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/03/21",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/03/28",
+              "legionWarType": 15
+            }
+          ],
+          "260426": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/04/04",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/04/11",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/04/18",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/04/25",
+              "legionWarType": 15
+            }
+          ],
+          "260524": [
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/05/02",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/05/09",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/05/16",
+              "legionWarType": 15
+            },
+            {
+              "legionWarMap": 13,
+              "warDate": "2026/05/23",
+              "legionWarType": 15
+            }
+          ]
+        },
+        "warInfo": {
+          "251228": {
+            "riseDate": "251206",
+            "sRGScoreArr": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              25,
+              23,
+              10,
+              7
+            ],
+            "sRKScoreArr": [
+              131,
+              147,
+              146,
+              144
+            ],
+            "sRTotalScore": 0
+          },
+          "260125": {
+            "riseDate": "260103",
+            "sRGScoreArr": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              43,
+              11,
+              42,
+              24
+            ],
+            "sRKScoreArr": [
+              165,
+              138,
+              133,
+              195
+            ],
+            "sRTotalScore": 0
+          },
+          "260301": {
+            "riseDate": "260207",
+            "sRGScoreArr": [
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              4,
+              13,
+              4
+            ],
+            "sRKScoreArr": [
+              176,
+              173,
+              140
+            ],
+            "sRTotalScore": 0
+          },
+          "260329": {
+            "riseDate": "260307",
+            "sRGScoreArr": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              11,
+              18,
+              4,
+              35
+            ],
+            "sRKScoreArr": [
+              146,
+              133,
+              108,
+              153
+            ],
+            "sRTotalScore": 0
+          },
+          "260426": {
+            "riseDate": "260404",
+            "sRGScoreArr": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              24,
+              18,
+              6,
+              20
+            ],
+            "sRKScoreArr": [
+              81,
+              163,
+              65,
+              146
+            ],
+            "sRTotalScore": 0
+          },
+          "260524": {
+            "riseDate": "260502",
+            "sRGScoreArr": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "sRBScoreArr": [
+              15,
+              0,
+              7,
+              22
+            ],
+            "sRKScoreArr": [
+              156,
+              195,
+              138,
+              105
+            ],
+            "sRTotalScore": 0
+          }
+        },
+        "warAchievement": {},
+        "nameplateType": 1,
+        "nameplate": {
+          "1": {
+            "1001": {
+              "id": 1001,
+              "expireTime": 1770469199,
+              "beginTime": 1769864400
+            },
+            "3001": {
+              "id": 3001,
+              "expireTime": 1717246799,
+              "beginTime": 1716642000
+            },
+            "4001": {
+              "id": 4001,
+              "expireTime": 1779541199,
+              "beginTime": 1778936400
+            }
+          }
+        },
+        "cup": [],
+        "cupStorage": {},
+        "tempTag": {},
+        "tagData": {
+          "recodeTime": "20241121",
+          "tags": {
+            "3": 3,
+            "5": 6
+          }
+        },
+        "islandType": 0,
+        "noApply": false,
+        "dissolveTime": 0
+      },
+      "firstMonthDate": "2023/01/29",
+      "isOpenSaltRoadWar": true,
+      "legionWarType": 6,
+      "exWeekRiseDate": "2026/05/02",
+      "isInExWeek": true,
+      "emLegionWarMap": 2,
+      "mapList": [
+        {
+          "legionWarMap": 13,
+          "warDate": "2026/05/02",
+          "legionWarType": 15
+        },
+        {
+          "legionWarMap": 13,
+          "warDate": "2026/05/09",
+          "legionWarType": 15
+        },
+        {
+          "legionWarMap": 13,
+          "warDate": "2026/05/16",
+          "legionWarType": 15
+        },
+        {
+          "legionWarMap": 13,
+          "warDate": "2026/05/23",
+          "legionWarType": 15
+        }
+      ],
+      "serverViewId": 8949
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1780055889136_tun4rm1ig
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

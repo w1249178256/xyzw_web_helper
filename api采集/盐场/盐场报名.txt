@@ -1,0 +1,102 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/5/16 13:43:02
+游戏版本: 未知
+页面URL: file:///C:/Program%20Files/slatshark/resources/app.asar/out/renderer/index.html
+记录数量: 5
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) slatshark/2.0.0 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/5/16 13:42:59
+服务: LegionService
+方法: getBattlefield
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 47,
+    "ack": 46,
+    "time": 1778910181336,
+    "resp": 47,
+    "cmd": "legion_getbattlefieldresp",
+    "body": {
+      "info": {
+        "phase": "WEEK-260516",
+        "type": 15,
+        "legionWarMapType": 13,
+        "signupStartTime": 1778889600,
+        "signupEndTime": 1778925600,
+        "readyTime": 1778932500,
+        "startTime": 1778932800,
+        "endTime": 1778936400,
+        "domainName": "wss://xxz-xyzw-new.hortorgames.com/agent"
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 26
+}
+异步: 是
+调用ID: call_1778910179783_kb4216t83
+
+
+
+记录 #3:
+----------------------------------------
+时间: 2026/5/16 13:42:59
+服务: LegionService
+方法: signup
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 45,
+    "ack": 0,
+    "time": 1778910181244,
+    "resp": 45,
+    "cmd": "legion_signupresp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 179
+}
+异步: 是
+调用ID: call_1778910179537_rlbddh9hr
+
+记录 #4:
+----------------------------------------
+时间: 2026/5/16 13:42:51
+服务: SaltRoadService
+方法: getWarType
+参数: [{"date":"2026/04/26"}]
+结果:
+{
+  "_raw": {
+    "seq": 44,
+    "ack": 0,
+    "time": 1778910173430,
+    "resp": 44,
+    "cmd": "saltroad_getwartyperesp",
+    "body": {
+      "warType": 15
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1778910171877_f85y95hqh
+
+

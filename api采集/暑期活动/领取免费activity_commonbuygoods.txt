@@ -1,0 +1,38 @@
+
+服务: ActivityService
+方法: commonBuyGoods
+参数: [{"goodsId":26013031}]
+结果:
+{
+  "_raw": {
+    "seq": 73,
+    "ack": 0,
+    "time": 1769841887519,
+    "resp": 71,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "5264": {
+            "quantity": 17
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 5264,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 50
+}
+异步: 是
+调用ID: call_1769841937785_ge0wmfb1p
+
+

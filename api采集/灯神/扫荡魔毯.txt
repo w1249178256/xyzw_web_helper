@@ -1,0 +1,276 @@
+
+时间: 2026/2/9 09:09:49
+服务: GenieService
+方法: sweep
+参数: [{"genieId":4,"sweepCnt":20}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 41,
+    "time": 1770599390455,
+    "resp": 41,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "1021": {
+            "quantity": 191
+          },
+          "1022": {
+            "quantity": 1909357
+          },
+          "3201": {
+            "quantity": 7998
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1022,
+          "value": 450,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 3201,
+          "value": 3,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+

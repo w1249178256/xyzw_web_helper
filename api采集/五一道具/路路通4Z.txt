@@ -1,0 +1,64 @@
+40004金元宝40001路路通
+
+记录 #1:
+----------------------------------------
+时间: 2026/2/14 00:11:48
+服务: ActivityService
+方法: mayDayLottery
+参数: [{"times":1}]
+结果:
+{
+  "_raw": {
+    "seq": 49,
+    "ack": 0,
+    "time": 1770999108727,
+    "resp": 47,
+    "cmd": "activity_maydaylotteryresp",
+    "body": {
+      "role": {
+        "items": {
+          "1003": {
+            "quantity": 1388658
+          },
+          "40001": {
+            "quantity": 3
+          }
+        },
+        "pack": {
+          "2602133": {
+            "5265": 22
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1003,
+          "value": 200,
+          "ext": 0
+        }
+      ],
+      "lotteryPackIdList": [
+        4
+      ],
+      "incFragProgress": 2,
+      "fragRatioList": [
+        2
+      ],
+      "mayDayLotteryInfo": {
+        "fragProgress": 49
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1770999108550_wwskqzpi4
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

@@ -1,0 +1,23 @@
+
+
+12:07:51 Send:
+team_setteam
+{
+  "ack": 0,
+  "body": {
+    "battleTeam": {
+      "0": 116,
+      "1": 102,
+      "2": 107,
+      "3": 104,
+      "4": 112
+    },
+    "cCMonsterId": 0,
+    "lordWeaponId": 3,
+    "petUId": "",
+    "teamType": 6
+  },
+  "cmd": "team_setteam",
+  "seq": 52,
+  "time": 1780027671905
+}
