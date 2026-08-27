@@ -24,19 +24,31 @@
     </div>
 
     <div class="card-actions">
-      <button
-        :class="[
-          'climb-button',
-          {
-            active: canClimb,
-            disabled: !canClimb,
-          },
-        ]"
-        :disabled="!canClimb"
-        @click="startTowerClimb"
-      >
-        {{ isClimbing.value ? "爬塔中..." : "开始爬塔" }}
-      </button>
+      <div class="climb-action-row">
+        <input
+          v-model.number="maxClimbInput"
+          class="climb-limit-input"
+          type="number"
+          min="1"
+          step="1"
+          aria-label="怪异塔爬塔次数"
+          :disabled="isClimbing || isUsingItems || isMerging"
+        />
+        <span class="climb-limit-unit">次</span>
+        <button
+          :class="[
+            'climb-button',
+            {
+              active: canClimb,
+              disabled: !canClimb,
+            },
+          ]"
+          :disabled="!canClimb"
+          @click="startTowerClimb"
+        >
+          {{ isClimbing ? "爬塔中..." : "开始爬塔" }}
+        </button>
+      </div>
 
       <!-- 停止批量爬塔按钮，仅批量时显示 -->
       <button v-if="isClimbing" class="stop-button" @click="stopClimbing">停止爬塔</button>
@@ -90,6 +102,10 @@ const stopUsingItems = () => {
 import { computed, onMounted, ref, watch } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
 import { useMessage } from "naive-ui";
+import {
+  DEFAULT_WEIRD_TOWER_MAX_CLIMB,
+  normalizeWeirdTowerMaxClimb,
+} from "@/utils/towerClimbLimit.js";
 
 const tokenStore = useTokenStore();
 const message = useMessage();
@@ -98,6 +114,7 @@ const message = useMessage();
 const isClimbing = ref(false);
 const isUsingItems = ref(false);
 const isMerging = ref(false);
+const maxClimbInput = ref(DEFAULT_WEIRD_TOWER_MAX_CLIMB);
 const climbTimeout = ref(null); // 用于超时重置状态
 const itemTimeout = ref(null); // 用于道具使用超时
 const mergeTimeout = ref(null); // 用于合成超时
@@ -473,7 +490,8 @@ const startTowerClimb = async () => {
   isClimbing.value = true;
   stopFlag = false;
   let climbCount = 0;
-  let maxClimb = 100; // 最多批量次数，防止死循环
+  const maxClimb = normalizeWeirdTowerMaxClimb(maxClimbInput.value);
+  maxClimbInput.value = maxClimb;
   // 设置超时保护，60秒后自动重置状态
   climbTimeout.value = setTimeout(() => {
     isClimbing.value = false;
@@ -773,6 +791,52 @@ onMounted(() => {
   gap: var(--spacing-sm);
   margin-top: auto;
   padding-top: var(--spacing-sm);
+}
+
+.climb-action-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+  width: 100%;
+
+  .climb-button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.climb-limit-input {
+  flex: 0 0 86px;
+  width: 86px;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  text-align: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: var(--border-radius-medium);
+  outline: none;
+  transition: border-color var(--transition-fast);
+
+  &:focus {
+    border-color: #8b5cf6;
+  }
+
+  &:disabled {
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+    background: var(--bg-secondary);
+  }
+}
+
+.climb-limit-unit {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
 }
 
 .climb-button {

@@ -66,6 +66,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
+import { getTowerActId } from "@/utils/towerActId.js";
 import { useMessage } from "naive-ui";
 import MyCard from "../Common/MyCard.vue";
 
@@ -162,7 +163,7 @@ const getInfo = async () => {
   if (tokenStore.getWebSocketStatus(tokenId) !== "connected") return;
 
   try {
-    const res = await tokenStore.sendMessageWithPromise(tokenId, "towers_getinfo", {}, 5000);
+    const res = await tokenStore.sendMessageWithPromise(tokenId, "towers_getinfo", { actId: getTowerActId() }, 5000);
     if (res) {
       // Handle nested data structure if necessary
       const data = res.actId ? res : (res.towerData && res.towerData.actId ? res.towerData : res);
@@ -210,10 +211,10 @@ const challengeSingle = async (type) => {
      
      while (loop) {
         if (needStart) {
-            await tokenStore.sendMessageWithPromise(tokenId, "towers_start", { towerType: type }, 5000);
+            await tokenStore.sendMessageWithPromise(tokenId, "towers_start", { actId: getTowerActId(), towerType: type }, 5000);
         }
         
-        const fightRes = await tokenStore.sendMessageWithPromise(tokenId, "towers_fight", { towerType: type }, 5000);
+        const fightRes = await tokenStore.sendMessageWithPromise(tokenId, "towers_fight", { actId: getTowerActId(), towerType: type }, 5000);
         const battleData = fightRes?.battleData;
         const curHP = battleData?.result?.accept?.ext?.curHP;
         
