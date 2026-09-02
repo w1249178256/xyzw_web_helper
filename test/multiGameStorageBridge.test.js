@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-delete globalThis.Game2StorageBridge;
-await import("../public/game/game2-storage-bridge.js").catch(() => undefined);
-const bridge = globalThis.Game2StorageBridge || {};
+delete globalThis.MultiGameStorageBridge;
+await import("../public/game/multi-game-storage-bridge.js").catch(() => undefined);
+const bridge = globalThis.MultiGameStorageBridge || {};
 
 class MemoryStorage {
   constructor(entries = []) {
@@ -48,11 +48,11 @@ test("scoped adapters isolate identity and ordinary game keys", () => {
   const backing = new MemoryStorage([["outside", "keep"]]);
   const a = bridge.createScopedStorageAdapter(
     backing,
-    "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   );
   const b = bridge.createScopedStorageAdapter(
     backing,
-    "g2-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "mg-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   );
 
   a.setItem("current_bin_id", "account-a");
@@ -71,11 +71,11 @@ test("key length and clear expose only one scope", () => {
   const backing = new MemoryStorage([["outside", "keep"]]);
   const a = bridge.createScopedStorageAdapter(
     backing,
-    "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   );
   const b = bridge.createScopedStorageAdapter(
     backing,
-    "g2-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "mg-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   );
 
   a.setItem("current_bin_id", "a");
@@ -97,15 +97,15 @@ test("invalid and nested scopes are rejected before shared keys are touched", ()
   const backing = new MemoryStorage();
   assert.throws(
     () => bridge.createScopedStorageAdapter(backing, "../shared"),
-    /Invalid Game2 scope/,
+    /Invalid MultiGame scope/,
   );
   assert.equal(backing.length, 0);
 
   const scoped = bridge.createScopedStorageAdapter(
     backing,
-    "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   );
-  assert.throws(() => scoped.setItem("game2:other:key", "value"), /Nested/);
+  assert.throws(() => scoped.setItem("multi-game:other:key", "value"), /Nested/);
   assert.equal(backing.length, 0);
 });
 
@@ -114,18 +114,18 @@ test("install virtualizes method and named-property access on iframe localStorag
   const RealmStorage = createRealmStorageClass();
   const localStorage = new RealmStorage([
     [
-      "game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:current_bin_id",
+      "multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:current_bin_id",
       "account-a",
     ],
     [
-      "game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:bin_data_account-a",
+      "multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:bin_data_account-a",
       "706c0102",
     ],
   ]);
   const sessionStorage = new RealmStorage([["shared", "session-value"]]);
   const win = { Storage: RealmStorage, localStorage, sessionStorage };
 
-  bridge.install(win, "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  bridge.install(win, "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
   assert.equal(win.localStorage.getItem("current_bin_id"), "account-a");
   assert.equal(win.localStorage.getItem("bin_data_account-a"), "706c0102");
@@ -135,7 +135,7 @@ test("install virtualizes method and named-property access on iframe localStorag
   win.localStorage.actual_login_bin_id = "account-a";
   assert.equal(
     localStorage.values.get(
-      "game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:actual_login_bin_id",
+      "multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:actual_login_bin_id",
     ),
     "account-a",
   );
@@ -181,11 +181,11 @@ test("install rolls back earlier descriptors when a later method cannot be repla
   };
 
   assert.throws(
-    () => bridge.install(win, "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+    () => bridge.install(win, "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
     /not supported/,
   );
   assert.equal(prototype.getItem, originalGetItem);
-  assert.equal(win.__GAME2_STORAGE_SCOPE__, undefined);
+  assert.equal(win.__MULTI_GAME_STORAGE_SCOPE__, undefined);
 });
 
 export { MemoryStorage };

@@ -140,11 +140,11 @@ import {
 } from "vue";
 import { useRouter } from "vue-router";
 import {
-  buildGame2FrameSrc,
-  closeGame2Session,
-  moveGame2Session,
-  readActiveGame2Launch,
-  resolveGame2FrameMessage,
+  buildMultiGameFrameSrc,
+  closeMultiGameSession,
+  moveMultiGameSession,
+  readActiveMultiGameLaunch,
+  resolveMultiGameFrameMessage,
 } from "@/utils/gameLauncher";
 
 const router = useRouter();
@@ -166,7 +166,7 @@ const frames = computed(() => {
     .filter(Boolean)
     .map((session) => ({
       ...session,
-      src: buildGame2FrameSrc(import.meta.env.BASE_URL, session),
+      src: buildMultiGameFrameSrc(import.meta.env.BASE_URL, session),
     }));
 });
 const frameElements = new Map();
@@ -207,7 +207,7 @@ function failureReason(reason) {
 
 function readLaunchSafely() {
   try {
-    return readActiveGame2Launch(window.sessionStorage);
+    return readActiveMultiGameLaunch(window.sessionStorage);
   } catch {
     return null;
   }
@@ -342,7 +342,7 @@ async function moveFrame(scopeId, direction, event) {
   movingFrame.value = true;
 
   try {
-    const updatedLaunch = moveGame2Session({
+    const updatedLaunch = moveMultiGameSession({
       scopeId,
       direction,
       sessionStorage: window.sessionStorage,
@@ -362,7 +362,7 @@ async function moveFrame(scopeId, direction, event) {
     );
     stripScrollTarget = strip.scrollLeft;
   } catch (error) {
-    console.error("Unable to move Game2 frame:", error);
+    console.error("Unable to move MultiGame frame:", error);
     window.alert("移动游戏窗口失败，请重试");
   } finally {
     movingFrame.value = false;
@@ -371,7 +371,7 @@ async function moveFrame(scopeId, direction, event) {
 
 function closeFrame(frame) {
   try {
-    const updatedLaunch = closeGame2Session({
+    const updatedLaunch = closeMultiGameSession({
       scopeId: frame.scopeId,
       localStorage: window.localStorage,
       sessionStorage: window.sessionStorage,
@@ -381,13 +381,13 @@ function closeFrame(frame) {
     delete frameStates[frame.scopeId];
     launch.value = updatedLaunch;
   } catch (error) {
-    console.error("Unable to close Game2 frame:", error);
+    console.error("Unable to close MultiGame frame:", error);
     window.alert("关闭游戏窗口失败，请重试");
   }
 }
 
 function handleMessage(event) {
-  const result = resolveGame2FrameMessage({
+  const result = resolveMultiGameFrameMessage({
     event,
     expectedOrigin: window.location.origin,
     frames: frames.value,

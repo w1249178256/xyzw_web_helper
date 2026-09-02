@@ -38,12 +38,12 @@
       </div>
     </div>
 
-    <script src="game2-storage-bridge.js" charset="utf-8"></script>
+    <script src="multi-game-storage-bridge.js" charset="utf-8"></script>
     <script type="text/javascript">
-      (function loadGame2Runtime() {
+      (function loadMultiGameRuntime() {
         "use strict";
 
-        if (!window.__GAME2_BRIDGE_READY__) return;
+        if (!window.__MULTI_GAME_BRIDGE_READY__) return;
 
         const runtime = [
           "patch.decrypted_readable.js",
@@ -65,10 +65,10 @@
             document.head.appendChild(script);
           });
         const notify = (type, code) => {
-          const { scope } = window.__GAME2_BRIDGE_READY__;
+          const { scope } = window.__MULTI_GAME_BRIDGE_READY__;
           window.parent.postMessage(
             {
-              channel: "game2",
+              channel: "multi-game",
               version: 1,
               type,
               scope,
@@ -80,6 +80,7 @@
 
         (async () => {
           for (const src of runtime) await loadScript(src);
+          document.getElementById("minimizeBtn")?.click();
           window.HtmlIsLoaded = true;
           document.getElementById("splash").style.display = "none";
           await window.boot();

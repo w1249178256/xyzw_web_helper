@@ -119,30 +119,30 @@
             </n-button-group>
           </n-space>
           <div class="header-actions">
-            <span class="game2-selection-count">
-              {{ isOpeningGame2 ? "正在准备" : "已选" }}
-              {{ game2SelectedTokenIds.size }} 个
+            <span class="multi-game-selection-count">
+              {{ isOpeningMultiGame ? "正在准备" : "已选" }}
+              {{ multiGameSelectedTokenIds.size }} 个
             </span>
             <n-button
               size="small"
-              :disabled="isOpeningGame2"
-              @click="selectAllGame2Tokens"
+              :disabled="isOpeningMultiGame"
+              @click="selectAllMultiGameTokens"
             >
-              {{ allGame2TokensSelected ? "已全选" : "全选" }}
+              {{ allMultiGameTokensSelected ? "已全选" : "全选" }}
             </n-button>
             <n-button
               size="small"
-              :disabled="game2SelectedTokenIds.size === 0 || isOpeningGame2"
-              @click="clearGame2TokenSelection"
+              :disabled="multiGameSelectedTokenIds.size === 0 || isOpeningMultiGame"
+              @click="clearMultiGameTokenSelection"
             >
               清空
             </n-button>
             <n-button
               type="warning"
               :disabled="
-                game2SelectedTokenIds.size === 0 || isOpeningGame2
+                multiGameSelectedTokenIds.size === 0 || isOpeningMultiGame
               "
-              :loading="isOpeningGame2"
+              :loading="isOpeningMultiGame"
               @click="openSelectedGames"
             >
               <template #icon>
@@ -150,7 +150,7 @@
                   <GameController />
                 </n-icon>
               </template>
-              批量进入游戏（{{ game2SelectedTokenIds.size }}）
+              批量进入游戏（{{ multiGameSelectedTokenIds.size }}）
             </n-button>
             <n-button type="info" @click="openGame">
               <template #icon>
@@ -212,18 +212,18 @@
             <template #title>
               <a-space class="token-name" align="center">
                 <span
-                  class="game2-token-checkbox"
+                  class="multi-game-token-checkbox"
                   @click.stop
                   @mousedown.stop
                   @dragstart.stop.prevent
                 >
                   <n-checkbox
-                    :checked="game2SelectedTokenIds.has(token.id)"
-                    :disabled="isOpeningGame2"
+                    :checked="multiGameSelectedTokenIds.has(token.id)"
+                    :disabled="isOpeningMultiGame"
                     :aria-label="`选择 ${token.name} 批量进入游戏`"
                     @click.stop
                     @update:checked="
-                      (checked) => setGame2TokenSelected(token.id, checked)
+                      (checked) => setMultiGameTokenSelected(token.id, checked)
                     "
                   />
                 </span>
@@ -423,18 +423,18 @@
               <!-- Info -->
               <n-space align="center" :size="6">
                 <span
-                  class="game2-token-checkbox"
+                  class="multi-game-token-checkbox"
                   @click.stop
                   @mousedown.stop
                   @dragstart.stop.prevent
                 >
                   <n-checkbox
-                    :checked="game2SelectedTokenIds.has(token.id)"
-                    :disabled="isOpeningGame2"
+                    :checked="multiGameSelectedTokenIds.has(token.id)"
+                    :disabled="isOpeningMultiGame"
                     :aria-label="`选择 ${token.name} 批量进入游戏`"
                     @click.stop
                     @update:checked="
-                      (checked) => setGame2TokenSelected(token.id, checked)
+                      (checked) => setMultiGameTokenSelected(token.id, checked)
                     "
                   />
                 </span>
@@ -713,7 +713,7 @@ import { useRouter } from "vue-router";
 import { transformToken, scheduleAuthUserRequest } from "@/utils/token";
 import { $emit } from "@/stores/events/index.ts";
 import useIndexedDB from "@/hooks/useIndexedDB";
-import { prepareGame2Launch } from "@/utils/gameLauncher";
+import { prepareMultiGameLaunch } from "@/utils/gameLauncher";
 import {
   pruneTokenSelection,
   selectAllTokenIds,
@@ -755,8 +755,8 @@ const connectingTokens = ref(new Set());
 // 从localStorage读取上次的视图模式，默认为列表视图
 const viewMode = ref(localStorage.getItem("tokenViewMode") || "list");
 const dragIndex = ref(null);
-const game2SelectedTokenIds = ref(new Set());
-const isOpeningGame2 = ref(false);
+const multiGameSelectedTokenIds = ref(new Set());
+const isOpeningMultiGame = ref(false);
 
 // 备注编辑状态管理
 const editingRemark = ref(null); // 当前正在编辑备注的tokenId
@@ -821,38 +821,38 @@ const sortedTokens = computed(() => {
   });
 });
 
-const selectedGame2Tokens = computed(() =>
+const selectedMultiGameTokens = computed(() =>
   sortedTokens.value.filter((token) =>
-    game2SelectedTokenIds.value.has(token.id),
+    multiGameSelectedTokenIds.value.has(token.id),
   ),
 );
-const allGame2TokensSelected = computed(
+const allMultiGameTokensSelected = computed(
   () =>
     sortedTokens.value.length > 0 &&
-    selectedGame2Tokens.value.length === sortedTokens.value.length,
+    selectedMultiGameTokens.value.length === sortedTokens.value.length,
 );
 
-function setGame2TokenSelected(tokenId, checked) {
-  game2SelectedTokenIds.value = toggleTokenSelection(
-    game2SelectedTokenIds.value,
+function setMultiGameTokenSelected(tokenId, checked) {
+  multiGameSelectedTokenIds.value = toggleTokenSelection(
+    multiGameSelectedTokenIds.value,
     tokenId,
     checked,
   );
 }
 
-function selectAllGame2Tokens() {
-  game2SelectedTokenIds.value = selectAllTokenIds(sortedTokens.value);
+function selectAllMultiGameTokens() {
+  multiGameSelectedTokenIds.value = selectAllTokenIds(sortedTokens.value);
 }
 
-function clearGame2TokenSelection() {
-  game2SelectedTokenIds.value = new Set();
+function clearMultiGameTokenSelection() {
+  multiGameSelectedTokenIds.value = new Set();
 }
 
 watch(
   () => tokenStore.gameTokens.map((token) => token.id),
   () => {
-    game2SelectedTokenIds.value = pruneTokenSelection(
-      game2SelectedTokenIds.value,
+    multiGameSelectedTokenIds.value = pruneTokenSelection(
+      multiGameSelectedTokenIds.value,
       tokenStore.gameTokens,
     );
   },
@@ -1687,11 +1687,11 @@ function convertBinToLx(buf) {
 }
 
 async function openSelectedGames() {
-  if (selectedGame2Tokens.value.length === 0 || isOpeningGame2.value) return;
-  const tokensToOpen = [...selectedGame2Tokens.value];
-  isOpeningGame2.value = true;
+  if (selectedMultiGameTokens.value.length === 0 || isOpeningMultiGame.value) return;
+  const tokensToOpen = [...selectedMultiGameTokens.value];
+  isOpeningMultiGame.value = true;
   try {
-    const { launch, failures } = await prepareGame2Launch({
+    const { launch, failures } = await prepareMultiGameLaunch({
       tokens: tokensToOpen,
       getArrayBuffer,
       localStorage: window.localStorage,
@@ -1706,12 +1706,12 @@ async function openSelectedGames() {
       const failedNames = failures.map((failure) => failure.name).join("、");
       message.warning(`已跳过 ${failures.length} 个账号：${failedNames}`);
     }
-    await router.push("/game2");
+    await router.push("/multi-game");
   } catch (error) {
     console.error("Batch game launch failed:", error);
     message.error("批量进入游戏失败，请重试");
   } finally {
-    isOpeningGame2.value = false;
+    isOpeningMultiGame.value = false;
   }
 }
 
@@ -2139,13 +2139,13 @@ onUnmounted(() => {
   flex-wrap: wrap;
 }
 
-.game2-selection-count {
+.multi-game-selection-count {
   color: var(--text-secondary);
   font-size: var(--font-size-sm);
   white-space: nowrap;
 }
 
-.game2-token-checkbox {
+.multi-game-token-checkbox {
   display: inline-flex;
   align-items: center;
   cursor: default;

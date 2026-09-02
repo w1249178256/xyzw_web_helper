@@ -1,21 +1,21 @@
-# Game2 Multi-Account Implementation Plan
+# MultiGame Multi-Account Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a Token-management batch selection flow that opens the selected accounts in an isolated, horizontally scrollable `/game2` page without changing the existing single-account `/game` behavior.
+**Goal:** Add a Token-management batch selection flow that opens the selected accounts in an isolated, horizontally scrollable `/multi-game` page without changing the existing single-account `/game` behavior.
 
-**Architecture:** A pure launcher service prepares one localStorage namespace per selected Token and stores a non-secret launch manifest in sessionStorage. Each iframe loads a dedicated `game2.html`; its first blocking script virtualizes localStorage for that iframe realm before reusing the existing Cocos files and protected login injector. A standalone Vue page renders and monitors the iframe sessions, while TokenImport owns the independent checkbox selection UI.
+**Architecture:** A pure launcher service prepares one localStorage namespace per selected Token and stores a non-secret launch manifest in sessionStorage. Each iframe loads a dedicated `multi-game.html`; its first blocking script virtualizes localStorage for that iframe realm before reusing the existing Cocos files and protected login injector. A standalone Vue page renders and monitors the iframe sessions, while TokenImport owns the independent checkbox selection UI.
 
 **Tech Stack:** Vue 3.5, Vue Router 4, Pinia, Naive UI, Vite 5, `lz4js`, browser Storage APIs, Node `node:test`.
 
-**Spec:** `docs/superpowers/specs/2026-09-02-game2-multi-account-design.md`
+**Spec:** `docs/superpowers/specs/2026-09-02-multi-game-multi-account-design.md`
 
 ## Global Constraints
 
 - Preserve `/game`, `src/views/GamePlayer.vue`, and the existing single-account “打开游戏” behavior.
 - Do not modify or de-obfuscate `public/game/sh1.js`; install isolation before it runs.
 - Never put Token text or BIN contents in a route or iframe URL.
-- Scope IDs must match `^g2-[a-f0-9]{32}$` and come from `crypto.randomUUID()`.
+- Scope IDs must match `^mg-[a-f0-9]{32}$` and come from `crypto.randomUUID()`.
 - Storage bridge failure is fatal for that iframe; never fall back to unscoped localStorage.
 - Only localStorage is virtualized. Browser verification must show that shared sessionStorage, IndexedDB, and BroadcastChannel do not break account login isolation.
 - Keep existing user changes and accept generated declaration changes only when directly caused by this feature.
@@ -29,17 +29,17 @@
 - Create `test/gameLauncher.test.js`: real launcher behavior against in-memory Storage objects.
 - Create `src/utils/gameSelection.js`: immutable helpers for the Token-management batch selection set.
 - Create `test/gameSelection.test.js`: selection toggle, select-all order, and deleted-Token pruning behavior.
-- Create `public/game/game2-storage-bridge.js`: classic-script API for scoped localStorage and iframe-realm installation.
-- Create `test/game2StorageBridge.test.js`: namespace adapter and simulated realm behavior.
-- Create `public/game/game2.html`: dedicated Cocos bootstrap that refuses to load game scripts unless isolation is ready.
+- Create `public/game/multi-game-storage-bridge.js`: classic-script API for scoped localStorage and iframe-realm installation.
+- Create `test/multiGameStorageBridge.test.js`: namespace adapter and simulated realm behavior.
+- Create `public/game/multi-game.html`: dedicated Cocos bootstrap that refuses to load game scripts unless isolation is ready.
 - Create `src/views/GameMultiPlayer.vue`: full-screen horizontal session renderer and validated child-message handling.
-- Modify `src/router/index.js`: register `/game2` outside `DefaultLayout` with the existing Token guard.
+- Modify `src/router/index.js`: register `/multi-game` outside `DefaultLayout` with the existing Token guard.
 - Modify `src/views/TokenImport/index.vue`: independent checkboxes, select-all/clear controls, and batch launch action.
 - Potentially modify generated `components.d.ts`, `src/auto-imports.d.ts`, and `src/typed-router.d.ts` only if Vite legitimately regenerates entries for the new SFC.
 
 ---
 
-### Task 1: Game2 Launch Session Service
+### Task 1: MultiGame Launch Session Service
 
 **Files:**
 - Create: `src/utils/gameLauncher.js`
@@ -47,8 +47,8 @@
 
 **Interfaces:**
 - Consumes: Token objects shaped as `{ id: string, name?: string }`, `getArrayBuffer(id): Promise<ArrayBuffer | null>`, Web Storage-compatible `localStorage` and `sessionStorage`, `randomUUID(): string`, and `now(): number`.
-- Produces: `GAME2_ACTIVE_LAUNCH_KEY`, `convertBinToLx(buffer, random?)`, `prepareGame2Launch(options)`, `readActiveGame2Launch(storage)`, `clearGame2Launch(options)`, and `buildGame2FrameSrc(baseUrl, session)`.
-- `prepareGame2Launch` returns `{ launch: { version: 1, id, createdAt, sessions, failures }, failures }`; every session is `{ tokenId, name, scopeId, order }`, and every failure is `{ tokenId, name, reason }` where reason is `missing-bin`, `read-failed`, or `convert-failed`.
+- Produces: `MULTI_GAME_ACTIVE_LAUNCH_KEY`, `convertBinToLx(buffer, random?)`, `prepareMultiGameLaunch(options)`, `readActiveMultiGameLaunch(storage)`, `clearMultiGameLaunch(options)`, and `buildMultiGameFrameSrc(baseUrl, session)`.
+- `prepareMultiGameLaunch` returns `{ launch: { version: 1, id, createdAt, sessions, failures }, failures }`; every session is `{ tokenId, name, scopeId, order }`, and every failure is `{ tokenId, name, reason }` where reason is `missing-bin`, `read-failed`, or `convert-failed`.
 
 - [ ] **Step 1: Write the failing URL and manifest tests**
 
@@ -88,23 +88,23 @@ class MemoryStorage {
   }
 }
 
-test("buildGame2FrameSrc encodes scope and account without exposing token data", () => {
-  assert.equal(typeof launcher.buildGame2FrameSrc, "function");
+test("buildMultiGameFrameSrc encodes scope and account without exposing token data", () => {
+  assert.equal(typeof launcher.buildMultiGameFrameSrc, "function");
   assert.equal(
-    launcher.buildGame2FrameSrc("/helper/", {
-      scopeId: "g2-0123456789abcdef0123456789abcdef",
+    launcher.buildMultiGameFrameSrc("/helper/", {
+      scopeId: "mg-0123456789abcdef0123456789abcdef",
       tokenId: "account / 一号",
     }),
-    "/helper/game/game2.html?scope=g2-0123456789abcdef0123456789abcdef&bin_id=account%20%2F%20%E4%B8%80%E5%8F%B7",
+    "/helper/game/multi-game.html?scope=mg-0123456789abcdef0123456789abcdef&bin_id=account%20%2F%20%E4%B8%80%E5%8F%B7",
   );
 });
 
-test("readActiveGame2Launch rejects malformed and wrong-version manifests", () => {
+test("readActiveMultiGameLaunch rejects malformed and wrong-version manifests", () => {
   const storage = new MemoryStorage();
-  storage.setItem("game2_active_launch_v1", "not-json");
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
-  storage.setItem("game2_active_launch_v1", JSON.stringify({ version: 2, sessions: [] }));
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", "not-json");
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", JSON.stringify({ version: 2, sessions: [] }));
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 });
 ```
 
@@ -112,7 +112,7 @@ test("readActiveGame2Launch rejects malformed and wrong-version manifests", () =
 
 Run: `node --test test/gameLauncher.test.js`
 
-Expected: FAIL on the explicit `typeof launcher.buildGame2FrameSrc` assertion because the module/API does not exist.
+Expected: FAIL on the explicit `typeof launcher.buildMultiGameFrameSrc` assertion because the module/API does not exist.
 
 - [ ] **Step 3: Implement URL construction and strict manifest parsing**
 
@@ -121,8 +121,8 @@ Create `src/utils/gameLauncher.js` with these exact public constants and validat
 ```js
 import lz4 from "lz4js";
 
-export const GAME2_ACTIVE_LAUNCH_KEY = "game2_active_launch_v1";
-const SCOPE_PATTERN = /^g2-[a-f0-9]{32}$/;
+export const MULTI_GAME_ACTIVE_LAUNCH_KEY = "multi-game_active_launch_v1";
+const SCOPE_PATTERN = /^mg-[a-f0-9]{32}$/;
 
 function normalizeBaseUrl(baseUrl) {
   return String(baseUrl || "/").replace(/\/?$/, "/");
@@ -140,15 +140,15 @@ function isSession(value) {
   );
 }
 
-export function buildGame2FrameSrc(baseUrl, session) {
+export function buildMultiGameFrameSrc(baseUrl, session) {
   const scope = encodeURIComponent(session.scopeId);
   const tokenId = encodeURIComponent(session.tokenId);
-  return `${normalizeBaseUrl(baseUrl)}game/game2.html?scope=${scope}&bin_id=${tokenId}`;
+  return `${normalizeBaseUrl(baseUrl)}game/multi-game.html?scope=${scope}&bin_id=${tokenId}`;
 }
 
-export function readActiveGame2Launch(storage) {
+export function readActiveMultiGameLaunch(storage) {
   try {
-    const parsed = JSON.parse(storage.getItem(GAME2_ACTIVE_LAUNCH_KEY) || "null");
+    const parsed = JSON.parse(storage.getItem(MULTI_GAME_ACTIVE_LAUNCH_KEY) || "null");
     if (
       parsed?.version !== 1 ||
       typeof parsed.id !== "string" ||
@@ -177,7 +177,7 @@ Expected: PASS for both URL and manifest tests.
 Append focused tests that use two literal `pl` buffers, one missing buffer, deterministic UUID values, and two Storage instances:
 
 ```js
-test("prepareGame2Launch seeds isolated accounts in display order and records failures", async () => {
+test("prepareMultiGameLaunch seeds isolated accounts in display order and records failures", async () => {
   const local = new MemoryStorage();
   const session = new MemoryStorage();
   const uuids = [
@@ -190,7 +190,7 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
     ["b", Uint8Array.from([112, 108, 4, 5, 6]).buffer],
   ]);
 
-  const result = await launcher.prepareGame2Launch({
+  const result = await launcher.prepareMultiGameLaunch({
     tokens: [
       { id: "a", name: "账号 A" },
       { id: "missing", name: "缺失账号" },
@@ -206,39 +206,39 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
   assert.deepEqual(
     result.launch.sessions.map(({ tokenId, scopeId, order }) => ({ tokenId, scopeId, order })),
     [
-      { tokenId: "a", scopeId: "g2-11111111111111111111111111111111", order: 0 },
-      { tokenId: "b", scopeId: "g2-22222222222222222222222222222222", order: 1 },
+      { tokenId: "a", scopeId: "mg-11111111111111111111111111111111", order: 0 },
+      { tokenId: "b", scopeId: "mg-22222222222222222222222222222222", order: 1 },
     ],
   );
   assert.deepEqual(result.failures, [
     { tokenId: "missing", name: "缺失账号", reason: "missing-bin" },
   ]);
   assert.equal(
-    local.getItem("game2:g2-11111111111111111111111111111111:bin_data_a"),
+    local.getItem("multi-game:mg-11111111111111111111111111111111:bin_data_a"),
     "706c010203",
   );
   assert.equal(
-    local.getItem("game2:g2-22222222222222222222222222222222:current_bin_id"),
+    local.getItem("multi-game:mg-22222222222222222222222222222222:current_bin_id"),
     "b",
   );
   assert.deepEqual(
-    JSON.parse(local.getItem("game2:g2-11111111111111111111111111111111:bin_file_list")),
+    JSON.parse(local.getItem("multi-game:mg-11111111111111111111111111111111:bin_file_list")),
     [{ id: "a", name: "账号 A", byteLength: 5, size: "0.0 KB", order: 0 }],
   );
   assert.deepEqual(
-    JSON.parse(session.getItem("game2_active_launch_v1")),
+    JSON.parse(session.getItem("multi-game_active_launch_v1")),
     result.launch,
   );
 });
 
-test("clearGame2Launch removes only scopes named by the active manifest", () => {
+test("clearMultiGameLaunch removes only scopes named by the active manifest", () => {
   const local = new MemoryStorage();
   const session = new MemoryStorage();
-  const scope = "g2-33333333333333333333333333333333";
-  local.setItem(`game2:${scope}:current_bin_id`, "a");
+  const scope = "mg-33333333333333333333333333333333";
+  local.setItem(`multi-game:${scope}:current_bin_id`, "a");
   local.setItem("bin_data_single-game", "keep");
   session.setItem(
-    "game2_active_launch_v1",
+    "multi-game_active_launch_v1",
     JSON.stringify({
       version: 1,
       id: "launch-44444444444444444444444444444444",
@@ -248,11 +248,11 @@ test("clearGame2Launch removes only scopes named by the active manifest", () => 
     }),
   );
 
-  launcher.clearGame2Launch({ localStorage: local, sessionStorage: session });
+  launcher.clearMultiGameLaunch({ localStorage: local, sessionStorage: session });
 
-  assert.equal(local.getItem(`game2:${scope}:current_bin_id`), null);
+  assert.equal(local.getItem(`multi-game:${scope}:current_bin_id`), null);
   assert.equal(local.getItem("bin_data_single-game"), "keep");
-  assert.equal(session.getItem("game2_active_launch_v1"), null);
+  assert.equal(session.getItem("multi-game_active_launch_v1"), null);
 });
 ```
 
@@ -260,7 +260,7 @@ test("clearGame2Launch removes only scopes named by the active manifest", () => 
 
 Run: `node --test test/gameLauncher.test.js`
 
-Expected: FAIL because `prepareGame2Launch` and `clearGame2Launch` are not functions.
+Expected: FAIL because `prepareMultiGameLaunch` and `clearMultiGameLaunch` are not functions.
 
 - [ ] **Step 7: Implement conversion, scoped seeding, failure isolation, and cleanup**
 
@@ -282,20 +282,20 @@ function storageKeys(storage) {
   return keys;
 }
 
-export function clearGame2Launch({ localStorage, sessionStorage }) {
-  const previous = readActiveGame2Launch(sessionStorage);
+export function clearMultiGameLaunch({ localStorage, sessionStorage }) {
+  const previous = readActiveMultiGameLaunch(sessionStorage);
   if (previous) {
     for (const gameSession of previous.sessions) {
-      const prefix = `game2:${gameSession.scopeId}:`;
+      const prefix = `multi-game:${gameSession.scopeId}:`;
       for (const key of storageKeys(localStorage)) {
         if (key.startsWith(prefix)) localStorage.removeItem(key);
       }
     }
   }
-  sessionStorage.removeItem(GAME2_ACTIVE_LAUNCH_KEY);
+  sessionStorage.removeItem(MULTI_GAME_ACTIVE_LAUNCH_KEY);
 }
 
-export async function prepareGame2Launch({
+export async function prepareMultiGameLaunch({
   tokens,
   getArrayBuffer,
   localStorage,
@@ -303,7 +303,7 @@ export async function prepareGame2Launch({
   randomUUID = () => crypto.randomUUID(),
   now = () => Date.now(),
 }) {
-  clearGame2Launch({ localStorage, sessionStorage });
+  clearMultiGameLaunch({ localStorage, sessionStorage });
   const launchId = `launch-${uuidHex(randomUUID)}`;
   const prepared = await Promise.all(
     tokens.map(async (token) => {
@@ -331,10 +331,10 @@ export async function prepareGame2Launch({
       failures.push(result.failure);
       continue;
     }
-    const scopeId = `g2-${uuidHex(randomUUID)}`;
+    const scopeId = `mg-${uuidHex(randomUUID)}`;
     const order = sessions.length;
     const name = result.token.name || "Token";
-    const prefix = `game2:${scopeId}:`;
+    const prefix = `multi-game:${scopeId}:`;
     const hex = Array.from(result.bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
     localStorage.setItem(`${prefix}bin_data_${result.token.id}`, hex);
     localStorage.setItem(`${prefix}current_bin_id`, result.token.id);
@@ -354,7 +354,7 @@ export async function prepareGame2Launch({
   }
 
   const launch = { version: 1, id: launchId, createdAt: now(), sessions, failures };
-  sessionStorage.setItem(GAME2_ACTIVE_LAUNCH_KEY, JSON.stringify(launch));
+  sessionStorage.setItem(MULTI_GAME_ACTIVE_LAUNCH_KEY, JSON.stringify(launch));
   return { launch, failures };
 }
 ```
@@ -377,25 +377,25 @@ git commit -m "feat: add isolated game launch sessions"
 ### Task 2: Iframe-Scoped localStorage Bridge
 
 **Files:**
-- Create: `public/game/game2-storage-bridge.js`
-- Create: `test/game2StorageBridge.test.js`
+- Create: `public/game/multi-game-storage-bridge.js`
+- Create: `test/multiGameStorageBridge.test.js`
 
 **Interfaces:**
-- Consumes: a scope matching `^g2-[a-f0-9]{32}$`, a Web Storage backing object, and a browser-like `window` with `Storage`, `localStorage`, `sessionStorage`, `location`, and `document`.
-- Produces: classic global `globalThis.Game2StorageBridge` with `validateScope(scope)`, `createScopedStorageAdapter(backing, scope)`, and `install(win, scope)`.
-- On browser auto-install, produces `window.__GAME2_BRIDGE_READY__ = { scope, binId }` or `window.__GAME2_BRIDGE_ERROR__ = { code }` and sends only the documented `fatal` message on failure.
+- Consumes: a scope matching `^mg-[a-f0-9]{32}$`, a Web Storage backing object, and a browser-like `window` with `Storage`, `localStorage`, `sessionStorage`, `location`, and `document`.
+- Produces: classic global `globalThis.MultiGameStorageBridge` with `validateScope(scope)`, `createScopedStorageAdapter(backing, scope)`, and `install(win, scope)`.
+- On browser auto-install, produces `window.__MULTI_GAME_BRIDGE_READY__ = { scope, binId }` or `window.__MULTI_GAME_BRIDGE_ERROR__ = { code }` and sends only the documented `fatal` message on failure.
 
 - [ ] **Step 1: Write failing adapter isolation tests**
 
-Create `test/game2StorageBridge.test.js`. Import the classic script for its global API, and use a fresh memory backing store per test:
+Create `test/multiGameStorageBridge.test.js`. Import the classic script for its global API, and use a fresh memory backing store per test:
 
 ```js
 import assert from "node:assert/strict";
 import test from "node:test";
 
-delete globalThis.Game2StorageBridge;
-await import("../public/game/game2-storage-bridge.js").catch(() => undefined);
-const bridge = globalThis.Game2StorageBridge || {};
+delete globalThis.MultiGameStorageBridge;
+await import("../public/game/multi-game-storage-bridge.js").catch(() => undefined);
+const bridge = globalThis.MultiGameStorageBridge || {};
 
 class MemoryStorage {
   constructor(entries = []) {
@@ -412,8 +412,8 @@ class MemoryStorage {
 test("scoped adapters isolate identity and ordinary game keys", () => {
   assert.equal(typeof bridge.createScopedStorageAdapter, "function");
   const backing = new MemoryStorage([["outside", "keep"]]);
-  const a = bridge.createScopedStorageAdapter(backing, "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-  const b = bridge.createScopedStorageAdapter(backing, "g2-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  const a = bridge.createScopedStorageAdapter(backing, "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  const b = bridge.createScopedStorageAdapter(backing, "mg-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
   a.setItem("current_bin_id", "account-a");
   b.setItem("current_bin_id", "account-b");
   a.setItem("setting", "left");
@@ -427,8 +427,8 @@ test("scoped adapters isolate identity and ordinary game keys", () => {
 
 test("key length and clear expose only one scope", () => {
   const backing = new MemoryStorage([["outside", "keep"]]);
-  const a = bridge.createScopedStorageAdapter(backing, "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-  const b = bridge.createScopedStorageAdapter(backing, "g2-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+  const a = bridge.createScopedStorageAdapter(backing, "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  const b = bridge.createScopedStorageAdapter(backing, "mg-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
   a.setItem("current_bin_id", "a");
   a.setItem("actual_login_bin_id", "a");
   b.setItem("current_bin_id", "b");
@@ -444,7 +444,7 @@ test("invalid scopes are rejected before a storage key is touched", () => {
   const backing = new MemoryStorage();
   assert.throws(
     () => bridge.createScopedStorageAdapter(backing, "../shared"),
-    /Invalid Game2 scope/,
+    /Invalid MultiGame scope/,
   );
   assert.equal(backing.length, 0);
 });
@@ -452,27 +452,27 @@ test("invalid scopes are rejected before a storage key is touched", () => {
 
 - [ ] **Step 2: Run bridge tests and verify RED**
 
-Run: `node --test test/game2StorageBridge.test.js`
+Run: `node --test test/multiGameStorageBridge.test.js`
 
 Expected: FAIL on the explicit API type assertion because the bridge script does not exist.
 
 - [ ] **Step 3: Implement the pure scoped adapter**
 
-Create a classic IIFE in `public/game/game2-storage-bridge.js`. The factory must expose the API on `globalThis.Game2StorageBridge`; do not use ESM syntax because the browser must execute it synchronously before classic game scripts:
+Create a classic IIFE in `public/game/multi-game-storage-bridge.js`. The factory must expose the API on `globalThis.MultiGameStorageBridge`; do not use ESM syntax because the browser must execute it synchronously before classic game scripts:
 
 ```js
-(function initializeGame2StorageBridge(root) {
+(function initializeMultiGameStorageBridge(root) {
   "use strict";
 
-  const SCOPE_PATTERN = /^g2-[a-f0-9]{32}$/;
+  const SCOPE_PATTERN = /^mg-[a-f0-9]{32}$/;
 
   function validateScope(scope) {
     return SCOPE_PATTERN.test(String(scope || ""));
   }
 
   function createScopedStorageAdapter(backing, scope) {
-    if (!validateScope(scope)) throw new Error("Invalid Game2 scope");
-    const prefix = `game2:${scope}:`;
+    if (!validateScope(scope)) throw new Error("Invalid MultiGame scope");
+    const prefix = `multi-game:${scope}:`;
     const scopedKeys = () => {
       const keys = [];
       for (let index = 0; index < backing.length; index += 1) {
@@ -483,7 +483,7 @@ Create a classic IIFE in `public/game/game2-storage-bridge.js`. The factory must
     };
     const normalizeKey = (key) => {
       const value = String(key);
-      if (value.startsWith("game2:")) throw new Error("Nested Game2 scope is not allowed");
+      if (value.startsWith("multi-game:")) throw new Error("Nested MultiGame scope is not allowed");
       return value;
     };
     return {
@@ -499,13 +499,13 @@ Create a classic IIFE in `public/game/game2-storage-bridge.js`. The factory must
   }
 
   const api = { validateScope, createScopedStorageAdapter };
-  root.Game2StorageBridge = api;
+  root.MultiGameStorageBridge = api;
 })(globalThis);
 ```
 
 - [ ] **Step 4: Run adapter tests and verify GREEN**
 
-Run: `node --test test/game2StorageBridge.test.js`
+Run: `node --test test/multiGameStorageBridge.test.js`
 
 Expected: all adapter tests PASS.
 
@@ -516,19 +516,19 @@ Append tests that create a fresh `RealmStorage` class inside each test. Seed nam
 ```js
 test("install virtualizes only the iframe localStorage object", () => {
   const localStorage = new MemoryStorage([
-    ["game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:current_bin_id", "account-a"],
-    ["game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:bin_data_account-a", "706c0102"],
+    ["multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:current_bin_id", "account-a"],
+    ["multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:bin_data_account-a", "706c0102"],
   ]);
   const sessionStorage = new MemoryStorage([["shared", "session-value"]]);
   const win = { Storage: MemoryStorage, localStorage, sessionStorage };
 
-  bridge.install(win, "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+  bridge.install(win, "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
   assert.equal(win.localStorage.getItem("current_bin_id"), "account-a");
   win.localStorage.setItem("actual_login_bin_id", "account-a");
   assert.equal(
     localStorage.values.get(
-      "game2:g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:actual_login_bin_id",
+      "multi-game:mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:actual_login_bin_id",
     ),
     "account-a",
   );
@@ -539,7 +539,7 @@ test("install virtualizes only the iframe localStorage object", () => {
 
 - [ ] **Step 6: Run bridge tests and verify RED**
 
-Run: `node --test test/game2StorageBridge.test.js`
+Run: `node --test test/multiGameStorageBridge.test.js`
 
 Expected: FAIL because `bridge.install` is not a function.
 
@@ -549,8 +549,8 @@ Extend the bridge factory with `install(win, scope)`. Capture `rawLocalStorage`,
 
 ```js
 function install(win, scope) {
-  if (!validateScope(scope)) throw new Error("Invalid Game2 scope");
-  if (win.__GAME2_STORAGE_SCOPE__) throw new Error("Game2 storage bridge already installed");
+  if (!validateScope(scope)) throw new Error("Invalid MultiGame scope");
+  if (win.__MULTI_GAME_STORAGE_SCOPE__) throw new Error("MultiGame storage bridge already installed");
   const rawLocalStorage = win.localStorage;
   const prototype = win.Storage?.prototype;
   const lengthDescriptor = Object.getOwnPropertyDescriptor(prototype, "length");
@@ -567,7 +567,7 @@ function install(win, scope) {
     !lengthDescriptor?.configurable ||
     Object.values(native).some((member) => typeof member !== "function")
   ) {
-    throw new Error("Game2 storage bridge is not supported");
+    throw new Error("MultiGame storage bridge is not supported");
   }
   const backing = {
     get length() { return native.getLength.call(rawLocalStorage); },
@@ -601,35 +601,35 @@ function install(win, scope) {
       return this === rawLocalStorage ? scoped.length : native.getLength.call(this);
     } },
   });
-  win.__GAME2_STORAGE_SCOPE__ = scope;
+  win.__MULTI_GAME_STORAGE_SCOPE__ = scope;
   return scoped;
 }
 ```
 
-Add `install` to the global API. When `root.window === root && root.document` is true, parse exactly one `scope` and one `bin_id` from `root.location.search`, run `install`, and verify the scoped `current_bin_id` and `bin_data_<binId>` exist. On success set `__GAME2_BRIDGE_READY__`; on failure set `__GAME2_BRIDGE_ERROR__`, render a short fatal message, and send `{ channel: "game2", version: 1, type: "fatal", scope, code: "bridge-install-failed" }` to the same-origin parent. Never include the thrown message or stack in the postMessage payload.
+Add `install` to the global API. When `root.window === root && root.document` is true, parse exactly one `scope` and one `bin_id` from `root.location.search`, run `install`, and verify the scoped `current_bin_id` and `bin_data_<binId>` exist. On success set `__MULTI_GAME_BRIDGE_READY__`; on failure set `__MULTI_GAME_BRIDGE_ERROR__`, render a short fatal message, and send `{ channel: "multi-game", version: 1, type: "fatal", scope, code: "bridge-install-failed" }` to the same-origin parent. Never include the thrown message or stack in the postMessage payload.
 
 - [ ] **Step 8: Run bridge and launcher tests**
 
-Run: `node --test test/game2StorageBridge.test.js test/gameLauncher.test.js`
+Run: `node --test test/multiGameStorageBridge.test.js test/gameLauncher.test.js`
 
 Expected: all tests PASS.
 
 - [ ] **Step 9: Commit the storage bridge**
 
 ```bash
-git add public/game/game2-storage-bridge.js test/game2StorageBridge.test.js
-git commit -m "feat: isolate game2 iframe storage"
+git add public/game/multi-game-storage-bridge.js test/multiGameStorageBridge.test.js
+git commit -m "feat: isolate multi-game iframe storage"
 ```
 
 ---
 
-### Task 3: Dedicated Game2 Cocos Bootstrap
+### Task 3: Dedicated MultiGame Cocos Bootstrap
 
 **Files:**
-- Create: `public/game/game2.html`
+- Create: `public/game/multi-game.html`
 
 **Interfaces:**
-- Consumes: `game2-storage-bridge.js`, the existing Cocos files referenced by `public/game/index.html`, and query parameters `scope` plus `bin_id`.
+- Consumes: `multi-game-storage-bridge.js`, the existing Cocos files referenced by `public/game/index.html`, and query parameters `scope` plus `bin_id`.
 - Produces: an isolated game document that sends a validated-shape `ready` or `fatal` message to its parent.
 
 - [ ] **Step 1: Create the dedicated document with the bridge as the first script**
@@ -637,11 +637,11 @@ git commit -m "feat: isolate game2 iframe storage"
 Copy the head, canvas, and splash markup from `public/game/index.html`. Do not copy the existing static game `<script>` tags. The body script order must be:
 
 ```html
-<script src="game2-storage-bridge.js" charset="utf-8"></script>
+<script src="multi-game-storage-bridge.js" charset="utf-8"></script>
 <script type="text/javascript">
-  (function loadGame2Runtime() {
+  (function loadMultiGameRuntime() {
     "use strict";
-    if (!window.__GAME2_BRIDGE_READY__) return;
+    if (!window.__MULTI_GAME_BRIDGE_READY__) return;
     const runtime = [
       "patch.decrypted_readable.js",
       "src/settings.da7ef.js",
@@ -662,9 +662,9 @@ Copy the head, canvas, and splash markup from `public/game/index.html`. Do not c
         document.head.appendChild(script);
       });
     const notify = (type, code) => {
-      const { scope } = window.__GAME2_BRIDGE_READY__;
+      const { scope } = window.__MULTI_GAME_BRIDGE_READY__;
       window.parent.postMessage(
-        { channel: "game2", version: 1, type, scope, ...(code ? { code } : {}) },
+        { channel: "multi-game", version: 1, type, scope, ...(code ? { code } : {}) },
         window.location.origin,
       );
     };
@@ -686,23 +686,23 @@ This keeps the exact existing runtime order but guarantees no runtime file execu
 
 - [ ] **Step 2: Run focused tests and a production build**
 
-Run: `node --test test/game2StorageBridge.test.js test/gameLauncher.test.js`
+Run: `node --test test/multiGameStorageBridge.test.js test/gameLauncher.test.js`
 
 Expected: all tests PASS.
 
 Run: `npm.cmd run build`
 
-Expected: Vite exits 0 and `dist/game/game2.html` plus `dist/game/game2-storage-bridge.js` exist.
+Expected: Vite exits 0 and `dist/game/multi-game.html` plus `dist/game/multi-game-storage-bridge.js` exist.
 
-Run: `Test-Path dist/game/game2.html; Test-Path dist/game/game2-storage-bridge.js`
+Run: `Test-Path dist/game/multi-game.html; Test-Path dist/game/multi-game-storage-bridge.js`
 
 Expected: both lines are `True`.
 
 - [ ] **Step 3: Commit the dedicated bootstrap**
 
 ```bash
-git add public/game/game2.html
-git commit -m "feat: add isolated game2 bootstrap"
+git add public/game/multi-game.html
+git commit -m "feat: add isolated multi-game bootstrap"
 ```
 
 ---
@@ -715,8 +715,8 @@ git commit -m "feat: add isolated game2 bootstrap"
 - Modify if generated: `src/typed-router.d.ts`
 
 **Interfaces:**
-- Consumes: `readActiveGame2Launch(sessionStorage)`, `buildGame2FrameSrc(import.meta.env.BASE_URL, session)`, child messages, and Vue Router.
-- Produces: `/game2`, one iframe panel per manifest session, per-panel `loading`, `ready`, or `fatal` state, isolated reload, and navigation back to `/tokens`.
+- Consumes: `readActiveMultiGameLaunch(sessionStorage)`, `buildMultiGameFrameSrc(import.meta.env.BASE_URL, session)`, child messages, and Vue Router.
+- Produces: `/multi-game`, one iframe panel per manifest session, per-panel `loading`, `ready`, or `fatal` state, isolated reload, and navigation back to `/tokens`.
 
 - [ ] **Step 1: Add the route and an empty-state-first page**
 
@@ -724,7 +724,7 @@ Register this manual route immediately after `/game` and outside `DefaultLayout`
 
 ```js
 {
-  path: "/game2",
+  path: "/multi-game",
   name: "GameMultiPlayer",
   component: () => import("@/views/GameMultiPlayer.vue"),
   meta: {
@@ -734,18 +734,18 @@ Register this manual route immediately after `/game` and outside `DefaultLayout`
 },
 ```
 
-Create the SFC with a fixed full-screen root, toolbar, and an empty state that appears when `readActiveGame2Launch(window.sessionStorage)` returns null or has no sessions. The empty-state action must call `router.push("/tokens")`.
+Create the SFC with a fixed full-screen root, toolbar, and an empty state that appears when `readActiveMultiGameLaunch(window.sessionStorage)` returns null or has no sessions. The empty-state action must call `router.push("/tokens")`.
 
 - [ ] **Step 2: Render horizontal sessions and validated status messages**
 
 In `<script setup>`, derive frames without copying secret data:
 
 ```js
-const launch = ref(readActiveGame2Launch(window.sessionStorage));
+const launch = ref(readActiveMultiGameLaunch(window.sessionStorage));
 const frames = computed(() =>
   (launch.value?.sessions || []).map((session) => ({
     ...session,
-    src: buildGame2FrameSrc(import.meta.env.BASE_URL, session),
+    src: buildMultiGameFrameSrc(import.meta.env.BASE_URL, session),
   })),
 );
 const frameElements = new Map();
@@ -756,7 +756,7 @@ const frameStates = reactive(
 function handleMessage(event) {
   if (event.origin !== window.location.origin) return;
   const payload = event.data;
-  if (payload?.channel !== "game2" || payload.version !== 1) return;
+  if (payload?.channel !== "multi-game" || payload.version !== 1) return;
   const frame = frames.value.find((item) => item.scopeId === payload.scope);
   const element = frameElements.get(payload.scope);
   if (!frame || !element || event.source !== element.contentWindow) return;
@@ -824,8 +824,8 @@ Only include `src/typed-router.d.ts` if its diff contains the generated GameMult
 - Modify if generated: `components.d.ts`, `src/auto-imports.d.ts`
 
 **Interfaces:**
-- Consumes: `sortedTokens`, `getArrayBuffer`, `prepareGame2Launch`, browser local/session storage, router, and Naive UI messages.
-- Produces: immutable `toggleTokenSelection`, `selectAllTokenIds`, and `pruneTokenSelection` helpers; independent `game2SelectedTokenIds`; list/card checkboxes; select-all/clear buttons; selected count; and `openSelectedGames()`.
+- Consumes: `sortedTokens`, `getArrayBuffer`, `prepareMultiGameLaunch`, browser local/session storage, router, and Naive UI messages.
+- Produces: immutable `toggleTokenSelection`, `selectAllTokenIds`, and `pruneTokenSelection` helpers; independent `multiGameSelectedTokenIds`; list/card checkboxes; select-all/clear buttons; selected count; and `openSelectedGames()`.
 
 - [ ] **Step 1: Write and run failing selection behavior tests**
 
@@ -889,36 +889,36 @@ Expected: both tests PASS.
 
 - [ ] **Step 3: Add independent reactive selection state**
 
-Import `prepareGame2Launch` from `@/utils/gameLauncher` and the three selection helpers from `@/utils/gameSelection`. Add:
+Import `prepareMultiGameLaunch` from `@/utils/gameLauncher` and the three selection helpers from `@/utils/gameSelection`. Add:
 
 ```js
-const game2SelectedTokenIds = ref(new Set());
-const isOpeningGame2 = ref(false);
-const selectedGame2Tokens = computed(() =>
-  sortedTokens.value.filter((token) => game2SelectedTokenIds.value.has(token.id)),
+const multiGameSelectedTokenIds = ref(new Set());
+const isOpeningMultiGame = ref(false);
+const selectedMultiGameTokens = computed(() =>
+  sortedTokens.value.filter((token) => multiGameSelectedTokenIds.value.has(token.id)),
 );
-const allGame2TokensSelected = computed(
-  () => sortedTokens.value.length > 0 && selectedGame2Tokens.value.length === sortedTokens.value.length,
+const allMultiGameTokensSelected = computed(
+  () => sortedTokens.value.length > 0 && selectedMultiGameTokens.value.length === sortedTokens.value.length,
 );
 
-function setGame2TokenSelected(tokenId, checked) {
-  game2SelectedTokenIds.value = toggleTokenSelection(
-    game2SelectedTokenIds.value,
+function setMultiGameTokenSelected(tokenId, checked) {
+  multiGameSelectedTokenIds.value = toggleTokenSelection(
+    multiGameSelectedTokenIds.value,
     tokenId,
     checked,
   );
 }
 
-function selectAllGame2Tokens() {
-  game2SelectedTokenIds.value = selectAllTokenIds(sortedTokens.value);
+function selectAllMultiGameTokens() {
+  multiGameSelectedTokenIds.value = selectAllTokenIds(sortedTokens.value);
 }
 
-function clearGame2TokenSelection() {
-  game2SelectedTokenIds.value = new Set();
+function clearMultiGameTokenSelection() {
+  multiGameSelectedTokenIds.value = new Set();
 }
 ```
 
-Watch `tokenStore.gameTokens.map(token => token.id)` and assign `pruneTokenSelection(game2SelectedTokenIds.value, tokenStore.gameTokens)` so deleted Tokens cannot be launched.
+Watch `tokenStore.gameTokens.map(token => token.id)` and assign `pruneTokenSelection(multiGameSelectedTokenIds.value, tokenStore.gameTokens)` so deleted Tokens cannot be launched.
 
 - [ ] **Step 4: Add list and card checkboxes without changing single selection**
 
@@ -926,10 +926,10 @@ Place an `n-checkbox` at the start of both the card title area and list info row
 
 ```vue
 <n-checkbox
-  :checked="game2SelectedTokenIds.has(token.id)"
+  :checked="multiGameSelectedTokenIds.has(token.id)"
   :aria-label="`选择 ${token.name} 批量进入游戏`"
   @click.stop
-  @update:checked="(checked) => setGame2TokenSelected(token.id, checked)"
+  @update:checked="(checked) => setMultiGameTokenSelected(token.id, checked)"
 />
 ```
 
@@ -940,19 +940,19 @@ The `.stop` modifier is required so checking an account does not invoke the exis
 Insert controls next to the existing “打开游戏” button:
 
 ```vue
-<n-button size="small" @click="selectAllGame2Tokens">
-  {{ allGame2TokensSelected ? "已全选" : "全选" }}
+<n-button size="small" @click="selectAllMultiGameTokens">
+  {{ allMultiGameTokensSelected ? "已全选" : "全选" }}
 </n-button>
-<n-button size="small" :disabled="game2SelectedTokenIds.size === 0" @click="clearGame2TokenSelection">
+<n-button size="small" :disabled="multiGameSelectedTokenIds.size === 0" @click="clearMultiGameTokenSelection">
   清空
 </n-button>
 <n-button
   type="warning"
-  :disabled="game2SelectedTokenIds.size === 0"
-  :loading="isOpeningGame2"
+  :disabled="multiGameSelectedTokenIds.size === 0"
+  :loading="isOpeningMultiGame"
   @click="openSelectedGames"
 >
-  批量进入游戏（{{ game2SelectedTokenIds.size }}）
+  批量进入游戏（{{ multiGameSelectedTokenIds.size }}）
 </n-button>
 ```
 
@@ -960,11 +960,11 @@ Implement the action with partial-failure behavior:
 
 ```js
 async function openSelectedGames() {
-  if (selectedGame2Tokens.value.length === 0 || isOpeningGame2.value) return;
-  isOpeningGame2.value = true;
+  if (selectedMultiGameTokens.value.length === 0 || isOpeningMultiGame.value) return;
+  isOpeningMultiGame.value = true;
   try {
-    const { launch, failures } = await prepareGame2Launch({
-      tokens: selectedGame2Tokens.value,
+    const { launch, failures } = await prepareMultiGameLaunch({
+      tokens: selectedMultiGameTokens.value,
       getArrayBuffer,
       localStorage: window.localStorage,
       sessionStorage: window.sessionStorage,
@@ -977,12 +977,12 @@ async function openSelectedGames() {
       message.error("所选账号均没有可用的 BIN 数据");
       return;
     }
-    await router.push("/game2");
+    await router.push("/multi-game");
   } catch (error) {
     console.error("Batch game launch failed:", error);
     message.error("批量进入游戏失败，请重试");
   } finally {
-    isOpeningGame2.value = false;
+    isOpeningMultiGame.value = false;
   }
 }
 ```
@@ -993,7 +993,7 @@ Allow `.section-header` and `.header-actions` to wrap with an 8px gap. Do not ch
 
 - [ ] **Step 7: Run tests and build**
 
-Run: `node --test test/gameLauncher.test.js test/game2StorageBridge.test.js test/gameSelection.test.js test/towerClimbLimit.test.js test/helperTaskRunner.test.js`
+Run: `node --test test/gameLauncher.test.js test/multiGameStorageBridge.test.js test/gameSelection.test.js test/towerClimbLimit.test.js test/helperTaskRunner.test.js`
 
 Expected: all tests PASS.
 
@@ -1009,7 +1009,7 @@ Keep only entries caused by `GameMultiPlayer.vue` or components newly used in th
 
 ```bash
 git add src/views/TokenImport/index.vue src/utils/gameSelection.js test/gameSelection.test.js components.d.ts src/auto-imports.d.ts src/typed-router.d.ts
-git commit -m "feat: launch selected tokens in game2"
+git commit -m "feat: launch selected tokens in multi-game"
 ```
 
 Omit unchanged generated files from `git add`.
@@ -1022,14 +1022,14 @@ Omit unchanged generated files from `git add`.
 - Modify only if a verified defect is found: files introduced or modified in Tasks 1-5.
 
 **Interfaces:**
-- Consumes: the complete Game2 feature and a local browser session.
+- Consumes: the complete MultiGame feature and a local browser session.
 - Produces: test/build evidence, visual interaction evidence, and an explicit record of whether two valid accounts were available for login isolation verification.
 
 - [ ] **Step 1: Run the complete automated test suite**
 
 Run: `node --test test/*.test.js`
 
-Expected: every Node test passes; no skipped Game2 test and no uncaught rejection.
+Expected: every Node test passes; no skipped MultiGame test and no uncaught rejection.
 
 - [ ] **Step 2: Run the production build and whitespace validation**
 
@@ -1051,7 +1051,7 @@ Keep the returned session running only for the browser checks, then stop it with
 
 Open `/tokens` and verify both list and card modes:
 
-1. Checking a batch checkbox changes only the Game2 count and does not change the existing active Token highlight.
+1. Checking a batch checkbox changes only the MultiGame count and does not change the existing active Token highlight.
 2. “全选” and “清空” update every visible Token correctly.
 3. “批量进入游戏” stays disabled at zero and navigates only when at least one BIN is ready.
 4. Missing BIN accounts produce one summary warning while valid accounts still open.
@@ -1060,7 +1060,7 @@ Open `/tokens` and verify both list and card modes:
 
 With two prepared scopes, inspect both iframe windows from the same-origin parent:
 
-1. Both iframe documents report `__GAME2_BRIDGE_READY__` with their own scope.
+1. Both iframe documents report `__MULTI_GAME_BRIDGE_READY__` with their own scope.
 2. Setting `current_bin_id`, `actual_login_bin_id`, and a neutral key such as `smoke_setting` in iframe A does not change the values read in iframe B.
 3. Each iframe's `key()` and `length` expose only its own namespace.
 4. Calling `localStorage.clear()` in iframe A leaves iframe B keys and the parent's ordinary `/game` keys intact.
@@ -1078,7 +1078,7 @@ If browser verification required a fix, commit the tested correction with:
 
 ```bash
 git add src public/game test
-git commit -m "fix: harden game2 browser integration"
+git commit -m "fix: harden multi-game browser integration"
 ```
 
 If no correction was needed, create no empty commit.

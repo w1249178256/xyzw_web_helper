@@ -1,8 +1,8 @@
 import lz4 from "lz4js";
 
-export const GAME2_ACTIVE_LAUNCH_KEY = "game2_active_launch_v1";
+export const MULTI_GAME_ACTIVE_LAUNCH_KEY = "multi-game_active_launch_v1";
 
-const SCOPE_PATTERN = /^g2-[a-f0-9]{32}$/;
+const SCOPE_PATTERN = /^mg-[a-f0-9]{32}$/;
 const FAILURE_REASONS = new Set([
   "missing-bin",
   "read-failed",
@@ -111,13 +111,13 @@ function isFailure(value) {
   );
 }
 
-export function buildGame2FrameSrc(baseUrl, session) {
+export function buildMultiGameFrameSrc(baseUrl, session) {
   const scope = encodeURIComponent(session.scopeId);
   const tokenId = encodeURIComponent(session.tokenId);
-  return `${normalizeBaseUrl(baseUrl)}game/game2.html?scope=${scope}&bin_id=${tokenId}`;
+  return `${normalizeBaseUrl(baseUrl)}game/multi-game.html?scope=${scope}&bin_id=${tokenId}`;
 }
 
-export function resolveGame2FrameMessage({
+export function resolveMultiGameFrameMessage({
   event,
   expectedOrigin,
   frames,
@@ -126,7 +126,7 @@ export function resolveGame2FrameMessage({
   if (event.origin !== expectedOrigin) return null;
   const payload = event.data;
   if (
-    payload?.channel !== "game2" ||
+    payload?.channel !== "multi-game" ||
     payload.version !== 1 ||
     !["ready", "fatal"].includes(payload.type)
   ) {
@@ -150,10 +150,10 @@ export function convertBinToLx(buffer, random = Math.random) {
   return bytes;
 }
 
-export function readActiveGame2Launch(storage) {
+export function readActiveMultiGameLaunch(storage) {
   try {
     const parsed = JSON.parse(
-      storage.getItem(GAME2_ACTIVE_LAUNCH_KEY) || "null",
+      storage.getItem(MULTI_GAME_ACTIVE_LAUNCH_KEY) || "null",
     );
     if (
       parsed?.version !== 1 ||
@@ -172,25 +172,25 @@ export function readActiveGame2Launch(storage) {
   }
 }
 
-export function clearGame2Launch({ localStorage, sessionStorage }) {
-  const previous = readActiveGame2Launch(sessionStorage);
+export function clearMultiGameLaunch({ localStorage, sessionStorage }) {
+  const previous = readActiveMultiGameLaunch(sessionStorage);
   if (previous) {
     for (const gameSession of previous.sessions) {
-      const prefix = `game2:${gameSession.scopeId}:`;
+      const prefix = `multi-game:${gameSession.scopeId}:`;
       for (const key of storageKeys(localStorage)) {
         if (key.startsWith(prefix)) localStorage.removeItem(key);
       }
     }
   }
-  sessionStorage.removeItem(GAME2_ACTIVE_LAUNCH_KEY);
+  sessionStorage.removeItem(MULTI_GAME_ACTIVE_LAUNCH_KEY);
 }
 
-export function closeGame2Session({
+export function closeMultiGameSession({
   scopeId,
   localStorage,
   sessionStorage,
 }) {
-  const launch = readActiveGame2Launch(sessionStorage);
+  const launch = readActiveMultiGameLaunch(sessionStorage);
   if (!launch) return null;
 
   const target = launch.sessions.find((session) => session.scopeId === scopeId);
@@ -203,11 +203,11 @@ export function closeGame2Session({
       .map((session, order) => ({ ...session, order })),
   };
   sessionStorage.setItem(
-    GAME2_ACTIVE_LAUNCH_KEY,
+    MULTI_GAME_ACTIVE_LAUNCH_KEY,
     JSON.stringify(updatedLaunch),
   );
 
-  const prefix = `game2:${target.scopeId}:`;
+  const prefix = `multi-game:${target.scopeId}:`;
   for (const key of storageKeys(localStorage)) {
     if (!key.startsWith(prefix)) continue;
     try {
@@ -219,8 +219,8 @@ export function closeGame2Session({
   return updatedLaunch;
 }
 
-export function moveGame2Session({ scopeId, direction, sessionStorage }) {
-  const launch = readActiveGame2Launch(sessionStorage);
+export function moveMultiGameSession({ scopeId, direction, sessionStorage }) {
+  const launch = readActiveMultiGameLaunch(sessionStorage);
   if (!launch || (direction !== -1 && direction !== 1)) return null;
 
   const currentIndex = launch.sessions.findIndex(
@@ -245,13 +245,13 @@ export function moveGame2Session({ scopeId, direction, sessionStorage }) {
     sessions: sessions.map((session, order) => ({ ...session, order })),
   };
   sessionStorage.setItem(
-    GAME2_ACTIVE_LAUNCH_KEY,
+    MULTI_GAME_ACTIVE_LAUNCH_KEY,
     JSON.stringify(updatedLaunch),
   );
   return updatedLaunch;
 }
 
-export async function prepareGame2Launch({
+export async function prepareMultiGameLaunch({
   tokens,
   getArrayBuffer,
   localStorage,
@@ -259,7 +259,7 @@ export async function prepareGame2Launch({
   randomUUID = () => crypto.randomUUID(),
   now = () => Date.now(),
 }) {
-  clearGame2Launch({ localStorage, sessionStorage });
+  clearMultiGameLaunch({ localStorage, sessionStorage });
   const launchId = `launch-${uuidHex(randomUUID)}`;
   const prepared = await Promise.all(
     tokens.map(async (token) => {
@@ -313,10 +313,10 @@ export async function prepareGame2Launch({
       continue;
     }
 
-    const scopeId = `g2-${uuidHex(randomUUID)}`;
+    const scopeId = `mg-${uuidHex(randomUUID)}`;
     const order = sessions.length;
     const name = result.token.name || "Token";
-    const prefix = `game2:${scopeId}:`;
+    const prefix = `multi-game:${scopeId}:`;
     const hex = Array.from(result.bytes, (byte) =>
       byte.toString(16).padStart(2, "0"),
     ).join("");
@@ -354,7 +354,7 @@ export async function prepareGame2Launch({
       attemptedLocalKeys.push(key);
       localStorage.setItem(key, value);
     }
-    sessionStorage.setItem(GAME2_ACTIVE_LAUNCH_KEY, serializedLaunch);
+    sessionStorage.setItem(MULTI_GAME_ACTIVE_LAUNCH_KEY, serializedLaunch);
   } catch (error) {
     for (const key of attemptedLocalKeys.reverse()) {
       try {
@@ -364,7 +364,7 @@ export async function prepareGame2Launch({
       }
     }
     try {
-      sessionStorage.removeItem(GAME2_ACTIVE_LAUNCH_KEY);
+      sessionStorage.removeItem(MULTI_GAME_ACTIVE_LAUNCH_KEY);
     } catch {
       // Preserve the original storage error for the caller.
     }

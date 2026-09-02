@@ -1,16 +1,16 @@
-(function initializeGame2StorageBridge(root) {
+(function initializeMultiGameStorageBridge(root) {
   "use strict";
 
-  const SCOPE_PATTERN = /^g2-[a-f0-9]{32}$/;
+  const SCOPE_PATTERN = /^mg-[a-f0-9]{32}$/;
 
   function validateScope(scope) {
     return SCOPE_PATTERN.test(String(scope || ""));
   }
 
   function createScopedStorageAdapter(backing, scope) {
-    if (!validateScope(scope)) throw new Error("Invalid Game2 scope");
+    if (!validateScope(scope)) throw new Error("Invalid MultiGame scope");
 
-    const prefix = `game2:${scope}:`;
+    const prefix = `multi-game:${scope}:`;
     const scopedKeys = () => {
       const keys = [];
       for (let index = 0; index < backing.length; index += 1) {
@@ -21,8 +21,8 @@
     };
     const normalizeKey = (key) => {
       const value = String(key);
-      if (value.startsWith("game2:")) {
-        throw new Error("Nested Game2 scope is not allowed");
+      if (value.startsWith("multi-game:")) {
+        throw new Error("Nested MultiGame scope is not allowed");
       }
       return value;
     };
@@ -133,9 +133,9 @@
   }
 
   function install(win, scope) {
-    if (!validateScope(scope)) throw new Error("Invalid Game2 scope");
-    if (win.__GAME2_STORAGE_SCOPE__) {
-      throw new Error("Game2 storage bridge already installed");
+    if (!validateScope(scope)) throw new Error("Invalid MultiGame scope");
+    if (win.__MULTI_GAME_STORAGE_SCOPE__) {
+      throw new Error("MultiGame storage bridge already installed");
     }
 
     const rawLocalStorage = win.localStorage;
@@ -173,7 +173,7 @@
       ) ||
       Object.values(native).some((member) => typeof member !== "function")
     ) {
-      throw new Error("Game2 storage bridge is not supported");
+      throw new Error("MultiGame storage bridge is not supported");
     }
 
     const backing = {
@@ -276,17 +276,17 @@
       } catch {
         // The caller will fail closed and never load the game runtime.
       }
-      throw new Error("Game2 storage bridge is not supported", {
+      throw new Error("MultiGame storage bridge is not supported", {
         cause: error,
       });
     }
 
-    win.__GAME2_STORAGE_SCOPE__ = scope;
+    win.__MULTI_GAME_STORAGE_SCOPE__ = scope;
     return scoped;
   }
 
   const api = { validateScope, createScopedStorageAdapter, install };
-  root.Game2StorageBridge = api;
+  root.MultiGameStorageBridge = api;
 
   if (root.window === root && root.document) {
     const params = new URLSearchParams(root.location.search);
@@ -296,9 +296,9 @@
     const binId = binIds.length === 1 ? binIds[0] : "";
 
     try {
-      if (!binId) throw new Error("Missing Game2 account");
-      if (!validateScope(scope)) throw new Error("Invalid Game2 scope");
-      const rawPrefix = `game2:${scope}:`;
+      if (!binId) throw new Error("Missing MultiGame account");
+      if (!validateScope(scope)) throw new Error("Invalid MultiGame scope");
+      const rawPrefix = `multi-game:${scope}:`;
       const rawCurrentBinId = root.localStorage.getItem(
         `${rawPrefix}current_bin_id`,
       );
@@ -306,18 +306,18 @@
         `${rawPrefix}bin_data_${binId}`,
       );
       if (rawCurrentBinId !== binId || !rawBinData) {
-        throw new Error("Game2 account seed is unavailable");
+        throw new Error("MultiGame account seed is unavailable");
       }
       install(root, scope);
       const currentBinId = root.localStorage.getItem("current_bin_id");
       const binData = root.localStorage.getItem(`bin_data_${binId}`);
       if (currentBinId !== binId || !binData) {
-        throw new Error("Game2 account seed is unavailable");
+        throw new Error("MultiGame account seed is unavailable");
       }
-      root.__GAME2_BRIDGE_READY__ = { scope, binId };
+      root.__MULTI_GAME_BRIDGE_READY__ = { scope, binId };
     } catch {
       const code = "bridge-install-failed";
-      root.__GAME2_BRIDGE_ERROR__ = { code };
+      root.__MULTI_GAME_BRIDGE_ERROR__ = { code };
       const renderFatal = () => {
         root.document.body.textContent = "游戏账号隔离初始化失败";
       };
@@ -328,7 +328,7 @@
 
       if (root.parent && root.parent !== root) {
         root.parent.postMessage(
-          { channel: "game2", version: 1, type: "fatal", scope, code },
+          { channel: "multi-game", version: 1, type: "fatal", scope, code },
           root.location.origin,
         );
       }

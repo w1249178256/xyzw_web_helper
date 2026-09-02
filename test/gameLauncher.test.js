@@ -47,32 +47,32 @@ class FailingStorage extends MemoryStorage {
   }
 }
 
-test("buildGame2FrameSrc encodes scope and account without exposing token data", () => {
-  assert.equal(typeof launcher.buildGame2FrameSrc, "function");
+test("buildMultiGameFrameSrc encodes scope and account without exposing token data", () => {
+  assert.equal(typeof launcher.buildMultiGameFrameSrc, "function");
   assert.equal(
-    launcher.buildGame2FrameSrc("/helper/", {
-      scopeId: "g2-0123456789abcdef0123456789abcdef",
+    launcher.buildMultiGameFrameSrc("/helper/", {
+      scopeId: "mg-0123456789abcdef0123456789abcdef",
       tokenId: "account / 一号",
     }),
-    "/helper/game/game2.html?scope=g2-0123456789abcdef0123456789abcdef&bin_id=account%20%2F%20%E4%B8%80%E5%8F%B7",
+    "/helper/game/multi-game.html?scope=mg-0123456789abcdef0123456789abcdef&bin_id=account%20%2F%20%E4%B8%80%E5%8F%B7",
   );
 });
 
-test("readActiveGame2Launch rejects malformed and wrong-version manifests", () => {
-  assert.equal(typeof launcher.readActiveGame2Launch, "function");
+test("readActiveMultiGameLaunch rejects malformed and wrong-version manifests", () => {
+  assert.equal(typeof launcher.readActiveMultiGameLaunch, "function");
   const storage = new MemoryStorage();
-  storage.setItem("game2_active_launch_v1", "not-json");
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", "not-json");
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
   storage.setItem(
-    "game2_active_launch_v1",
+    "multi-game_active_launch_v1",
     JSON.stringify({ version: 2, sessions: [], failures: [] }),
   );
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 });
 
-test("readActiveGame2Launch rejects duplicate scopes and inconsistent order", () => {
+test("readActiveMultiGameLaunch rejects duplicate scopes and inconsistent order", () => {
   const storage = new MemoryStorage();
-  const scope = "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+  const scope = "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
   const manifest = {
     version: 1,
     id: "launch-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -83,16 +83,16 @@ test("readActiveGame2Launch rejects duplicate scopes and inconsistent order", ()
     ],
     failures: [],
   };
-  storage.setItem("game2_active_launch_v1", JSON.stringify(manifest));
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", JSON.stringify(manifest));
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 
-  manifest.sessions[1].scopeId = "g2-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  manifest.sessions[1].scopeId = "mg-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
   manifest.sessions[1].order = 2;
-  storage.setItem("game2_active_launch_v1", JSON.stringify(manifest));
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", JSON.stringify(manifest));
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 });
 
-test("readActiveGame2Launch rejects malformed failure entries", () => {
+test("readActiveMultiGameLaunch rejects malformed failure entries", () => {
   const storage = new MemoryStorage();
   const manifest = {
     version: 1,
@@ -101,14 +101,14 @@ test("readActiveGame2Launch rejects malformed failure entries", () => {
     sessions: [],
     failures: [null],
   };
-  storage.setItem("game2_active_launch_v1", JSON.stringify(manifest));
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", JSON.stringify(manifest));
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 
   manifest.failures = [
     { tokenId: "a", name: "A", reason: "unexpected-failure" },
   ];
-  storage.setItem("game2_active_launch_v1", JSON.stringify(manifest));
-  assert.equal(launcher.readActiveGame2Launch(storage), null);
+  storage.setItem("multi-game_active_launch_v1", JSON.stringify(manifest));
+  assert.equal(launcher.readActiveMultiGameLaunch(storage), null);
 });
 
 test("convertBinToLx preserves lx data and converts x data", () => {
@@ -126,8 +126,8 @@ test("convertBinToLx preserves lx data and converts x data", () => {
   assert.ok(converted.length > 4);
 });
 
-test("prepareGame2Launch seeds isolated accounts in display order and records failures", async () => {
-  assert.equal(typeof launcher.prepareGame2Launch, "function");
+test("prepareMultiGameLaunch seeds isolated accounts in display order and records failures", async () => {
+  assert.equal(typeof launcher.prepareMultiGameLaunch, "function");
   const local = new MemoryStorage();
   const session = new MemoryStorage();
   const uuids = [
@@ -140,7 +140,7 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
     ["b", Uint8Array.from([112, 108, 4, 5, 6]).buffer],
   ]);
 
-  const result = await launcher.prepareGame2Launch({
+  const result = await launcher.prepareMultiGameLaunch({
     tokens: [
       { id: "a", name: "账号 A" },
       { id: "missing", name: "缺失账号" },
@@ -162,12 +162,12 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
     [
       {
         tokenId: "a",
-        scopeId: "g2-11111111111111111111111111111111",
+        scopeId: "mg-11111111111111111111111111111111",
         order: 0,
       },
       {
         tokenId: "b",
-        scopeId: "g2-22222222222222222222222222222222",
+        scopeId: "mg-22222222222222222222222222222222",
         order: 1,
       },
     ],
@@ -178,20 +178,20 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
   assert.deepEqual(result.launch.failures, result.failures);
   assert.equal(
     local.getItem(
-      "game2:g2-11111111111111111111111111111111:bin_data_a",
+      "multi-game:mg-11111111111111111111111111111111:bin_data_a",
     ),
     "706c010203",
   );
   assert.equal(
     local.getItem(
-      "game2:g2-22222222222222222222222222222222:current_bin_id",
+      "multi-game:mg-22222222222222222222222222222222:current_bin_id",
     ),
     "b",
   );
   assert.deepEqual(
     JSON.parse(
       local.getItem(
-        "game2:g2-11111111111111111111111111111111:bin_file_list",
+        "multi-game:mg-11111111111111111111111111111111:bin_file_list",
       ),
     ),
     [
@@ -205,12 +205,12 @@ test("prepareGame2Launch seeds isolated accounts in display order and records fa
     ],
   );
   assert.deepEqual(
-    JSON.parse(session.getItem("game2_active_launch_v1")),
+    JSON.parse(session.getItem("multi-game_active_launch_v1")),
     result.launch,
   );
 });
 
-test("prepareGame2Launch isolates a BIN read error from other accounts", async () => {
+test("prepareMultiGameLaunch isolates a BIN read error from other accounts", async () => {
   const local = new MemoryStorage();
   const session = new MemoryStorage();
   const uuids = [
@@ -218,7 +218,7 @@ test("prepareGame2Launch isolates a BIN read error from other accounts", async (
     "11111111-1111-1111-1111-111111111111",
   ];
 
-  const result = await launcher.prepareGame2Launch({
+  const result = await launcher.prepareMultiGameLaunch({
     tokens: [
       { id: "broken", name: "读取失败" },
       { id: "ready", name: "可用账号" },
@@ -241,7 +241,7 @@ test("prepareGame2Launch isolates a BIN read error from other accounts", async (
   ]);
 });
 
-test("prepareGame2Launch rolls back every new scope when localStorage writes fail", async () => {
+test("prepareMultiGameLaunch rolls back every new scope when localStorage writes fail", async () => {
   for (let failOnWrite = 1; failOnWrite <= 6; failOnWrite += 1) {
     const local = new FailingStorage(failOnWrite);
     const session = new MemoryStorage();
@@ -252,7 +252,7 @@ test("prepareGame2Launch rolls back every new scope when localStorage writes fai
     ];
 
     await assert.rejects(
-      launcher.prepareGame2Launch({
+      launcher.prepareMultiGameLaunch({
         tokens: [
           { id: "a", name: "账号 A" },
           { id: "b", name: "账号 B" },
@@ -268,11 +268,11 @@ test("prepareGame2Launch rolls back every new scope when localStorage writes fai
     );
 
     assert.equal(local.length, 0, `failed write ${failOnWrite}`);
-    assert.equal(session.getItem("game2_active_launch_v1"), null);
+    assert.equal(session.getItem("multi-game_active_launch_v1"), null);
   }
 });
 
-test("prepareGame2Launch rolls back new scopes when the manifest write fails", async () => {
+test("prepareMultiGameLaunch rolls back new scopes when the manifest write fails", async () => {
   const local = new MemoryStorage();
   const session = new FailingStorage(1);
   const uuids = [
@@ -281,7 +281,7 @@ test("prepareGame2Launch rolls back new scopes when the manifest write fails", a
   ];
 
   await assert.rejects(
-    launcher.prepareGame2Launch({
+    launcher.prepareMultiGameLaunch({
       tokens: [{ id: "a", name: "账号 A" }],
       getArrayBuffer: async () =>
         Uint8Array.from([112, 108, 1, 2, 3]).buffer,
@@ -294,18 +294,18 @@ test("prepareGame2Launch rolls back new scopes when the manifest write fails", a
   );
 
   assert.equal(local.length, 0);
-  assert.equal(session.getItem("game2_active_launch_v1"), null);
+  assert.equal(session.getItem("multi-game_active_launch_v1"), null);
 });
 
-test("clearGame2Launch removes only scopes named by the active manifest", () => {
-  assert.equal(typeof launcher.clearGame2Launch, "function");
+test("clearMultiGameLaunch removes only scopes named by the active manifest", () => {
+  assert.equal(typeof launcher.clearMultiGameLaunch, "function");
   const local = new MemoryStorage();
   const session = new MemoryStorage();
-  const scope = "g2-33333333333333333333333333333333";
-  local.setItem(`game2:${scope}:current_bin_id`, "a");
+  const scope = "mg-33333333333333333333333333333333";
+  local.setItem(`multi-game:${scope}:current_bin_id`, "a");
   local.setItem("bin_data_single-game", "keep");
   session.setItem(
-    "game2_active_launch_v1",
+    "multi-game_active_launch_v1",
     JSON.stringify({
       version: 1,
       id: "launch-44444444444444444444444444444444",
@@ -315,24 +315,24 @@ test("clearGame2Launch removes only scopes named by the active manifest", () => 
     }),
   );
 
-  launcher.clearGame2Launch({
+  launcher.clearMultiGameLaunch({
     localStorage: local,
     sessionStorage: session,
   });
 
-  assert.equal(local.getItem(`game2:${scope}:current_bin_id`), null);
+  assert.equal(local.getItem(`multi-game:${scope}:current_bin_id`), null);
   assert.equal(local.getItem("bin_data_single-game"), "keep");
-  assert.equal(session.getItem("game2_active_launch_v1"), null);
+  assert.equal(session.getItem("multi-game_active_launch_v1"), null);
 });
 
-test("closeGame2Session removes only the target scope and persists remaining order", () => {
-  assert.equal(typeof launcher.closeGame2Session, "function");
+test("closeMultiGameSession removes only the target scope and persists remaining order", () => {
+  assert.equal(typeof launcher.closeMultiGameSession, "function");
   const local = new MemoryStorage();
   const session = new MemoryStorage();
   const scopes = [
-    "g2-11111111111111111111111111111111",
-    "g2-22222222222222222222222222222222",
-    "g2-33333333333333333333333333333333",
+    "mg-11111111111111111111111111111111",
+    "mg-22222222222222222222222222222222",
+    "mg-33333333333333333333333333333333",
   ];
   const launch = {
     version: 1,
@@ -348,14 +348,14 @@ test("closeGame2Session removes only the target scope and persists remaining ord
       { tokenId: "missing", name: "缺失账号", reason: "missing-bin" },
     ],
   };
-  session.setItem("game2_active_launch_v1", JSON.stringify(launch));
+  session.setItem("multi-game_active_launch_v1", JSON.stringify(launch));
   for (const [index, scope] of scopes.entries()) {
-    local.setItem(`game2:${scope}:current_bin_id`, launch.sessions[index].tokenId);
-    local.setItem(`game2:${scope}:setting`, `value-${index}`);
+    local.setItem(`multi-game:${scope}:current_bin_id`, launch.sessions[index].tokenId);
+    local.setItem(`multi-game:${scope}:setting`, `value-${index}`);
   }
   local.setItem("outside", "keep");
 
-  const result = launcher.closeGame2Session({
+  const result = launcher.closeMultiGameSession({
     scopeId: scopes[1],
     localStorage: local,
     sessionStorage: session,
@@ -374,20 +374,20 @@ test("closeGame2Session removes only the target scope and persists remaining ord
   );
   assert.deepEqual(result.failures, launch.failures);
   assert.deepEqual(
-    JSON.parse(session.getItem("game2_active_launch_v1")),
+    JSON.parse(session.getItem("multi-game_active_launch_v1")),
     result,
   );
-  assert.equal(local.getItem(`game2:${scopes[1]}:current_bin_id`), null);
-  assert.equal(local.getItem(`game2:${scopes[1]}:setting`), null);
-  assert.equal(local.getItem(`game2:${scopes[0]}:setting`), "value-0");
-  assert.equal(local.getItem(`game2:${scopes[2]}:setting`), "value-2");
+  assert.equal(local.getItem(`multi-game:${scopes[1]}:current_bin_id`), null);
+  assert.equal(local.getItem(`multi-game:${scopes[1]}:setting`), null);
+  assert.equal(local.getItem(`multi-game:${scopes[0]}:setting`), "value-0");
+  assert.equal(local.getItem(`multi-game:${scopes[2]}:setting`), "value-2");
   assert.equal(local.getItem("outside"), "keep");
 });
 
-test("closeGame2Session keeps scoped data when the updated manifest cannot be saved", () => {
+test("closeMultiGameSession keeps scoped data when the updated manifest cannot be saved", () => {
   const local = new MemoryStorage();
   const session = new FailingStorage(2);
-  const scopeId = "g2-11111111111111111111111111111111";
+  const scopeId = "mg-11111111111111111111111111111111";
   const launch = {
     version: 1,
     id: "launch-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -395,12 +395,12 @@ test("closeGame2Session keeps scoped data when the updated manifest cannot be sa
     sessions: [{ tokenId: "a", name: "账号 A", scopeId, order: 0 }],
     failures: [],
   };
-  session.setItem("game2_active_launch_v1", JSON.stringify(launch));
-  local.setItem(`game2:${scopeId}:current_bin_id`, "a");
+  session.setItem("multi-game_active_launch_v1", JSON.stringify(launch));
+  local.setItem(`multi-game:${scopeId}:current_bin_id`, "a");
 
   assert.throws(
     () =>
-      launcher.closeGame2Session({
+      launcher.closeMultiGameSession({
         scopeId,
         localStorage: local,
         sessionStorage: session,
@@ -409,21 +409,21 @@ test("closeGame2Session keeps scoped data when the updated manifest cannot be sa
   );
 
   assert.deepEqual(
-    JSON.parse(session.getItem("game2_active_launch_v1")),
+    JSON.parse(session.getItem("multi-game_active_launch_v1")),
     launch,
   );
-  assert.equal(local.getItem(`game2:${scopeId}:current_bin_id`), "a");
+  assert.equal(local.getItem(`multi-game:${scopeId}:current_bin_id`), "a");
 });
 
-test("moveGame2Session swaps adjacent sessions and persists their order", () => {
+test("moveMultiGameSession swaps adjacent sessions and persists their order", () => {
   const session = new MemoryStorage();
   const scopes = [
-    "g2-11111111111111111111111111111111",
-    "g2-22222222222222222222222222222222",
-    "g2-33333333333333333333333333333333",
+    "mg-11111111111111111111111111111111",
+    "mg-22222222222222222222222222222222",
+    "mg-33333333333333333333333333333333",
   ];
   session.setItem(
-    "game2_active_launch_v1",
+    "multi-game_active_launch_v1",
     JSON.stringify({
       version: 1,
       id: "launch-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -438,7 +438,7 @@ test("moveGame2Session swaps adjacent sessions and persists their order", () => 
     }),
   );
 
-  const result = launcher.moveGame2Session({
+  const result = launcher.moveMultiGameSession({
     scopeId: scopes[1],
     direction: 1,
     sessionStorage: session,
@@ -453,11 +453,11 @@ test("moveGame2Session swaps adjacent sessions and persists their order", () => 
     ],
   );
   assert.deepEqual(
-    JSON.parse(session.getItem("game2_active_launch_v1")),
+    JSON.parse(session.getItem("multi-game_active_launch_v1")),
     result,
   );
   assert.equal(
-    launcher.moveGame2Session({
+    launcher.moveMultiGameSession({
       scopeId: scopes[1],
       direction: 1,
       sessionStorage: session,
@@ -466,11 +466,11 @@ test("moveGame2Session swaps adjacent sessions and persists their order", () => 
   );
 });
 
-test("resolveGame2FrameMessage accepts only the matching same-origin iframe", () => {
-  assert.equal(typeof launcher.resolveGame2FrameMessage, "function");
+test("resolveMultiGameFrameMessage accepts only the matching same-origin iframe", () => {
+  assert.equal(typeof launcher.resolveMultiGameFrameMessage, "function");
   const expectedSource = {};
   const frames = [
-    { scopeId: "g2-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
+    { scopeId: "mg-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" },
   ];
   const frameElements = new Map([
     [frames[0].scopeId, { contentWindow: expectedSource }],
@@ -479,7 +479,7 @@ test("resolveGame2FrameMessage accepts only the matching same-origin iframe", ()
     origin: "https://helper.example",
     source: expectedSource,
     data: {
-      channel: "game2",
+      channel: "multi-game",
       version: 1,
       type: "ready",
       scope: frames[0].scopeId,
@@ -487,7 +487,7 @@ test("resolveGame2FrameMessage accepts only the matching same-origin iframe", ()
   };
 
   assert.deepEqual(
-    launcher.resolveGame2FrameMessage({
+    launcher.resolveMultiGameFrameMessage({
       event: baseEvent,
       expectedOrigin: "https://helper.example",
       frames,
@@ -496,7 +496,7 @@ test("resolveGame2FrameMessage accepts only the matching same-origin iframe", ()
     { scopeId: frames[0].scopeId, status: "ready" },
   );
   assert.equal(
-    launcher.resolveGame2FrameMessage({
+    launcher.resolveMultiGameFrameMessage({
       event: { ...baseEvent, origin: "https://attacker.example" },
       expectedOrigin: "https://helper.example",
       frames,
@@ -505,7 +505,7 @@ test("resolveGame2FrameMessage accepts only the matching same-origin iframe", ()
     null,
   );
   assert.equal(
-    launcher.resolveGame2FrameMessage({
+    launcher.resolveMultiGameFrameMessage({
       event: { ...baseEvent, source: {} },
       expectedOrigin: "https://helper.example",
       frames,
@@ -514,7 +514,7 @@ test("resolveGame2FrameMessage accepts only the matching same-origin iframe", ()
     null,
   );
   assert.equal(
-    launcher.resolveGame2FrameMessage({
+    launcher.resolveMultiGameFrameMessage({
       event: { ...baseEvent, data: { ...baseEvent.data, type: "unknown" } },
       expectedOrigin: "https://helper.example",
       frames,

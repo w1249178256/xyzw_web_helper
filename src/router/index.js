@@ -45,7 +45,7 @@ const my_routes = [
     })
   },
   {
-    path: '/game2',
+    path: '/multi-game',
     name: 'GameMultiPlayer',
     component: () => import('@/views/GameMultiPlayer.vue'),
     meta: {
