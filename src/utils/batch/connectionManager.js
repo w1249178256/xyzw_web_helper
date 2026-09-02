@@ -301,13 +301,8 @@ export const isTodayAvailable = (lastTimeSec) => {
  */
 export const calculateMonthProgress = () => {
   const now = new Date();
-  const daysInMonth = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    0
-  ).getDate();
   const dayOfMonth = now.getDate();
-  return Math.min(1, Math.max(0, dayOfMonth / daysInMonth));
+  return Math.min(1, Math.max(0, dayOfMonth / 28));
 };
 
 /**

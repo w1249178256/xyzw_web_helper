@@ -1,0 +1,111 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/9/1 18:37:51
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1780585491160.00-%E5%A4%A9%E6%B0%94-%E5%8D%81%E6%AE%BF-%E2%98%81%EF%B8%8F%E5%AE%87%E5%B3%B0.bin&fromManager=true&viewId=game-window-1788258749422-guosk36hx
+记录数量: 1
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta5 Chrome/150.0.7871.129 Electron/43.2.0 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/9/1 18:37:49
+服务: ClubService
+方法: getTargetTeam
+参数: [{"targetId":355578771}]
+结果:
+{
+  "_raw": {
+    "seq": 96,
+    "ack": 0,
+    "time": 1788259072277,
+    "resp": 95,
+    "cmd": "club_gettargetteamresp",
+    "body": {
+      "roleBattleTeam": {
+        "role": {
+          "roleId": 355578771,
+          "name": "皆无意义",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/0sUibCSJ47ia5XFcpgaPVROBmPibRRNHGzT2xFI4jxcW4jXuSmTeJhl3HbZElCMgHQP35CfJ2KzTEXBlcagNOym804MXicic0cCw8QiayxibPpYzia8/132",
+          "avatarFrame": {
+            "id": 1105,
+            "expire": -1
+          },
+          "power": 12333224731
+        },
+        "battleTeam": {
+          "0": {
+            "heroId": 119,
+            "level": 6000,
+            "star": 30,
+            "power": 2347060966,
+            "useSkin": 3001,
+            "hp": 8728127673,
+            "redQuenchCnt": 7,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "1": {
+            "heroId": 121,
+            "level": 6000,
+            "star": 30,
+            "power": 2121592235,
+            "useSkin": 12103,
+            "hp": 7225227684,
+            "redQuenchCnt": 6,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "2": {
+            "heroId": 105,
+            "level": 5972,
+            "star": 30,
+            "power": 2648110168,
+            "useSkin": 2005,
+            "hp": 7806869256,
+            "redQuenchCnt": 14,
+            "enchantCnt": 1,
+            "enchantGroupCnt": 0
+          },
+          "3": {
+            "heroId": 111,
+            "level": 6000,
+            "star": 30,
+            "power": 2836949144,
+            "useSkin": 11108,
+            "hp": 11490263219,
+            "redQuenchCnt": 9,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "4": {
+            "heroId": 106,
+            "level": 6000,
+            "star": 30,
+            "power": 2379512218,
+            "useSkin": 10603,
+            "hp": 8478448760,
+            "redQuenchCnt": 8,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1788259069004_fdcg3a2j9
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

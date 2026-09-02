@@ -83,6 +83,7 @@ import OperationLogCard from '@/diy/OneClickGoldFish/OperationLogCard.vue'
 import { Shield } from '@vicons/ionicons5'
 import ConnectionPoolManager from '@/utils/connectionPoolManager'
 import { HERO_DICT, FishMap, PearlMap, weapon } from '@/utils/HeroList.js'
+import { XyzwLegionWarWebSocketClient } from '@/utils/xyzwLegionWarWebSocket.js'
 
 const tokenStore = useTokenStore()
 const logStore = useOperationLogStore()
@@ -254,6 +255,7 @@ const handleSaltFieldSignup = async () => {
     
     let successCount = 0
     let failCount = 0
+    const successTokenIndices = []
     
     // 使用连接池逐个执行
     for (let i = 0; i < leaderTokens.length; i++) {
@@ -306,6 +308,7 @@ const handleSaltFieldSignup = async () => {
         
         message.success(`${tokenIndex}、${token.name} 盐场报名成功`)
         successCount++
+        successTokenIndices.push(tokenIndex)
         
         logStore.addLog({
           page: 'fish-helper',
@@ -347,12 +350,13 @@ const handleSaltFieldSignup = async () => {
     }
     
     message.success(`盐场报名完成！成功: ${successCount}，失败: ${failCount}`)
+    const successIndicesText = successTokenIndices.length > 0 ? `，成功Token序号: ${successTokenIndices.join(',')}` : ''
     logStore.addLog({
       page: 'fish-helper',
       cardType: '盐场',
       operation: '盐场报名',
       status: 'success',
-      message: `盐场报名完成（团长：${rangeText}），成功: ${successCount}，失败: ${failCount}`
+      message: `盐场报名完成（团长：${rangeText}），成功: ${successCount}，失败: ${failCount}${successIndicesText}`
     })
   } catch (error) {
     console.error('盐场报名失败:', error)
@@ -457,10 +461,11 @@ const handleSaltFieldFormation = async () => {
         const tokenIndex = getTokenIndex(token)
         message.info(`[序号${tokenIndex}] ${token.name || token.id} 正在盐场布阵...`)
         
-        // 步骤0: 使用fight_startlevel获取 battleTeam 和 lordWeaponId
+        // 步骤0: 使用fight_startlevel获取 battleTeam、lordWeaponId、petUId
         const fightResult = await tokenStore.sendFightStartLevel(token.id, {})
         let battleTeam = {}
         let lordWeaponId = 0
+        let petUId = ''
         
         // 从响应中提取数据
         let leftTeam = null
@@ -474,9 +479,16 @@ const handleSaltFieldFormation = async () => {
           // 提取 lordWeaponId（使用 weaponId）
           lordWeaponId = leftTeam.weaponId || 0
           
-          // 提取 battleTeam：从 team 数组中提取 slot 位置 (index) 和 hero id
-          if (leftTeam.team && Array.isArray(leftTeam.team)) {
-            leftTeam.team.forEach(hero => {
+          // 提取 petUId
+          petUId = leftTeam.petUId || ''
+          
+          // 提取 battleTeam：从 team 中提取 slot 位置 (index) 和 hero id
+          // team 可能是对象 {0: {id, index}, 1: {id, index}, ...} 或数组
+          if (leftTeam.team) {
+            const teamEntries = Array.isArray(leftTeam.team)
+              ? leftTeam.team
+              : Object.values(leftTeam.team)
+            teamEntries.forEach(hero => {
               if (hero && hero.index !== undefined && hero.id !== undefined) {
                 battleTeam[hero.index] = hero.id
               }
@@ -494,21 +506,56 @@ const handleSaltFieldFormation = async () => {
           throw new Error('未获取到盐场ID')
         }
         
-        // 步骤2: 进入盐场（失败也继续执行）
-        try {
-          await tokenStore.sendWarEnterBattlefield(token.id, { battlefieldId })
-        } catch (enterError) {
-          console.warn(`${token.name} 进入盐场失败，继续执行:`, enterError)
+        // 步骤2-4: 使用盐场专用WebSocket执行
+        const sid = battlefieldInfo?.info?.sid
+        if (!sid) {
+          throw new Error('未获取到盐场sid')
         }
-        await waitCommandDelay()
         
-        // 步骤3: 设置布阵
-        await tokenStore.sendWarSetBattleTeam(token.id, { battlefieldId, battleTeam, lordWeaponId })
-        await waitCommandDelay()
+        const baseWsUrl = 'wss://xxz-xyzw-new.hortorgames.com/agent' + `?p=${encodeURIComponent(token.token)}&e=x&sid2=${sid}&lang=chinese`
         
-        // 步骤4: 队伍入场
-        await tokenStore.sendWarTeamSetBattleTeam(token.id, { battlefieldId, battleTeam, lordWeaponId })
-        await waitCommandDelay()
+        const legionWarWs = new XyzwLegionWarWebSocketClient({
+          url: baseWsUrl,
+          utils: null,
+          hint: battlefieldId,
+          heartbeatMs: 5000
+        })
+        
+        // 等待连接建立
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('盐场WebSocket连接超时'))
+          }, 10000)
+          
+          legionWarWs.onConnect = () => {
+            clearTimeout(timeout)
+            resolve()
+          }
+          legionWarWs.onError = (error) => {
+            clearTimeout(timeout)
+            reject(error)
+          }
+          legionWarWs.init()
+        })
+        
+        try {
+          // 步骤2: 进入盐场
+          await legionWarWs.send("war_enterbattlefield", { battlefieldId, useGzip: true })
+          await waitCommandDelay()
+          
+          // 步骤3: 设置布阵
+          await legionWarWs.send("war_setbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId })
+          await waitCommandDelay()
+          
+          // 步骤4: 队伍入场
+          await legionWarWs.send("war_teamsetbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId })
+          await waitCommandDelay()
+        } finally {
+          // 关闭盐场WebSocket
+          if (legionWarWs.socket && legionWarWs.socket.readyState === WebSocket.OPEN) {
+            legionWarWs.socket.close()
+          }
+        }
         
         await connectionPool.release(token.id, false)
         

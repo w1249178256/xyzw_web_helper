@@ -1,5 +1,6 @@
 import { HERO_DICT, STAR_DICT } from "@/utils/HeroList";
 import { PEACH_TASKS } from "@/utils/PeachTaskIds";
+import { XyzwLegionWarWebSocketClient } from '@/utils/xyzwLegionWarWebSocket.js';
 
 /**
  * 开箱、钓鱼、招募类任务
@@ -43,12 +44,18 @@ export function createTasksItem(deps) {
 
   /**
    * 批量英雄升星（单个Token）
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
    */
-  const batchHeroUpgradeForToken = async (tokenId) => {
+  const batchHeroUpgradeForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始英雄升星`,
@@ -286,12 +293,18 @@ export function createTasksItem(deps) {
 
   /**
    * 批量图鉴升星（单个Token）
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
    */
-  const batchBookUpgradeForToken = async (tokenId) => {
+  const batchBookUpgradeForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始图鉴升星`,
@@ -444,11 +457,15 @@ export function createTasksItem(deps) {
   /**
    * 批量领取图鉴奖励（单个Token）
    */
-  const batchClaimStarRewardsForToken = async (tokenId) => {
+  const batchClaimStarRewardsForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+
       addLog({
         time: new Date().toLocaleTimeString(),
         message: `${token.name} 开始领取图鉴奖励`,
@@ -529,8 +546,9 @@ export function createTasksItem(deps) {
       tokenStatus.value[id] = "waiting";
     });
 
-    const taskPromises = selectedTokens.value.map(async (tokenId) => {
-      if (shouldStop.value) return;
+    // 顺序执行：执行完一个token所有任务后，再执行下一个token
+    for (const tokenId of selectedTokens.value) {
+      if (shouldStop.value) break;
 
       tokenStatus.value[tokenId] = "running";
       const token = tokens.value.find((t) => t.id === tokenId);
@@ -591,9 +609,8 @@ export function createTasksItem(deps) {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
       }
-    });
+    }
 
-    await Promise.all(taskPromises);
     isRunning.value = false;
     currentRunningTokenId.value = null;
     message.success("批量领取图鉴奖励结束");
@@ -882,11 +899,13 @@ export function createTasksItem(deps) {
   /**
    * 一键灯神扫荡（单个Token）
    */
-  const batchGenieSweepForToken = async (tokenId) => {
+  const batchGenieSweepForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
-    await ensureConnection(tokenId);
+    if (!skipConnect) {
+      await ensureConnection(tokenId);
+    }
     
     addLog({
       time: new Date().toLocaleTimeString(),
@@ -1992,13 +2011,17 @@ export function createTasksItem(deps) {
 
   /**
    * 俱乐部BOSS - ForToken版本
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
    */
-  const batchLegionBossForToken = async (tokenId) => {
+  const batchLegionBossForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     try {
-      await ensureConnection(tokenId);
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
       
       addLog({
         time: new Date().toLocaleTimeString(),
@@ -2044,13 +2067,17 @@ export function createTasksItem(deps) {
 
   /**
    * 每日免费礼包 - ForToken版本
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
    */
-  const batchFreeGiftForToken = async (tokenId) => {
+  const batchFreeGiftForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     try {
-      await ensureConnection(tokenId);
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
       
       addLog({
         time: new Date().toLocaleTimeString(),
@@ -2117,15 +2144,19 @@ export function createTasksItem(deps) {
 
   /**
    * 每日咸王 - ForToken版本
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
    */
-  const batchDailyBossForToken = async (tokenId) => {
+  const batchDailyBossForToken = async (tokenId, skipConnect = false) => {
     const token = tokens.value.find((t) => t.id === tokenId);
     if (!token) return;
 
     const todayBossId = getTodayBossId();
 
     try {
-      await ensureConnection(tokenId);
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
       
       addLog({
         time: new Date().toLocaleTimeString(),
@@ -2158,6 +2189,1251 @@ export function createTasksItem(deps) {
     }
   };
 
+  /**
+   * 一键免费钓鱼⭐（批量）
+   */
+  const batchFreeFishing = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始免费钓鱼`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        for (let i = 0; i < 3; i++) {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            'artifact_lottery',
+            { type: 1, lotteryNumber: 1, newFree: true },
+            8000
+          );
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费钓鱼完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费钓鱼失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键免费钓鱼结束");
+  };
+
+  /**
+   * 一键免费钓鱼⭐（单个Token）
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
+   */
+  const batchFreeFishingForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始免费钓鱼`,
+        type: "info",
+      });
+
+      for (let i = 0; i < 3; i++) {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          'artifact_lottery',
+          { type: 1, lotteryNumber: 1, newFree: true },
+          8000
+        );
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 免费钓鱼完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 免费钓鱼失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 一键宠物蛋⭐（批量）
+   */
+  const batchPetEgg = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始宠物蛋`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        // 执行1次购买宠物蛋
+        await tokenStore.sendLegionStoreBuyGoods(tokenId, { id: 205 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 宠物蛋完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 宠物蛋失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键宠物蛋结束");
+  };
+
+  /**
+   * 一键宠物蛋⭐（单个Token）
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
+   */
+  const batchPetEggForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始宠物蛋`,
+        type: "info",
+      });
+
+      // 执行1次购买宠物蛋
+      await tokenStore.sendLegionStoreBuyGoods(tokenId, { id: 205 });
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 宠物蛋完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 宠物蛋失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 一键扭蛋⭐（批量）
+   */
+  const batchGacha = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始扭蛋`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        // 执行1次扭蛋
+        await tokenStore.sendGachaDrawReward(tokenId, {});
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 获取扭蛋信息，领取未领取的阶段奖励
+        try {
+          const gachaInfo = await tokenStore.sendGachaGetInfo(tokenId, {});
+          const claimedMap = gachaInfo?.body?.roleGacha?.claimedStageIdMap;
+          if (claimedMap) {
+            for (const [stageId, claimed] of Object.entries(claimedMap)) {
+              if (!claimed) {
+                await tokenStore.sendGachaClaimStageReward(tokenId, { stageId: parseInt(stageId) });
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 领取扭蛋阶段奖励 stageId=${stageId}`,
+                  type: "success",
+                });
+                await new Promise(resolve => setTimeout(resolve, 500));
+              }
+            }
+          }
+        } catch (stageErr) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 领取扭蛋阶段奖励失败: ${stageErr.message}`,
+            type: "warning",
+          });
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 扭蛋完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 扭蛋失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("一键扭蛋结束");
+  };
+
+  /**
+   * 一键扭蛋⭐（单个Token）
+   * @param {string} tokenId - Token ID
+   * @param {boolean} skipConnect - 是否跳过连接检查（定时任务调用时为true）
+   */
+  const batchGachaForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始扭蛋`,
+        type: "info",
+      });
+
+      // 执行1次扭蛋
+      await tokenStore.sendGachaDrawReward(tokenId, {});
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 获取扭蛋信息，领取未领取的阶段奖励
+      try {
+        const gachaInfo = await tokenStore.sendGachaGetInfo(tokenId, {});
+        const claimedMap = gachaInfo?.body?.roleGacha?.claimedStageIdMap;
+        if (claimedMap) {
+          for (const [stageId, claimed] of Object.entries(claimedMap)) {
+            if (!claimed) {
+              await tokenStore.sendGachaClaimStageReward(tokenId, { stageId: parseInt(stageId) });
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 领取扭蛋阶段奖励 stageId=${stageId}`,
+                type: "success",
+              });
+              await new Promise(resolve => setTimeout(resolve, 500));
+            }
+          }
+        }
+      } catch (stageErr) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 领取扭蛋阶段奖励失败: ${stageErr.message}`,
+          type: "warning",
+        });
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 扭蛋完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 扭蛋失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 篝火营地报名（批量）
+   */
+  const batchCampSignup = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始篝火营地报名`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+        await tokenStore.sendClubSignup(tokenId, {});
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 篝火营地报名完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 篝火营地报名失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("篝火营地报名结束");
+  };
+
+  /**
+   * 篝火营地报名（单个Token）
+   */
+  const batchCampSignupForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始篝火营地报名`,
+        type: "info",
+      });
+
+      await tokenStore.sendClubSignup(tokenId, {});
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 篝火营地报名完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 篝火营地报名失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 篝火营地战斗（批量，战力模式）
+   */
+  const batchCampFight = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始篝火营地战斗`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        // 切换阵容2（出错也继续）
+        try {
+          await tokenStore.sendPresetteamSaveTeam(tokenId, { teamId: 2 });
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (e) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 切换阵容2失败，继续执行`,
+            type: "warning",
+          });
+        }
+
+        // 获取当前战力
+        const roleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {});
+        const myPower = roleInfo?.role?.power || roleInfo?.power || 0;
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 获取俱乐部信息
+        await tokenStore.sendLegionGetInfo(tokenId, {});
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 获取篝火营地信息
+        const clubInfo = await tokenStore.sendClubGetInfo(tokenId, {});
+        const oppoMap = clubInfo?.club?.oppoMap;
+        if (!oppoMap) throw new Error('未获取到篝火营地对手信息');
+
+        // 根据星期几获取对手
+        const dayOfWeek = new Date().getDay();
+        const dayToOppo = { 2: '2', 3: '3', 4: '4' };
+        const oppoKey = dayToOppo[dayOfWeek];
+        if (!oppoKey) throw new Error(`今天星期${dayOfWeek}，篝火营地战力模式只在周2、周3、周4开放`);
+
+        const oppoData = oppoMap[oppoKey];
+        if (!oppoData) throw new Error(`未找到星期${dayOfWeek}对应的对手`);
+
+        const legionId = oppoData.legionId;
+        const defenders = oppoData.defenders || {};
+        const defenderList = [];
+
+        // 获取每个对手的战力
+        for (const [nodeId, def] of Object.entries(defenders)) {
+          try {
+            const teamInfo = await tokenStore.sendClubGetTargetTeam(tokenId, { targetId: def.roleId });
+            const power = teamInfo?.roleBattleTeam?.role?.power || 0;
+            defenderList.push({
+              nodeId: parseInt(nodeId),
+              targetId: def.roleId,
+              challengeCnt: def.challengeCnt || 0,
+              failCnt: def.failCnt || 0,
+              power: power,
+              name: def.name || ''
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (e) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 获取对手${def.roleId}战力失败，跳过`,
+              type: "warning",
+            });
+          }
+        }
+
+        // 按战力从大到小排序
+        defenderList.sort((a, b) => b.power - a.power);
+
+        // 获取当前阵容
+        const fightResult = await tokenStore.sendFightStartLevel(tokenId, {});
+        const battleData = fightResult?.battleData?.leftTeam;
+        if (!battleData) throw new Error('未获取到战斗数据');
+
+        const team = battleData.team || {};
+        const weaponId = battleData.weaponId;
+        const petUId = battleData.petUId;
+        const battleTeam = {};
+        for (let pos = 0; pos <= 4; pos++) {
+          if (team[pos]) {
+            battleTeam[pos] = team[pos].id;
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 筛选对手
+        const filterTargets = () => {
+          const group1 = defenderList
+            .filter(d => d.challengeCnt < 5 && d.power < myPower * 1.5)
+            .sort((a, b) => a.failCnt - b.failCnt)
+            .slice(0, 2);
+          
+          const group2 = defenderList
+            .filter(d => d.challengeCnt < 5 && d.power < myPower * 1.3)
+            .sort((a, b) => a.failCnt - b.failCnt)
+            .slice(0, 7);
+          
+          const combined = [...group1];
+          for (const d of group2) {
+            if (!combined.find(c => c.nodeId === d.nodeId)) {
+              combined.push(d);
+            }
+          }
+          return combined.slice(0, 7);
+        };
+
+        let targets = filterTargets();
+        let challengeCount = 0;
+        const maxChallenges = 7;
+        let challengeError = false;
+
+        // 循环挑战
+        while (challengeCount < maxChallenges && !challengeError) {
+          if (targets.length === 0) {
+            // 重新获取 club_getinfo 更新缓存
+            try {
+              const clubInfo2 = await tokenStore.sendClubGetInfo(tokenId, {});
+              const oppoMap2 = clubInfo2?.club?.oppoMap;
+              if (oppoMap2) {
+                const oppoData2 = oppoMap2[oppoKey];
+                if (oppoData2) {
+                  const defenders2 = oppoData2.defenders || {};
+                  for (const [nodeId, def] of Object.entries(defenders2)) {
+                    const defInList = defenderList.find(d => d.targetId === def.roleId);
+                    if (defInList) {
+                      defInList.challengeCnt = def.challengeCnt || 0;
+                      defInList.failCnt = def.failCnt || 0;
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 重新获取 club_getinfo 失败`,
+                type: "warning",
+              });
+            }
+
+            targets = filterTargets();
+            if (targets.length === 0) break;
+          }
+
+          const target = targets[0];
+          try {
+            const attackResult = await tokenStore.sendClubAttack(tokenId, {
+              nodeId: target.nodeId,
+              targetId: target.targetId,
+              challengeCnt: target.challengeCnt,
+              failCnt: target.failCnt,
+              useItem: false,
+              teamSetParams: {
+                lordWeaponId: weaponId,
+                petUId: petUId,
+                battleTeam: battleTeam
+              }
+            });
+
+            challengeCount++;
+            const resultStr = JSON.stringify(attackResult || {});
+            
+            if (resultStr.includes('今日成功挑战次数已用完') || resultStr.includes('请明日再来')) {
+              break;
+            }
+
+            target.challengeCnt++;
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (e) {
+            challengeError = true;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 挑战${target.name}异常: ${e.message}`,
+              type: "error",
+            });
+            break;
+          }
+
+          targets = filterTargets();
+        }
+
+        // 执行3次空投战斗
+        if (!challengeError) {
+          for (let fightCount = 1; fightCount <= 3; fightCount++) {
+            try {
+              await tokenStore.sendClubAttackMonster(tokenId, {
+                useItem: false,
+                teamSetParams: {
+                  lordWeaponId: weaponId,
+                  petUId: petUId,
+                  battleTeam: battleTeam
+                }
+              });
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (e) {
+              break;
+            }
+          }
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 篝火营地战斗完成，挑战${challengeCount}次`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 篝火营地战斗失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("篝火营地战斗结束");
+  };
+
+  /**
+   * 篝火营地战斗（单个Token，战力模式）
+   */
+  const batchCampFightForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始篝火营地战斗`,
+        type: "info",
+      });
+
+      // 切换阵容2
+      try {
+        await tokenStore.sendPresetteamSaveTeam(tokenId, { teamId: 2 });
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (e) {
+        // 继续执行
+      }
+
+      // 获取当前战力
+      const roleInfo = await tokenStore.sendMessageWithPromise(tokenId, 'role_getroleinfo', {});
+      const myPower = roleInfo?.role?.power || roleInfo?.power || 0;
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 获取俱乐部信息
+      await tokenStore.sendLegionGetInfo(tokenId, {});
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 获取篝火营地信息
+      const clubInfo = await tokenStore.sendClubGetInfo(tokenId, {});
+      const oppoMap = clubInfo?.club?.oppoMap;
+      if (!oppoMap) throw new Error('未获取到篝火营地对手信息');
+
+      const dayOfWeek = new Date().getDay();
+      const dayToOppo = { 2: '2', 3: '3', 4: '4' };
+      const oppoKey = dayToOppo[dayOfWeek];
+      if (!oppoKey) throw new Error(`今天星期${dayOfWeek}，篝火营地战力模式只在周2、周3、周4开放`);
+
+      const oppoData = oppoMap[oppoKey];
+      if (!oppoData) throw new Error(`未找到星期${dayOfWeek}对应的对手`);
+
+      const legionId = oppoData.legionId;
+      const defenders = oppoData.defenders || {};
+      const defenderList = [];
+
+      for (const [nodeId, def] of Object.entries(defenders)) {
+        try {
+          const teamInfo = await tokenStore.sendClubGetTargetTeam(tokenId, { targetId: def.roleId });
+          const power = teamInfo?.roleBattleTeam?.role?.power || 0;
+          defenderList.push({
+            nodeId: parseInt(nodeId),
+            targetId: def.roleId,
+            challengeCnt: def.challengeCnt || 0,
+            failCnt: def.failCnt || 0,
+            power: power,
+            name: def.name || ''
+          });
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (e) {
+          // 跳过
+        }
+      }
+
+      defenderList.sort((a, b) => b.power - a.power);
+
+      const fightResult = await tokenStore.sendFightStartLevel(tokenId, {});
+      const battleData = fightResult?.battleData?.leftTeam;
+      if (!battleData) throw new Error('未获取到战斗数据');
+
+      const team = battleData.team || {};
+      const weaponId = battleData.weaponId;
+      const petUId = battleData.petUId;
+      const battleTeam = {};
+      for (let pos = 0; pos <= 4; pos++) {
+        if (team[pos]) {
+          battleTeam[pos] = team[pos].id;
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const filterTargets = () => {
+        const group1 = defenderList
+          .filter(d => d.challengeCnt < 5 && d.power < myPower * 1.5)
+          .sort((a, b) => a.failCnt - b.failCnt)
+          .slice(0, 2);
+        
+        const group2 = defenderList
+          .filter(d => d.challengeCnt < 5 && d.power < myPower * 1.3)
+          .sort((a, b) => a.failCnt - b.failCnt)
+          .slice(0, 7);
+        
+        const combined = [...group1];
+        for (const d of group2) {
+          if (!combined.find(c => c.nodeId === d.nodeId)) {
+            combined.push(d);
+          }
+        }
+        return combined.slice(0, 7);
+      };
+
+      let targets = filterTargets();
+      let challengeCount = 0;
+      const maxChallenges = 7;
+      let challengeError = false;
+
+      while (challengeCount < maxChallenges && !challengeError) {
+        if (targets.length === 0) {
+          try {
+            const clubInfo2 = await tokenStore.sendClubGetInfo(tokenId, {});
+            const oppoMap2 = clubInfo2?.club?.oppoMap;
+            if (oppoMap2) {
+              const oppoData2 = oppoMap2[oppoKey];
+              if (oppoData2) {
+                const defenders2 = oppoData2.defenders || {};
+                for (const [nodeId, def] of Object.entries(defenders2)) {
+                  const defInList = defenderList.find(d => d.targetId === def.roleId);
+                  if (defInList) {
+                    defInList.challengeCnt = def.challengeCnt || 0;
+                    defInList.failCnt = def.failCnt || 0;
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            // 继续
+          }
+
+          targets = filterTargets();
+          if (targets.length === 0) break;
+        }
+
+        const target = targets[0];
+        try {
+          const attackResult = await tokenStore.sendClubAttack(tokenId, {
+            nodeId: target.nodeId,
+            targetId: target.targetId,
+            challengeCnt: target.challengeCnt,
+            failCnt: target.failCnt,
+            useItem: false,
+            teamSetParams: {
+              lordWeaponId: weaponId,
+              petUId: petUId,
+              battleTeam: battleTeam
+            }
+          });
+
+          challengeCount++;
+          const resultStr = JSON.stringify(attackResult || {});
+          
+          if (resultStr.includes('今日成功挑战次数已用完') || resultStr.includes('请明日再来')) {
+            break;
+          }
+
+          target.challengeCnt++;
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (e) {
+          challengeError = true;
+          break;
+        }
+
+        targets = filterTargets();
+      }
+
+      if (!challengeError) {
+        for (let fightCount = 1; fightCount <= 3; fightCount++) {
+          try {
+            await tokenStore.sendClubAttackMonster(tokenId, {
+              useItem: false,
+              teamSetParams: {
+                lordWeaponId: weaponId,
+                petUId: petUId,
+                battleTeam: battleTeam
+              }
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (e) {
+            break;
+          }
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 篝火营地战斗完成，挑战${challengeCount}次`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 篝火营地战斗失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 盐场报名（批量）
+   */
+  const batchSaltSignup = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始盐场报名`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+        await tokenStore.sendLegionSignup(tokenId, {});
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 盐场报名完成`,
+          type: "success",
+        });
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 盐场报名失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("盐场报名结束");
+  };
+
+  /**
+   * 盐场报名（单个Token）
+   */
+  const batchSaltSignupForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始盐场报名`,
+        type: "info",
+      });
+
+      await tokenStore.sendLegionSignup(tokenId, {});
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 盐场报名完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 盐场报名失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
+  /**
+   * 盐场布阵（批量）
+   */
+  const batchSaltFormation = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 开始盐场布阵`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        // 获取战斗数据
+        const fightResult = await tokenStore.sendFightStartLevel(tokenId, {});
+        let battleTeam = {};
+        let lordWeaponId = 0;
+        let petUId = '';
+        
+        let leftTeam = null;
+        if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam) {
+          leftTeam = fightResult.battleData.leftTeam;
+        } else if (fightResult && fightResult.leftTeam) {
+          leftTeam = fightResult.leftTeam;
+        }
+        
+        if (leftTeam) {
+          lordWeaponId = leftTeam.weaponId || 0;
+          petUId = leftTeam.petUId || '';
+          
+          if (leftTeam.team) {
+            const teamEntries = Array.isArray(leftTeam.team)
+              ? leftTeam.team
+              : Object.values(leftTeam.team);
+            teamEntries.forEach(hero => {
+              if (hero && hero.index !== undefined && hero.id !== undefined) {
+                battleTeam[hero.index] = hero.id;
+              }
+            });
+          }
+        }
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 获取盐场信息
+        const battlefieldInfo = await tokenStore.sendLegionGetBattlefield(tokenId, {});
+        const battlefieldId = battlefieldInfo?.info?.battlefieldId;
+        if (!battlefieldId) throw new Error('未获取到盐场ID');
+
+        const sid = battlefieldInfo?.info?.sid;
+        if (!sid) throw new Error('未获取到盐场sid');
+
+        // 使用盐场专用WebSocket
+        const baseWsUrl = 'wss://xxz-xyzw-new.hortorgames.com/agent' + `?p=${encodeURIComponent(token.token)}&e=x&sid2=${sid}&lang=chinese`;
+        
+        const legionWarWs = new XyzwLegionWarWebSocketClient({
+          url: baseWsUrl,
+          utils: null,
+          hint: battlefieldId,
+          heartbeatMs: 5000
+        });
+        
+        // 等待连接建立
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error('盐场WebSocket连接超时'));
+          }, 10000);
+          
+          legionWarWs.onConnect = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          legionWarWs.onError = (error) => {
+            clearTimeout(timeout);
+            reject(error);
+          };
+          legionWarWs.init();
+        });
+        
+        try {
+          // 进入盐场
+          await legionWarWs.send("war_enterbattlefield", { battlefieldId, useGzip: true });
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // 设置布阵
+          await legionWarWs.send("war_setbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId });
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // 队伍入场
+          await legionWarWs.send("war_teamsetbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId });
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } finally {
+          // 关闭盐场WebSocket
+          if (legionWarWs.socket && legionWarWs.socket.readyState === WebSocket.OPEN) {
+            legionWarWs.socket.close();
+          }
+        }
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 盐场布阵完成`,
+          type: "success",
+        });
+
+        tokenStatus.value[tokenId] = "success";
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 盐场布阵失败: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("盐场布阵结束");
+  };
+
+  /**
+   * 盐场布阵（单个Token）
+   */
+  const batchSaltFormationForToken = async (tokenId, skipConnect = false) => {
+    const token = tokens.value.find((t) => t.id === tokenId);
+    if (!token) return;
+
+    try {
+      if (!skipConnect) {
+        await ensureConnection(tokenId);
+      }
+      
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 开始盐场布阵`,
+        type: "info",
+      });
+
+      // 获取战斗数据
+      const fightResult = await tokenStore.sendFightStartLevel(tokenId, {});
+      let battleTeam = {};
+      let lordWeaponId = 0;
+      let petUId = '';
+      
+      let leftTeam = null;
+      if (fightResult && fightResult.battleData && fightResult.battleData.leftTeam) {
+        leftTeam = fightResult.battleData.leftTeam;
+      } else if (fightResult && fightResult.leftTeam) {
+        leftTeam = fightResult.leftTeam;
+      }
+      
+      if (leftTeam) {
+        lordWeaponId = leftTeam.weaponId || 0;
+        petUId = leftTeam.petUId || '';
+        
+        if (leftTeam.team) {
+          const teamEntries = Array.isArray(leftTeam.team)
+            ? leftTeam.team
+            : Object.values(leftTeam.team);
+          teamEntries.forEach(hero => {
+            if (hero && hero.index !== undefined && hero.id !== undefined) {
+              battleTeam[hero.index] = hero.id;
+            }
+          });
+        }
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // 获取盐场信息
+      const battlefieldInfo = await tokenStore.sendLegionGetBattlefield(tokenId, {});
+      const battlefieldId = battlefieldInfo?.info?.battlefieldId;
+      if (!battlefieldId) throw new Error('未获取到盐场ID');
+
+      const sid = battlefieldInfo?.info?.sid;
+      if (!sid) throw new Error('未获取到盐场sid');
+
+      // 使用盐场专用WebSocket
+      const baseWsUrl = 'wss://xxz-xyzw-new.hortorgames.com/agent' + `?p=${encodeURIComponent(token.token)}&e=x&sid2=${sid}&lang=chinese`;
+      
+      const legionWarWs = new XyzwLegionWarWebSocketClient({
+        url: baseWsUrl,
+        utils: null,
+        hint: battlefieldId,
+        heartbeatMs: 5000
+      });
+      
+      // 等待连接建立
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('盐场WebSocket连接超时'));
+        }, 10000);
+        
+        legionWarWs.onConnect = () => {
+          clearTimeout(timeout);
+          resolve();
+        };
+        legionWarWs.onError = (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        };
+        legionWarWs.init();
+      });
+      
+      try {
+        // 步骤2: 进入盐场
+        await legionWarWs.send("war_enterbattlefield", { battlefieldId, useGzip: true });
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // 步骤3: 设置布阵
+        await legionWarWs.send("war_setbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId });
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // 步骤4: 队伍入场
+        await legionWarWs.send("war_teamsetbattleteam", { battlefieldId, battleTeam, lordWeaponId, petUId });
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } finally {
+        // 关闭盐场WebSocket
+        if (legionWarWs.socket && legionWarWs.socket.readyState === WebSocket.OPEN) {
+          legionWarWs.socket.close();
+        }
+      }
+
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 盐场布阵完成`,
+        type: "success",
+      });
+    } catch (error) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${token.name} 盐场布阵失败: ${error.message}`,
+        type: "error",
+      });
+      // 不抛出异常，继续执行后续命令
+    }
+  };
+
   return {
     batchOpenBox,
     batchOpenBoxByPoints,
@@ -2179,5 +3455,19 @@ export function createTasksItem(deps) {
     batchFreeGiftForToken,
     batchDailyBoss,
     batchDailyBossForToken,
+    batchFreeFishing,
+    batchFreeFishingForToken,
+    batchPetEgg,
+    batchPetEggForToken,
+    batchGacha,
+    batchGachaForToken,
+    batchCampSignup,
+    batchCampSignupForToken,
+    batchCampFight,
+    batchCampFightForToken,
+    batchSaltSignup,
+    batchSaltSignupForToken,
+    batchSaltFormation,
+    batchSaltFormationForToken,
   };
 }

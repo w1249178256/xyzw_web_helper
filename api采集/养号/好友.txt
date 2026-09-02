@@ -1,0 +1,864 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/9/2 18:25:04
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1788082858921.8901%E6%9C%8D-0-721083389-%E7%9B%B8%E7%AC%A601-0.bin&fromManager=true&viewId=game-window-1788344677594-yd18c3wxf
+记录数量: 8
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta5 Chrome/150.0.7871.129 Electron/43.2.0 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/9/2 18:24:57
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 48,
+    "time": 1788344698766,
+    "resp": 49,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 24
+}
+异步: 是
+调用ID: call_1788344697948_x1jkeb92z
+
+记录 #2:
+----------------------------------------
+时间: 2026/9/2 18:24:55
+服务: FriendService
+方法: list
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 51,
+    "ack": 44,
+    "time": 1788344696475,
+    "resp": 45,
+    "cmd": "friend_resp",
+    "body": {
+      "friendList": {
+        "112130336": {
+          "roleId": 112130336,
+          "serverId": 9012,
+          "serverViewId": 8985,
+          "name": " 无忧",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM6tiaKlrLBGWyWxDib04Ek6GE544STX9nqK7hDrzFZXwTFFnoW6mCic16DEP1Cwkpty49fo8mddz0wgQ/132",
+          "level": 4001,
+          "levelId": 5687,
+          "power": 436477483,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-09-02T10:24:56.436Z"
+        },
+        "237058024": {
+          "roleId": 237058024,
+          "serverId": 9026,
+          "serverViewId": 8999,
+          "name": "刨地11",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/237058024/1762653485.jpg",
+          "level": 4500,
+          "levelId": 5355,
+          "power": 227928479,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-09-02T10:24:56.401Z"
+        },
+        "508534671": {
+          "roleId": 508534671,
+          "serverId": 2009017,
+          "serverViewId": 8990,
+          "name": "11贝贝",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/B9eDDgEoS93u4hMqvibVtgAMF0GPRIkwSL7GT3qfeZ2PibLMsAkEWakJAK5lFpia9D5XJM6WgPSXAux7ADX2WOibWZpk4mia3MkP15e2wR2TaaOY/132",
+          "level": 4001,
+          "levelId": 5618,
+          "power": 62999004,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-09-02T10:24:56.448Z"
+        },
+        "662549758": {
+          "roleId": 662549758,
+          "serverId": 2009015,
+          "serverViewId": 8988,
+          "name": "Ch",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/hhicswv527HzyoklLNgT38fD7Tzh0icG66KXTYrLCMDZd8w3nQvD6PibuRmuicUZl8tMC7FLdOKOfW3hO8hzycVgrA/132",
+          "level": 5000,
+          "levelId": 6170,
+          "power": 146084816,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": -62135596800,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-09-02T10:24:56.384Z"
+        },
+        "720859806": {
+          "roleId": 720859806,
+          "serverId": 2008954,
+          "serverViewId": 8927,
+          "name": "8927三",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/IpicUuIn7kdGlkEP25HZeQdkWgDKRu18aAx8KWdSF1BM5EvGLlgUDuECTXTyibsJibPEXxadGMI5FKzsdIJ6HIG8ULJ4eWOr0tibTFHRusbFr2M/132",
+          "level": 1299,
+          "levelId": 605,
+          "power": 657935,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1788341722,
+          "lastLogin": 1788249330,
+          "lastOnline": 1788249335,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-04-23T02:15:17.050Z"
+        },
+        "721174533": {
+          "roleId": 721174533,
+          "serverId": 8655,
+          "serverViewId": 8628,
+          "name": "小鱼",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/prkpFIYSgGnsC7eF43PBxaUY2gFzV5RRiabJiaAc8C5AFhWtmfQZSIRiapbcZuHn7sVN8GIvpvsnAFjQ4xrbzy40CstlorsAYCCL5kB3t7ezk0/132",
+          "level": 5000,
+          "levelId": 7790,
+          "power": 1251601679,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIialEezAORdFK38py1IpyEYpslGV7kpYYkt7u0qGztibyj40F2EKsgeGe4p5ZHHs6jH1aTZGlQfcZh2QllqiaGcrHILicJrZk0T4BBe11qVTMr7Q/132",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1788341722,
+          "presented": 1788341722,
+          "lastLogin": 1788338908,
+          "lastOnline": 1788338908,
+          "avatarFrame": {
+            "id": 3006,
+            "expire": -1
+          },
+          "customCard": null,
+          "createTime": "2026-04-23T19:04:41.337Z"
+        }
+      },
+      "leftReceiveCnt": 49
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 86
+}
+异步: 是
+调用ID: call_1788344695595_xdvuq7a4s
+
+记录 #3:
+----------------------------------------
+时间: 2026/9/2 18:24:55
+服务: FriendService
+方法: batchAgree
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 50,
+    "ack": 0,
+    "time": 1788344696465,
+    "resp": 44,
+    "cmd": "friend_applylistresp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 120
+}
+异步: 是
+调用ID: call_1788344695551_flmph6m7i
+
+记录 #4:
+----------------------------------------
+时间: 2026/9/2 18:24:53
+服务: FriendService
+方法: applyList
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 45,
+    "ack": 42,
+    "time": 1788344694118,
+    "resp": 43,
+    "cmd": "friend_applylistresp",
+    "body": {
+      "friendList": {
+        "112130336": {
+          "roleId": 112130336,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": " 无忧",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM6tiaKlrLBGWyWxDib04Ek6GE544STX9nqK7hDrzFZXwTFFnoW6mCic16DEP1Cwkpty49fo8mddz0wgQ/132",
+          "level": 4001,
+          "levelId": 5687,
+          "power": 436477483,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "184324503": {
+          "roleId": 184324503,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地9",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/184324503/1761736446.jpg",
+          "level": 4500,
+          "levelId": 5333,
+          "power": 229812484,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "207716101": {
+          "roleId": 207716101,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "隨緣9000",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/zmDUDuQIxvicslVequyTNBLdOrlerW9I6f2FjDkRxLAnD8AEVp4C7y7tsuMjZ3cCYicZkDF4QpCw7FDrlIRYHFBNQ7FiaaqF28JIrNpbribtibOI/132",
+          "level": 4343,
+          "levelId": 5686,
+          "power": 275626433,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "237058024": {
+          "roleId": 237058024,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地11",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/237058024/1762653485.jpg",
+          "level": 4500,
+          "levelId": 5355,
+          "power": 227928479,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "237069944": {
+          "roleId": 237069944,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地10",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/237069944/1761736966.jpg",
+          "level": 4500,
+          "levelId": 5419,
+          "power": 230430666,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "490462760": {
+          "roleId": 490462760,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "隨緣9000-2",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/zmDUDuQIxvicslVequyTNBLdOrlerW9I6f2FjDkRxLAnD8AEVp4C7y7tsuMjZ3cCYicZkDF4QpCw7FDrlIRYHFBNQ7FiaaqF28JIrNpbribtibOI/132",
+          "level": 4500,
+          "levelId": 5406,
+          "power": 162927849,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "508534671": {
+          "roleId": 508534671,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "11贝贝",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/B9eDDgEoS93u4hMqvibVtgAMF0GPRIkwSL7GT3qfeZ2PibLMsAkEWakJAK5lFpia9D5XJM6WgPSXAux7ADX2WOibWZpk4mia3MkP15e2wR2TaaOY/132",
+          "level": 4001,
+          "levelId": 5618,
+          "power": 62999004,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "662549758": {
+          "roleId": 662549758,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "Ch",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/hhicswv527HzyoklLNgT38fD7Tzh0icG66KXTYrLCMDZd8w3nQvD6PibuRmuicUZl8tMC7FLdOKOfW3hO8hzycVgrA/132",
+          "level": 5000,
+          "levelId": 6170,
+          "power": 146084816,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1788344693299_8cn6mrz2l
+
+记录 #5:
+----------------------------------------
+时间: 2026/9/2 18:24:51
+服务: FriendService
+方法: list
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 44,
+    "ack": 41,
+    "time": 1788344692618,
+    "resp": 42,
+    "cmd": "friend_resp",
+    "body": {
+      "friendList": {
+        "720859806": {
+          "roleId": 720859806,
+          "serverId": 2008954,
+          "serverViewId": 8927,
+          "name": "8927三",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/IpicUuIn7kdGlkEP25HZeQdkWgDKRu18aAx8KWdSF1BM5EvGLlgUDuECTXTyibsJibPEXxadGMI5FKzsdIJ6HIG8ULJ4eWOr0tibTFHRusbFr2M/132",
+          "level": 1299,
+          "levelId": 605,
+          "power": 657935,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1788341722,
+          "lastLogin": 1788249330,
+          "lastOnline": 1788249335,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-04-23T02:15:17.050Z"
+        },
+        "721174533": {
+          "roleId": 721174533,
+          "serverId": 8655,
+          "serverViewId": 8628,
+          "name": "小鱼",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/prkpFIYSgGnsC7eF43PBxaUY2gFzV5RRiabJiaAc8C5AFhWtmfQZSIRiapbcZuHn7sVN8GIvpvsnAFjQ4xrbzy40CstlorsAYCCL5kB3t7ezk0/132",
+          "level": 5000,
+          "levelId": 7790,
+          "power": 1251601679,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIialEezAORdFK38py1IpyEYpslGV7kpYYkt7u0qGztibyj40F2EKsgeGe4p5ZHHs6jH1aTZGlQfcZh2QllqiaGcrHILicJrZk0T4BBe11qVTMr7Q/132",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1788341722,
+          "presented": 1788341722,
+          "lastLogin": 1788338908,
+          "lastOnline": 1788338908,
+          "avatarFrame": {
+            "id": 3006,
+            "expire": -1
+          },
+          "customCard": null,
+          "createTime": "2026-04-23T19:04:41.337Z"
+        }
+      },
+      "leftReceiveCnt": 49
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 27
+}
+异步: 是
+调用ID: call_1788344691797_j9tk7n5ap
+
+记录 #6:
+----------------------------------------
+时间: 2026/9/2 18:24:49
+服务: FriendService
+方法: applyList
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 43,
+    "ack": 40,
+    "time": 1788344690161,
+    "resp": 41,
+    "cmd": "friend_applylistresp",
+    "body": {
+      "friendList": {
+        "112130336": {
+          "roleId": 112130336,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": " 无忧",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM6tiaKlrLBGWyWxDib04Ek6GE544STX9nqK7hDrzFZXwTFFnoW6mCic16DEP1Cwkpty49fo8mddz0wgQ/132",
+          "level": 4001,
+          "levelId": 5687,
+          "power": 436477483,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "184324503": {
+          "roleId": 184324503,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地9",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/184324503/1761736446.jpg",
+          "level": 4500,
+          "levelId": 5333,
+          "power": 229812484,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "207716101": {
+          "roleId": 207716101,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "隨緣9000",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/zmDUDuQIxvicslVequyTNBLdOrlerW9I6f2FjDkRxLAnD8AEVp4C7y7tsuMjZ3cCYicZkDF4QpCw7FDrlIRYHFBNQ7FiaaqF28JIrNpbribtibOI/132",
+          "level": 4343,
+          "levelId": 5686,
+          "power": 275626433,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "237058024": {
+          "roleId": 237058024,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地11",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/237058024/1762653485.jpg",
+          "level": 4500,
+          "levelId": 5355,
+          "power": 227928479,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "237069944": {
+          "roleId": 237069944,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "刨地10",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/237069944/1761736966.jpg",
+          "level": 4500,
+          "levelId": 5419,
+          "power": 230430666,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "490462760": {
+          "roleId": 490462760,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "隨緣9000-2",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/zmDUDuQIxvicslVequyTNBLdOrlerW9I6f2FjDkRxLAnD8AEVp4C7y7tsuMjZ3cCYicZkDF4QpCw7FDrlIRYHFBNQ7FiaaqF28JIrNpbribtibOI/132",
+          "level": 4500,
+          "levelId": 5406,
+          "power": 162927849,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "508534671": {
+          "roleId": 508534671,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "11贝贝",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/B9eDDgEoS93u4hMqvibVtgAMF0GPRIkwSL7GT3qfeZ2PibLMsAkEWakJAK5lFpia9D5XJM6WgPSXAux7ADX2WOibWZpk4mia3MkP15e2wR2TaaOY/132",
+          "level": 4001,
+          "levelId": 5618,
+          "power": 62999004,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        },
+        "662549758": {
+          "roleId": 662549758,
+          "serverId": 0,
+          "serverViewId": 0,
+          "name": "Ch",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/hhicswv527HzyoklLNgT38fD7Tzh0icG66KXTYrLCMDZd8w3nQvD6PibuRmuicUZl8tMC7FLdOKOfW3hO8hzycVgrA/132",
+          "level": 5000,
+          "levelId": 6170,
+          "power": 146084816,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": {},
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 0,
+          "lastLogin": 0,
+          "lastOnline": 0,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "1677-09-21T00:12:43.146Z"
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 25
+}
+异步: 是
+调用ID: call_1788344689343_nuh5eladf
+
+记录 #7:
+----------------------------------------
+时间: 2026/9/2 18:24:49
+服务: FriendService
+方法: list
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 42,
+    "ack": 39,
+    "time": 1788344690136,
+    "resp": 40,
+    "cmd": "friend_resp",
+    "body": {
+      "friendList": {
+        "720859806": {
+          "roleId": 720859806,
+          "serverId": 2008954,
+          "serverViewId": 8927,
+          "name": "8927三",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/IpicUuIn7kdGlkEP25HZeQdkWgDKRu18aAx8KWdSF1BM5EvGLlgUDuECTXTyibsJibPEXxadGMI5FKzsdIJ6HIG8ULJ4eWOr0tibTFHRusbFr2M/132",
+          "level": 1299,
+          "levelId": 605,
+          "power": 657935,
+          "bossId": 0,
+          "bossHeadImg": "",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": false,
+          "received": 0,
+          "presented": 1788341722,
+          "lastLogin": 1788249330,
+          "lastOnline": 1788249335,
+          "avatarFrame": null,
+          "customCard": null,
+          "createTime": "2026-04-23T02:15:17.050Z"
+        },
+        "721174533": {
+          "roleId": 721174533,
+          "serverId": 8655,
+          "serverViewId": 8628,
+          "name": "小鱼",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/prkpFIYSgGnsC7eF43PBxaUY2gFzV5RRiabJiaAc8C5AFhWtmfQZSIRiapbcZuHn7sVN8GIvpvsnAFjQ4xrbzy40CstlorsAYCCL5kB3t7ezk0/132",
+          "level": 5000,
+          "levelId": 7790,
+          "power": 1251601679,
+          "bossId": 0,
+          "bossHeadImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIialEezAORdFK38py1IpyEYpslGV7kpYYkt7u0qGztibyj40F2EKsgeGe4p5ZHHs6jH1aTZGlQfcZh2QllqiaGcrHILicJrZk0T4BBe11qVTMr7Q/132",
+          "medallion": null,
+          "medallionStorage": null,
+          "isOnline": false,
+          "isReceive": true,
+          "received": 1788341722,
+          "presented": 1788341722,
+          "lastLogin": 1788338908,
+          "lastOnline": 1788338908,
+          "avatarFrame": {
+            "id": 3006,
+            "expire": -1
+          },
+          "customCard": null,
+          "createTime": "2026-04-23T19:04:41.337Z"
+        }
+      },
+      "leftReceiveCnt": 49
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 31
+}
+异步: 是
+调用ID: call_1788344689310_lrpw97ko3
+
+记录 #8:
+----------------------------------------
+时间: 2026/9/2 18:24:49
+服务: FriendService
+方法: getFollowInfo
+参数: [{"friendId":721083389}]
+结果:
+{
+  "_raw": {
+    "seq": 41,
+    "ack": 0,
+    "time": 1788344690104,
+    "resp": 39,
+    "cmd": "friend_getfollowinforesp",
+    "body": {
+      "0": 8,
+      "1": 0
+    }
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 23
+}
+异步: 是
+调用ID: call_1788344689287_waitpbr09
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

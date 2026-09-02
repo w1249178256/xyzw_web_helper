@@ -210,8 +210,9 @@ export function createTasksHangUp(deps) {
     });
     await preloadQuestions();
 
-    const taskPromises = selectedTokens.value.map(async (tokenId) => {
-      if (shouldStop.value) return;
+    // 顺序执行：执行完一个token所有任务后，再执行下一个token
+    for (const tokenId of selectedTokens.value) {
+      if (shouldStop.value) break;
 
       tokenStatus.value[tokenId] = "running";
 
@@ -317,9 +318,7 @@ export function createTasksHangUp(deps) {
           type: "info",
         });
       }
-    });
-
-    await Promise.all(taskPromises);
+    }
 
     isRunning.value = false;
     currentRunningTokenId.value = null;

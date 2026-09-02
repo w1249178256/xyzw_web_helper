@@ -127,6 +127,7 @@ export default defineConfig(async () => {
 
   return {
     plugins,
+    base: './',
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "src"),

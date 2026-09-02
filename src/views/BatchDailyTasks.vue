@@ -393,6 +393,48 @@
                 >
                   一键灯神扫荡
                 </n-button>
+                <n-button
+                  size="small"
+                  @click="batchPetEgg"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键宠物蛋
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchGacha"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键扭蛋
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchCampSignup"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  篝火营地报名
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchCampFight"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  篝火营地战斗
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchSaltSignup"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  盐场报名
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchSaltFormation"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  盐场布阵
+                </n-button>
               </n-space>
             </n-tab-pane>
             <n-tab-pane name="dungeon" tab="副本">
@@ -4329,6 +4371,66 @@ const handleTokenRefreshWaiting = (data) => {
 };
 
 // Debug: Log initial state when component mounts
+// 检查并恢复待重试的日常任务
+const checkAndResumeRetryTask = () => {
+  try {
+    const retryTaskStr = localStorage.getItem("dailyTask_retry");
+    if (!retryTaskStr) return;
+
+    const retryTask = JSON.parse(retryTaskStr);
+    const { tokenIds, timestamp, taskType, groupIds } = retryTask;
+
+    // 检查任务是否在30分钟内（避免过期的重试任务）
+    const thirtyMinutes = 30 * 60 * 1000;
+    if (Date.now() - timestamp > thirtyMinutes) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: "检测到过期的重试任务，已清除",
+        type: "warning",
+      });
+      localStorage.removeItem("dailyTask_retry");
+      return;
+    }
+
+    // 检查是否有待重试的 token
+    if (!tokenIds || tokenIds.length === 0) {
+      localStorage.removeItem("dailyTask_retry");
+      return;
+    }
+
+    addLog({
+      time: new Date().toLocaleTimeString(),
+      message: `检测到 ${tokenIds.length} 个待重试的 token，将在 3 秒后自动执行...`,
+      type: "info",
+    });
+
+    // 清除重试标记
+    localStorage.removeItem("dailyTask_retry");
+
+    // 等待 3 秒后自动执行
+    setTimeout(() => {
+      // 恢复分组选择
+      if (groupIds && groupIds.length > 0) {
+        selectedGroups.value = groupIds;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `已恢复分组选择，共 ${groupIds.length} 个分组`,
+          type: "info",
+        });
+      }
+
+      // 设置选中的 token
+      selectedTokens.value = tokenIds;
+
+      // 自动启动批量任务
+      startBatch();
+    }, 3000);
+  } catch (error) {
+    console.error("恢复重试任务失败:", error);
+    localStorage.removeItem("dailyTask_retry");
+  }
+};
+
 onMounted(() => {
   // Start the task scheduler after all functions are initialized
   scheduleTaskExecution();
@@ -4337,6 +4439,9 @@ onMounted(() => {
   loadTaskTemplates();
   // 监听Token刷新等待事件
   $emit.on("token:refresh:waiting", handleTokenRefreshWaiting);
+
+  // 检查是否有待重试的日常任务
+  checkAndResumeRetryTask();
 });
 
 // Cleanup countdown interval on unmount
@@ -5766,6 +5871,12 @@ const {
   batchClaimStarRewards,
   batchClaimPeachTasks,
   batchGenieSweep,
+  batchPetEgg,
+  batchGacha,
+  batchCampSignup,
+  batchCampFight,
+  batchSaltSignup,
+  batchSaltFormation,
 } = tasksItem;
 
 const tasksDungeon = createTasksDungeon(createTaskDeps());
@@ -5804,6 +5915,18 @@ const onFootballPickChange = async (val) => {
   await batchFootballBet(val);
 };
 
+// 检测是否为连接错误（需要刷新页面重试）
+const isConnectionError = (error) => {
+  const errorMsg = error.message || "";
+  return (
+    errorMsg.includes("check token error") ||
+    errorMsg.includes("连接失败") ||
+    errorMsg.includes("WebSocket") ||
+    errorMsg.includes("timeout") ||
+    errorMsg.includes("1006")
+  );
+};
+
 const startBatch = async () => {
   if (selectedTokens.value.length === 0) return;
 
@@ -5817,9 +5940,9 @@ const startBatch = async () => {
     tokenStatus.value[id] = "waiting";
   });
 
-  // 并行执行任务，但通过connectionQueue限制并发连接数
-  const taskPromises = selectedTokens.value.map(async (tokenId) => {
-    if (shouldStop.value) return;
+  // 顺序执行：执行完一个token所有任务后，再执行下一个token
+  for (const tokenId of selectedTokens.value) {
+    if (shouldStop.value) break;
 
     tokenStatus.value[tokenId] = "running";
 
@@ -5831,6 +5954,7 @@ const startBatch = async () => {
       if (shouldStop.value) break;
 
       const token = tokens.value.find((t) => t.id === tokenId);
+      let isConnectionErrorHandled = false;
 
       try {
         if (retryCount === 0) {
@@ -5872,13 +5996,14 @@ const startBatch = async () => {
         });
       } catch (error) {
         console.error(error);
+        const isConnError = isConnectionError(error);
+
         if (retryCount < MAX_RETRIES && !shouldStop.value) {
           addLog({
             time: new Date().toLocaleTimeString(),
             message: `${token.name} 执行出错: ${error.message}，等待3秒后重试...`,
             type: "warning",
           });
-          // Wait for potential token refresh in store
           await new Promise((r) => setTimeout(r, 3000));
           retryCount++;
         } else {
@@ -5888,25 +6013,89 @@ const startBatch = async () => {
             message: `${token.name} 执行失败: ${error.message}`,
             type: "error",
           });
+
+          // 如果是连接错误，立即触发刷新重试
+          if (isConnError) {
+            // 检查是否已达到最大连续刷新重试次数
+            const retryCountKey = "dailyTask_retryCount";
+            const currentRetryCount = parseInt(localStorage.getItem(retryCountKey) || "0", 10);
+            const MAX_REFRESH_RETRIES = 5;
+
+            if (currentRetryCount >= MAX_REFRESH_RETRIES) {
+              // 已达到最大重试次数，记录失败并停止
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `已达到最大连续刷新重试次数(${MAX_REFRESH_RETRIES}次)，停止重试`,
+                type: "error",
+              });
+              localStorage.removeItem(retryCountKey);
+              localStorage.removeItem("dailyTask_retry");
+              return;
+            }
+
+            // 收集当前失败的 token 和剩余未执行的 token
+            const currentIdx = selectedTokens.value.indexOf(tokenId);
+            const remainingTokenIds = selectedTokens.value.slice(currentIdx);
+
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `检测到连接错误，准备刷新页面重试 ${remainingTokenIds.length} 个 token... (第${currentRetryCount + 1}/${MAX_REFRESH_RETRIES}次)`,
+              type: "warning",
+            });
+
+            // 保存待重试的任务信息到 localStorage（包含分组信息）
+            const retryTask = {
+              tokenIds: remainingTokenIds,
+              timestamp: Date.now(),
+              taskType: "dailyTask",
+              groupIds: [...selectedGroups.value],
+            };
+            localStorage.setItem("dailyTask_retry", JSON.stringify(retryTask));
+
+            // 增加连续刷新重试计数
+            localStorage.setItem(retryCountKey, String(currentRetryCount + 1));
+
+            // 标记已处理连接错误，避免 finally 重复关闭
+            isConnectionErrorHandled = true;
+
+            // 关闭当前连接
+            tokenStore.closeWebSocketConnection(tokenId);
+            releaseConnectionSlot();
+
+            // 2分钟后刷新页面（120000毫秒）
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: "将在2分钟后刷新页面并重新执行任务...",
+              type: "info",
+            });
+
+            await new Promise((r) => setTimeout(r, 2 * 60 * 1000));
+
+            // 刷新页面
+            window.location.reload();
+            return;
+          }
         }
       } finally {
-        // 完成后关闭连接并释放槽位
-        tokenStore.closeWebSocketConnection(tokenId);
-        releaseConnectionSlot();
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
-          type: "info",
-        });
+        // 如果已经处理过连接错误，跳过 finally 中的清理操作
+        if (!isConnectionErrorHandled) {
+          tokenStore.closeWebSocketConnection(tokenId);
+          releaseConnectionSlot();
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+            type: "info",
+          });
+        }
       }
     }
-  });
-
-  // 等待所有任务完成
-  await Promise.all(taskPromises);
+  }
 
   // 等待所有任务完成后再继续
   await new Promise((r) => setTimeout(r, 1000));
+
+  // 任务成功完成，重置连续刷新重试计数
+  localStorage.removeItem("dailyTask_retryCount");
 
   isRunning.value = false;
   currentRunningTokenId.value = null;

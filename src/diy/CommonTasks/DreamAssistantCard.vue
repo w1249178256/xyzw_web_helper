@@ -2112,6 +2112,39 @@ const handleBatchGacha = async () => {
             await tokenStore.sendGachaDrawReward(token.id, {})
             await new Promise(resolve => setTimeout(resolve, 500))
           }
+
+          // 获取扭蛋信息，领取未领取的阶段奖励
+          try {
+            const gachaInfo = await tokenStore.sendGachaGetInfo(token.id, {})
+            const claimedMap = gachaInfo?.body?.roleGacha?.claimedStageIdMap
+            if (claimedMap) {
+              for (const [stageId, claimed] of Object.entries(claimedMap)) {
+                if (!claimed) {
+                  await tokenStore.sendGachaClaimStageReward(token.id, { stageId: parseInt(stageId) })
+                  logStore.addLog({
+                    page: 'fish-helper',
+                    cardType: '梦境助手',
+                    operation: '批量扭蛋',
+                    tokenId: token.id,
+                    tokenName: token.name,
+                    status: 'success',
+                    message: `[序号${tokenIndex}] 领取扭蛋阶段奖励 stageId=${stageId}`
+                  })
+                  await new Promise(resolve => setTimeout(resolve, 500))
+                }
+              }
+            }
+          } catch (stageErr) {
+            logStore.addLog({
+              page: 'fish-helper',
+              cardType: '梦境助手',
+              operation: '批量扭蛋',
+              tokenId: token.id,
+              tokenName: token.name,
+              status: 'warning',
+              message: `[序号${tokenIndex}] 领取扭蛋阶段奖励失败: ${stageErr.message}`
+            })
+          }
           
           message.success(`[序号${tokenIndex}] ${token.name || token.id} 扭蛋完成，共${gachaCount}次`)
           logStore.addLog({

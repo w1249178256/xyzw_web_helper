@@ -131,6 +131,13 @@
             :disabled="isExportingTeam"
             :loading="isExportingTeam"
           />
+          <CustomizedCard 
+            mode="button"
+            :name="isBatchAgreeFriendRunning ? '批量同意好友中...' : '批量同意好友'"
+            @button-click="handleBatchAgreeFriend"
+            :disabled="isBatchAgreeFriendRunning"
+            :loading="isBatchAgreeFriendRunning"
+          />
         </CustomizedCard>
       </div>
       
@@ -257,6 +264,7 @@ const boxWeekRewardOptions = [
   { label: '万能', value: '万能' },
   { label: '珍珠', value: '珍珠' }
 ]
+const isBatchAgreeFriendRunning = ref(false)
 
 // 计算是否有任何操作正在运行
 const isAnyOperationRunning = computed(() => {
@@ -1472,6 +1480,94 @@ const handleBatchRename = async () => {
     })
   } finally {
     isBatchRenaming.value = false
+  }
+}
+
+// 批量同意好友
+const handleBatchAgreeFriend = async () => {
+  const tokenIndices = parseTokenRange(executionTokens.value)
+  const targetTokens = getTargetTokens(tokenIndices)
+
+  if (targetTokens.length === 0) {
+    message.warning('没有可用的Token')
+    return
+  }
+
+  const rangeText = tokenIndices === null ? '全部' : `范围${executionTokens.value}`
+
+  try {
+    isBatchAgreeFriendRunning.value = true
+
+    message.info(`开始批量同意好友（${rangeText}），共${targetTokens.length}个Token...`)
+
+    const results = await connectionPool.batchOperate(
+      targetTokens,
+      async (token, globalIndex) => {
+        try {
+          const tokenIndex = getTokenIndex(token)
+          message.info(`[序号${tokenIndex}] ${token.name || token.id} 开始同意好友...`)
+
+          // 执行批量同意好友
+          await tokenStore.sendFriendBatchAgree(token.id, {})
+          await waitCommandDelay()
+
+          message.success(`[序号${tokenIndex}] ${token.name || token.id} - 同意好友成功`)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量同意好友',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'success',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]同意好友成功`
+          })
+          return { success: true, tokenId: token.id }
+        } catch (error) {
+          console.error(`[序号${globalIndex + 1}] ${token.name || token.id} 同意好友失败:`, error)
+          message.error(`[序号${globalIndex + 1}] ${token.name || token.id} 同意好友失败: ${error.message}`)
+          const tokenIndex = getTokenIndex(token)
+          logStore.addLog({
+            page: 'fish-helper',
+            cardType: '养号',
+            operation: '批量同意好友',
+            tokenId: token.id,
+            tokenName: token.name,
+            status: 'error',
+            message: `【序号${tokenIndex}】[${token.name || token.id}]同意好友失败: ${error.message}`
+          })
+          return { success: false, tokenId: token.id, error: error.message }
+        }
+      },
+      {
+        batchSize: 5,
+        delayBetweenBatches: 1000
+      }
+    )
+
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.filter(r => !r.success).length
+
+    message.success(`批量同意好友完成：成功 ${successCount} 个，失败 ${failureCount} 个`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量同意好友',
+      status: 'success',
+      message: `【批量】批量同意好友完成，成功 ${successCount} 个，失败 ${failureCount} 个`
+    })
+
+  } catch (error) {
+    console.error('批量同意好友失败:', error)
+    message.error(`批量同意好友失败: ${error.message || '未知错误'}`)
+    logStore.addLog({
+      page: 'fish-helper',
+      cardType: '养号',
+      operation: '批量同意好友',
+      status: 'error',
+      message: `【批量】批量同意好友失败: ${error.message || '未知错误'}`
+    })
+  } finally {
+    isBatchAgreeFriendRunning.value = false
   }
 }
 

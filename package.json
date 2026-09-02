@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "type": "module",
   "description": "XYZW游戏Token管理器 - 支持Base64导入和WebSocket连接管理",
-  "main": "src/main.js",
+  "main": "electron/main.js",
   "scripts": {
     "testr": "node ./test/roleToken.js",
     "testd": "node ./test/token.js",
@@ -11,7 +11,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext .vue,.js,.ts --fix",
-    "format": "prettier --write \"src/**/*.{js,vue,ts,css,scss}\""
+    "format": "prettier --write \"src/**/*.{js,vue,ts,css,scss}\"",
+    "electron:dev": "vite build && electron .",
+    "electron:build": "vite build && electron-builder --win"
   },
   "dependencies": {
     "@arco-design/web-vue": "^2.57.0",
@@ -41,6 +43,8 @@
     "@types/node": "^20.19.21",
     "@vitejs/plugin-vue": "^5.2.4",
     "@vue/tsconfig": "^0.8.1",
+    "electron": "^44.0.0",
+    "electron-builder": "^26.15.3",
     "jiti": "^2.6.1",
     "sass": "^1.93.2",
     "typescript": "^5.9.3",

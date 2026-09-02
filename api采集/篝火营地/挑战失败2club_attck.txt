@@ -1,0 +1,3238 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/9/2 08:13:00
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1780585491160.00-%E9%94%A6%E8%A1%A3-%E2%98%81%EF%B8%8F%E9%BB%AF%E6%B6%A993.bin&fromManager=true&viewId=game-window-1788307934238-rp6ksjh7c
+记录数量: 8
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta5 Chrome/150.0.7871.129 Electron/43.2.0 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/9/2 08:12:51
+服务: ClubService
+方法: attack
+参数: [{"nodeId":3,"targetId":715026833,"challengeCnt":1,"failCnt":0,"useItem":false,"teamSetParams":{"lordWeaponId":3,"petUId":"255-SKa","battleTeam":{"0":116,"1":107,"2":106,"3":118,"4":102}}}]
+结果:
+{
+  "_raw": {
+    "seq": 62,
+    "ack": 61,
+    "time": 1788307972393,
+    "resp": 62,
+    "cmd": "club_attackresp",
+    "body": {
+      "club": {
+        "oppoMap": {
+          "3": {
+            "defenders": {
+              "3": {
+                "failCnt": 1,
+                "challengeCnt": 2
+              }
+            }
+          }
+        }
+      },
+      "siege": {
+        "attackMap": {
+          "260902": {
+            "attackCnt": 3
+          }
+        }
+      },
+      "battleData": {
+        "id": 1788307972218,
+        "mode": 41,
+        "randomSeed": 3648,
+        "version": 240514,
+        "maxRound": 30,
+        "leftTeam": {
+          "roleId": 440406840,
+          "power": 8391306970,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 116,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 330860728,
+              "defense": 146388607,
+              "curHp": 3330335521,
+              "hp": 3330335521,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11601,
+              "skinName": "",
+              "activeSkill": 1165,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1166,
+                1167,
+                1168,
+                1033014
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "1": {
+              "id": 107,
+              "type": 0,
+              "index": 1,
+              "level": 6000,
+              "attack": 852846300,
+              "defense": 143060798,
+              "curHp": 4543730495,
+              "hp": 4543730495,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                206,
+                207,
+                208,
+                1033014
+              ],
+              "recordFlag": true,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "2": {
+              "id": 106,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 332678041,
+              "defense": 146764650,
+              "curHp": 4808292036,
+              "hp": 4808292036,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10601,
+              "skinName": "",
+              "activeSkill": 8000005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                8000006,
+                8000007,
+                8000008,
+                112150
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "3": {
+              "id": 118,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 628585217,
+              "defense": 145323439,
+              "curHp": 7209341565,
+              "hp": 7209341565,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11808,
+              "skinName": "",
+              "activeSkill": 1185,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1186,
+                1187,
+                1188,
+                1033015,
+                111350
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "4": {
+              "id": 102,
+              "type": 0,
+              "index": 4,
+              "level": 6000,
+              "attack": 441912201,
+              "defense": 149652167,
+              "curHp": 5102207565,
+              "hp": 5102207565,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10201,
+              "skinName": "",
+              "activeSkill": 1025,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1026,
+                1027,
+                1028,
+                111850
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            }
+          },
+          "name": "黯涩小9-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw/132",
+          "weaponId": 3,
+          "weaponActiveLevelId": 450,
+          "lordSkill": [
+            193
+          ],
+          "levelWeaponSkillId": [],
+          "petId": 603,
+          "petUId": "255-SKa",
+          "petActiveSkillId": 60301,
+          "petPassiveSkillIds": [
+            6030102,
+            6030201
+          ]
+        },
+        "rightTeam": {
+          "roleId": 715026833,
+          "power": 12543101310,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 110,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 854166967,
+              "defense": 189855447,
+              "curHp": 6272439232,
+              "hp": 6272439232,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11005,
+              "skinName": "",
+              "activeSkill": 1105,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1106,
+                1107,
+                1108,
+                1033012,
+                12105
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 7,
+              "power": 2315669303,
+              "enchantGroupCnt": 0
+            },
+            "1": {
+              "id": 113,
+              "type": 0,
+              "index": 1,
+              "level": 6000,
+              "attack": 336174755,
+              "defense": 157232143,
+              "curHp": 14743692515,
+              "hp": 14743692515,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11302,
+              "skinName": "",
+              "activeSkill": 1135,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1136,
+                1137,
+                1138,
+                1033007,
+                111550
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 6,
+              "power": 3551846514,
+              "enchantGroupCnt": 0
+            },
+            "2": {
+              "id": 118,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 544496355,
+              "defense": 151955775,
+              "curHp": 7401510553,
+              "hp": 7401510553,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11810,
+              "skinName": "",
+              "activeSkill": 1185,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1186,
+                1187,
+                1188,
+                1033015,
+                11085
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 12,
+              "power": 2214299911,
+              "enchantGroupCnt": 0
+            },
+            "3": {
+              "id": 104,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 729328357,
+              "defense": 160298143,
+              "curHp": 7308834425,
+              "hp": 7308834425,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10408,
+              "skinName": "",
+              "activeSkill": 7005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                7006,
+                7007,
+                7008,
+                1033011,
+                111850
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 11,
+              "power": 2386010126,
+              "enchantGroupCnt": 0
+            },
+            "4": {
+              "id": 106,
+              "type": 0,
+              "index": 4,
+              "level": 6000,
+              "attack": 495622287,
+              "defense": 160615449,
+              "curHp": 6940883213,
+              "hp": 6940883213,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10603,
+              "skinName": "",
+              "activeSkill": 8000005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                8000006,
+                8000007,
+                8000008,
+                1033007,
+                11095
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 7,
+              "power": 2075275456,
+              "enchantGroupCnt": 0
+            }
+          },
+          "name": "龙泣！孤峰",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+          "weaponId": 3,
+          "weaponActiveLevelId": 450,
+          "lordSkinId": 2,
+          "lordSkill": [
+            193
+          ],
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "levelWeaponSkillId": [],
+          "petId": 602,
+          "petUId": "151-TKm",
+          "petActiveSkillId": 60204,
+          "petPassiveSkillIds": [
+            6020105,
+            6020203
+          ]
+        },
+        "result": {
+          "id": 1788307972218,
+          "seed": 3648,
+          "totalFrame": 2688,
+          "version": 240514,
+          "battleVersion": "722a6e55c0",
+          "memoMode": 1,
+          "inputCode": "cd70cf2fd1185c65a72ab860753dbf1d",
+          "outputCode": "4d6deeaca0db3e2ed1ea6dab250ee385",
+          "sponsor": {
+            "roleId": 440406840,
+            "name": "%E9%BB%AF%E6%B6%A9%E5%B0%8F9-3",
+            "headImg": "https%3A%2F%2Fthirdwx.qlogo.cn%2Fmmopen%2Fvi_32%2FQ3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw%2F132",
+            "power": 8391306970,
+            "teamInfo": [
+              {
+                "heroId": 116,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 0,
+                "club": 4,
+                "slot": 0,
+                "star": 30,
+                "damage": 0,
+                "takeDamage": 4061831239,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11601,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 107,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 1,
+                "rage": 0,
+                "club": 4,
+                "slot": 1,
+                "star": 30,
+                "damage": 806597486,
+                "takeDamage": 5830468723,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10701,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 806597486,
+                  "3": 289245124,
+                  "4": 806597486
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 2,
+                "rage": 0,
+                "club": 3,
+                "slot": 2,
+                "star": 30,
+                "damage": 0,
+                "takeDamage": 5397870851,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10601,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 118,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 3,
+                "rage": 0,
+                "club": 2,
+                "slot": 3,
+                "star": 30,
+                "damage": 185605683038,
+                "takeDamage": 40984546952,
+                "treatment": 56987121737,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11808,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 83224948465,
+                  "3": 52802829204,
+                  "4": 185605683038
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 102,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 4,
+                "rage": 0,
+                "club": 1,
+                "slot": 4,
+                "star": 30,
+                "damage": 2633985699,
+                "takeDamage": 5102397457,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10201,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 2633985699,
+                  "3": 1074222878,
+                  "4": 2633985699
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 0
+            }
+          },
+          "accept": {
+            "roleId": 715026833,
+            "name": "%E9%BE%99%E6%B3%A3%EF%BC%81%E5%AD%A4%E5%B3%B0",
+            "headImg": "https%3A%2F%2Fmars-face.hortorgames.com%2Fxxz-xyzw-head-img%2Frelease%2F715026833%2F1769784189.jpg",
+            "avatarFrame": {
+              "id": 1118,
+              "expire": -1
+            },
+            "power": 12543101310,
+            "teamInfo": [
+              {
+                "heroId": 110,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 0,
+                "club": 2,
+                "slot": 0,
+                "star": 30,
+                "damage": 10546204866,
+                "takeDamage": 86238348770,
+                "treatment": 5942145756,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11005,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 10546204866,
+                  "3": 3571295163,
+                  "4": 10546204866
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 113,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 1,
+                "rage": 0,
+                "club": 1,
+                "slot": 1,
+                "star": 30,
+                "damage": 923884937,
+                "takeDamage": 46533402066,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11302,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 565082798,
+                  "3": 303451036,
+                  "4": 923884937
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 118,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 2,
+                "rage": 0,
+                "club": 2,
+                "slot": 2,
+                "star": 30,
+                "damage": 37111709349,
+                "takeDamage": 28326758937,
+                "treatment": 25820722822,
+                "hp": 3657504667,
+                "energy": 0,
+                "skin": 11810,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 5344192513,
+                  "3": 5344192513,
+                  "4": 37111709349
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 104,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 3,
+                "rage": 0,
+                "club": 2,
+                "slot": 3,
+                "star": 30,
+                "damage": 10923613643,
+                "takeDamage": 12573089445,
+                "treatment": 5636460649,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10408,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 10923613643,
+                  "3": 3778274905,
+                  "4": 10923613643
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 4,
+                "rage": 0,
+                "club": 3,
+                "slot": 4,
+                "star": 30,
+                "damage": 372073986,
+                "takeDamage": 16841303622,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10603,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 372073986,
+                  "3": 372073985,
+                  "4": 372073986
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 3657504667
+            }
+          },
+          "type": 41,
+          "round": 10,
+          "memos": [
+            "eJwdy7sNgEAMA9CFXMRJOC7KNDRIFFCxv/DRPfnjlbP30fdxPQgDmdHnSyJRv0xyS7FAeAkBR1KYSjiEDaHr6uhrFR/GiRV3",
+            "eJy1mYmSI7kKRb+oFAgEEuH//693cKbb6a3Krnk1OR3tXLQAl8tFLSczEzN37cefLqfhw6bJSD/+5PmSpalicfwpp6mSNrqHH3/Kybuoyqybw085RVqX4ea9Mf72Tk49",
+            "NPtcfJ+NEQ/3clrcRmSP3oQJ7255LzM02Fy2UL+/xcDJ5zE9XVjS72/lydXHHBap3tnQ7++k/vdTnuzU+ylO69T1pKdxUh8rJzY2xxM5Us/LRui0erjC8GvM/fl5Sydz",
+            "rPI1RutsXzsezm37qdHLoTkWUXXvc4x5GMl8QgB9tOUy2aR2Wds7VwvtA1dF78uXzrEOIx9ds3oChZnRpmCmYxXbiOESzK5SY3p6L3h5NNHe5zYPS1st1wJcuIwR14VU",
+            "QhXYWdOO/56sXE9UNXyErd7WFHC0me9zpeCalrpCib99NrHOsCmAonX+c8Xxfvlu4hQWbJJrrcwA7G43Y4cl27IGniSDma5DSY1cjT0Rau+442jyyYKQAPYRjM0Qxq/t",
+            "ffocPn22RYhHkpHYcBg5uAJgGZnMGJkKsoQx4Mb4mTrduq4BvIS/5todJZi3ujXLZXxPDPph2m7WF/Ad2tZQN2MT51dAUecMaYQ1gWDgjCMygYMH2+hthMSCWkjB8zsw",
+            "F2t2LPGZkzmm5hFfgAPIhEsCpz40x9BtJCw0lQcNHylOJfB5xPQjMhWTCYKPSYKkkWC5ZZV0C1DfCBMmExU/OPMdgBj8NxOIe1ESGWvzspWssAWh6taTrCXgojfbtD1Y",
+            "8CfZkgKYeKDkGjk8T9nFmFPLRQODQcmKG6ugKwDayhvQaq6Y62GPzy/8OxlWi83GEgwdarm/JVZriOEX8KYDu0jWlzPNOQLySTA1mHRmAeyyR0LX8WQrAhkCHWm3lzNd",
+            "f39l5ovPQGYWwxWLUkn4Q5oQhKz6JNuoL61dj0FUOj4kzySuvpdW/MByTb+d3wRgLgM1ArfhXIK9zx+rk7bWwnyJEUA88Ob8P13X9QElOUciNJboAUAjNnx+katRboUO",
+            "JsCDKyL64waeeTk6YFSKHFRZBboiv00KMZOkEB7lAgaHhpddLSD7QeMI3ME2SNh4tsJ55X3925J3RkOaktZCQSLz+p7wBEopAdqQF9PBy7HQvMf/xmfLfUEHrc8YY+1l",
+            "7ota5FS4VbXR1+ooBLsmOawNWicsUPmLfhgvjTqXrxuTzgD/O2r5dVEfvF9zaYc5M6B/VtsW71R3WQuax0Uj+cjilpNurxmL7w0EYoWv+bSkBwQvCslXUSFNqJN7lkBQ",
+            "fOSTPIFO8DOO/tD3fwubXrUsi3wRQFVrgMqOGwpl5ZZ601IU7IG0/HTvT/DyR7YQR8Kisho11YqQ44AJMDMwY3oDG4EGh5PHTaHWRDDA+gGlECSjuBzEEkUb/mZ3HTdU",
+            "9UXr3JgJBxN6fEUxh3YHpaom9d6NnDtXMNRQ1fAs1VnqN/lrnaqgWUFIDeGBr4t0KknPUy81VG9PdC+ahMSmXulnjrl/UiUN6hzkACVCRU122QbYyV5tpqgY9KhTUo6K",
+            "REm2ca42SRbxGi9s72s+4souEGtVSsfq/Zs91Nb5xqvhoeaTYajUcSld05BRMlYziuoi7fwAhqCeomopyQ1N9gNh3cPvv9+DHHSKQmslBim5/9okcj3QAJiDUVQP6sh6",
+            "VcJL3SUApIbgbvxIVzf1EtgaXx0O1El0qd3w1Pf6DtkF55QMLbVL8Aot0tg5Ah7orN2zFFByBA1bzU2hPe21KnDwWvhKIcfBCdPPzdgv+qGJzIEW0OcQKW/susMPasqr",
+            "QvkdhO/vXyUZiKTuiSf1A30Jr7DOuUXYky/KRAolqRCYA3/gwmNeD1id4V6VCFyvtLzZBfgTGhdQodjBFNVBbB6KNQxR6tWJV+MDtx3Q8Dbzd2QgvET70SoZS1pusalW",
+            "k2rfqIAo1bO+O+TWe9z/Z3N/GhHdDgMIJc4o1hH8SY9Vo3d3Sh2LoGFwd5JpNNkHSkCpj06dhrleUuAX0KeX7NXAHV79uCVoii+YPml0URNWreA2GFmCmFyLQhZG8Rz9",
+            "0MRSDJxGNUYzeemnbZGr+QtGACrLaWnwn/0zn/SuvrUtWlr62PSD+UWPSPz01t+pAEfbVp1SWJ0HEVaaKeh9P/ygtYSDeAHf0VcAgwOhf2CbfOd8LCbcpAFtcUNIwmGb",
+            "A79Q2mRVZqN5obBQsQ9VD1VCLg5oaa5Xiuk3qvQds5iaV2My/WxJvZt2icWXpxo8tlqVSdom8JrHzOlZnSRNS/5ft40aAaIdbWP5YzRKIdEehClzeckk2U9lUNSDPngJ",
+            "BYx2WHsVko8WuX8iVUr8iWL+7WdvfXN7oZegLKSltjp5Pajvy2WV1ug9GA1hB7LemPWnq3xF59Jhf3Q/7ELbdUksagFM1gJRPagYfmkWtrdvsKsz5dJAK58PJSuF9q68",
+            "ZChkmw0dYlVyaJM+pG43uuE6fWvWz/Gug+INHnXYBujRY3UWRd+s/tncD15yG/hJo4FvFDk9wa430XWoDiarw2xF9IbYZ9R6PtGD2Wkk2ioJXS2azN0U0SJX8hD2w0lU",
+            "l89Y4C/nvn/y23C/Zccfzv1gR9Vs2io0KtoIfqwDnO3bOnmHlBpuTFRgHbvnf1rr4QuIGRIgGkgEpHkdC3w/4O1/ybgfeT6RY6Fqo2TV+ZlflvqqIzlMocNE9dLmdl1P",
+            "9DdykBLP9K2OxWGPOtu8TGFVY0avI0tEJHVoxOH8+zJF9XiYST9AttJYD7mw2hc6JfAwohb9j6hii/Ew/id/PhhN+ndUbta/XHn1Fcy821yLCISHFVKNbfnk30Dwhy6u",
+            "4/22Mnn7SgjfYalXGfBS19XH7B6gLcE3WuKR2iZknn6gkv5izod9o4VLS1mj7K51XYMWDe2JOrKJ2OqHNUga0cJv689Vw1/Mef/EENdZ/y5Fu0IRIAFkPVbSw/U/gesM",
+            "6A==eJwBLgDR//9T3W2rusWv+X/NGn/31t1fGttwmZblfnd3d7u7C9t+2y1td7vdAdkZA7vdAgGY1hmo"
+          ]
+        }
+      },
+      "addScore": 6
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 238
+}
+异步: 是
+调用ID: call_1788307971972_i940n4axp
+
+记录 #2:
+----------------------------------------
+时间: 2026/9/2 08:12:51
+服务: HeroService
+方法: calcPowerByTeam
+参数: [{"battleTeam":{},"lordWeaponId":3,"petUId":"255-SKa"}]
+结果:
+{
+  "_raw": {
+    "seq": 61,
+    "ack": 60,
+    "time": 1788307971623,
+    "resp": 61,
+    "cmd": "hero_calcpowerbyteamresp",
+    "body": {
+      "power": 8391306970
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1788307971407_76jq2k048
+
+记录 #3:
+----------------------------------------
+时间: 2026/9/2 08:12:51
+服务: ClubService
+方法: getTargetTeam
+参数: [{"targetId":715026833}]
+结果:
+{
+  "_raw": {
+    "seq": 60,
+    "ack": 0,
+    "time": 1788307971586,
+    "resp": 60,
+    "cmd": "club_gettargetteamresp",
+    "body": {
+      "roleBattleTeam": {
+        "role": {
+          "roleId": 715026833,
+          "name": "龙泣！孤峰",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "power": 12543101310
+        },
+        "battleTeam": {
+          "0": {
+            "heroId": 110,
+            "level": 6000,
+            "star": 30,
+            "power": 2315669303,
+            "useSkin": 11005,
+            "hp": 6272439232,
+            "redQuenchCnt": 7,
+            "enchantCnt": 1,
+            "enchantGroupCnt": 0
+          },
+          "1": {
+            "heroId": 113,
+            "level": 6000,
+            "star": 30,
+            "power": 3551846514,
+            "useSkin": 11302,
+            "hp": 14743692515,
+            "redQuenchCnt": 6,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "2": {
+            "heroId": 118,
+            "level": 6000,
+            "star": 30,
+            "power": 2214299911,
+            "useSkin": 11810,
+            "hp": 7401510553,
+            "redQuenchCnt": 12,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "3": {
+            "heroId": 104,
+            "level": 6000,
+            "star": 30,
+            "power": 2386010126,
+            "useSkin": 10408,
+            "hp": 7308834425,
+            "redQuenchCnt": 11,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "4": {
+            "heroId": 106,
+            "level": 6000,
+            "star": 30,
+            "power": 2075275456,
+            "useSkin": 10603,
+            "hp": 6940883213,
+            "redQuenchCnt": 7,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 38
+}
+异步: 是
+调用ID: call_1788307971364_ar96u0r6g
+
+记录 #4:
+----------------------------------------
+时间: 2026/9/2 08:12:50
+服务: ClubService
+方法: getTargetTeam
+参数: [{"targetId":715026833}]
+结果:
+{
+  "_raw": {
+    "seq": 59,
+    "ack": 0,
+    "time": 1788307970436,
+    "resp": 59,
+    "cmd": "club_gettargetteamresp",
+    "body": {
+      "roleBattleTeam": {
+        "role": {
+          "roleId": 715026833,
+          "name": "龙泣！孤峰",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "power": 12543101310
+        },
+        "battleTeam": {
+          "0": {
+            "heroId": 110,
+            "level": 6000,
+            "star": 30,
+            "power": 2315669303,
+            "useSkin": 11005,
+            "hp": 6272439232,
+            "redQuenchCnt": 7,
+            "enchantCnt": 1,
+            "enchantGroupCnt": 0
+          },
+          "1": {
+            "heroId": 113,
+            "level": 6000,
+            "star": 30,
+            "power": 3551846514,
+            "useSkin": 11302,
+            "hp": 14743692515,
+            "redQuenchCnt": 6,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "2": {
+            "heroId": 118,
+            "level": 6000,
+            "star": 30,
+            "power": 2214299911,
+            "useSkin": 11810,
+            "hp": 7401510553,
+            "redQuenchCnt": 12,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "3": {
+            "heroId": 104,
+            "level": 6000,
+            "star": 30,
+            "power": 2386010126,
+            "useSkin": 10408,
+            "hp": 7308834425,
+            "redQuenchCnt": 11,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "4": {
+            "heroId": 106,
+            "level": 6000,
+            "star": 30,
+            "power": 2075275456,
+            "useSkin": 10603,
+            "hp": 6940883213,
+            "redQuenchCnt": 7,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 42
+}
+异步: 是
+调用ID: call_1788307970215_mvacn0p7s
+
+记录 #5:
+----------------------------------------
+时间: 2026/9/2 08:12:47
+服务: ClubService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 58,
+    "ack": 58,
+    "time": 1788307967935,
+    "resp": 58,
+    "cmd": "club_getinforesp",
+    "body": {
+      "club": {
+        "legionId": 2781636,
+        "power": 274180266610,
+        "phase": "260831",
+        "dan": 5,
+        "lastDan": 0,
+        "weekScore": 332,
+        "dayScore": 6,
+        "members": {
+          "1": {
+            "roleId": 460379015,
+            "name": "相符42-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 12,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "2": {
+            "roleId": 111576243,
+            "name": "锦衣•KK",
+            "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/111576243/1746699587.jpg",
+            "score": 8,
+            "lordSkinId": 1,
+            "petId": 504,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "3": {
+            "roleId": 111579431,
+            "name": "锦衣•南良",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/CED6Q8VjibXaWT3I0iaJKPO6WHClWe2WaEBAWDLJ0kicOicKFT9jGvNsgxpgye6NZH5HCHZQASpOuibEcvg5D1wiaFJw/132",
+            "score": 16,
+            "lordSkinId": 2,
+            "petId": 604,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 3,
+            "challengeCnt": 5
+          },
+          "4": {
+            "roleId": 112012701,
+            "name": "神州、闯",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/m13MgoY2do6rSib0qCJsVPfF6qfWsp7JM6rhKbHDQA7ib6eoFYMbLwFDZQ1sWQV6WdYEPFO8uC4aJzjBBYldVxWQ/132",
+            "score": 15,
+            "lordSkinId": 2,
+            "petId": 503,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "5": {
+            "roleId": 440406840,
+            "name": "黯涩小9-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw/132",
+            "score": 21,
+            "lordSkinId": 0,
+            "petId": 603,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "6": {
+            "roleId": 636922458,
+            "name": "仁72阿瑟",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw/132",
+            "score": 15,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "7": {
+            "roleId": 438230729,
+            "name": "相符41-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 13,
+            "lordSkinId": 0,
+            "petId": 603,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "8": {
+            "roleId": 111581800,
+            "name": "锦衣•YSL",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/6sgdxewDVSQb9WwzpN9FGs1UUyibBckm7Nj6UwnsWsUNhV74UuqeiahgvyjmbGCnrsqqFt7wxiaiaMKicbWIicOiamSFA/132",
+            "score": 6,
+            "lordSkinId": 2,
+            "petId": 503,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "9": {
+            "roleId": 438230701,
+            "name": "相符41-2",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 16,
+            "lordSkinId": 0,
+            "petId": 601,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "10": {
+            "roleId": 115708264,
+            "name": "相符42-1",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 17,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "11": {
+            "roleId": 438246984,
+            "name": "相符43-2",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 12,
+            "lordSkinId": 0,
+            "petId": 603,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "12": {
+            "roleId": 112018979,
+            "name": "神州、坚持",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/8wicwR0fGXkibiaIM3HtBdATsUGRjPFwDW4WEveBgGniaau5pngAicibVY7iaUgePvibYg3fIZBJjIuPCSQQcmvh4t8f27xoVm7jiaJzFj4Bt9XicLprU/132",
+            "score": 15,
+            "lordSkinId": 2,
+            "petId": 503,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "13": {
+            "roleId": 111583668,
+            "name": "五金鱼",
+            "headImg": "",
+            "score": 0,
+            "lordSkinId": 2,
+            "petId": 604,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "14": {
+            "roleId": 453028474,
+            "name": "神舟丶小布",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/p10DkNBFPiaQ465SmZrODSZsrqNiaGFuBGE9ibYgLLrWsoFE4qEQdxJWsoicXvYhiakscC4Rmd4O4YxUEBxzW90WzgZWq4xEfjVd8Y4koszvTicQ8/132",
+            "score": 12,
+            "lordSkinId": 1,
+            "petId": 502,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "15": {
+            "roleId": 597010243,
+            "name": "☁黯涩71",
+            "headImg": "",
+            "score": 22,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "16": {
+            "roleId": 115719789,
+            "name": "相符43-1",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 18,
+            "lordSkinId": 0,
+            "petId": 502,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "17": {
+            "roleId": 460348782,
+            "name": "相符43-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 16,
+            "lordSkinId": 0,
+            "petId": 603,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "18": {
+            "roleId": 111572720,
+            "name": "锦衣·小瓶盖",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTL9ggnWTOwgnHibakBWC8V2oAS9kZ4tPvrHibMmpj6ibkTU1kN7AmLCAruClMk4I8apFPMHicSxdfV9gw/132",
+            "score": 17,
+            "lordSkinId": 2,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "19": {
+            "roleId": 438241986,
+            "name": "相符42-2",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 15,
+            "lordSkinId": 0,
+            "petId": 601,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "20": {
+            "roleId": 115685052,
+            "name": "相符41-1",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 15,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "21": {
+            "roleId": 115789831,
+            "name": "相符50-1",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 6,
+            "lordSkinId": 0,
+            "petId": 403,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "22": {
+            "roleId": 638647392,
+            "name": "神州、南良",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/CED6Q8VjibXaWT3I0iaJKPO6WHClWe2WaEBAWDLJ0kicOicKFT9jGvNsgxpgye6NZH5HQmwKJDxv8gVexLe1rafX5A/132",
+            "score": 6,
+            "lordSkinId": 0,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "23": {
+            "roleId": 111574137,
+            "name": "锦衣 · 听风",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/RYSoaAcXDTrlFYQKDVWeYV3EXyD7GwUNAcf32ZRFOYiaxUUFRpMVfYqgwPFFIHWcgsfKfiaGOqiackHabnzDTP0jw/132",
+            "score": 15,
+            "lordSkinId": 2,
+            "petId": 603,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 1,
+            "challengeCnt": 1
+          },
+          "24": {
+            "roleId": 112007511,
+            "name": "牛易勃",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/6tJXsPnFmTWYfo2u09ccRj7te57h6lHeq3hjfXicHMAzqs0r5anLNlHTiaZGKJEM22JDsrQxt0BDXDWr9AOKTQ9g/132",
+            "score": 0,
+            "lordSkinId": 2,
+            "petId": 602,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "25": {
+            "roleId": 115869905,
+            "name": "相符60-1",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 2,
+            "lordSkinId": 0,
+            "petId": 0,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "26": {
+            "roleId": 460009897,
+            "name": "相符60-2",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 2,
+            "lordSkinId": 0,
+            "petId": 0,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "27": {
+            "roleId": 460394822,
+            "name": "相符50-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 6,
+            "lordSkinId": 0,
+            "petId": 0,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "28": {
+            "roleId": 199148453,
+            "name": "关小涩",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw/132",
+            "score": 6,
+            "lordSkinId": 2,
+            "petId": 604,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "29": {
+            "roleId": 438280542,
+            "name": "相符50-2",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 2,
+            "lordSkinId": 0,
+            "petId": 0,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          },
+          "30": {
+            "roleId": 460025209,
+            "name": "相符60-3",
+            "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83erZ8zgvv1MIGK0ibia5gF4pYs2zLc5qJ2jjDdnQGuHM5lGI4mv9YLHB7YIbj77DK9CSUj2Hick4a5RBQ/132",
+            "score": 6,
+            "lordSkinId": 0,
+            "petId": 0,
+            "petEvo": 0,
+            "defeated": false,
+            "failCnt": 0,
+            "challengeCnt": 0
+          }
+        },
+        "oppoMap": {
+          "2": {
+            "legionId": 6749871,
+            "viewId": 5029,
+            "logo": "https://thirdwx.qlogo.cn/mmopen/vi_32/Yg9aO7frurrXRszhaibwQMEez7tekzElSh9948zf1ia75BmyaIiakCjDoY1j0BOoSLuicG8P1yic9XC5LApa5ibUFa5q5Pibr8VKjAP9ohFnMialPOI/132",
+            "name": "仙罡⁵⁰²⁹",
+            "power": 79202401187,
+            "mirror": false,
+            "dayScore": 0,
+            "defenders": {
+              "1": {
+                "roleId": 460650171,
+                "name": "小号5023-3",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 1
+              },
+              "2": {
+                "roleId": 59362853,
+                "name": "⌜魔⌟·阿龙",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEL0hdhQWG3qGP8Qrcl9pqjnykHnqlEupYRH0SkibjwH42J5wiaJjZxLRLxbc87luXcIINp1W4Au4icvqPmQ6ahmLBp8plBFB0ungwPBgZy82iaA8g/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 501,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 5,
+                "challengeCnt": 8
+              },
+              "3": {
+                "roleId": 59676025,
+                "name": "⌜仙⌟·轮回",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/nQ7SDQsJLAiaf3Axta5toH8ezicjicGgBdfJkca9TwRNK23gJpAOicT7aDsj1UHowLPnTQKOK6yLYibQl5D6xDFN70xDOGpd3DmVJicX05BibfxCn8/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 1,
+                "challengeCnt": 1
+              },
+              "4": {
+                "roleId": 59364156,
+                "name": "「仙」.苏瑾",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/59364156/1782958391.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 5,
+                "challengeCnt": 6
+              },
+              "5": {
+                "roleId": 416302407,
+                "name": "小号5023-1",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "6": {
+                "roleId": 503316437,
+                "name": "小号5024-3",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 3
+              },
+              "7": {
+                "roleId": 488072065,
+                "name": "小号5022-2",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 0,
+                "challengeCnt": 5
+              },
+              "8": {
+                "roleId": 59360471,
+                "name": "「仙」·小二",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaELF7lHsKu5icToMfW8vLOwdXSCibygIRXcsCViad8wMhY7N90ncNzyYuo30fa0DvgWXSVk5UO3fKZRemaZpicf43PzkxYyZ6ef5F76r8v7Ynian1CA/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 504,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 2,
+                "challengeCnt": 7
+              },
+              "9": {
+                "roleId": 488087347,
+                "name": "小号5022-3",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 0,
+                "challengeCnt": 5
+              },
+              "12": {
+                "roleId": 73274081,
+                "name": "开卷012",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/cSTJJvVS6gBERRMgEkicURwk6vlWiaorpre3Nju50KmcXR7jOdibo2mcyIL6EkJ2EL2vCrMTeeDVbLYpenI0bia9Kw/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 4
+              },
+              "13": {
+                "roleId": 60513732,
+                "name": "帝",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/uARxyMPalZJ9SKUzFWXWdxdlr1v9Go7JH6uEzYLs7xibWbQ8lgKAkaVDVfG4Wc5GpeEVyg8HSv593wibJMAHhmDkdfaZnFGUEPQTqu3AOfWVw/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "14": {
+                "roleId": 687801304,
+                "name": "龙芯中科",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEKJRQwn4x0JcIge2iawwmCO14ON0HiaKOJtB1czEbq1xQIDibqrwoCJSqoKtcFXyvmCMYKQdwIII0Evxp6Jn7NWK1cjWZy1feW7ad4WzZlMzRx8g/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 401,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 3
+              },
+              "18": {
+                "roleId": 459736345,
+                "name": "小号5023-2",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 3
+              },
+              "22": {
+                "roleId": 415609852,
+                "name": "小号5022-1",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 0,
+                "challengeCnt": 5
+              },
+              "23": {
+                "roleId": 59365164,
+                "name": "⌜仙⌟·游客",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/59365164/1755487776.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 4,
+                "challengeCnt": 9
+              },
+              "24": {
+                "roleId": 421485391,
+                "name": "小号5024-1",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaELJ07oBdX56Rxe0jaCB4MLtfZSiau8FNKGic1ocicYklB64nzXIdNJAMFjKic3ialLEG2xRA8Fo8BdkXCXuX2sxuIiaHibNDlGjn271IsmiaxZDmkcRxQ/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 0,
+                "challengeCnt": 5
+              },
+              "28": {
+                "roleId": 503305132,
+                "name": "小号5024-2",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/sOYOOxpK7wP4ZmaibSZYBNk9REvcFLnl5ALc2IPZ4K48ggqRfvMYThv0AQtfMf1yPRjL6lKic9QAIml33cLmAygA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": true,
+                "failCnt": 0,
+                "challengeCnt": 5
+              }
+            }
+          },
+          "3": {
+            "legionId": 7300769,
+            "viewId": 29001,
+            "logo": "https://thirdwx.qlogo.cn/mmopen/vi_32/8ZENFIkicEdQruGpjW1EJPJM5jMmBMUCHllPrJA93WlPaJWe28oe932YiaPtq9UOGRZaHiandkbCiacbdLZNAcVNABnz2knKArkMyQ9zFtHfnSE/132",
+            "name": "龙泣",
+            "power": 338481581954,
+            "mirror": false,
+            "dayScore": 12,
+            "defenders": {
+              "1": {
+                "roleId": 709281880,
+                "name": "龙泣！悟空",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/byk9mvYJ8SxsqqyClPxiaLozUl2IP4Y9YcMTLPKrKZtHC2L1yww2jvibXz0iaSQbPPm9Zj1y3aYJ2bibuLBhZYkb6Knn6bTgGO3r13I9ZUAmaicQ/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 504,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "2": {
+                "roleId": 706799925,
+                "name": "龙泣！冲冲冲",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/706799925/1785780129.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "3": {
+                "roleId": 715026833,
+                "name": "龙泣！孤峰",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 1
+              },
+              "4": {
+                "roleId": 706971360,
+                "name": "龙泣！可乐",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/706971360/1783908463.jpg",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "5": {
+                "roleId": 706807706,
+                "name": "龙泣！疯子",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJeyia2WxDldcRM0en0vaibx3qBDs4jWFn1wXESUdFrD03Z07obfnYPxtW1cS5xsqokPZrvBty6jloX9FwEibCJUkYHdgnWRiaxRxYprQiceywDt3w/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 504,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "6": {
+                "roleId": 707862207,
+                "name": "龙泣！古城",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJXnUr1fRpcnjelMhAiblia14mG6mxvsHysVOEjoHIX13m2ic6ddglAULYOMux8mEyIORiareZAN78MWvjt2utqQAt5ueqTqZUju90rgYjRLGjwSw/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "7": {
+                "roleId": 706803308,
+                "name": "龙泣！贰六",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaELoZ7kvYvXKoXHHfKJB6Rh7BqOyOZnHc7EMqN1vCibhTCib8X1GobRQrfrB1YmlaRF1udvic2nSWNSuuUoguRtsWcAbX100bwuQficIeGLIibK5bvw/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 502,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "8": {
+                "roleId": 710340354,
+                "name": "龙泣！鹿鹿",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/D07FE684E8D5F66F01FB7031E809B627/100",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "9": {
+                "roleId": 706829360,
+                "name": "龙泣！小鱼",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/tz7zjKkvLibOF7Z80RliaTicLgpCYicYr8LOkn7NXvNwnvqAic3WicZPPPEz5OjuYLibhdD1HIRyc0IrQia3dA5MM0pbfBmO7SuaDoicQnNnD2HbibXK4/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "10": {
+                "roleId": 706813069,
+                "name": "龙泣！石⑨",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIBUibXH09YpWyEq5OEq0WTxcYxyibJvcyHyPXySgy1RE9wmibDkmq5JOGqkbP5GBJTgpiagibZuZz6TOAALX2uCYnHBDJmgq5aQnJCiaPcB6R6vWaw/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "11": {
+                "roleId": 707277733,
+                "name": "龙泣！长乐",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/atTAHgzU7OLyAFh323Hmg3wlT8qIicvsnibzyrHDTAibH0iaaFw9sWar7ziccIicrv7fneichYoqNtjOXpbQicibCKqeB6c6h6AfowoA4N2JDYmYPwqI/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "12": {
+                "roleId": 709230052,
+                "name": "龙泣！雪碧",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/709230052/1779931474.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "13": {
+                "roleId": 710517898,
+                "name": "龙泣！锦鲤",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIT3kQSlwFBnXWLTErZKu4heoCgcCa9BNBe2J6DDj1gzib3QSk22WHnAU2kicr2t0JhQmpVCiacW1VQFNYD7VsLcBoT3ZCLFaSPMVJQaxK5XvEvQ/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "14": {
+                "roleId": 713303164,
+                "name": "龙泣！十八",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIkor05SxPXK84ouwcIahKT85J7MuHicVHQYPYtd06yfN1NrttUPMHFooMxjzyCuNicOtXRD5h6Jc5BAibMA8V465QLhdV91K8vXhIHJdeA9M9FQ/132",
+                "score": 0,
+                "lordSkinId": 5114,
+                "petId": 703,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "15": {
+                "roleId": 718055069,
+                "name": "龙泣！章若楠",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIbB7TblfWlNp2JNIBUicvFZMEpib2Mn4AjasQ380IopQ90LNdMB2WzSaZQdxMSqMBA2qdB8fAFVW7eHJWKlyfhXYibFyaLNRr0CmFryKe61b2pw/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 1,
+                "challengeCnt": 1
+              },
+              "16": {
+                "roleId": 708275393,
+                "name": "龙泣！玄影",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/0BF0E995803D538AD983DD74657EEBAF/100",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "17": {
+                "roleId": 707934378,
+                "name": "龙泣！雲",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/4A629BE61810F3A7BDC6E49BAB731F31/100",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "18": {
+                "roleId": 706795385,
+                "name": "龙泣！ 南山",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/706795385/1784115153.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "19": {
+                "roleId": 708779618,
+                "name": "龙泣！韩老魔",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJhLH6mDqx0rm5bUpLAFol2ibGygzVIsONt5oqgbWDbian03xBmUT8XQFPmX4yJgNO8FlBCmU6xRCsV38TicfGVKf8sN0vCJnMcibZoYrDjTTWrnQ/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "20": {
+                "roleId": 707835463,
+                "name": "龙泣！ 雾隐",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/fLsz4MWRfXViawoym1iaK8p4EBuaBdB8gzvVuYIZsOpuOcic1kPdkdsZWeZV2qVfWKlyV44qzLFibLrzeg7TzNwQIYryicxYv9tiboDX0AztKLSII/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 502,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "21": {
+                "roleId": 711263261,
+                "name": "龙泣！鹏",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/YBqA2wLPASF9UPkLgWgZcLNIOeCCxjyeK8wEILchqYJMOibyHbkSbTTpeR2KojpuHmRzb231BYtZKRiaEq4FYfE7hk3CXMPfHuPicroazsfTFA/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "22": {
+                "roleId": 710930300,
+                "name": "龙泣！巅峰",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/710930300/1770033211.jpg",
+                "score": 0,
+                "lordSkinId": 5104,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "23": {
+                "roleId": 718144987,
+                "name": "龙泣！八点半",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/718144987/1778849013.jpg",
+                "score": 0,
+                "lordSkinId": 5117,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "24": {
+                "roleId": 710729731,
+                "name": "龙泣！别感冒",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/710729731/1779274724.jpg",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 704,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "25": {
+                "roleId": 707899437,
+                "name": "龙泣！验证",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEKEwEmibicNenEfm7D1LmFhD0CDTCbRVesEMCEAkSwjpthOojAnHEUcK8TsCNONK8UbUOOc1oialEiaVIicDMMGHceQ6FibQNKA4QwfTa54G8v3RcSQ/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "26": {
+                "roleId": 706798931,
+                "name": "龙泣！晚安",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/706798931/1769793097.jpg",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "27": {
+                "roleId": 709885050,
+                "name": "龙泣！桀骜",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/B0718B4C66937B4B6FAE39E3FB9FF8BD/100",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "28": {
+                "roleId": 707562901,
+                "name": "龙泣！华强",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/707562901/1778931059.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 502,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "29": {
+                "roleId": 706796906,
+                "name": "龙泣！桃花仙",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/vYqqjRZ8LSxFhiacC0Y0XaW9DGKibtlIYjvt0d58m6bfhaRocyM70VkctibQCnF0nKsicUX8jT35NDYhZ4HR8BOtlOJicFibHRlmNgO6JmFHZcoD4/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              }
+            }
+          },
+          "4": {
+            "legionId": 162685,
+            "viewId": 2887,
+            "logo": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJ0ma1Zed1NraM6DQMzbXpvMLiaCarIib33FfPicK3jPgLxXibAenENNS8rBmAeBUI22u9Dnpp2GJCk5ic1oVxbrEAXneiaHxx43eCQchiaiamYVfqb0w/132",
+            "name": "雁阵惊寒☘",
+            "power": 267324735579,
+            "mirror": false,
+            "dayScore": 0,
+            "defenders": {
+              "1": {
+                "roleId": 445183054,
+                "name": "莫灵-非酋",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTItLlyqJT59oWhWALclvyeic3pkzBnATzjT7NcNhQ8jN8o3icXIxetWn8XST53kiapMLibxZ8WPGx0Fibg/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "2": {
+                "roleId": 28442396,
+                "name": "風雲 窝头",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/28442396/1732381921.jpg",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "3": {
+                "roleId": 217169037,
+                "name": "咸友",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM7Xvojavo9dlLoA1oicpzR1oQIexlTfVbPfq1SlVwmoVN8RwibibWkaodq9CmdJUL7daa6iawMzAhtIRA/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "4": {
+                "roleId": 28327828,
+                "name": "咸友",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/F8AEE61197364B8F4D72E10038DE2B79/100",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 0,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "5": {
+                "roleId": 128326739,
+                "name": "云诡",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/u3L60uE6cv47uGwQPGuCLZ1nAicOAmF0liaraXxhysGZCMm2hrxzXJGUx2ibzMgVRqTqYM4coousgCFiafFH4CkM9A/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "6": {
+                "roleId": 467871398,
+                "name": "王权、",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJkgJ4hyW44UPXibwxBX6pkyNSqeHvfM6rvKtNFJSyFvRPr6mMT4j0n2IhEPZykYhcK0wUntrY6jFkUIxXZoibiagZNnicGfZTd1KpO4DjKX1LNaA/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "7": {
+                "roleId": 478119196,
+                "name": "琉璃დ仔仔",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eqk98FKczkT4Uq4Z2iatIfUdYsnepwvvIAsCiacDD2Tiav0Ltib8ocZxHBCzB3p2AcoiayHBqscqeTfXvg/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "8": {
+                "roleId": 132143359,
+                "name": "琉璃დ厨师长",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/132143359/1731659643.jpg",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "9": {
+                "roleId": 235617866,
+                "name": "寻风",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/aria9uSA88fuzkBWlal0ricQM4WSY5pysh1hNHb9CiaIyeXbpydCjXib3Pk17MytQTaw3C8wOMGjsYpgUqibribgvn8LCicxO9JVDPxgQxibqpnRsYE/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "10": {
+                "roleId": 453013481,
+                "name": "琉璃დ大佛",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/23uUlU9OJf75KYO4bAT9zdxficcZLkLicuib2US7PgxQLpCfD4MtSg0vcY7NCLQRPaatd3AKQU3sk6BDF8krJIlSg/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 502,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "11": {
+                "roleId": 450855387,
+                "name": "琉璃დ落枫",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIqKUjVlyKIKCcm7lYM9fEzEAsPOUCum59hZRIyyticpiaMp51a1kNv6kKr1FCsHbViaIqPOict5wOuwlmiaH4rWY0TwDHVmCKXfDApTXL4KByCxYg/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 404,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "12": {
+                "roleId": 28049740,
+                "name": "胖橘",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/uUDZhoIJG7km1GQdapcibcI71omw1404C4y08cQsbTic5ibXKRVSCWYnbSgBhZogkphVLKdWXgBiaebjw3kYeopeibLxqe6B0LuHvtXNm4aCEL9w/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 504,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "13": {
+                "roleId": 26196008,
+                "name": "丶冠绝追龙",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaELa9azicKnN2dibyjjlo9tpYOWPz1j0p0nCKdqr18kDFjibh60m3VazUBh5BeA3lJPuEutPw0ZRJx4hgK2VNVicBHYC68gL4mo7HAicr7azuXTcv1g/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "14": {
+                "roleId": 115702181,
+                "name": "王权、",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/115702181/1741501457.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "15": {
+                "roleId": 283616202,
+                "name": "国服司马",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/283616202/1730485084.jpg",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "16": {
+                "roleId": 622976871,
+                "name": "王权、",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/622976871/1741501433.jpg",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 601,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "17": {
+                "roleId": 28335194,
+                "name": "莫灵-空荡荡",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/182424DE3D5D1AFAEBEC22CBE043FB18/100",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 604,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "18": {
+                "roleId": 403820379,
+                "name": "琉璃დ打工仔",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eqk98FKczkT4Uq4Z2iatIfUdYsnepwvvIAsCiacDD2Tiav0Ltib8ocZxHBCzB3p2AcoiayHBqscqeTfXvg/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 603,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "19": {
+                "roleId": 678463946,
+                "name": "琉璃  xz",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEJt7leLctlWtxKq3Dle0hjicsxtS1HVF1LMciaZXKdiakNKIr2KwJavfqdO2kWtGgicjluAnmHhFQvh48XqaEjIQe7tFothnF8BMic02BoYH87Q5yw/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 502,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "20": {
+                "roleId": 470114198,
+                "name": "胖橘",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/uUDZhoIJG7km1GQdapcibcI71omw1404C4y08cQsbTic5ibXKRVSCWYnbSgBhZogkphVLKdWXgBiaebjw3kYeopeibLxqe6B0LuHvtXNm4aCEL9w/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 602,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "21": {
+                "roleId": 707644381,
+                "name": "落枫",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/PiajxSqBRaEIfl2lIBkR40z9twlXE4vSSEEAgWg8KO7RJIqkJenpWjwnnm4ibh7T1XO6z02SBDaiafgQsynnYpib5KuQdV2P1ZBNzSeJfMhxkGLK8qsQhqhibXw/132",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 301,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "22": {
+                "roleId": 73067196,
+                "name": "辣舞的智慧果",
+                "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/73067196/1732675393.jpg",
+                "score": 0,
+                "lordSkinId": 0,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "23": {
+                "roleId": 28331623,
+                "name": "琉璃დ等等",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/byk9mvYJ8SxsqqyClPxiaLkFRAkckibAmW9xREFc3tdevbmibicrPWVMZFiadJwxqBHeqkwia76BzIJn7XggLfEQkhEulHRsrdgibbR1pib8ES1hibSg/132",
+                "score": 0,
+                "lordSkinId": 1,
+                "petId": 503,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "24": {
+                "roleId": 28364222,
+                "name": "肆拾玖坊",
+                "headImg": "https://thirdqq.qlogo.cn/qqapp/1112173744/53CBC4E9C145D913A436CF8D55D87360/100",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 504,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              },
+              "28": {
+                "roleId": 217835422,
+                "name": "琉璃დ拾荒者",
+                "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/BrbWvwngJSicIMibmBAjuuoq4icicdP2MWb3dFicMUI84yVM8rp8gYfE6b4mqic7BgIt8ja9oaAOp55UbIz9gXAcglEY6svFaYnwEqphYSuCcib1Og/132",
+                "score": 0,
+                "lordSkinId": 2,
+                "petId": 302,
+                "petEvo": 0,
+                "defeated": false,
+                "failCnt": 0,
+                "challengeCnt": 0
+              }
+            }
+          }
+        },
+        "groupId": 2599,
+        "settleTime": 0,
+        "danUpdateAt": 1788105686
+      },
+      "siege": {
+        "roleId": 440406840,
+        "seasonId": 1,
+        "level": 0,
+        "exp": 0,
+        "score": 21,
+        "levelReward": {},
+        "attackMap": {
+          "260901": {
+            "attackCnt": 3,
+            "aSuccessCnt": 3
+          },
+          "260902": {
+            "attackCnt": 2,
+            "aSuccessCnt": 1
+          }
+        },
+        "settleTime": 0,
+        "boxId": 1,
+        "poolRewards": [
+          {
+            "type": 3,
+            "itemId": 3008,
+            "value": 4,
+            "ext": 0
+          },
+          {
+            "type": 3,
+            "itemId": 3009,
+            "value": 5,
+            "ext": 0
+          },
+          {
+            "type": 3,
+            "itemId": 1001,
+            "value": 3,
+            "ext": 0
+          }
+        ],
+        "talentResetTime": 1787846400,
+        "taskProgress": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 2
+        },
+        "taskClaimedMap": {},
+        "taskResetTime": 1788278400,
+        "signUpMap": {
+          "260831": 2781636
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 34
+}
+异步: 是
+调用ID: call_1788307967718_uia9dm8dp
+
+记录 #6:
+----------------------------------------
+时间: 2026/9/2 08:12:43
+服务: ClubService
+方法: attack
+参数: [{"nodeId":3,"targetId":715026833,"challengeCnt":0,"failCnt":0,"useItem":false,"teamSetParams":{"lordWeaponId":3,"petUId":"255-SKa","battleTeam":{"0":116,"1":107,"2":106,"3":118,"4":102}}}]
+结果:
+{
+  "_raw": {
+    "seq": 57,
+    "ack": 56,
+    "time": 1788307964023,
+    "resp": 57,
+    "cmd": "club_attackresp",
+    "body": {
+      "role": {
+        "diamond": 354843,
+        "freeDiamond": 354843,
+        "items": {
+          "1014": {
+            "quantity": 532240
+          },
+          "41003": {
+            "quantity": 775
+          },
+          "41004": {
+            "quantity": 11
+          }
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 41004,
+          "value": 2,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 41003,
+          "value": 75,
+          "ext": 0
+        },
+        {
+          "type": 2,
+          "itemId": 0,
+          "value": 500,
+          "ext": 0
+        },
+        {
+          "type": 3,
+          "itemId": 1014,
+          "value": 75,
+          "ext": 0
+        }
+      ],
+      "club": {
+        "weekScore": 332,
+        "dayScore": 6,
+        "members": {
+          "5": {
+            "score": 21
+          }
+        },
+        "oppoMap": {
+          "3": {
+            "defenders": {
+              "3": {
+                "challengeCnt": 1
+              }
+            }
+          }
+        }
+      },
+      "siege": {
+        "score": 21,
+        "attackMap": {
+          "260902": {
+            "attackCnt": 2,
+            "aSuccessCnt": 1
+          }
+        }
+      },
+      "battleData": {
+        "id": 1788307963826,
+        "mode": 41,
+        "randomSeed": 8698,
+        "version": 240514,
+        "maxRound": 30,
+        "leftTeam": {
+          "roleId": 440406840,
+          "power": 8391306970,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 116,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 330860728,
+              "defense": 146388607,
+              "curHp": 3330335521,
+              "hp": 3330335521,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11601,
+              "skinName": "",
+              "activeSkill": 1165,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1166,
+                1167,
+                1168,
+                1033014
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "1": {
+              "id": 107,
+              "type": 0,
+              "index": 1,
+              "level": 6000,
+              "attack": 852846300,
+              "defense": 143060798,
+              "curHp": 4543730495,
+              "hp": 4543730495,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10701,
+              "skinName": "",
+              "activeSkill": 205,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                206,
+                207,
+                208,
+                1033014
+              ],
+              "recordFlag": true,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "2": {
+              "id": 106,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 332678041,
+              "defense": 146764650,
+              "curHp": 4808292036,
+              "hp": 4808292036,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10601,
+              "skinName": "",
+              "activeSkill": 8000005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                8000006,
+                8000007,
+                8000008,
+                112150
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "3": {
+              "id": 118,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 628585217,
+              "defense": 145323439,
+              "curHp": 7209341565,
+              "hp": 7209341565,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11808,
+              "skinName": "",
+              "activeSkill": 1185,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1186,
+                1187,
+                1188,
+                1033015,
+                111350
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            },
+            "4": {
+              "id": 102,
+              "type": 0,
+              "index": 4,
+              "level": 6000,
+              "attack": 441912201,
+              "defense": 149652167,
+              "curHp": 5102207565,
+              "hp": 5102207565,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10201,
+              "skinName": "",
+              "activeSkill": 1025,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1026,
+                1027,
+                1028,
+                111850
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 0,
+              "power": 0,
+              "enchantGroupCnt": 0
+            }
+          },
+          "name": "黯涩小9-3",
+          "headImg": "https://thirdwx.qlogo.cn/mmopen/vi_32/Q3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw/132",
+          "weaponId": 3,
+          "weaponActiveLevelId": 450,
+          "lordSkill": [
+            193
+          ],
+          "levelWeaponSkillId": [],
+          "petId": 603,
+          "petUId": "255-SKa",
+          "petActiveSkillId": 60301,
+          "petPassiveSkillIds": [
+            6030102,
+            6030201
+          ]
+        },
+        "rightTeam": {
+          "roleId": 715026833,
+          "power": 12543101310,
+          "tapAttack": 77885,
+          "team": {
+            "0": {
+              "id": 110,
+              "type": 0,
+              "index": 0,
+              "level": 6000,
+              "attack": 854166967,
+              "defense": 189855447,
+              "curHp": 6272439232,
+              "hp": 6272439232,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11005,
+              "skinName": "",
+              "activeSkill": 1105,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1106,
+                1107,
+                1108,
+                1033012,
+                12105
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 7,
+              "power": 2315669303,
+              "enchantGroupCnt": 0
+            },
+            "1": {
+              "id": 113,
+              "type": 0,
+              "index": 1,
+              "level": 6000,
+              "attack": 336174755,
+              "defense": 157232143,
+              "curHp": 14743692515,
+              "hp": 14743692515,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11302,
+              "skinName": "",
+              "activeSkill": 1135,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1136,
+                1137,
+                1138,
+                1033007,
+                111550
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 6,
+              "power": 3551846514,
+              "enchantGroupCnt": 0
+            },
+            "2": {
+              "id": 118,
+              "type": 0,
+              "index": 2,
+              "level": 6000,
+              "attack": 544496355,
+              "defense": 151955775,
+              "curHp": 7401510553,
+              "hp": 7401510553,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 11810,
+              "skinName": "",
+              "activeSkill": 1185,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                1186,
+                1187,
+                1188,
+                1033015,
+                11085
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 12,
+              "power": 2214299911,
+              "enchantGroupCnt": 0
+            },
+            "3": {
+              "id": 104,
+              "type": 0,
+              "index": 3,
+              "level": 6000,
+              "attack": 729328357,
+              "defense": 160298143,
+              "curHp": 7308834425,
+              "hp": 7308834425,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10408,
+              "skinName": "",
+              "activeSkill": 7005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                7006,
+                7007,
+                7008,
+                1033011,
+                111850
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 11,
+              "power": 2386010126,
+              "enchantGroupCnt": 0
+            },
+            "4": {
+              "id": 106,
+              "type": 0,
+              "index": 4,
+              "level": 6000,
+              "attack": 495622287,
+              "defense": 160615449,
+              "curHp": 6940883213,
+              "hp": 6940883213,
+              "curEnergy": -1,
+              "speed": 0,
+              "color": 3,
+              "star": 30,
+              "order": 19,
+              "skin": 10603,
+              "skinName": "",
+              "activeSkill": 8000005,
+              "attribute": {},
+              "enchantMap": {},
+              "skill": [
+                8000006,
+                8000007,
+                8000008,
+                1033007,
+                11095
+              ],
+              "recordFlag": false,
+              "redQuenchCnt": 7,
+              "power": 2075275456,
+              "enchantGroupCnt": 0
+            }
+          },
+          "name": "龙泣！孤峰",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+          "weaponId": 3,
+          "weaponActiveLevelId": 450,
+          "lordSkinId": 2,
+          "lordSkill": [
+            193
+          ],
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "levelWeaponSkillId": [],
+          "petId": 602,
+          "petUId": "151-TKm",
+          "petActiveSkillId": 60204,
+          "petPassiveSkillIds": [
+            6020105,
+            6020203
+          ]
+        },
+        "result": {
+          "id": 1788307963826,
+          "isWin": true,
+          "seed": 8698,
+          "totalFrame": 2681,
+          "version": 240514,
+          "battleVersion": "722a6e55c0",
+          "memoMode": 1,
+          "inputCode": "d1633cb82391c031879de27345575892",
+          "outputCode": "a27e5619ad13f2e84924e1ad5e432747",
+          "sponsor": {
+            "roleId": 440406840,
+            "name": "%E9%BB%AF%E6%B6%A9%E5%B0%8F9-3",
+            "headImg": "https%3A%2F%2Fthirdwx.qlogo.cn%2Fmmopen%2Fvi_32%2FQ3auHgzwzM70r0D6iaKiaHdRu4DGQhamMBKFeFJOK99f7ZXgDuMDjwB0hSQzhXg9CY8JiaNDo6BuSVU8FFuIvydTw%2F132",
+            "power": 8391306970,
+            "teamInfo": [
+              {
+                "heroId": 116,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 0,
+                "club": 4,
+                "slot": 0,
+                "star": 30,
+                "damage": 0,
+                "takeDamage": 5092269850,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11601,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 107,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 1,
+                "rage": 0,
+                "club": 4,
+                "slot": 1,
+                "star": 30,
+                "damage": 2751760634,
+                "takeDamage": 9038721602,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10701,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 2751760634,
+                  "3": 879523475,
+                  "4": 2751760634
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 2,
+                "rage": 0,
+                "club": 3,
+                "slot": 2,
+                "star": 30,
+                "damage": 0,
+                "takeDamage": 6191846946,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10601,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 0,
+                  "3": 0,
+                  "4": 0
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 118,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 3,
+                "rage": 100,
+                "club": 2,
+                "slot": 3,
+                "star": 30,
+                "damage": 120159198373,
+                "takeDamage": 40177979362,
+                "treatment": 42325879213,
+                "hp": 5676526708,
+                "energy": 100,
+                "skin": 11808,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 32660773725,
+                  "3": 32660773725,
+                  "4": 120159198373
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 102,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 4,
+                "rage": 0,
+                "club": 1,
+                "slot": 4,
+                "star": 30,
+                "damage": 1432114950,
+                "takeDamage": 6265310603,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10201,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 1432114950,
+                  "3": 668825223,
+                  "4": 1432114950
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 5676526708
+            }
+          },
+          "accept": {
+            "roleId": 715026833,
+            "name": "%E9%BE%99%E6%B3%A3%EF%BC%81%E5%AD%A4%E5%B3%B0",
+            "headImg": "https%3A%2F%2Fmars-face.hortorgames.com%2Fxxz-xyzw-head-img%2Frelease%2F715026833%2F1769784189.jpg",
+            "avatarFrame": {
+              "id": 1118,
+              "expire": -1
+            },
+            "power": 12543101310,
+            "teamInfo": [
+              {
+                "heroId": 110,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 0,
+                "rage": 0,
+                "club": 2,
+                "slot": 0,
+                "star": 30,
+                "damage": 5108781132,
+                "takeDamage": 13465832559,
+                "treatment": 12355210845,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11005,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 3556219764,
+                  "3": 2171205836,
+                  "4": 5108781132
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 113,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 1,
+                "rage": 0,
+                "club": 1,
+                "slot": 1,
+                "star": 30,
+                "damage": 431728157,
+                "takeDamage": 28501549067,
+                "treatment": 0,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11302,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 431728157,
+                  "3": 283556335,
+                  "4": 431728157
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 118,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 2,
+                "rage": 0,
+                "club": 2,
+                "slot": 2,
+                "star": 30,
+                "damage": 45778895581,
+                "takeDamage": 26413281286,
+                "treatment": 27748949942,
+                "hp": 0,
+                "energy": 0,
+                "skin": 11810,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 5483314508,
+                  "3": 5483314508,
+                  "4": 45778895581
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 104,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 3,
+                "rage": 0,
+                "club": 2,
+                "slot": 3,
+                "star": 30,
+                "damage": 13517928243,
+                "takeDamage": 21924244174,
+                "treatment": 9561490268,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10408,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 9033831464,
+                  "3": 4808713516,
+                  "4": 13517928243
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              },
+              {
+                "heroId": 106,
+                "color": 3,
+                "level": 6000,
+                "order": 19,
+                "index": 4,
+                "rage": 0,
+                "club": 3,
+                "slot": 4,
+                "star": 30,
+                "damage": 429166810,
+                "takeDamage": 35504803487,
+                "treatment": 515515948,
+                "hp": 0,
+                "energy": 0,
+                "skin": 10603,
+                "skinName": "",
+                "type": 0,
+                "maxAttr": {
+                  "2": 429166810,
+                  "3": 372073985,
+                  "4": 429166810
+                },
+                "statistic": {},
+                "skillDamage": {},
+                "skillTreatment": {},
+                "enchantMap": {}
+              }
+            ],
+            "ext": {
+              "curHP": 0
+            }
+          },
+          "type": 41,
+          "round": 9,
+          "memos": [
+            "eJwVyjEOgEAIRNELTcHAukA4jY2JhVbeP0L1X/GNscp3Pef9wgSkaV0fidX2oQxzN4+RZyshkK5BsdgIEDG3NlR/rKcVQA==",
+            "eJy1mYuSGzsIRL9oVYCEgPL//9c9eLz2ZF+xc2vjVGJ7ZvSApruR5TLnlDndTc9vXS7L14wpq/z8lu9T0spk7vNbuYRJzaW+/fxWLq5iJtEfTm/lsmuqLJ+ug+f//CQX",
+            "3VYayf01eOLTZ7kkH/cu3TqEAT985LrEts3iamzzjx/ZYHD7Di8XpvSPH+WLl65Yc5e5sqB//yT91y91mRfVy77kRe1il3WZVnvulBozVAmVH+tID97GEEZZhGGu+VjT",
+            "pYOdO4qNbd0hNtda12vOG/E9opSNL9tSvk5PLpGcObcMLbdcSzPzuCbLNCo6FBIxa2Xp6cnPsUktsBDFbMI+nW0x214ue6Sb9DNmtn3tmToyhIQf2/PIEjY7ynIbiTrt",
+            "zmSbAbw5TIngF1P3NyxfG7jsVUw1jrtY+XSbe2wQ57LWfm1ciz1DQMVQ/rgt4PG4LzSdrQwpgla1wbvPP55Xws/g7FaMvO7tDHO7OsNXLh2EZycPUkZZf+zJauk0QrdH",
+            "UZjvwYoNmJwnQ8Q87fVgGYWpCzzI8NQ91w1lvsXZRpIu1x4nXxx67ey9WMQAL55Awm5wMoKVNmOAgL3Z7ZQznCZV4PzLPnNL8JTyFvBavzVZIaDKRq5ZBtIljiASIAPA",
+            "lAsINWVmz/OCFpCAuHxQI0tI4bbjkjrlnkVku0YYded5PUAIxAL9Isy6SMWy40lWFcYXw5ypg3tWxY+F0eVpDCc6SuemTC632jQAahR1gQXVdVr5c4l8f71V1RcT9wsA",
+            "VhMJNEOlU3MhlB6lQhChyuNxpTac+Yd6kSgjiHoiwNHQ49ZhP07gCr2woT1IiTupWvU+AcU5qyjwIHgJqH3nkxP87fVYgO0mWVI3ZBI2ofb2wXZvjXOCOjwaSY6U7K2f",
+            "F9DZmpEpDosMWMl7H7chDHkMlbGiiCLAPCdsegRw3Tniq2wdM9zm+VMMGlMUNAEps0FoFmggD8esadQAkR0GQ6asDQ/Yi9MSGWX7yabWQABSeO4BGJjRJNkYpc90Sarm",
+            "+jzUCXcqOzQklw8eDOpg3wFICa5NTkg19biiAx/fjpXJ1d49BWrQHZw237dnlJpsnYMVUbe4Bpb5xzo+vhzho8BUc6yZ7RVuUSKRk38wDrBAoqanED4lBAc92TTv3O+x",
+            "LuiUw83Xvf1Whc/eMgBcA1lnLlBeR12WERisUnW6+KOg4MxCkOzcQQwGuGqJKT1S2riDocGFkRqcRMU+O4JP1cUKmlfhu1WVgVEDP5DwRmnxSiwSVwXNChBsY7I99zon",
+            "HF5OaHngPtA/wdZAAKcZ2yvAO2uPVse6fgrED/4HYXwbeB5Cv09Ch5NDTQisChuDUtT9NCQWsmXoiiE1DB01RQhxSfiTIwyUABheLUcLokADT1F4UkZ/bewW+65SBkZ8",
+            "NBxC2J1V77TnXOggVwmMXEeAG6TgOiEgaHAzSPb3O6m/WkzV4FvEqkfBSyLLUAGX95Td1bX4Pt5d6cOTznZ+0A6W4GqF2qscC8bUmFGbMiWwQdTBjLOAfnaDH3FDAFlV",
+            "ROHafbR3ggxu8H5zNBsoIFYbMtKrIXkwVrT0EiGkBprPH4ivAZyUCJxfmDiD2wjtuqVCyRmQG9F0DGvIeQtPguDXxf3x+r25UDZ0IbpjG/QEmLCYh1d+o6TJ+5o6AFBC",
+            "/ETqpB0b7y7YPKSVcvgazWs1FChJYIuTMuj+WGEWtjwmK58UPm6Le84gsjbFKHY1e3RvJHrbcu1W0YawCg0OrnX/JA0Hf6P6qrQE+BzNbiW3nUKFvmTCc6wEiaARoUT8",
+            "2zG/YkpMBw6BxQInt8+w/Lasvylfv3aK/X+yfkq5E1NKNWPdrclx3pIMxXJxIMU0DNDNmV/pipfhONYhFjCVuN3whGhgzUabbjSxE/mTFjzX4XET+6GY0G043G72CW9B",
+            "y9OrrOACfaA9Yv8MjOAcwe1oJ3Hg2r174htItSAWFoc5o2vpvgi39uLodHdoIUQxRzj0DRqv14gevgRgOJexDvjHx8IbwA5yFjH8gSR+a2j6Wjp+6h/v1plFFc/WhvFQ",
+            "76DHzDa1uDH7zop9HJl+lUaLqhsKOqa32fkJq/MQj14+iBKUQhFpmqTslu7Y1Rvl1uLoWAVKNiGzmo+W3LCK/Vg0VX1Lim/st9CG7gXP6z3m73YA+NFYt9srlkqLOI8n",
+            "8cDRNjhhz93HGktfPhA4ZrlPhinFulBRGCp0inDc0E4njT1LCIrU0/lTNI/MclsSNojiWzB+hSFs+mQofAVCRSd3GxGtpDDo58duUtlUOdt+PPuXFuFK/4jlRODbhhPd",
+            "Od+7szeS1P1gDRrCbttmrpfGfqQlmzBmn74RaPwoJPV+NAB1QGXkSzHXUFvqY6iFZBhWFV3Kv2RFfsJHaxysNPsIYIBaU78rnG1aq5oDp40CYWTq+Q7ra6Wmk/UvyPGv",
+            "r+ceIw+gFc230QeqmLfP3uo3X6/PBt5RXIRpD6oRw/nXXXYVkw+oniawzWDq+8mkRfcIifaHtDeA608HZ8+UsXeebWOZ+lCqsQBTHNcw7FWrxsI2K64Kv/0iR1BJtDpp",
+            "2AAtxN77tPl6iV5rSsVYTFoLwn6/8vTYH7/J5jewGX2cCjtA9MdqrU/PYImRuATwHX2e9+pccGVlH4dAmAQMszBvXWSf9FAY2S0btVwsQ15sqR0zlJhueplpfVqDo4lb",
+            "nChHbb/S56tkADJ9rL3Pj65hHbOeDdO/5vsZCf7NsT/tI66qOaXTitObfah13MvwcP8ahBEvBLedXfozc0EjjBd9NKBOk3n9+o0tbSvyTF/fPw6dagHcgeY+3P5yxMfR",
+            "EwVOF9kHptj22+kOdpB4QGB4QSBMoazXR8bNMERbFCrubjRBErYH9AjgRTVPNvPZkT9+b92a4rLo9FF8Ain3c0U2BRhnN0cta7Pl6/7ccZiNw1vXM6yncjxxE9nn85jC",
+            "bujuB4GbBiARKbrA6p9xTvUMKLBlmJvRyv/lyXy1kOHK+2z2zgVvlCBR8kXTR2/cAvs/XApWCEaHmgdUJPd8YAdXp4dhkCxq+YWE6L8M+vLCsx1c9m9HXvTBBR3FO9Bp",
+            "LaJPUXRc1SrQ24zTYfsNMZjJtk20lt1rzIUu3n8LeuuuE+sEGXv/eNAnlCe2vMMZM49jhEj6WESjHmzx1ofpgG40OPAjtYjZ5xE+wfn5139WKjB5eJwBLgDR//9T3e24",
+            "W3X/966xT2O6W9nZbr/b3cqru7u9u9vdLXu9319td7tdfXe7BdkZAQHSbxu6"
+          ]
+        }
+      },
+      "addScore": 6
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 254
+}
+异步: 是
+调用ID: call_1788307963585_nx2typd3r
+
+记录 #7:
+----------------------------------------
+时间: 2026/9/2 08:12:43
+服务: HeroService
+方法: calcPowerByTeam
+参数: [{"battleTeam":{},"lordWeaponId":3,"petUId":"255-SKa"}]
+结果:
+{
+  "_raw": {
+    "seq": 56,
+    "ack": 55,
+    "time": 1788307963249,
+    "resp": 56,
+    "cmd": "hero_calcpowerbyteamresp",
+    "body": {
+      "power": 8391306970
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 80
+}
+异步: 是
+调用ID: call_1788307963032_3dyp8wicx
+
+记录 #8:
+----------------------------------------
+时间: 2026/9/2 08:12:42
+服务: ClubService
+方法: getTargetTeam
+参数: [{"targetId":715026833}]
+结果:
+{
+  "_raw": {
+    "seq": 55,
+    "ack": 0,
+    "time": 1788307963147,
+    "resp": 55,
+    "cmd": "club_gettargetteamresp",
+    "body": {
+      "roleBattleTeam": {
+        "role": {
+          "roleId": 715026833,
+          "name": "龙泣！孤峰",
+          "headImg": "https://mars-face.hortorgames.com/xxz-xyzw-head-img/release/715026833/1769784189.jpg",
+          "avatarFrame": {
+            "id": 1118,
+            "expire": -1
+          },
+          "power": 12543101310
+        },
+        "battleTeam": {
+          "0": {
+            "heroId": 110,
+            "level": 6000,
+            "star": 30,
+            "power": 2315669303,
+            "useSkin": 11005,
+            "hp": 6272439232,
+            "redQuenchCnt": 7,
+            "enchantCnt": 1,
+            "enchantGroupCnt": 0
+          },
+          "1": {
+            "heroId": 113,
+            "level": 6000,
+            "star": 30,
+            "power": 3551846514,
+            "useSkin": 11302,
+            "hp": 14743692515,
+            "redQuenchCnt": 6,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "2": {
+            "heroId": 118,
+            "level": 6000,
+            "star": 30,
+            "power": 2214299911,
+            "useSkin": 11810,
+            "hp": 7401510553,
+            "redQuenchCnt": 12,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "3": {
+            "heroId": 104,
+            "level": 6000,
+            "star": 30,
+            "power": 2386010126,
+            "useSkin": 10408,
+            "hp": 7308834425,
+            "redQuenchCnt": 11,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          },
+          "4": {
+            "heroId": 106,
+            "level": 6000,
+            "star": 30,
+            "power": 2075275456,
+            "useSkin": 10603,
+            "hp": 6940883213,
+            "redQuenchCnt": 7,
+            "enchantCnt": 0,
+            "enchantGroupCnt": 0
+          }
+        }
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 35
+}
+异步: 是
+调用ID: call_1788307962928_09wjco2xp
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

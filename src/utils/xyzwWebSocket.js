@@ -189,6 +189,7 @@ export function registerDefaultCommands(reg) {
 
     // 好友/招募
     .register("friend_batch", { friendId: 0 })
+    .register("friend_batchagree")
     .register("hero_recruit", {
       byClub: false,
       recruitNumber: 1,
@@ -233,7 +234,6 @@ export function registerDefaultCommands(reg) {
     .register("legionwar_getgoldmonthwarrank")
     .register("legion_getopponent")
     .register("legion_getbattlefield")
-    .register("war_enterbattlefield")
     .register("legion_claimpayloadtask")
     .register("legion_claimpayloadtaskprogress")
     .register("saltroad_getwartype")
@@ -241,6 +241,7 @@ export function registerDefaultCommands(reg) {
     .register("league_getbattlefield")
     .register("league_getgroupopponent")
     .register("legion_signup") // 盐场报名
+    .register("club_signup") // 俱乐部报名
 
     // 邮件
     .register("mail_getlist", { category: [0, 4, 5], lastId: 0, size: 60 })
@@ -262,6 +263,8 @@ export function registerDefaultCommands(reg) {
 
     // 扭蛋
     .register("gacha_drawreward", { num: 1, isGroup: false })
+    .register("gacha_claimstagereward")
+    .register("gacha_getinfo")
 
     // 怪异咸将塔
     .register("evotower_getinfo")
@@ -500,8 +503,6 @@ export function registerDefaultCommands(reg) {
     // 新增缺失的命令
     .register("fight_startgenie")
     .register("legion_applyjoin")
-    .register("war_setbattleteam")
-    .register("war_teamsetbattleteam")
     .register("activity_buystoregoods")
     .register("autumn_useitem")
     .register("lordweapon_upgradeactiveskilllevel")
@@ -533,6 +534,12 @@ export function registerDefaultCommands(reg) {
     // 盐杯竞猜
     .register("saltcup26_getbetinfo")
     .register("saltcup26_placebet", { matchId: "", pick: 0 })
+
+    // 篝火营地
+    .register("club_getinfo")
+    .register("club_gettargetteam", { targetId: 0 })
+    .register("club_attack", { nodeId: 0, targetId: 0, challengeCnt: 1, failCnt: 0, useItem: false, teamSetParams: { lordWeaponId: 3, petUId: "", battleTeam: {} } })
+    .register("club_attackmonster", { useItem: false, teamSetParams: { lordWeaponId: 3, petUId: "", battleTeam: {} } })
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1210,6 +1217,7 @@ export class XyzwWebSocketClient {
       role_getroleinforesp: "role_getroleinfo",
       hero_recruitresp: "hero_recruit",
       friend_batchresp: "friend_batch",
+      friend_batchagreeresp: "friend_batchagree",
       system_claimhanguprewardresp: "system_claimhangupreward",
       system_claimhanguporderresp: "system_claimhanguporder",
       system_claimcdkrewardresp: "system_claimcdkreward",
@@ -1237,6 +1245,7 @@ export class XyzwWebSocketClient {
       fight_startbossresp: "fight_startboss",
       fight_startlegionbossresp: "fight_startlegionboss",
       fight_startareaarenaresp: "fight_startareaarena",
+      fight_startlevelresp: "fight_startlevel",
       arena_startarearesp: "arena_startarea",
       arena_getareatargetresp: "arena_getareatarget",
       arena_getarearankresp: "arena_getarearank",
@@ -1249,6 +1258,8 @@ export class XyzwWebSocketClient {
       tower_claimrewardresp: "tower_claimreward",
       fight_starttowerresp: "fight_starttower",
       gacha_drawrewardresp: "gacha_drawreward",
+      gacha_claimstagerewardresp: "gacha_claimstagereward",
+      gacha_getinforesp: "gacha_getinfo",
       evotowerinforesp: "evotower_getinfo",
       evotower_fightresp: "evotower_fight",
       evotower_getlegionjoinmembersresp: "evotower_getlegionjoinmembers",
@@ -1274,6 +1285,7 @@ export class XyzwWebSocketClient {
       league_getbattlefieldresp: "league_getbattlefield",
       league_getgroupopponentresp: "league_getgroupopponent",
       legion_signupresp: "legion_signup",
+      club_signupresp: "club_signup",
       legion_getbattlefieldresp: "legion_getbattlefield",
       war_enterbattlefieldresp: "war_enterbattlefield",
       war_setbattleteamresp: "war_setbattleteam",
@@ -1342,6 +1354,12 @@ export class XyzwWebSocketClient {
       // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
       task_claimdailyrewardresp: "task_claimdailyreward",
       task_claimweekrewardresp: "task_claimweekreward",
+
+      // 篝火营地响应映射
+      club_getinforesp: "club_getinfo",
+      club_gettargetteamresp: "club_gettargetteam",
+      club_attackresp: "club_attack",
+      club_attackmonsterresp: "club_attackmonster",
 
       // 同步响应映射（优先级低）
 

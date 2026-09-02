@@ -54,6 +54,13 @@
             name="一键竞技场"
             v-model:switchValue="scheduledTasks.batcharenafight"
           />
+          <CustomizedCard
+            mode="button-number-input"
+            name="竞技次数"
+            v-model:inputValue="arenaFightCount"
+            placeholder="默认3"
+            @update:inputValue="handleArenaFightCountInput"
+          />
           <CustomizedCard 
             mode="name-switch"
             name="一键黑市采购"
@@ -64,15 +71,20 @@
             name="一键俱乐部 BOSS"
             v-model:switchValue="scheduledTasks.legion_boss"
           />
-          <CustomizedCard 
+          <CustomizedCard
             mode="name-switch"
-            name="一键每日免费礼包"
+            name="一键每日免费礼包⭐"
             v-model:switchValue="scheduledTasks.freeGift"
           />
-          <CustomizedCard 
+          <CustomizedCard
             mode="name-switch"
             name="一键每日咸王"
             v-model:switchValue="scheduledTasks.dailyBoss"
+          />
+          <CustomizedCard
+            mode="name-switch"
+            name="一键免费钓鱼"
+            v-model:switchValue="scheduledTasks.freeFishing"
           />
 
           <CustomizedCard 
@@ -205,7 +217,21 @@ const scheduledTasks = ref({
   store_purchase: false,
   legion_boss: false,
   freeGift: false,
-  dailyBoss: false
+  dailyBoss: false,
+  freeFishing: false
+})
+
+// 竞技场战斗次数输入框，默认3次
+const arenaFightCount = ref('3')
+const handleArenaFightCountInput = (value) => {
+  arenaFightCount.value = value
+  localStorage.setItem('arenaFightCount', value)
+}
+
+// 初始化时从 localStorage 读取
+onMounted(() => {
+  const saved = localStorage.getItem('arenaFightCount')
+  if (saved) arenaFightCount.value = saved
 })
 
 // 处理定时任务执行范围输入
@@ -226,7 +252,8 @@ const handleOpenDailyTasks = () => {
   scheduledTasks.value.legion_boss = true       // 开启一键俱乐部 BOSS
   scheduledTasks.value.freeGift = true          // 开启一键每日免费礼包
   scheduledTasks.value.dailyBoss = true         // 开启一键每日咸王
-  
+  scheduledTasks.value.freeFishing = true       // 开启一键免费钓鱼
+
   message.success('已打开日常任务开关')
 }
 
@@ -242,6 +269,7 @@ const handleOpenClaimTasks = () => {
   scheduledTasks.value.legion_boss = false      // 关闭一键俱乐部 BOSS
   scheduledTasks.value.freeGift = false         // 关闭一键每日免费礼包
   scheduledTasks.value.dailyBoss = false        // 关闭一键每日咸王
+  scheduledTasks.value.freeFishing = false      // 关闭一键免费钓鱼
   
   message.success('已打开领取任务开关')
 }
@@ -574,9 +602,10 @@ const handleExecuteScheduledTasks = async () => {
               )
               await new Promise(resolve => setTimeout(resolve, 500))
               
-              // 进行 3 次战斗
-              for (let i = 1; i <= 3; i++) {
-                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 竞技场战斗 ${i}/3`)
+              // 进行指定次数的战斗
+              const fightCount = parseInt(arenaFightCount.value) || 3
+              for (let i = 1; i <= fightCount; i++) {
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 竞技场战斗 ${i}/${fightCount}`)
                 
                 // 获取对手列表
                 let targets
@@ -931,6 +960,45 @@ const handleExecuteScheduledTasks = async () => {
                 tokenName: token.name,
                 status: 'error',
                 message: `【序号${tokenIndex}】[${token.name || token.id}]一键每日咸王失败`
+              })
+            }
+          }
+          
+          if (scheduledTasks.value.freeFishing) {
+            try {
+              // 一键免费钓鱼：执行 3 次 artifact_lottery
+              message.info(`[序号${tokenIndex}] ${token.name || token.id} - 开始免费钓鱼`)
+              
+              for (let i = 0; i < 3; i++) {
+                await tokenStore.sendMessageWithPromise(
+                  token.id,
+                  'artifact_lottery',
+                  { type: 1, lotteryNumber: 1, newFree: true },
+                  8000
+                )
+                message.info(`[序号${tokenIndex}] ${token.name || token.id} - 免费钓鱼 ${i + 1}/3 完成`)
+                await new Promise(resolve => setTimeout(resolve, 500))
+              }
+              
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键免费钓鱼',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'success',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键免费钓鱼成功`
+              })
+            } catch (error) {
+              console.error(`一键免费钓鱼失败：${error.message}`, error)
+              logStore.addLog({
+                page: 'fish-helper',
+                cardType: '定时任务',
+                operation: '一键免费钓鱼',
+                tokenId: token.id,
+                tokenName: token.name,
+                status: 'error',
+                message: `【序号${tokenIndex}】[${token.name || token.id}]一键免费钓鱼失败`
               })
             }
           }

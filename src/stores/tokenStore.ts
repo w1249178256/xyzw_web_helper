@@ -1158,6 +1158,31 @@ export const useTokenStore = defineStore("tokens", () => {
     });
   };
 
+  // 获取篝火营地信息
+  const sendClubGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "club_getinfo", params);
+  };
+
+  // 获取篝火营地对手详情
+  const sendClubGetTargetTeam = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "club_gettargetteam", params);
+  };
+
+  // 篝火营地挑战对手
+  const sendClubAttack = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "club_attack", params);
+  };
+
+  // 篝火营地挑战空投
+  const sendClubAttackMonster = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "club_attackmonster", params);
+  };
+
+  // 批量同意好友申请
+  const sendFriendBatchAgree = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "friend_batchagree", params);
+  };
+
   // 发送军团商店购买商品
   const sendLegionStoreBuyGoods = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "legion_storebuygoods", params);
@@ -1236,6 +1261,11 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送盐场报名
   const sendLegionSignup = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "legion_signup", params);
+  };
+
+  // 发送俱乐部报名
+  const sendClubSignup = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "club_signup", params);
   };
 
   // 发送盐场入场
@@ -1361,6 +1391,16 @@ export const useTokenStore = defineStore("tokens", () => {
   // 发送扭蛋抽奖
   const sendGachaDrawReward = (tokenId: string, params = {}) => {
     return sendMessageWithPromise(tokenId, "gacha_drawreward", params);
+  };
+
+  // 领取扭蛋阶段奖励
+  const sendGachaClaimStageReward = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "gacha_claimstagereward", params);
+  };
+
+  // 获取扭蛋信息
+  const sendGachaGetInfo = (tokenId: string, params = {}) => {
+    return sendMessageWithPromise(tokenId, "gacha_getinfo", params);
   };
 
   // 发送英雄交换
@@ -2334,6 +2374,7 @@ export const useTokenStore = defineStore("tokens", () => {
     sendLegionGetInfobyid,
     sendLegionGetBattlefield,
     sendLegionSignup,
+    sendClubSignup,
     sendWarEnterBattlefield,
     sendWarSetBattleTeam,
     sendWarTeamSetBattleTeam,
@@ -2359,6 +2400,8 @@ export const useTokenStore = defineStore("tokens", () => {
     sendFightStartGenie,
     sendFightStartLevel,
     sendGachaDrawReward,
+    sendGachaClaimStageReward,
+    sendGachaGetInfo,
     sendHeroExchange,
     sendArtifactLoad,
     sendHeroUpgradeLevel,
@@ -2451,6 +2494,13 @@ export const useTokenStore = defineStore("tokens", () => {
     sendBossTowerStartBox,
     sendBossTowerBoom,
     sendGameMessage,
+
+    // 篝火营地方法
+    sendClubGetInfo,
+    sendClubGetTargetTeam,
+    sendClubAttack,
+    sendClubAttackMonster,
+    sendFriendBatchAgree,
 
     // 工具方法
     exportTokens,

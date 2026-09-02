@@ -135,6 +135,21 @@ export class GameCommands {
   }
 
   /**
+   * 好友批量同意
+   */
+  friend_batchagree(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+                ...params,
+      }),
+      cmd: "friend_batchagree",
+      seq,
+      time: Date.now(),
+    };
+  }
+
+  /**
    * 英雄招募
    */
   hero_recruit(ack = 0, seq = 0, params = {}) {
@@ -525,7 +540,7 @@ export class GameCommands {
   }
 
   /**
-   * 军团签到
+   * 俱乐部签到
    */
   legion_signin(ack = 0, seq = 0, params = {}) {
     return {
@@ -540,7 +555,7 @@ export class GameCommands {
   }
 
   /**
-   * 开始军团BOSS战
+   * 开始俱乐部BOSS战
    */
   fight_startlegionboss(ack = 0, seq = 0, params = {}) {
     return {
@@ -571,7 +586,7 @@ export class GameCommands {
   }
 
   /**
-   * 获取军团信息
+   * 获取俱乐部信息
    */
   legion_getinfo(ack = 0, seq = 0, params = {}) {
     return {
@@ -584,7 +599,7 @@ export class GameCommands {
   }
 
   /**
-   * 军团匹配角色报名
+   * 俱乐部匹配角色报名
    */
   legionmatch_rolesignup(ack = 0, seq = 0, params = {}) {
     return {
@@ -1620,10 +1635,9 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       ack,
       body: this.g_utils.bon.encode({
       	  battlefieldId:params.battlefieldId,
-      	  battleTeam:{},
+      	  battleTeam:params.battleTeam || {},
       	  lordWeaponId:params.lordWeaponId,
-      	  petUId: "",
-                ...params
+      	  petUId: params.petUId
       }),
       cmd: "war_setbattleteam",
       seq,
@@ -1639,10 +1653,9 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       ack,
       body: this.g_utils.bon.encode({
       	  battlefieldId:params.battlefieldId,
-      	  battleTeam:{},
+      	  battleTeam:params.battleTeam || {},
       	  lordWeaponId:params.lordWeaponId,
-      	  petUId: "",
-                ...params
+      	  petUId: params.petUId
       }),
       cmd: "war_teamsetbattleteam",
       seq,
@@ -1943,6 +1956,105 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
   }
 
   /**
+   *篝火营地报名
+   */
+  club_signup(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+            ...params
+      }),
+      cmd: "club_signup",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   *篝火营地详情
+   */
+  club_getinfo(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+            ...params
+      }),
+      cmd: "club_getinfo",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   *篝火营地对手详情
+   */
+  club_gettargetteam(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  targetId: params.targetId,
+            ...params
+      }),
+      cmd: "club_gettargetteam",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   *篝火营地挑战对手
+   */
+  club_attack(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  nodeId:params.nodeId,
+      	  targetId:params.targetId,
+      	  challengeCnt:params.challengeCnt,
+      	  	  failCnt:params.failCnt,
+      	  	  useItem:false,
+      	  teamSetParams:{lordWeaponId:params.lordWeaponId,
+      	  	              petUId:params.petUId,
+      	  battleTeam:{
+      	  	  	  0:params.0,
+      	  	  	  1:params.1,
+      	  	  	  2:params.2,
+      	  	  	  3:params.3,
+      	  	  	  4:params.4}},
+            ...params
+      }),
+      cmd: "club_attack",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   *篝火营地挑战空投
+   */
+  club_attackmonster(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+      	  	  useItem:false,
+      	  teamSetParams:{lordWeaponId:params.lordWeaponId,
+      	  	              petUId:params.petUId,
+      	  battleTeam:{
+      	  	  	  0:params.0,
+      	  	  	  1:params.1,
+      	  	  	  2:params.2,
+      	  	  	  3:params.3,
+      	  	  	  4:params.4}},
+            ...params
+      }),
+      cmd: "club_attackmonster",
+      seq,
+      time: Date.now()
+    }
+  }
+
+
+  /**
    *加入队伍
    */
   matchteam_join(ack = 0, seq = 0, params = {}) {
@@ -2087,6 +2199,37 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
           ...params
       }),
       cmd: "gacha_drawreward",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 获取扭蛋信息
+   */
+  gacha_getinfo(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+          ...params
+      }),
+      cmd: "gacha_getinfo",
+      seq,
+      time: Date.now()
+    }
+  }
+
+  /**
+   * 领取扭蛋图鉴
+   */
+  gacha_claimstagereward(ack = 0, seq = 0, params = {}) {
+    return {
+      ack,
+      body: this.g_utils.bon.encode({
+        stageId:params.stageId,
+          ...params
+      }),
+      cmd: "gacha_claimstagereward",
       seq,
       time: Date.now()
     }
@@ -2731,7 +2874,7 @@ legacy_claimchargereward(ack = 0, seq = 0, params = {}) {
       body: this.g_utils.bon.encode({
         club:params.club,
         isArtifact:params.isArtifact,
-        isSkin:params.isskin
+        isSkin:params.isskin,
         ...params
       }),
       cmd: "book_batchupgrade",

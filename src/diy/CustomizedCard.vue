@@ -176,7 +176,7 @@
       size="small"
       :placeholder="placeholder"
       class="n-input"
-      :maxlength="10"
+      :maxlength="100"
     />
   </div>
 
@@ -354,11 +354,7 @@ const handleNameClick = () => {
 
 // 数字输入验证
 const handleNumberInput = (value) => {
-  // 过滤非数字字符
-  const filteredValue = value.replace(/[^0-9]/g, '')
-  // 限制最大长度为10位
-  const limitedValue = filteredValue.slice(0, 10)
-  emit('update:inputValue', limitedValue)
+  emit('update:inputValue', value)
 }
 </script>
 

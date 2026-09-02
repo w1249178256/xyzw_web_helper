@@ -67,6 +67,13 @@ export const availableTasks = [
   { label: "一键俱乐部BOSS⭐", value: "batchLegionBoss" },
   { label: "一键每日免费礼包⭐", value: "batchFreeGift" },
   { label: "一键每日咸王⭐", value: "batchDailyBoss" },
+  { label: "一键免费钓鱼⭐", value: "batchFreeFishing" },
+  { label: "一键宠物蛋⭐", value: "batchPetEgg" },
+  { label: "一键扭蛋⭐", value: "batchGacha" },
+  { label: "篝火营地报名", value: "batchCampSignup" },
+  { label: "篝火营地战斗", value: "batchCampFight" },
+  { label: "盐场报名", value: "batchSaltSignup" },
+  { label: "盐场布阵", value: "batchSaltFormation" },
   { label: "一键购买梦境商品", value: "batchBuyDreamItems" },
 ];
 

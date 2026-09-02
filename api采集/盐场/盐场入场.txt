@@ -1,55 +1,597 @@
-
-记录 #2:
-----------------------------------------
-时间: 2026/1/3 20:15:09
-服务: WarService
-方法: setBattleTeam
-参数: [{"battlefieldId":"WEEK-260103:487","battleTeam":{},"lordWeaponId":3}]
-结果: undefined
-异步: 否
-调用ID: call_1767442509226_xoq5u7vkt
-
-记录 #3:
-----------------------------------------
-时间: 2026/1/3 20:15:07
-服务: WarService
-方法: teamSetBattleTeam
-参数: [{"battlefieldId":"WEEK-260103:487","battleTeam":{},"lordWeaponId":3}]
-结果: undefined
-异步: 否
-调用ID: call_1767442507478_qj39557gz
-
-
-记录 #5:
-----------------------------------------
-时间: 2026/1/3 20:15:04
-服务: HeroService
-方法: calcPowerByTeam
-参数: [{"battleTeam":{},"lordWeaponId":3}]
-结果: Promise<resolved>: {"rtt":210,"_raw":{"seq":40,"ack":0,"time":1767442504003,"resp":40,"cmd":"hero_calcpowerbyteamresp","body":{"0":8,"1":1,"2":5,"3":5,"4":112,"5":111,"6":119,"7":101,"8":114,"9":2,"10":153,"11":40,"12":40,"13":58,"14":0,"15":0,"16":0,"17":0}},"_sendMsg":{"cmd":"hero_calcpowerbyteam","params":{"battleTeam":{},"lordWeaponId":3},"seq":40,"time":1767442504220},"_t":{"typeCode":"Class","base":{"typeCode":"Class","base":{"typeCode":"Object","name":"Object","allPropertiesMap":{},"allPropertiesList":[]},"name":"e","allPropertiesMap":{},"allPropertiesList":[]},"name":"t","ownProperties":{}},"_rawData":{"power":975710361}}
-异步: 是
-调用ID: call_1767442504218_rejt9exva
-
-记录 #6:
-----------------------------------------
-时间: 2026/1/3 20:15:01
-服务: WarService
-方法: enterBattlefield
-参数: [{"battlefieldId":"WEEK-260103:487","useGzip":true}]
-结果: undefined
-异步: 否
-调用ID: call_1767442501110_zpt8nt1el
-
-记录 #7:
-----------------------------------------
-时间: 2026/1/3 20:14:59
-服务: LegionService
-方法: getBattlefield
-参数: [{}]
-结果: 
-"_sendMsg":{"cmd":"legion_getbattlefield",
-"_rawData":{"isInWeekWar":true,"info":{"phase":"WEEK-260103","type":15,"subType":3,"legionWarMapType":13,"signupStartTime":1767398400,"signupEndTime":1767434400,"readyTime":1767441300,"startTime":1767441600,"endTime":1767445200,"battlefieldId":"WEEK-260103:487","battlefieldNumber":487,"canEnterWar":true,"sid":"x2iOOx_NyyoZeJ29MrhY4oYMNw7SgYGN6B8OiCDHpEwsgBY06kF8Y5no1xQOzr4w","domainName":"wss://xxz-xyzw-new.hortorgames.com/agent"}},"_data":{"isInWeekWar":true,"isInMonthWar":false,"info":{"phase":"WEEK-260103","type":15,"subType":3,"legionWarMapType":13,"signupStartTime":1767398400,"signupEndTime":1767434400,"readyTime":1767441300,"startTime":1767441600,"endTime":1767445200,"battlefieldId":"WEEK-260103:487","battlefieldNumber":487,"canEnterWar":true,"sid":"x2iOOx_NyyoZeJ29MrhY4oYMNw7SgYGN6B8OiCDHpEwsgBY06kF8Y5no1xQOzr4w","domainName":"wss://xxz-xyzw-new.hortorgames.com/agent"},"seasonList":[]}}
-异步: 是
-调用ID: call_1767442499264_2ixbmnvcc
-
-
+[20:42:48] [GAME] [VERBOSE] ProtoMsg Blob消息，使用rawData: 
+{battlefield: {…}, roleCodeId: 407, battlefieldId: 'FLAG-260829:1569', battleList: {…}, roleMap: {…}}
+battleList
+: 
+{}
+battlefield
+: 
+arenaId
+: 
+1569
+bIntent
+: 
+{}
+buildingData
+: 
+3_6
+: 
+{id: '3_6', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+3_9
+: 
+{id: '3_9', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+4_5
+: 
+{id: '4_5', type: 3, hP: 10, maxHP: 10, point: 0, …}
+4_8
+: 
+{id: '4_8', type: 3, hP: 10, maxHP: 10, point: 0, …}
+4_11
+: 
+{id: '4_11', type: 3, hP: 10, maxHP: 10, point: 0, …}
+5_6
+: 
+{id: '5_6', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+5_9
+: 
+{id: '5_9', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+6_5
+: 
+{id: '6_5', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+6_11
+: 
+{id: '6_11', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+7_3
+: 
+{id: '7_3', type: 3, hP: 10, maxHP: 10, point: 0, …}
+7_12
+: 
+{id: '7_12', type: 3, hP: 10, maxHP: 10, point: 0, …}
+8_2
+: 
+{id: '8_2', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+8_8
+: 
+{id: '8_8', type: 5, hP: 40, maxHP: 40, point: 0, …}
+8_14
+: 
+{id: '8_14', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+9_3
+: 
+{id: '9_3', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+9_12
+: 
+{id: '9_12', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+10_2
+: 
+{id: '10_2', type: 3, hP: 6, maxHP: 10, point: 0, …}
+10_5
+: 
+{id: '10_5', type: 5, hP: 16, maxHP: 40, point: 0, …}
+10_8
+: 
+{id: '10_8', type: 6, hP: 18, maxHP: 50, point: 0, …}
+10_11
+: 
+{id: '10_11', type: 5, hP: 40, maxHP: 40, point: 0, …}
+10_14
+: 
+{id: '10_14', type: 3, hP: 10, maxHP: 10, point: 0, …}
+11_3
+: 
+{id: '11_3', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+11_12
+: 
+{id: '11_12', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+12_2
+: 
+{id: '12_2', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+12_8
+: 
+{id: '12_8', type: 5, hP: 40, maxHP: 40, point: 0, …}
+12_14
+: 
+{id: '12_14', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+13_3
+: 
+{id: '13_3', type: 3, hP: 10, maxHP: 10, point: 0, …}
+13_12
+: 
+{id: '13_12', type: 3, hP: 10, maxHP: 10, point: 0, …}
+14_5
+: 
+{id: '14_5', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+14_11
+: 
+{id: '14_11', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+15_6
+: 
+{id: '15_6', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+15_9
+: 
+{id: '15_9', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+16_5
+: 
+{id: '16_5', type: 3, hP: 10, maxHP: 10, point: 0, …}
+16_8
+: 
+{id: '16_8', type: 3, hP: 10, maxHP: 10, point: 0, …}
+16_11
+: 
+{id: '16_11', type: 3, hP: 10, maxHP: 10, point: 0, …}
+17_6
+: 
+{id: '17_6', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+17_9
+: 
+{id: '17_9', type: 4, hP: 9999, maxHP: 9999, point: 0, …}
+[[Prototype]]
+: 
+Object
+confId
+: 
+5
+constant
+: 
+{Time: 3600, StrengthLowerLimit: 1, MoveTime: 25, ProtectTime: 3600, StrengthPlayer: 5, …}
+createAt
+: 
+Tue Sep 21 1677 08:18:26 GMT+0805 (中国标准时间) {}
+currentIdx
+: 
+0
+custom
+: 
+{}
+endTime
+: 
+1788008400
+fCLegionId
+: 
+7374262
+id
+: 
+"FLAG-260829:1569"
+legionWarMap
+: 
+2
+legions
+: 
+415183
+: 
+{id: 415183, codeId: 0, name: '中華帝国', color: 0, level: 30, …}
+462567
+: 
+{id: 462567, codeId: 0, name: '༺清茶༻', color: 2, level: 30, …}
+1258342
+: 
+{id: 1258342, codeId: 0, name: '闪电五连缏', color: 9, level: 30, …}
+1777067
+: 
+{id: 1777067, codeId: 0, name: '太上白', color: 5, level: 30, …}
+1804985
+: 
+{id: 1804985, codeId: 0, name: '✨问道联盟ཽ', color: 18, level: 30, …}
+2187357
+: 
+{id: 2187357, codeId: 0, name: '躺着的咸鱼干', color: 1, level: 30, …}
+2857357
+: 
+{id: 2857357, codeId: 0, name: '鱼中的皇后', color: 11, level: 30, …}
+3686783
+: 
+{id: 3686783, codeId: 0, name: '商城', color: 19, level: 30, …}
+3711151
+: 
+{id: 3711151, codeId: 0, name: '仗剑/沧浪', color: 7, level: 30, …}
+3846087
+: 
+{id: 3846087, codeId: 0, name: '烟雨听风3', color: 13, level: 27, …}
+5519763
+: 
+{id: 5519763, codeId: 0, name: '乌衣渡✨', color: 12, level: 20, …}
+6421007
+: 
+{id: 6421007, codeId: 0, name: '阐教营地', color: 4, level: 30, …}
+6482115
+: 
+blessingIdList
+: 
+[]
+blessingScore
+: 
+0
+buildings
+: 
+{5_6: 1, 4_8: 1}
+codeId
+: 
+0
+color
+: 
+3
+custom
+: 
+{red:quench: 305}
+group
+: 
+3
+id
+: 
+6482115
+killAddScore
+: 
+0
+killCnt
+: 
+9
+killLegionId
+: 
+0
+level
+: 
+30
+logo
+: 
+""
+membersV2
+: 
+{405: 12, 406: 1, 407: 0, 408: 0, 410: 11, 411: 0, 412: 22, 413: 22, 414: 1, 415: 2, 416: 12, 418: 12, 420: 0, 422: 1, 424: 1, 426: 3, 427: 11}
+name
+: 
+"明月松间照✨"
+outTime
+: 
+0
+point
+: 
+139
+position
+: 
+{x: 5, y: 6}
+power
+: 
+158280866038
+protectSkin
+: 
+-1
+seizeTime
+: 
+1390
+serverId
+: 
+8888
+state
+: 
+"normal"
+strongholdId
+: 
+"5_6"
+strongholdSkin
+: 
+-1
+[[Prototype]]
+: 
+Object
+6711929
+: 
+{id: 6711929, codeId: 0, name: '月亮塔是我儿', color: 6, level: 28, …}
+7253310
+: 
+{id: 7253310, codeId: 0, name: '洪 門', color: 8, level: 30, …}
+7305626
+: 
+{id: 7305626, codeId: 0, name: '有只小鱼3', color: 15, level: 21, …}
+7363727
+: 
+{id: 7363727, codeId: 0, name: '古月真人.', color: 16, level: 30, …}
+7374262
+: 
+{id: 7374262, codeId: 0, name: '归屿⁶⁹', color: 10, level: 16, …}
+7421600
+: 
+{id: 7421600, codeId: 0, name: '神•之界', color: 17, level: 26, …}
+7655682
+: 
+{id: 7655682, codeId: 0, name: '浓咖啡', color: 14, level: 22, …}
+[[Prototype]]
+: 
+Object
+mapName
+: 
+"legionWarMapFlag"
+marches
+: 
+657
+: 
+{id: 657, codeId: 5, legionId: 7363727, group: 16, from: {…}, …}
+668
+: 
+{id: 668, codeId: 107, legionId: 7305626, group: 15, from: {…}, …}
+669
+: 
+{id: 669, codeId: 103, legionId: 7305626, group: 15, from: {…}, …}
+670
+: 
+{id: 670, codeId: 252, legionId: 3686783, group: 19, from: {…}, …}
+671
+: 
+{id: 671, codeId: 55, legionId: 1258342, group: 9, from: {…}, …}
+672
+: 
+{id: 672, codeId: 294, legionId: 1804985, group: 18, from: {…}, …}
+673
+: 
+{id: 673, codeId: 370, legionId: 7655682, group: 14, from: {…}, …}
+674
+: 
+{id: 674, codeId: 115, legionId: 7305626, group: 15, from: {…}, …}
+675
+: 
+{id: 675, codeId: 116, legionId: 7305626, group: 15, from: {…}, …}
+[[Prototype]]
+: 
+Object
+name
+: 
+"FLAG-260829:1569"
+openTime
+: 
+1788004800
+rTimeoutTime
+: 
+5
+readyTime
+: 
+300
+roleNum
+: 
+322
+roles
+: 
+{1: {…}, 2: {…}, 3: {…}, 4: {…}, 5: {…}, 6: {…}, 7: {…}, 8: {…}, 9: {…}, 10: {…}, 11: {…}, 12: {…}, 13: {…}, 14: {…}, 15: {…}, 16: {…}, 17: {…}, 18: {…}, 19: {…}, 20: {…}, 21: {…}, 22: {…}, 23: {…}, 24: {…}, 25: {…}, 26: {…}, 27: {…}, 28: {…}, 29: {…}, 30: {…}, 31: {…}, 32: {…}, 33: {…}, 34: {…}, 35: {…}, 36: {…}, 37: {…}, 38: {…}, 39: {…}, 40: {…}, 41: {…}, 42: {…}, 43: {…}, 44: {…}, 45: {…}, 46: {…}, 47: {…}, 48: {…}, 50: {…}, 51: {…}, 52: {…}, 54: {…}, 55: {…}, 59: {…}, 60: {…}, 61: {…}, 62: {…}, 63: {…}, 64: {…}, 65: {…}, 66: {…}, 67: {…}, 69: {…}, 71: {…}, 72: {…}, 75: {…}, 76: {…}, 81: {…}, 88: {…}, 95: {…}, 97: {…}, 98: {…}, 99: {…}, 100: {…}, 101: {…}, 102: {…}, 103: {…}, 104: {…}, 105: {…}, 106: {…}, 107: {…}, 108: {…}, 109: {…}, 110: {…}, 111: {…}, 112: {…}, 113: {…}, 114: {…}, 115: {…}, 116: {…}, 117: {…}, 118: {…}, 119: {…}, 120: {…}, 125: {…}, 126: {…}, 131: {…}, 134: {…}, 136: {…}, 137: {…}, …}
+seasonNum
+: 
+0
+signUpCnt
+: 
+0
+state
+: 
+"started"
+subType
+: 
+0
+teamMap
+: 
+5
+: 
+lCodeId
+: 
+5
+mCodeIds
+: 
+(5) [6, 24, 11, 14, 5]
+position
+: 
+{x: 9, y: 3}
+state
+: 
+"march"
+[[Prototype]]
+: 
+Object
+19
+: 
+{lCodeId: 19, state: 'combat', mCodeIds: Array(5), position: {…}}
+23
+: 
+{lCodeId: 23, state: 'idle', mCodeIds: Array(5), position: {…}}
+36
+: 
+{lCodeId: 36, state: 'combat', mCodeIds: Array(5), position: {…}}
+41
+: 
+{lCodeId: 41, state: 'watching', mCodeIds: Array(5), position: {…}}
+46
+: 
+{lCodeId: 46, state: 'combat', mCodeIds: Array(3), position: {…}}
+55
+: 
+{lCodeId: 55, state: 'march', mCodeIds: Array(5), position: {…}}
+64
+: 
+{lCodeId: 64, state: 'idle', mCodeIds: Array(5), position: {…}}
+72
+: 
+{lCodeId: 72, state: 'idle', mCodeIds: Array(5), position: {…}}
+104
+: 
+{lCodeId: 104, state: 'combat', mCodeIds: Array(2), position: {…}}
+107
+: 
+{lCodeId: 107, state: 'march', mCodeIds: Array(5), position: {…}}
+109
+: 
+{lCodeId: 109, state: 'idle', mCodeIds: Array(5), position: {…}}
+116
+: 
+{lCodeId: 116, state: 'march', mCodeIds: Array(2), position: {…}}
+136
+: 
+{lCodeId: 136, state: 'idle', mCodeIds: Array(5), position: {…}}
+164
+: 
+{lCodeId: 164, state: 'idle', mCodeIds: Array(5), position: {…}}
+171
+: 
+{lCodeId: 171, state: 'idle', mCodeIds: Array(5), position: {…}}
+252
+: 
+{lCodeId: 252, state: 'march', mCodeIds: Array(5), position: {…}}
+256
+: 
+{lCodeId: 256, state: 'idle', mCodeIds: Array(3), position: {…}}
+257
+: 
+{lCodeId: 257, state: 'idle', mCodeIds: Array(5), position: {…}}
+265
+: 
+{lCodeId: 265, state: 'idle', mCodeIds: Array(5), position: {…}}
+278
+: 
+{lCodeId: 278, state: 'idle', mCodeIds: Array(5), position: {…}}
+294
+: 
+{lCodeId: 294, state: 'march', mCodeIds: Array(5), position: {…}}
+333
+: 
+{lCodeId: 333, state: 'idle', mCodeIds: Array(4), position: {…}}
+351
+: 
+{lCodeId: 351, state: 'idle', mCodeIds: Array(5), position: {…}}
+353
+: 
+{lCodeId: 353, state: 'combat', mCodeIds: Array(5), position: {…}}
+364
+: 
+{lCodeId: 364, state: 'idle', mCodeIds: Array(5), position: {…}}
+370
+: 
+{lCodeId: 370, state: 'march', mCodeIds: Array(5), position: {…}}
+374
+: 
+{lCodeId: 374, state: 'idle', mCodeIds: Array(5), position: {…}}
+376
+: 
+{lCodeId: 376, state: 'idle', mCodeIds: Array(5), position: {…}}
+379
+: 
+{lCodeId: 379, state: 'idle', mCodeIds: Array(3), position: {…}}
+396
+: 
+{lCodeId: 396, state: 'idle', mCodeIds: Array(3), position: {…}}
+404
+: 
+{lCodeId: 404, state: 'idle', mCodeIds: Array(2), position: {…}}
+426
+: 
+{lCodeId: 426, state: 'idle', mCodeIds: Array(5), position: {…}}
+428
+: 
+{lCodeId: 428, state: 'idle', mCodeIds: Array(5), position: {…}}
+452
+: 
+{lCodeId: 452, state: 'idle', mCodeIds: Array(4), position: {…}}
+464
+: 
+{lCodeId: 464, state: 'idle', mCodeIds: Array(5), position: {…}}
+472
+: 
+{lCodeId: 472, state: 'idle', mCodeIds: Array(5), position: {…}}
+473
+: 
+{lCodeId: 473, state: 'idle', mCodeIds: Array(2), position: {…}}
+480
+: 
+{lCodeId: 480, state: 'idle', mCodeIds: Array(5), position: {…}}
+[[Prototype]]
+: 
+Object
+timeoutTime
+: 
+14400
+type
+: 
+6
+version
+: 
+""
+weekArenaId
+: 
+0
+[[Prototype]]
+: 
+Object
+battlefieldId
+: 
+"FLAG-260829:1569"
+roleCodeId
+: 
+407
+roleMap
+: 
+115813679
+: 
+{rId: 115813679, cId: 424, n: '', h: '', s: 0}
+115822637
+: 
+{rId: 115822637, cId: 423, n: '', h: '', s: 0}
+115846426
+: 
+{rId: 115846426, cId: 417, n: '', h: '', s: 0}
+254625287
+: 
+{rId: 254625287, cId: 412, n: '', h: '', s: 0}
+359056259
+: 
+{rId: 359056259, cId: 420, n: '', h: '', s: 0}
+436379721
+: 
+{rId: 436379721, cId: 426, n: '', h: '', s: 0}
+436382722
+: 
+{rId: 436382722, cId: 411, n: '', h: '', s: 0}
+436933647
+: 
+{rId: 436933647, cId: 408, n: '', h: '', s: 0}
+438166696
+: 
+{rId: 438166696, cId: 406, n: '', h: '', s: 0}
+442135762
+: 
+{rId: 442135762, cId: 410, n: '', h: '', s: 0}
+459565589
+: 
+{rId: 459565589, cId: 421, n: '', h: '', s: 0}
+459579047
+: 
+{rId: 459579047, cId: 425, n: '', h: '', s: 0}
+459651521
+: 
+{rId: 459651521, cId: 407, n: '', h: '', s: 0}
+459682523
+: 
+{rId: 459682523, cId: 409, n: '', h: '', s: 0}
+459982028
+: 
+{rId: 459982028, cId: 422, n: '', h: '', s: 0}
+460252857
+: 
+{rId: 460252857, cId: 419, n: '', h: '', s: 0}
+460263603
+: 
+{rId: 460263603, cId: 415, n: '', h: '', s: 0}
+476447838
+: 
+{rId: 476447838, cId: 418, n: '', h: '', s: 0}
+476601508
+: 
+{rId: 476601508, cId: 427, n: '', h: '', s: 0}
+484632933
+: 
+{rId: 484632933, cId: 414, n: '', h: '', s: 0}
+597357853
+: 
+{rId: 597357853, cId: 416, n: '', h: '', s: 0}
+636931448
+: 
+{rId: 636931448, cId: 405, n: '', h: '', s: 0}
+677095932
+: 
+{rId: 677095932, cId: 413, n: '', h: '', s: 0}
+[[Prototype]]
+: 
+Object
+[[Prototype]]
+: 
+Object

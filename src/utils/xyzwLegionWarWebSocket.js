@@ -94,8 +94,10 @@
  export function registerDefaultCommands(reg) {
    const registry = reg.registerHeartbeat()
      //盐场-获取战场信息
-     .register("war_getbattlefieldinfo")
-     .register("war_enterbattlefield")
+    .register("war_getbattlefieldinfo")
+    .register("war_enterbattlefield")
+    .register("war_setbattleteam")
+    .register("war_teamsetbattleteam")
    
    return registry
  }
@@ -662,7 +664,12 @@
        // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
        'task_claimdailyrewardresp': 'task_claimdailyreward',
        'task_claimweekrewardresp': 'task_claimweekreward',
- 
+
+       // 盐场响应映射
+       'war_enterbattlefieldresp': 'war_enterbattlefield',
+       'war_setbattleteamresp': 'war_setbattleteam',
+       'war_teamsetbattleteamresp': 'war_teamsetbattleteam',
+
        // 同步响应映射（优先级低）
        'syncresp': ['system_mysharecallback', 'task_claimdailypoint'],
        'syncrewardresp': ['system_buygold', 'discount_claimreward', 'card_claimreward',

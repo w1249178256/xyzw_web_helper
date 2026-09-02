@@ -238,8 +238,9 @@ export function createTasksStore(deps) {
       tokenStatus.value[id] = "waiting";
     });
 
-    const taskPromises = selectedTokens.value.map(async (tokenId) => {
-      if (shouldStop.value) return;
+    // 顺序执行：执行完一个token后，再执行下一个token
+    for (const tokenId of selectedTokens.value) {
+      if (shouldStop.value) break;
 
       tokenStatus.value[tokenId] = "running";
 
@@ -299,9 +300,7 @@ export function createTasksStore(deps) {
           type: "info",
         });
       }
-    });
-
-    await Promise.all(taskPromises);
+    }
 
     currentRunningTokenId.value = null;
     isRunning.value = false;

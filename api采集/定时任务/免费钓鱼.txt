@@ -1,0 +1,230 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/8/30 17:42:31
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1788082858921.8940%E6%9C%8D-0-721076420-%E7%9B%B8%E7%AC%A640-0.bin&fromManager=true&viewId=game-window-1788082915809-zghw9oslk
+记录数量: 4
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta5 Chrome/150.0.7871.129 Electron/43.2.0 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/8/30 17:42:28
+服务: ArtifactService
+方法: lottery
+参数: [{"type":1,"lotteryNumber":1,"newFree":true}]
+结果:
+{
+  "_raw": {
+    "seq": 76,
+    "ack": 0,
+    "time": 1788082948687,
+    "resp": 59,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "1008": {
+            "quantity": 977
+          }
+        },
+        "statistics": {
+          "ar:normal:lo:cnt": 3,
+          "artifact:normal:lottery:time": 1788082948,
+          "artifact:point": 3,
+          "month:artifact:2": 3,
+          "artifact:normal:lottery": 3
+        },
+        "statisticsTime": {
+          "ar:normal:lo:cnt": 1788082948
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1008,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 29
+}
+异步: 是
+调用ID: call_1788082948345_bdedusb24
+
+记录 #2:
+----------------------------------------
+时间: 2026/8/30 17:42:26
+服务: ArtifactService
+方法: lottery
+参数: [{"type":1,"lotteryNumber":1,"newFree":true}]
+结果:
+{
+  "_raw": {
+    "seq": 74,
+    "ack": 0,
+    "time": 1788082946767,
+    "resp": 58,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "1007": {
+            "quantity": 206
+          }
+        },
+        "statistics": {
+          "artifact:normal:lottery": 2,
+          "artifact:point": 2,
+          "artifact:normal:lottery:time": 1788082946,
+          "ar:normal:lo:cnt": 2,
+          "month:artifact:2": 2
+        },
+        "statisticsTime": {
+          "ar:normal:lo:cnt": 1788082946
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 1007,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 32
+}
+异步: 是
+调用ID: call_1788082946423_be4wb0juj
+
+记录 #3:
+----------------------------------------
+时间: 2026/8/30 17:42:22
+服务: ArtifactService
+方法: lottery
+参数: [{"type":1,"lotteryNumber":1,"newFree":true}]
+结果:
+{
+  "_raw": {
+    "seq": 72,
+    "ack": 0,
+    "time": 1788082942895,
+    "resp": 57,
+    "cmd": "syncrewardresp",
+    "body": {
+      "role": {
+        "items": {
+          "16011": {
+            "itemId": 16011,
+            "quantity": 1,
+            "ext": null
+          }
+        },
+        "artifactBooks": {
+          "1601": {
+            "artifactId": 16011,
+            "claimedStar": 0
+          }
+        },
+        "statistics": {
+          "artifact:normal:lottery:time": 1788082942,
+          "artifact:normal:lottery": 1,
+          "month:artifact:2": 1,
+          "ar:normal:lo:cnt": 1,
+          "artifact:point": 1
+        },
+        "statisticsTime": {
+          "ar:normal:lo:cnt": 1788082942,
+          "month:artifact:2": 1785513600
+        }
+      },
+      "reward": [
+        {
+          "type": 3,
+          "itemId": 16011,
+          "value": 1,
+          "ext": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1788082942553_ox09cxh03
+
+记录 #4:
+----------------------------------------
+时间: 2026/8/30 17:42:20
+服务: DiscountService
+方法: getDiscountInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 70,
+    "ack": 0,
+    "time": 1788082940771,
+    "resp": 56,
+    "cmd": "discount_getdiscountinforesp",
+    "body": {
+      "discountList": [
+        {
+          "discountId": 1,
+          "expireTime": 0,
+          "discountState": 3,
+          "version": 0
+        },
+        {
+          "discountId": 2,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 3,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 4,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        },
+        {
+          "discountId": 5,
+          "expireTime": 0,
+          "discountState": 0,
+          "version": 0
+        }
+      ]
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 20
+}
+异步: 是
+调用ID: call_1788082940437_zxy0vlzsj
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================

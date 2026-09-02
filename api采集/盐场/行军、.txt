@@ -1,0 +1,1962 @@
+======================================================================
+咸鱼之王API调用记录
+======================================================================
+导出时间: 2026/8/29 20:53:00
+游戏版本: 未知
+页面URL: aiking://d/Program%20Files/ai-king-manager/resources/app.asar/dist/index.html?fileName=group-1787573719174.A-8953%E6%9C%8D-2-459682523-%E7%9B%B8%E7%AC%A653-3.bin&fromManager=true&viewId=game-window-1788007552519-2tgq0f3pn
+记录数量: 43
+用户代理: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ai-king-manager/2.0.0beta5 Chrome/150.0.7871.129 Electron/43.2.0 Safari/537.36
+注：_raw.body字段的二进制数据已被过滤
+
+API调用记录详情:
+======================================================================
+
+记录 #1:
+----------------------------------------
+时间: 2026/8/29 20:52:56
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007976946_qmvrgz2wr
+
+记录 #2:
+----------------------------------------
+时间: 2026/8/29 20:52:53
+服务: WarService
+方法: startMarch
+参数: [{"battlefieldId":"FLAG-260829:1569","target":{"x":4,"y":8}}]
+结果: undefined
+异步: 否
+调用ID: call_1788007973504_1hcrl5cnz
+
+记录 #3:
+----------------------------------------
+时间: 2026/8/29 20:52:51
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007971925_kc8br34k7
+
+记录 #4:
+----------------------------------------
+时间: 2026/8/29 20:52:46
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007966920_ph51ckx39
+
+记录 #5:
+----------------------------------------
+时间: 2026/8/29 20:52:41
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007961948_hnfx4s70d
+
+记录 #6:
+----------------------------------------
+时间: 2026/8/29 20:52:36
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007956926_l884feha5
+
+记录 #7:
+----------------------------------------
+时间: 2026/8/29 20:52:31
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007951921_vsgwvz073
+
+记录 #8:
+----------------------------------------
+时间: 2026/8/29 20:52:26
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007946950_wwvgfi17q
+
+记录 #9:
+----------------------------------------
+时间: 2026/8/29 20:52:21
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007941911_mf4apzx0c
+
+记录 #10:
+----------------------------------------
+时间: 2026/8/29 20:52:16
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007936923_7lz009i6u
+
+记录 #11:
+----------------------------------------
+时间: 2026/8/29 20:52:11
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007931951_sithq2v2p
+
+记录 #12:
+----------------------------------------
+时间: 2026/8/29 20:52:06
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007926913_g74x82rb4
+
+记录 #13:
+----------------------------------------
+时间: 2026/8/29 20:52:01
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007921924_0cx7n3zo4
+
+记录 #14:
+----------------------------------------
+时间: 2026/8/29 20:51:56
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007916953_ct7ghpe4l
+
+记录 #15:
+----------------------------------------
+时间: 2026/8/29 20:51:51
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007911914_eas4w6uka
+
+记录 #16:
+----------------------------------------
+时间: 2026/8/29 20:51:46
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007906926_ay9caw1nb
+
+记录 #17:
+----------------------------------------
+时间: 2026/8/29 20:51:41
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007901955_55a3bnl7j
+
+记录 #18:
+----------------------------------------
+时间: 2026/8/29 20:51:36
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007896916_2sold61bt
+
+记录 #19:
+----------------------------------------
+时间: 2026/8/29 20:51:31
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007891911_szq20srjk
+
+记录 #20:
+----------------------------------------
+时间: 2026/8/29 20:51:26
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007886956_ob5xixfq5
+
+记录 #21:
+----------------------------------------
+时间: 2026/8/29 20:51:21
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007881918_axyzn26jn
+
+记录 #22:
+----------------------------------------
+时间: 2026/8/29 20:51:16
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007876930_nm9x173rb
+
+记录 #23:
+----------------------------------------
+时间: 2026/8/29 20:51:11
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007871958_qz7uk4p81
+
+记录 #24:
+----------------------------------------
+时间: 2026/8/29 20:51:06
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007866919_5in8sd7hw
+
+记录 #25:
+----------------------------------------
+时间: 2026/8/29 20:51:01
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007861931_jvlxshejo
+
+记录 #26:
+----------------------------------------
+时间: 2026/8/29 20:50:56
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007856959_q7ezodlty
+
+记录 #27:
+----------------------------------------
+时间: 2026/8/29 20:50:55
+服务: ActivityService
+方法: get
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 64,
+    "ack": 62,
+    "time": 1788007858224,
+    "resp": 63,
+    "cmd": "activity_getresp",
+    "body": {
+      "activity": {
+        "firstCharge": {
+          "packId": 1001
+        },
+        "activityShop": {
+          "1": {
+            "activityId": 1,
+            "record": {
+              "5": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "6": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "64": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "65": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "66": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "67": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "68": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "69": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "70": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "71": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "101": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "8": {
+            "activityId": 8,
+            "record": {
+              "8101": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8102": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8103": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8104": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8105": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8106": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8107": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8108": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8109": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8110": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8111": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8112": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8113": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8114": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8115": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8201": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8202": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8203": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8204": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8205": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8206": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8207": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8208": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8209": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8210": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8211": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8212": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8213": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8214": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8215": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8216": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8217": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8218": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8219": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8220": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8221": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8301": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8302": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8303": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8304": {
+                "buyQuantity": 1,
+                "lastBuyTime": 0
+              },
+              "8305": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "8999": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "10": {
+            "activityId": 10,
+            "record": {}
+          },
+          "11": {
+            "activityId": 11,
+            "record": {}
+          },
+          "12": {
+            "activityId": 12,
+            "record": {}
+          },
+          "13": {
+            "activityId": 13,
+            "record": {
+              "1301": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1302": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1303": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1304": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1305": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1306": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1307": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1308": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1309": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1310": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1311": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1312": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1313": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1314": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1315": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1316": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1317": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1318": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1319": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1320": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1321": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1322": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1323": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1324": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1325": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1326": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1327": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1328": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1329": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1330": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1331": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1332": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1333": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1334": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1335": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1336": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1337": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1338": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1339": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1340": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1341": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1342": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1343": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1344": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1345": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1346": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1347": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1348": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1349": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1350": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1351": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1352": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1353": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1354": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1355": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1356": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1357": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1358": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1359": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1360": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1361": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1362": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1363": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1364": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1365": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1366": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1367": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1368": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1369": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1370": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1371": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1372": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1373": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1374": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1375": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1376": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1377": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1378": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1379": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1380": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1381": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1382": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1383": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1384": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1385": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1386": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1387": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1388": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1389": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1390": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "15": {
+            "activityId": 15,
+            "record": {
+              "1501": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1502": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1503": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1504": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1505": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1506": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1507": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1508": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1509": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1510": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1511": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1512": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1513": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1514": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1515": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1516": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1517": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1518": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1519": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1520": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1521": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1522": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1523": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1524": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1525": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1526": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1527": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1528": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1529": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1530": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1531": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1532": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1533": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1534": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "16": {
+            "activityId": 16,
+            "record": {}
+          },
+          "17": {
+            "activityId": 17,
+            "record": {}
+          },
+          "18": {
+            "activityId": 18,
+            "record": {
+              "1801": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1802": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1803": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1804": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1805": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1806": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              },
+              "1807": {
+                "buyQuantity": 0,
+                "lastBuyTime": 0
+              }
+            }
+          },
+          "19": {
+            "activityId": 19,
+            "record": {}
+          }
+        },
+        "pushGoods": {},
+        "dynamicPushGoods": {
+          "65": {
+            "id": 65,
+            "name": "扭蛋&盐场特惠礼",
+            "desc": "特地为你准备的盐场特惠礼",
+            "times": "9",
+            "pushType": 2,
+            "pushValue": 1660277475,
+            "buyNum": 1,
+            "boughtNum": 0,
+            "expire": 4142,
+            "timeGift": 79200,
+            "price": 3000,
+            "stayFixedReward": [
+              {
+                "type": 2,
+                "itemId": 3,
+                "value": 300,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 1017,
+                "value": 1,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3031,
+                "value": 1,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 5270,
+                "value": 3,
+                "ext": 0
+              }
+            ],
+            "rankGift": 97,
+            "nameId": "",
+            "descId": "",
+            "giftUI": "3"
+          },
+          "66": {
+            "id": 66,
+            "name": "扭蛋&盐场进阶礼",
+            "desc": "特地为你准备的盐场进阶礼",
+            "times": "9",
+            "pushType": 2,
+            "pushValue": 1660277475,
+            "buyNum": 1,
+            "boughtNum": 0,
+            "expire": 4142,
+            "timeGift": 79200,
+            "price": 19800,
+            "stayFixedReward": [
+              {
+                "type": 2,
+                "itemId": 3,
+                "value": 1980,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 1017,
+                "value": 3,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 3032,
+                "value": 1,
+                "ext": 0
+              },
+              {
+                "type": 3,
+                "itemId": 5270,
+                "value": 6,
+                "ext": 0
+              }
+            ],
+            "rankGift": 98,
+            "nameId": "",
+            "descId": "",
+            "giftUI": "3"
+          }
+        },
+        "activity": [
+          {
+            "id": 1,
+            "type": 1,
+            "name": "招募达标",
+            "icon": "activities/icon/xshd_btn_zhaomudabiao",
+            "res": "activities/banner/xshd_img_zyhgbanner",
+            "module": 0,
+            "data": {
+              "rewards": [
+                {
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 3007,
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "num": 50
+                },
+                {
+                  "num": 100,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 20,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2002,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 40
+                    },
+                    {
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 2003
+                    }
+                  ]
+                },
+                {
+                  "num": 300,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 3007,
+                      "value": 80,
+                      "ext": 0
+                    },
+                    {
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 2004,
+                      "value": 10
+                    }
+                  ]
+                },
+                {
+                  "num": 400,
+                  "rewardList": [
+                    {
+                      "value": 10,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1001
+                    },
+                    {
+                      "itemId": 3201,
+                      "value": 80,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 2005,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "value": 8,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1013
+                    }
+                  ]
+                }
+              ],
+              "rounds": 4
+            },
+            "openTime": "2026-08-28T04:00:00.000Z",
+            "endTime": "2026-09-03T16:00:00.000Z",
+            "updateTime": "2022-12-02T03:56:01.746Z",
+            "createTime": "2021-12-11T02:40:26.195Z",
+            "nameId": "100000060",
+            "resID": "100000066",
+            "resText": "招募达标奖励"
+          },
+          {
+            "id": 12,
+            "type": 10,
+            "name": "灵贝达标",
+            "icon": "activities/icon/xshd_btn_yuzhudabiao",
+            "res": "activities/banner/xshd_img_yzdbbanner",
+            "module": 0,
+            "data": {
+              "rewards": [
+                {
+                  "num": 20,
+                  "rewardList": [
+                    {
+                      "value": 5,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 100
+                    }
+                  ]
+                },
+                {
+                  "num": 50,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 10,
+                      "ext": 0
+                    },
+                    {
+                      "itemId": 2,
+                      "value": 150,
+                      "ext": 0,
+                      "type": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 100,
+                  "rewardList": [
+                    {
+                      "value": 25,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1000,
+                      "ext": 0
+                    },
+                    {
+                      "value": 250,
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2
+                    }
+                  ]
+                },
+                {
+                  "num": 150,
+                  "rewardList": [
+                    {
+                      "value": 30,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1033
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1022,
+                      "value": 1000,
+                      "ext": 0
+                    },
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 250,
+                      "ext": 0
+                    }
+                  ]
+                },
+                {
+                  "num": 200,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 30,
+                      "ext": 0
+                    },
+                    {
+                      "value": 1,
+                      "ext": 0,
+                      "type": 3,
+                      "itemId": 1034
+                    },
+                    {
+                      "itemId": 1022,
+                      "value": 1000,
+                      "ext": 0,
+                      "type": 3
+                    },
+                    {
+                      "ext": 0,
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 250
+                    }
+                  ]
+                }
+              ],
+              "rounds": 2
+            },
+            "openTime": "2026-08-28T04:00:00.000Z",
+            "endTime": "2026-09-03T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:31:32.909Z",
+            "createTime": "2025-05-29T22:31:32.909Z",
+            "nameId": "100000954",
+            "resID": "100000954",
+            "resText": "灵贝达标"
+          },
+          {
+            "id": 6,
+            "type": 4,
+            "name": "限时商店",
+            "icon": "activities/icon/xshd_btn_zmlbsd",
+            "res": "activities/banner/xshd_img_zmllbbanner",
+            "module": -1,
+            "data": {
+              "goodsList": [
+                {
+                  "title": "招募福利",
+                  "description": "",
+                  "limit": 1,
+                  "price": 0,
+                  "rewardList": [
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 5,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "招募必买",
+                  "description": "",
+                  "limit": 5,
+                  "price": 3000,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 600,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 10,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "初级招募包",
+                  "description": "",
+                  "limit": 2,
+                  "price": 6800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 1360,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 20,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "中级招募包",
+                  "description": "",
+                  "limit": 2,
+                  "price": 12800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 2560,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 40,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "高级招募包",
+                  "description": "",
+                  "limit": 5,
+                  "price": 32800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 6560,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 100,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级招募包",
+                  "description": "",
+                  "limit": 10,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 12960,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1001,
+                      "value": 200,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "",
+                  "descriptionId": ""
+                },
+                {
+                  "title": "特级灵贝补给",
+                  "description": "",
+                  "limit": 7,
+                  "price": 64800,
+                  "rewardList": [
+                    {
+                      "type": 2,
+                      "itemId": 2,
+                      "value": 6480,
+                      "ext": 0
+                    },
+                    {
+                      "type": 3,
+                      "itemId": 1033,
+                      "value": 35,
+                      "ext": 0
+                    }
+                  ],
+                  "titleId": "100000957",
+                  "descriptionId": ""
+                }
+              ],
+              "buyType": 1,
+              "itemId": 0
+            },
+            "openTime": "2026-08-28T04:00:00.000Z",
+            "endTime": "2026-09-03T16:00:00.000Z",
+            "updateTime": "2025-05-29T22:34:15.597Z",
+            "createTime": "2021-12-31T02:29:23.613Z",
+            "nameId": "100000955",
+            "resID": "100000956",
+            "resText": "招募&灵贝大放送|招募&灵贝大礼"
+          }
+        ],
+        "myTotalInfo": {
+          "1": {
+            "num": 2,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          },
+          "12": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 0
+          }
+        },
+        "myMonthInfo": {
+          "2": {
+            "num": 343,
+            "rounds": 1,
+            "complete": {
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1
+            },
+            "openTime": 1785513600
+          },
+          "3": {
+            "num": 0,
+            "rounds": 1,
+            "complete": {},
+            "openTime": 1785513600
+          }
+        },
+        "myArenaInfo": {
+          "num": 234,
+          "rounds": 1,
+          "complete": {
+            "0": 1,
+            "1": 1,
+            "2": 1
+          },
+          "openTime": 1785513600
+        },
+        "myStoreInfo": {
+          "6": {
+            "complete": {
+              "0": 1
+            }
+          }
+        },
+        "yearInfo": {},
+        "fiveInfo": {},
+        "commonActivityInfo": {},
+        "warOrderActivityInfo": {
+          "1": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {
+              "1": 1,
+              "2": 1,
+              "3": 1,
+              "4": 1,
+              "5": 1,
+              "6": 1,
+              "7": 1,
+              "8": 1,
+              "9": 1,
+              "10": 1,
+              "11": 1,
+              "12": 1,
+              "13": 1,
+              "14": 1,
+              "15": 1,
+              "16": 1,
+              "17": 1,
+              "18": 1,
+              "19": 1,
+              "20": 1,
+              "21": 1,
+              "22": 1,
+              "23": 1,
+              "24": 1,
+              "25": 1,
+              "26": 1,
+              "27": 1,
+              "28": 1,
+              "29": 1,
+              "30": 1,
+              "31": 1,
+              "32": 1,
+              "33": 1,
+              "34": 1,
+              "35": 1,
+              "36": 1,
+              "37": 1,
+              "38": 1,
+              "39": 1,
+              "40": 1,
+              "41": 1,
+              "42": 1,
+              "43": 1,
+              "44": 1,
+              "45": 1,
+              "46": 1,
+              "47": 1,
+              "48": 1,
+              "49": 1,
+              "50": 1,
+              "51": 1,
+              "52": 1,
+              "53": 1,
+              "54": 1,
+              "55": 1,
+              "56": 1
+            },
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          },
+          "1003": {
+            "purchased": false,
+            "purchased2": false,
+            "purchased3": false,
+            "complete": {},
+            "taskClaimed": {},
+            "rewardClaimed": {},
+            "newRewardClaimed": {},
+            "dailyTime": 0,
+            "weekTime": 0,
+            "itemNum": 0,
+            "unlockClaimed": false,
+            "phaseTh": 0,
+            "phaseEndTime": 0
+          }
+        },
+        "totalChargeDay": 2,
+        "actBingoInfo": {},
+        "dropReward": {},
+        "actCMInfo": {}
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "_data": "[循环引用]",
+  "rtt": 49
+}
+异步: 是
+调用ID: call_1788007855459_crjhul3hg
+
+记录 #28:
+----------------------------------------
+时间: 2026/8/29 20:50:55
+服务: HallService
+方法: getInfo
+参数: [{}]
+结果:
+{
+  "_raw": {
+    "seq": 63,
+    "ack": 0,
+    "time": 1788007858204,
+    "resp": 62,
+    "cmd": "hall_getinforesp",
+    "body": {
+      "bottle": {
+        "roleId": 459682523,
+        "bottleType": 1,
+        "occupyId": -1,
+        "occupyLordWeaponId": 9,
+        "occupyPower": 7240282175,
+        "occupyTotalTime": 10800,
+        "occupyEndTime": 1767270559,
+        "nextRefreshTime": -1,
+        "isFirst": false,
+        "battleTeam": {},
+        "occupyPetUId": ""
+      }
+    },
+    "_note": "body已使用rawData解码"
+  },
+  "_rawData": "[循环引用]",
+  "rtt": 30
+}
+异步: 是
+调用ID: call_1788007855458_6kxs7m71g
+
+记录 #29:
+----------------------------------------
+时间: 2026/8/29 20:50:51
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007851921_20xm7zymc
+
+记录 #30:
+----------------------------------------
+时间: 2026/8/29 20:50:46
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007846899_f3pi7irv3
+
+记录 #31:
+----------------------------------------
+时间: 2026/8/29 20:50:41
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007841944_i8eikolis
+
+记录 #32:
+----------------------------------------
+时间: 2026/8/29 20:50:36
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007836923_7t0unprqi
+
+记录 #33:
+----------------------------------------
+时间: 2026/8/29 20:50:31
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007831901_wci9tjvrr
+
+记录 #34:
+----------------------------------------
+时间: 2026/8/29 20:50:26
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007826946_6k71ky3xq
+
+记录 #35:
+----------------------------------------
+时间: 2026/8/29 20:50:21
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007821941_1orai3kxk
+
+记录 #36:
+----------------------------------------
+时间: 2026/8/29 20:50:16
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007816902_zsjb3q11b
+
+记录 #37:
+----------------------------------------
+时间: 2026/8/29 20:50:15
+服务: WarService
+方法: startAttackBuilding
+参数: [{"battlefieldId":"FLAG-260829:1569","buildingId":"4_5"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007815745_26bxw5thk
+
+记录 #38:
+----------------------------------------
+时间: 2026/8/29 20:50:11
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007811947_nnhdw84st
+
+记录 #39:
+----------------------------------------
+时间: 2026/8/29 20:50:10
+服务: WarService
+方法: startAttackBuilding
+参数: [{"battlefieldId":"FLAG-260829:1569","buildingId":"4_5"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007810722_ddxgebs8u
+
+记录 #40:
+----------------------------------------
+时间: 2026/8/29 20:50:06
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007806926_5z26w7f1d
+
+记录 #41:
+----------------------------------------
+时间: 2026/8/29 20:50:03
+服务: WarService
+方法: speedUp
+参数: [{"battlefieldId":"FLAG-260829:1569","marchId":757}]
+结果: undefined
+异步: 否
+调用ID: call_1788007803749_eqtjivep9
+
+记录 #42:
+----------------------------------------
+时间: 2026/8/29 20:50:01
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007801921_ljkhf1iir
+
+记录 #43:
+----------------------------------------
+时间: 2026/8/29 20:49:56
+服务: WarService
+方法: ping
+参数: [{"battlefieldId":"FLAG-260829:1569"}]
+结果: undefined
+异步: 否
+调用ID: call_1788007796966_xmpex6m5z
+
+
+======================================================================
+导出完成 - 由API调用记录工具 v2.4 生成
+注：_raw.body字段的二进制数据已被过滤
+======================================================================
