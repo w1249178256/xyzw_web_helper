@@ -212,6 +212,11 @@ export function registerDefaultCommands(reg) {
     .register("saltroad_getsaltroadwartotalrank")
     .register("legionwar_getgoldmonthwarrank")
     .register("legion_getopponent")
+    .register("club_getinfo")
+    .register("club_gettargetteam")
+    .register("club_attack")
+    .register("club_attackmonster")
+    .register("club_taskclaim")
     .register("legion_getbattlefield")
     .register("legion_claimpayloadtask")
     .register("legion_claimpayloadtaskprogress")
@@ -1140,6 +1145,11 @@ export class XyzwWebSocketClient {
       // 军团信息
       legion_getinforesp: "legion_getinfo",
       legion_getinforresp: "legion_getinfo",
+      club_getinforesp: "club_getinfo",
+      club_gettargetteamresp: "club_gettargetteam",
+      club_attackresp: "club_attack",
+      club_attackmonsterresp: "club_attackmonster",
+      club_taskclaimresp: "club_taskclaim",
       // 车辆相关响应映射
       car_getrolecarresp: "car_getrolecar",
       car_refreshresp: "car_refresh",

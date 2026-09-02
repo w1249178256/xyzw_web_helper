@@ -25,3 +25,4 @@ export { createTasksStore } from './tasksStore.js';
 export { createTasksLegacy } from './tasksLegacy.js';
 export { createTasksFootball } from './tasksFootball.js';
 export { createTasksApex } from './tasksApex.js';
+export { createTasksCampChallenge } from './tasksCampChallenge.js';
