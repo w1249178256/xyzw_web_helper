@@ -119,6 +119,39 @@
             </n-button-group>
           </n-space>
           <div class="header-actions">
+            <span class="game2-selection-count">
+              {{ isOpeningGame2 ? "正在准备" : "已选" }}
+              {{ game2SelectedTokenIds.size }} 个
+            </span>
+            <n-button
+              size="small"
+              :disabled="isOpeningGame2"
+              @click="selectAllGame2Tokens"
+            >
+              {{ allGame2TokensSelected ? "已全选" : "全选" }}
+            </n-button>
+            <n-button
+              size="small"
+              :disabled="game2SelectedTokenIds.size === 0 || isOpeningGame2"
+              @click="clearGame2TokenSelection"
+            >
+              清空
+            </n-button>
+            <n-button
+              type="warning"
+              :disabled="
+                game2SelectedTokenIds.size === 0 || isOpeningGame2
+              "
+              :loading="isOpeningGame2"
+              @click="openSelectedGames"
+            >
+              <template #icon>
+                <n-icon>
+                  <GameController />
+                </n-icon>
+              </template>
+              批量进入游戏（{{ game2SelectedTokenIds.size }}）
+            </n-button>
             <n-button type="info" @click="openGame">
               <template #icon>
                 <n-icon>
@@ -178,6 +211,22 @@
           >
             <template #title>
               <a-space class="token-name" align="center">
+                <span
+                  class="game2-token-checkbox"
+                  @click.stop
+                  @mousedown.stop
+                  @dragstart.stop.prevent
+                >
+                  <n-checkbox
+                    :checked="game2SelectedTokenIds.has(token.id)"
+                    :disabled="isOpeningGame2"
+                    :aria-label="`选择 ${token.name} 批量进入游戏`"
+                    @click.stop
+                    @update:checked="
+                      (checked) => setGame2TokenSelected(token.id, checked)
+                    "
+                  />
+                </span>
                 <n-avatar
                   v-if="token.avatar"
                   :src="token.avatar"
@@ -373,6 +422,22 @@
             <n-space justify="space-between" align="center">
               <!-- Info -->
               <n-space align="center" :size="6">
+                <span
+                  class="game2-token-checkbox"
+                  @click.stop
+                  @mousedown.stop
+                  @dragstart.stop.prevent
+                >
+                  <n-checkbox
+                    :checked="game2SelectedTokenIds.has(token.id)"
+                    :disabled="isOpeningGame2"
+                    :aria-label="`选择 ${token.name} 批量进入游戏`"
+                    @click.stop
+                    @update:checked="
+                      (checked) => setGame2TokenSelected(token.id, checked)
+                    "
+                  />
+                </span>
                 <!-- 连接状态 - 移动到最前端显示 -->
                 <div style="min-width: 65px">
                   <a-badge
@@ -643,11 +708,17 @@ import {
   GameController,
 } from "@vicons/ionicons5";
 import { NIcon, NAlert, useDialog, useMessage } from "naive-ui";
-import { h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { transformToken, scheduleAuthUserRequest } from "@/utils/token";
 import { $emit } from "@/stores/events/index.ts";
 import useIndexedDB from "@/hooks/useIndexedDB";
+import { prepareGame2Launch } from "@/utils/gameLauncher";
+import {
+  pruneTokenSelection,
+  selectAllTokenIds,
+  toggleTokenSelection,
+} from "@/utils/gameSelection";
 import lz4 from "lz4js";
 const { getArrayBuffer, storeArrayBuffer, deleteArrayBuffer, clearAll } =
   useIndexedDB();
@@ -684,6 +755,8 @@ const connectingTokens = ref(new Set());
 // 从localStorage读取上次的视图模式，默认为列表视图
 const viewMode = ref(localStorage.getItem("tokenViewMode") || "list");
 const dragIndex = ref(null);
+const game2SelectedTokenIds = ref(new Set());
+const isOpeningGame2 = ref(false);
 
 // 备注编辑状态管理
 const editingRemark = ref(null); // 当前正在编辑备注的tokenId
@@ -747,6 +820,43 @@ const sortedTokens = computed(() => {
     return 0;
   });
 });
+
+const selectedGame2Tokens = computed(() =>
+  sortedTokens.value.filter((token) =>
+    game2SelectedTokenIds.value.has(token.id),
+  ),
+);
+const allGame2TokensSelected = computed(
+  () =>
+    sortedTokens.value.length > 0 &&
+    selectedGame2Tokens.value.length === sortedTokens.value.length,
+);
+
+function setGame2TokenSelected(tokenId, checked) {
+  game2SelectedTokenIds.value = toggleTokenSelection(
+    game2SelectedTokenIds.value,
+    tokenId,
+    checked,
+  );
+}
+
+function selectAllGame2Tokens() {
+  game2SelectedTokenIds.value = selectAllTokenIds(sortedTokens.value);
+}
+
+function clearGame2TokenSelection() {
+  game2SelectedTokenIds.value = new Set();
+}
+
+watch(
+  () => tokenStore.gameTokens.map((token) => token.id),
+  () => {
+    game2SelectedTokenIds.value = pruneTokenSelection(
+      game2SelectedTokenIds.value,
+      tokenStore.gameTokens,
+    );
+  },
+);
 
 // 切换排序
 const toggleSort = (field) => {
@@ -1576,6 +1686,35 @@ function convertBinToLx(buf) {
   return e;
 }
 
+async function openSelectedGames() {
+  if (selectedGame2Tokens.value.length === 0 || isOpeningGame2.value) return;
+  const tokensToOpen = [...selectedGame2Tokens.value];
+  isOpeningGame2.value = true;
+  try {
+    const { launch, failures } = await prepareGame2Launch({
+      tokens: tokensToOpen,
+      getArrayBuffer,
+      localStorage: window.localStorage,
+      sessionStorage: window.sessionStorage,
+    });
+
+    if (launch.sessions.length === 0) {
+      message.error("所选账号均准备失败，请检查 BIN 数据后重试");
+      return;
+    }
+    if (failures.length > 0) {
+      const failedNames = failures.map((failure) => failure.name).join("、");
+      message.warning(`已跳过 ${failures.length} 个账号：${failedNames}`);
+    }
+    await router.push("/game2");
+  } catch (error) {
+    console.error("Batch game launch failed:", error);
+    message.error("批量进入游戏失败，请重试");
+  } finally {
+    isOpeningGame2.value = false;
+  }
+}
+
 const openGame = async () => {
   const token = tokenStore.selectedToken;
   if (!token) {
@@ -1971,8 +2110,10 @@ onUnmounted(() => {
 
 .section-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   margin-bottom: var(--spacing-xl);
   position: sticky;
   top: 0;
@@ -1992,11 +2133,22 @@ onUnmounted(() => {
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-md);
+  align-items: center;
+  gap: 8px;
   max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+}
+
+.game2-selection-count {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.game2-token-checkbox {
+  display: inline-flex;
+  align-items: center;
+  cursor: default;
 }
 
 .tokens-grid {

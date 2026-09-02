@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>鲨鱼之王 - 多账号</title>
+    <meta
+      name="viewport"
+      content="width=device-width,user-scalable=no,initial-scale=1, minimum-scale=1,maximum-scale=1"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="renderer" content="webkit" />
+    <meta name="force-rendering" content="webkit" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="full-screen" content="yes" />
+    <meta name="x5-fullscreen" content="true" />
+    <meta name="360-fullscreen" content="true" />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="x5-orientation" content="portrait" />
+    <meta name="x5-page-mode" content="app" />
+    <link rel="stylesheet" type="text/css" href="style-mobile.1777a.css" />
+    <link rel="icon" href="favicon.8de18.ico" />
+  </head>
+  <body>
+    <canvas
+      id="GameCanvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="0"
+    ></canvas>
+    <div id="splash">
+      <div class="progress-bar stripes">
+        <span style="width: 0%"></span>
+      </div>
+    </div>
+
+    <script src="game2-storage-bridge.js" charset="utf-8"></script>
+    <script type="text/javascript">
+      (function loadGame2Runtime() {
+        "use strict";
+
+        if (!window.__GAME2_BRIDGE_READY__) return;
+
+        const runtime = [
+          "patch.decrypted_readable.js",
+          "src/settings.da7ef.js",
+          "game-defines.a175e.js",
+          "main.2a00e.js",
+          "cocos2d-js-min.a5841.js",
+          "xh.js",
+          "sh1.js",
+          "diagnose_require.js",
+        ];
+        const loadScript = (src) =>
+          new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = src;
+            script.charset = "utf-8";
+            script.onload = resolve;
+            script.onerror = () => reject(new Error(`Unable to load ${src}`));
+            document.head.appendChild(script);
+          });
+        const notify = (type, code) => {
+          const { scope } = window.__GAME2_BRIDGE_READY__;
+          window.parent.postMessage(
+            {
+              channel: "game2",
+              version: 1,
+              type,
+              scope,
+              ...(code ? { code } : {}),
+            },
+            window.location.origin,
+          );
+        };
+
+        (async () => {
+          for (const src of runtime) await loadScript(src);
+          window.HtmlIsLoaded = true;
+          document.getElementById("splash").style.display = "none";
+          await window.boot();
+          notify("ready");
+        })().catch(() => {
+          document.getElementById("splash").textContent = "游戏资源加载失败";
+          notify("fatal", "runtime-load-failed");
+        });
+      })();
+    </script>
+  </body>
+</html>

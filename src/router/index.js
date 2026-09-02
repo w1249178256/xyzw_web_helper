@@ -45,6 +45,15 @@ const my_routes = [
     })
   },
   {
+    path: '/game2',
+    name: 'GameMultiPlayer',
+    component: () => import('@/views/GameMultiPlayer.vue'),
+    meta: {
+      title: '批量游戏',
+      requiresToken: true
+    }
+  },
+  {
     name: 'DefaultLayout',
     path: '/admin',
     component: () => import('@/layout/DefaultLayout.vue'),
