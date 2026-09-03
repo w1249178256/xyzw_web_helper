@@ -47,6 +47,21 @@ class FailingStorage extends MemoryStorage {
   }
 }
 
+test("createCompatibleRandomUUID falls back to getRandomValues on HTTP", () => {
+  assert.equal(typeof launcher.createCompatibleRandomUUID, "function");
+  const cryptoSource = {
+    getRandomValues(bytes) {
+      bytes.set(Array.from({ length: 16 }, (_, index) => index));
+      return bytes;
+    },
+  };
+
+  assert.equal(
+    launcher.createCompatibleRandomUUID(cryptoSource),
+    "00010203-0405-4607-8809-0a0b0c0d0e0f",
+  );
+});
+
 test("buildMultiGameFrameSrc encodes scope and account without exposing token data", () => {
   assert.equal(typeof launcher.buildMultiGameFrameSrc, "function");
   assert.equal(

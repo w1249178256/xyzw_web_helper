@@ -63,6 +63,30 @@ function lxEncrypt(plain, random) {
   return output;
 }
 
+export function createCompatibleRandomUUID(cryptoSource = globalThis.crypto) {
+  if (typeof cryptoSource?.randomUUID === "function") {
+    return cryptoSource.randomUUID();
+  }
+  if (typeof cryptoSource?.getRandomValues !== "function") {
+    throw new Error("安全随机UUID生成不可用");
+  }
+
+  const bytes = new Uint8Array(16);
+  cryptoSource.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  );
+  return [
+    hex.slice(0, 4).join(""),
+    hex.slice(4, 6).join(""),
+    hex.slice(6, 8).join(""),
+    hex.slice(8, 10).join(""),
+    hex.slice(10, 16).join(""),
+  ].join("-");
+}
+
 function uuidHex(randomUUID) {
   const value = randomUUID().replaceAll("-", "").toLowerCase();
   if (!/^[a-f0-9]{32}$/.test(value)) throw new Error("invalid UUID source");
@@ -256,7 +280,7 @@ export async function prepareMultiGameLaunch({
   getArrayBuffer,
   localStorage,
   sessionStorage,
-  randomUUID = () => crypto.randomUUID(),
+  randomUUID = createCompatibleRandomUUID,
   now = () => Date.now(),
 }) {
   clearMultiGameLaunch({ localStorage, sessionStorage });

@@ -16,6 +16,29 @@
       <span class="toolbar-warning">
         在窗口标题栏滚动可横向浏览；按住 Ctrl + 滚轮缩放页面，可同时查看更多账号
       </span>
+      <n-popover trigger="hover" placement="bottom-end" :width="360">
+        <template #trigger>
+          <button class="crash-help-trigger" type="button">页面崩溃？</button>
+        </template>
+        <div class="crash-help-content">
+          <strong>多开内存提示</strong>
+          <p>
+            同时开启多个游戏会占用大量内存。若系统仍有可用内存但页面提示
+            Out of Memory，可能是 32 位浏览器的进程内存限制，建议升级到 64
+            位浏览器。
+          </p>
+          <p>
+            查看方法：在 Chrome 地址栏输入 <code>chrome://version</code>，检查版本或操作系统信息是否显示 64 位。
+          </p>
+          <a
+            href="https://support.google.com/chrome/a/answer/7650032?hl=zh-Hans"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            下载 Chrome 官方 Windows 64 位捆绑包
+          </a>
+        </div>
+      </n-popover>
     </header>
 
     <main
@@ -129,6 +152,7 @@
 </template>
 
 <script setup>
+import { NPopover } from "naive-ui";
 import {
   computed,
   nextTick,
@@ -479,6 +503,36 @@ onUnmounted(() => {
   font-size: 12px;
 }
 
+
+.crash-help-trigger {
+  flex: none;
+  padding: 3px 7px;
+  border: 1px solid #92400e;
+  border-radius: 6px;
+  color: #fbbf24;
+  background: #451a03;
+  cursor: help;
+}
+
+.crash-help-trigger:hover,
+.crash-help-trigger:focus-visible {
+  background: #78350f;
+  outline: none;
+}
+
+.crash-help-content {
+  line-height: 1.6;
+  white-space: normal;
+}
+
+.crash-help-content p {
+  margin: 8px 0;
+}
+
+.crash-help-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
 .game-strip {
   box-sizing: border-box;
   display: flex;
