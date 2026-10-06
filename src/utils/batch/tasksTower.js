@@ -347,7 +347,13 @@ export function createTasksTower(deps) {
       tokenStatus.value[id] = "waiting";
     });
 
-    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+    const taskPromises = selectedTokens.value.map(async (tokenId, index) => {
+      if (shouldStop.value) return;
+
+      // 错峰启动：每个账号随机延迟 0~5s，让请求流在时间轴上摊开（降低批量风控风险）
+      if (index > 0) {
+        await new Promise((r) => setTimeout(r, Math.random() * 5000));
+      }
       if (shouldStop.value) return;
 
       tokenStatus.value[tokenId] = "running";
@@ -435,6 +441,15 @@ export function createTasksTower(deps) {
           weirdTowerMaxClimb?.value ?? weirdTowerMaxClimb,
         );
         let consecutiveFailures = 0;
+        let throttledCount = 0; // 限流退避计数
+
+        // 人性化节奏：递增间隔 + 随机抖动（模拟真人前期快后期慢）
+        const climbDelay = (round) => {
+          const progress = MAX_CLIMB > 0 ? round / MAX_CLIMB : 1;
+          if (progress < 0.2) return 800 + Math.random() * 700;
+          if (progress < 0.7) return 1200 + Math.random() * 800;
+          return 1500 + Math.random() * 1000;
+        };
 
         addLog({
           time: new Date().toLocaleTimeString(),
@@ -451,7 +466,7 @@ export function createTasksTower(deps) {
               5000,
             );
 
-            await tokenStore.sendMessageWithPromise(
+            const fightRes = await tokenStore.sendMessageWithPromise(
               tokenId,
               "evotower_fight",
               {
@@ -469,72 +484,94 @@ export function createTasksTower(deps) {
               type: "info",
             });
 
-            await new Promise((r) => setTimeout(r, 500));
+            // 人性化节奏等待
+            await new Promise((r) => setTimeout(r, climbDelay(count)));
 
-            const evotowerinfo2 = await tokenStore.sendMessageWithPromise(
-              tokenId,
-              "evotower_getinfo",
-              {},
-              5000,
-            );
-
-            // 检查并领取每日任务奖励
-            if (evotowerinfo2 && evotowerinfo2.evoTower && evotowerinfo2.evoTower.taskClaimMap) {
-                 const now = new Date();
-                 const year = now.getFullYear().toString().slice(2);
-                 const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                 const day = now.getDate().toString().padStart(2, '0');
-                 const dateKey = `${year}${month}${day}`;
-                 
-                 const dailyTasks = evotowerinfo2.evoTower.taskClaimMap[dateKey] || {};
-                 const taskIds = [1, 2, 3];
-                 
-                 for (const taskId of taskIds) {
-                    if (!dailyTasks[taskId]) {
-                      await tokenStore.sendMessageWithPromise(
-                        tokenId,
-                        "evotower_claimtask",
-                        { taskId: taskId },
-                        2000
-                      ).then(() => {
-                         addLog({
-                            time: new Date().toLocaleTimeString(),
-                            message: `${token.name} 领取每日任务奖励 ${taskId} 成功`,
-                            type: "success",
-                         });
-                      }).catch(() => {});
-                      await new Promise(r => setTimeout(r, 200)); 
-                    }
-                 }
-            }
-
-            // 通关章节奖励：以 rewardTowerId 为准判断是否有未领取的章节
-            // （原按 (towerId % 10) + 1 === 1 判断，towerId 为 10 的整数倍时恒成立，
-            //   会重复发送领奖命令，且无法感知历史未领取的章节）
-            await claimPendingEvoTowerRewards(
-              tokenStore,
-              tokenId,
-              evotowerinfo2?.evoTower,
-              (message, type) => addLog({
-                time: new Date().toLocaleTimeString(),
-                message: `${token.name} ${message}`,
-                type,
-              }),
-            );
-
-            // 刷新能量
-            try {
-              const evotowerinfoRefresh1 = await tokenStore.sendMessageWithPromise(
-                tokenId,
-                "evotower_getinfo",
-                {},
-                5000,
-              );
-              currentEnergy = evotowerinfoRefresh1?.evoTower?.energy || 0;
-            } catch (e) {
-              // 忽略刷新失败
+            // 能量直接用 fight 返回值（探测已确认响应带 evoTower.energy）
+            const fightEnergy = fightRes?.evoTower?.energy;
+            if (fightEnergy !== undefined) {
+              currentEnergy = fightEnergy;
+            } else {
+              // 兜底：响应没带能量时每10轮校准一次
+              if (count % 10 === 0) {
+                const infoRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "evotower_getinfo",
+                  {},
+                  5000,
+                ).catch(() => null);
+                if (infoRes?.evoTower?.energy !== undefined) {
+                  currentEnergy = infoRes.evoTower.energy;
+                } else {
+                  currentEnergy = Math.max(currentEnergy - 1, 0);
+                }
+              } else {
+                currentEnergy = Math.max(currentEnergy - 1, 0);
+              }
             }
           } catch (err) {
+            // 限流识别：指数退避，不计入失败
+            const isThrottled =
+              (err.message && err.message.includes("200400")) ||
+              (err.message && err.message.includes("请求超时"));
+            const isDisconnected = err.message && err.message.includes("WebSocket未连接");
+
+            if (isThrottled || isDisconnected) {
+              throttledCount = Math.min(throttledCount + 1, 5);
+              const backoff = Math.min(5000 * Math.pow(2, throttledCount), 60000);
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} ${isDisconnected ? "连接断开" : "疑似被限流"}，退避 ${Math.round(backoff / 1000)}s 后重试（第 ${throttledCount} 次）`,
+                type: "warning",
+              });
+              await new Promise((r) => setTimeout(r, backoff));
+
+              // 断连时尝试重连
+              if (isDisconnected) {
+                try {
+                  tokenStore.closeWebSocketConnection(tokenId);
+                  await ensureConnection(tokenId);
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 已重新建立连接`,
+                    type: "info",
+                  });
+                } catch (e) {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 重连失败，停止该账号爬塔`,
+                    type: "error",
+                  });
+                  break;
+                }
+              }
+              continue; // 退避后重试，不消耗 consecutiveFailures
+            }
+
+            // 12200020：章节奖励未领取（可恢复）
+            if (err.message && err.message.includes("12200020")) {
+              try {
+                const infoRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "evotower_getinfo",
+                  {},
+                  5000,
+                ).catch(() => null);
+                await claimPendingEvoTowerRewards(
+                  tokenStore,
+                  tokenId,
+                  infoRes?.evoTower,
+                  (message, type) => addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} ${message}`,
+                    type,
+                  }),
+                );
+              } catch (e) {}
+              consecutiveFailures = 0;
+              continue;
+            }
+
             consecutiveFailures++;
             addLog({
               time: new Date().toLocaleTimeString(),
@@ -551,20 +588,76 @@ export function createTasksTower(deps) {
               break;
             }
 
-            await new Promise((r) => setTimeout(r, 1000));
+            await new Promise((r) => setTimeout(r, 2000));
 
             try {
-              const evotowerinfoRefresh2 = await tokenStore.sendMessageWithPromise(
+              const infoRes = await tokenStore.sendMessageWithPromise(
                 tokenId,
                 "evotower_getinfo",
                 {},
                 5000,
               );
-              currentEnergy = evotowerinfoRefresh2?.evoTower?.energy || 0;
-            } catch (e) {
-              // 忽略刷新失败
+              currentEnergy = infoRes?.evoTower?.energy || 0;
+            } catch (e) {}
+          }
+        }
+
+        // ============ 循环结束，统一领取奖励（替代原每轮查询） ============
+        try {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 爬塔结束，统一领取奖励...`,
+            type: "info",
+          });
+
+          const finalInfo = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "evotower_getinfo",
+            {},
+            5000,
+          );
+
+          // 1. 每日任务奖励（一次领完）
+          if (finalInfo?.evoTower?.taskClaimMap) {
+            const now = new Date();
+            const dateKey = `${now.getFullYear().toString().slice(2)}${(now.getMonth() + 1).toString().padStart(2, "0")}${now.getDate().toString().padStart(2, "0")}`;
+            const dailyTasks = finalInfo.evoTower.taskClaimMap[dateKey] || {};
+            for (const taskId of [1, 2, 3]) {
+              if (!dailyTasks[taskId]) {
+                await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "evotower_claimtask",
+                  { taskId },
+                  2000,
+                ).then(() => {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 领取每日任务奖励 ${taskId} 成功`,
+                    type: "success",
+                  });
+                }).catch(() => {});
+                await new Promise((r) => setTimeout(r, 500));
+              }
             }
           }
+
+          // 2. 章节通关奖励（一次补齐）
+          await claimPendingEvoTowerRewards(
+            tokenStore,
+            tokenId,
+            finalInfo?.evoTower,
+            (message, type) => addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} ${message}`,
+              type,
+            }),
+          );
+        } catch (e) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 统一领奖失败: ${e.message}`,
+            type: "warning",
+          });
         }
         if (Isswitching) {
           await tokenStore.sendMessageWithPromise(
