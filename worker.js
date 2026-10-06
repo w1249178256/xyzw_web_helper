@@ -19,7 +19,7 @@ export default {
     const proxies = [
       {
         prefix: '/api/hortor-ucenter',
-        target: 'https://comb-platform.hortorgames.com',
+        target: 'https://ucenter-app-server.hortorgames.com',
         headers: {
           'User-Agent': 'Mozilla/5.0 (Linux; Android 12; ALN-AL80 Build/HUAWEIALN-AL80; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/114.0.5735.196 Mobile Safari/537.36',
           'Accept': 'application/json',
