@@ -6,12 +6,12 @@ import {
   normalizeWeirdTowerMaxClimb,
 } from "../src/utils/towerClimbLimit.js";
 
-test("normalizeWeirdTowerMaxClimb defaults to 100 for empty or invalid input", () => {
-  assert.equal(DEFAULT_WEIRD_TOWER_MAX_CLIMB, 100);
-  assert.equal(normalizeWeirdTowerMaxClimb(""), 100);
-  assert.equal(normalizeWeirdTowerMaxClimb("abc"), 100);
-  assert.equal(normalizeWeirdTowerMaxClimb(0), 100);
-  assert.equal(normalizeWeirdTowerMaxClimb(-3), 100);
+test("normalizeWeirdTowerMaxClimb defaults to 400 for empty or invalid input", () => {
+  assert.equal(DEFAULT_WEIRD_TOWER_MAX_CLIMB, 400);
+  assert.equal(normalizeWeirdTowerMaxClimb(""), 400);
+  assert.equal(normalizeWeirdTowerMaxClimb("abc"), 400);
+  assert.equal(normalizeWeirdTowerMaxClimb(0), 400);
+  assert.equal(normalizeWeirdTowerMaxClimb(-3), 400);
 });
 
 test("normalizeWeirdTowerMaxClimb accepts positive integer values", () => {

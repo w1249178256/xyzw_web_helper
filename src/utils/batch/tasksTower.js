@@ -350,9 +350,9 @@ export function createTasksTower(deps) {
     const taskPromises = selectedTokens.value.map(async (tokenId, index) => {
       if (shouldStop.value) return;
 
-      // 错峰启动：每个账号随机延迟 0~5s，让请求流在时间轴上摊开（降低批量风控风险）
+      // 错峰启动：压缩到 0~2s（原0~5s），仍保留时间轴摊开效果
       if (index > 0) {
-        await new Promise((r) => setTimeout(r, Math.random() * 5000));
+        await new Promise((r) => setTimeout(r, Math.random() * 2000));
       }
       if (shouldStop.value) return;
 
@@ -443,12 +443,12 @@ export function createTasksTower(deps) {
         let consecutiveFailures = 0;
         let throttledCount = 0; // 限流退避计数
 
-        // 人性化节奏：递增间隔 + 随机抖动（模拟真人前期快后期慢）
+        // 人性化节奏：递增间隔 + 随机抖动（整体压缩到 0.5~1.5s，保留递增与随机特征）
         const climbDelay = (round) => {
           const progress = MAX_CLIMB > 0 ? round / MAX_CLIMB : 1;
-          if (progress < 0.2) return 800 + Math.random() * 700;
-          if (progress < 0.7) return 1200 + Math.random() * 800;
-          return 1500 + Math.random() * 1000;
+          if (progress < 0.2) return 500 + Math.random() * 400;   // 0.5~0.9s
+          if (progress < 0.7) return 700 + Math.random() * 500;   // 0.7~1.2s
+          return 900 + Math.random() * 600;                        // 0.9~1.5s
         };
 
         addLog({
