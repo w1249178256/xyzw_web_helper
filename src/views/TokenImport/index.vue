@@ -1054,6 +1054,11 @@ const refreshToken = async (token) => {
         roleIndex: token.roleIndex,
         roleId: token.roleId,
       });
+      
+      // 把刷新生成的 bin 存回 IndexedDB，供「打开游戏」使用
+      // （勾选「强制下线」导入的账号不会保存 bin，刷新时补存即可）
+      await storeArrayBuffer(token.id, refreshed.bin);          // ← 新增
+      
       tokenStore.updateToken(token.id, {
         token: refreshed.token,
         serverId: refreshed.role.serverId,
