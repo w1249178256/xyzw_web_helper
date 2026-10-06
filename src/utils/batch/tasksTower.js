@@ -1425,69 +1425,95 @@ export function createTasksTower(deps) {
   };
 
   /**
-   * 一键领取合成道具（编排版）：直接组合现有三个功能
-   * batchClaimFreeEnergy → 循环[batchUseItems → batchMergeItems] → 道具归零后最终合成
-   * 现有函数尾部会重置 isRunning/shouldStop，每轮调用间由包装器恢复状态
+   * 一键领取合成道具（逐账号编排版）：每个账号独立执行完整流程
+   * 单账号流程：领取免费道具 → 循环[使用道具 → 合成] → 该账号道具归零后最终合成
+   * 通过临时切换 selectedTokens 为单账号，复用现有三个批量函数
    */
   const batchClaimAndUseItems = async () => {
     if (selectedTokens.value.length === 0) return;
     isRunning.value = true;
     shouldStop.value = false;
 
+    // 保存用户原始勾选，结束后恢复
+    const originalSelection = [...selectedTokens.value];
+
     const log = (msg, type = "info") =>
       addLog({ time: new Date().toLocaleTimeString(), message: `${msg}`, type });
 
-    // 编排现有函数的包装器：调用后恢复运行状态（这些函数结束时会把状态置回）
-    const runExisting = async (fn, name) => {
+    // 编排现有函数：临时把 selectedTokens 切换为单账号，调用后恢复状态
+    // 注意：子函数入口会重置 shouldStop=false，因此每轮循环需显式检查 stopRequested
+    let stopRequested = false;
+    const runForToken = async (fn, tokenId, name) => {
+      if (stopRequested) return 0;
       isRunning.value = true;
       shouldStop.value = false;
+      selectedTokens.value = [tokenId];   // 切换为单账号
       try {
         return await fn();
       } catch (e) {
-        log(`执行${name}时出错: ${e.message}`, "error");
+        log(`账号执行${name}时出错: ${e.message}`, "error");
         return 0;
       } finally {
-        // 恢复状态供下一轮循环使用（最后一轮结束后由外层 finally 统一收尾）
+        selectedTokens.value = originalSelection;   // 恢复勾选
         isRunning.value = true;
-        shouldStop.value = false;
       }
     };
+
+    let totalUsed = 0;
 
     try {
       log("=== 一键领取合成道具开始 ===", "info");
 
-      // ① 领取免费道具（现有功能）
-      await runExisting(batchClaimFreeEnergy, "领取免费道具");
+      // ———— 逐账号执行完整流程 ————
+      for (const tokenId of originalSelection) {
+        if (stopRequested) break;
+        const token = tokens.value.find((t) => t.id === tokenId);
+        if (!token) continue;
 
-      // ② 循环 [使用道具 → 合成]，直到本轮没有使用任何道具（= 全部用完或受阻无法继续）
-      const MAX_OUTER_LOOPS = 50;
-      let outerLoop = 0;
-      let totalUsed = 0;
+        log(`=== 开始账号流程: ${token.name} ===`, "info");
+        tokenStatus.value[tokenId] = "running";
 
-      while (!shouldStop.value && outerLoop < MAX_OUTER_LOOPS) {
-        outerLoop++;
+        // ① 领取免费道具（现有功能，单账号）
+        await runForToken(batchClaimFreeEnergy, tokenId, "领取免费道具");
+        if (shouldStop.value) { stopRequested = true; break; }
 
-        const usedThisRound = await runExisting(batchUseItems, "使用道具");
-        totalUsed += usedThisRound;
+        // ② 循环 [使用道具 → 合成]，直到该账号道具归零
+        const MAX_OUTER_LOOPS = 50;
+        let outerLoop = 0;
+        let accountUsed = 0;
 
-        // 本轮一个道具都没用 = 道具已归零（或全部受阻），结束循环进入最终合成
-        if (usedThisRound === 0) {
-          log(`第 ${outerLoop} 轮未使用任何道具，道具已用完`, "info");
-          break;
+        while (!stopRequested && outerLoop < MAX_OUTER_LOOPS) {
+          outerLoop++;
+
+          const usedThisRound = await runForToken(batchUseItems, tokenId, "使用道具");
+          accountUsed += usedThisRound;
+
+          // 本账号没使用任何道具 = 道具已归零（或受阻），进入最终合成
+          if (usedThisRound === 0) {
+            log(`${token.name} 第 ${outerLoop} 轮未使用道具，道具已用完`, "info");
+            break;
+          }
+
+          if (shouldStop.value) { stopRequested = true; break; }
+
+          log(`${token.name} 第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
+          await runForToken(batchMergeItems, tokenId, "合成");
         }
 
-        log(`第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
-        await runExisting(batchMergeItems, "合成");
+        // ③ 该账号道具归零后，最终合成一次（含领奖）
+        if (!stopRequested) {
+          log(`${token.name} 执行最终合成`, "info");
+          await runForToken(batchMergeItems, tokenId, "最终合成");
+        }
+
+        totalUsed += accountUsed;
+        tokenStatus.value[tokenId] = "completed";
+        log(`=== ${token.name} 账号流程结束：共使用道具 ${accountUsed} 个 ===`, "success");
       }
 
-      // ③ 道具归零后，最终执行一次完整合成（含领奖）
-      if (!shouldStop.value) {
-        log("道具已用完，执行最终合成", "info");
-        await runExisting(batchMergeItems, "最终合成");
-      }
-
-      log(`=== 一键领取合成道具结束：共使用道具 ${totalUsed} 个 ===`, "success");
+      log(`=== 一键领取合成道具全部结束：共使用道具 ${totalUsed} 个 ===`, "success");
     } finally {
+      selectedTokens.value = originalSelection;   // 确保勾选恢复
       isRunning.value = false;
       currentRunningTokenId.value = null;
       message.success("批量一键领取合成道具结束");
