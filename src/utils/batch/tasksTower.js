@@ -1464,20 +1464,6 @@ export function createTasksTower(deps) {
       return towerInfoRes?.evoTower?.lotteryLeftCnt || 0;
     };
 
-    // 从 gridMap 计算空格列表
-    const getEmptyCells = (gridMap) => {
-      const empty = [];
-      for (const xStr in gridMap) {
-        for (const yStr in gridMap[xStr]) {
-          const item = gridMap[xStr][yStr];
-          if (item.gridConfId == 0 && !(item.gridItemId > 0) && !item.isLock) {
-            empty.push({ gridX: parseInt(xStr), gridY: parseInt(yStr) });
-          }
-        }
-      }
-      return empty;
-    };
-
     // 执行一轮合成（复用既有合成规则：8级以上智能合成，否则手动两两合成）
     const runMergeRound = async (tokenId, mergeBox) => {
       const gridMap = mergeBox.gridMap || {};
@@ -1598,73 +1584,89 @@ export function createTasksTower(deps) {
         }
         await new Promise((r) => setTimeout(r, 800));
 
-        // —— 步骤2：循环 [用道具 → 满格时合成] ——
+        // —— 步骤2：循环 [用道具 → 受阻时合成] ——
+        // 错误驱动模式：不做空格预检测（gridMap 不含空格数据，预检会误判满格），
+        // 而是沿用原版固定坐标策略，服务器报错（真满格）时才触发合成腾空间
         let lotteryLeftCnt = await getLotteryLeft(tokenId);
         let usedCount = 0;
         let mergeCount = 0;
         let costTotalCnt = 0;
         const MAX_USE_LOOP = 500; // 使用循环保险丝：防意外死循环
+        const MAX_BLOCKED = 5;    // 连续受阻上限：合成后仍放不下则终止
         let useLoop = 0;
+        let blockedCount = 0;
+
+        // 先读一次已用次数，用于原版坐标策略
+        try {
+          const initInfo = await getMergeBoxInfo(tokenId);
+          costTotalCnt = initInfo.mergeBox.costTotalCnt || 0;
+        } catch (e) {}
 
         log(`${token.name} 剩余道具: ${lotteryLeftCnt}`, "info");
 
         while (lotteryLeftCnt > 0 && !shouldStop.value && useLoop < MAX_USE_LOOP) {
           useLoop++;
 
-          // 检查空格
-          let info = await getMergeBoxInfo(tokenId);
-          costTotalCnt = info.mergeBox.costTotalCnt || 0;
-          let emptyCells = getEmptyCells(info.mergeBox.gridMap || {});
-
-          // 满格 → 先合成再回来继续
-          if (emptyCells.length === 0) {
-            const merged = await runMergeRound(tokenId, info.mergeBox);
-            if (merged) {
-              mergeCount++;
-              log(`${token.name} 格子已满，完成第 ${mergeCount} 轮合成，腾出空间`, "warning");
-            } else {
-              // 满格但无可合成（全锁/全异类）→ 无法继续，终止该账号
-              log(`${token.name} 格子已满且无可合成物品，停止该账号道具使用`, "error");
-              break;
-            }
-            await new Promise((r) => setTimeout(r, 800));
-            // 重新检查空格
-            info = await getMergeBoxInfo(tokenId);
-            emptyCells = getEmptyCells(info.mergeBox.gridMap || {});
-            if (emptyCells.length === 0) {
-              log(`${token.name} 合成后仍无空格，停止该账号道具使用`, "error");
-              break;
-            }
-          }
-
-          // 使用道具（优先选原版常用坐标，其次任意空格）
+          // 使用道具（原版固定坐标策略，按累计使用次数切换）
           let pos;
-          if (emptyCells.some((c) => c.gridX === 4 && c.gridY === 5)) {
+          if (costTotalCnt < 2) {
             pos = { gridX: 4, gridY: 5 };
-          } else if (emptyCells.some((c) => c.gridX === 7 && c.gridY === 3)) {
+          } else if (costTotalCnt < 102) {
             pos = { gridX: 7, gridY: 3 };
-          } else if (emptyCells.some((c) => c.gridX === 6 && c.gridY === 3)) {
-            pos = { gridX: 6, gridY: 3 };
           } else {
-            pos = { gridX: emptyCells[0].gridX, gridY: emptyCells[0].gridY };
+            pos = { gridX: 6, gridY: 3 };
           }
 
-          await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "mergebox_openbox",
-            { actType: 1, pos },
-            5000,
-          );
-          usedCount++;
-          lotteryLeftCnt--;
-
-          // 顺带领取已完成的合成进度奖励（静默）
           try {
-            const infoAfterUse = await getMergeBoxInfo(tokenId);
-            await claimMergeRewards(tokenId, infoAfterUse.mergeBox);
-          } catch (e) {}
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "mergebox_openbox",
+              { actType: 1, pos },
+              5000,
+            );
+            usedCount++;
+            lotteryLeftCnt--;
+            costTotalCnt++;
+            blockedCount = 0; // 成功后重置受阻计数
 
-          await new Promise((r) => setTimeout(r, 600));
+            // 顺带领取已完成的合成进度奖励（静默）
+            try {
+              const infoAfterUse = await getMergeBoxInfo(tokenId);
+              await claimMergeRewards(tokenId, infoAfterUse.mergeBox);
+            } catch (e) {}
+
+            await new Promise((r) => setTimeout(r, 600));
+          } catch (err) {
+            // 使用受阻（服务器判定放不下 = 满格）→ 合成腾空间后重试
+            blockedCount++;
+            log(
+              `${token.name} 使用道具受阻（${err.message}），尝试合成腾出空间（受阻 ${blockedCount}/${MAX_BLOCKED}）`,
+              "warning",
+            );
+
+            try {
+              const info = await getMergeBoxInfo(tokenId);
+              const merged = await runMergeRound(tokenId, info.mergeBox);
+              if (merged) {
+                mergeCount++;
+                log(`${token.name} 完成第 ${mergeCount} 轮合成`, "success");
+              } else {
+                log(`${token.name} 无可合成物品，无法腾出空间`, "error");
+                break;
+              }
+            } catch (e) {
+              log(`${token.name} 合成失败: ${e.message}`, "error");
+              break;
+            }
+
+            if (blockedCount >= MAX_BLOCKED) {
+              log(`${token.name} 连续受阻次数过多，停止该账号道具使用`, "error");
+              break;
+            }
+
+            await new Promise((r) => setTimeout(r, 800));
+            // 不递增 useLoop 的重试由外层 while 承担，此处继续循环
+          }
         }
 
         // —— 步骤3：道具用完后，最终合成（每轮领奖）——
