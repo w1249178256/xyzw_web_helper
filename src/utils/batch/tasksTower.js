@@ -1420,6 +1420,305 @@ export function createTasksTower(deps) {
     message.success("批量一键合成结束");
   };
 
+  /**
+   * 一键领取合成道具：领取免费道具 + 使用道具 + 满格自动合成 的组合流程
+   * 流程：领取免费道具 → 循环[用道具→满格时合成→领奖] → 道具用完后最终合成 → 领取全部奖励 → 下一个账号
+   */
+  const batchClaimAndUseItems = async () => {
+    if (selectedTokens.value.length === 0) return;
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    // 日志快捷函数
+    const log = (msg, type = "info") =>
+      addLog({ time: new Date().toLocaleTimeString(), message: `${msg}`, type });
+
+    // ———— 工具函数 ————
+
+    // 读取 mergebox 信息
+    const getMergeBoxInfo = async (tokenId) => {
+      const infoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "mergebox_getinfo",
+        { actType: 1 },
+        5000,
+      );
+      if (!infoRes || !infoRes.mergeBox) {
+        throw new Error("获取活动信息失败");
+      }
+      return infoRes;
+    };
+
+    // 读取剩余道具数（来自怪异塔信息）
+    const getLotteryLeft = async (tokenId) => {
+      const towerInfoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "evotower_getinfo",
+        {},
+        5000,
+      );
+      return towerInfoRes?.evoTower?.lotteryLeftCnt || 0;
+    };
+
+    // 从 gridMap 计算空格列表
+    const getEmptyCells = (gridMap) => {
+      const empty = [];
+      for (const xStr in gridMap) {
+        for (const yStr in gridMap[xStr]) {
+          const item = gridMap[xStr][yStr];
+          if (item.gridConfId == 0 && !(item.gridItemId > 0) && !item.isLock) {
+            empty.push({ gridX: parseInt(xStr), gridY: parseInt(yStr) });
+          }
+        }
+      }
+      return empty;
+    };
+
+    // 执行一轮合成（复用既有合成规则：8级以上智能合成，否则手动两两合成）
+    const runMergeRound = async (tokenId, mergeBox) => {
+      const gridMap = mergeBox.gridMap || {};
+      const items = [];
+      for (const xStr in gridMap) {
+        for (const yStr in gridMap[xStr]) {
+          const item = gridMap[xStr][yStr];
+          if (item.gridConfId == 0 && item.gridItemId > 0 && !item.isLock) {
+            items.push({ x: parseInt(xStr), y: parseInt(yStr), id: item.gridItemId });
+          }
+        }
+      }
+      const groupedItems = {};
+      items.forEach((item) => {
+        if (!groupedItems[item.id]) groupedItems[item.id] = [];
+        groupedItems[item.id].push(item);
+      });
+
+      const hasMergeable = Object.values(groupedItems).some((g) => g.length >= 2);
+      if (!hasMergeable) return false;
+
+      const isLevel8OrAbove =
+        mergeBox.taskMap && mergeBox.taskMap["251212208"] && mergeBox.taskMap["251212208"] !== 0;
+
+      if (isLevel8OrAbove) {
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "mergebox_automergeitem",
+          { actType: 1 },
+          10000,
+        );
+        await new Promise((r) => setTimeout(r, 1500));
+      } else {
+        for (const id in groupedItems) {
+          if (shouldStop.value) break;
+          const group = groupedItems[id];
+          while (group.length >= 2) {
+            if (shouldStop.value) break;
+            const source = group.shift();
+            const target = group.shift();
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "mergebox_mergeitem",
+              {
+                actType: 1,
+                sourcePos: { gridX: source.x, gridY: source.y },
+                targetPos: { gridX: target.x, gridY: target.y },
+              },
+              1000,
+            ).catch(() => {});
+            await new Promise((r) => setTimeout(r, 300));
+          }
+        }
+      }
+
+      // 合成后立即领取本轮产生的进度奖励（含可能占格的道具型奖励）
+      try {
+        const postMergeInfo = await getMergeBoxInfo(tokenId);
+        await claimMergeRewards(tokenId, postMergeInfo.mergeBox);
+      } catch (e) {
+        // 领奖失败不阻断主流程
+      }
+
+      return true;
+    };
+
+    // 领取合成进度奖励（沿用既有判定：taskMap[taskId]!==0 且未领取）
+    const claimMergeRewards = async (tokenId, mergeBox) => {
+      if (!mergeBox || !mergeBox.taskMap) return;
+      const taskMap = mergeBox.taskMap;
+      const taskClaimMap = mergeBox.taskClaimMap || {};
+      for (const taskId in taskMap) {
+        if (shouldStop.value) break;
+        if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "mergebox_claimmergeprogress",
+            { actType: 1, taskId: parseInt(taskId) },
+            2000,
+          ).catch(() => {});
+          await new Promise((r) => setTimeout(r, 500));
+        }
+      }
+    };
+
+    const taskPromises = selectedTokens.value.map(async (tokenId, index) => {
+      if (shouldStop.value) return;
+
+      // 错峰启动：随机延迟 0~3s，摊开请求流
+      if (index > 0) {
+        await new Promise((r) => setTimeout(r, Math.random() * 3000));
+      }
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        log(`=== 开始一键领取合成道具: ${token.name} ===`, "info");
+        await ensureConnection(tokenId);
+
+        // —— 步骤1：领取免费道具 ——
+        try {
+          const freeInfo = await getMergeBoxInfo(tokenId);
+          if (freeInfo.mergeBox.freeEnergy > 0) {
+            await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "mergebox_claimfreeenergy",
+              { actType: 1 },
+              5000,
+            );
+            log(`${token.name} 领取免费道具 ${freeInfo.mergeBox.freeEnergy} 个`, "success");
+          } else {
+            log(`${token.name} 暂无免费道具`, "info");
+          }
+        } catch (e) {
+          log(`${token.name} 领取免费道具失败（继续执行使用道具）: ${e.message}`, "warning");
+        }
+        await new Promise((r) => setTimeout(r, 800));
+
+        // —— 步骤2：循环 [用道具 → 满格时合成] ——
+        let lotteryLeftCnt = await getLotteryLeft(tokenId);
+        let usedCount = 0;
+        let mergeCount = 0;
+        let costTotalCnt = 0;
+        const MAX_USE_LOOP = 500; // 使用循环保险丝：防意外死循环
+        let useLoop = 0;
+
+        log(`${token.name} 剩余道具: ${lotteryLeftCnt}`, "info");
+
+        while (lotteryLeftCnt > 0 && !shouldStop.value && useLoop < MAX_USE_LOOP) {
+          useLoop++;
+
+          // 检查空格
+          let info = await getMergeBoxInfo(tokenId);
+          costTotalCnt = info.mergeBox.costTotalCnt || 0;
+          let emptyCells = getEmptyCells(info.mergeBox.gridMap || {});
+
+          // 满格 → 先合成再回来继续
+          if (emptyCells.length === 0) {
+            const merged = await runMergeRound(tokenId, info.mergeBox);
+            if (merged) {
+              mergeCount++;
+              log(`${token.name} 格子已满，完成第 ${mergeCount} 轮合成，腾出空间`, "warning");
+            } else {
+              // 满格但无可合成（全锁/全异类）→ 无法继续，终止该账号
+              log(`${token.name} 格子已满且无可合成物品，停止该账号道具使用`, "error");
+              break;
+            }
+            await new Promise((r) => setTimeout(r, 800));
+            // 重新检查空格
+            info = await getMergeBoxInfo(tokenId);
+            emptyCells = getEmptyCells(info.mergeBox.gridMap || {});
+            if (emptyCells.length === 0) {
+              log(`${token.name} 合成后仍无空格，停止该账号道具使用`, "error");
+              break;
+            }
+          }
+
+          // 使用道具（优先选原版常用坐标，其次任意空格）
+          let pos;
+          if (emptyCells.some((c) => c.gridX === 4 && c.gridY === 5)) {
+            pos = { gridX: 4, gridY: 5 };
+          } else if (emptyCells.some((c) => c.gridX === 7 && c.gridY === 3)) {
+            pos = { gridX: 7, gridY: 3 };
+          } else if (emptyCells.some((c) => c.gridX === 6 && c.gridY === 3)) {
+            pos = { gridX: 6, gridY: 3 };
+          } else {
+            pos = { gridX: emptyCells[0].gridX, gridY: emptyCells[0].gridY };
+          }
+
+          await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "mergebox_openbox",
+            { actType: 1, pos },
+            5000,
+          );
+          usedCount++;
+          lotteryLeftCnt--;
+
+          // 顺带领取已完成的合成进度奖励（静默）
+          try {
+            const infoAfterUse = await getMergeBoxInfo(tokenId);
+            await claimMergeRewards(tokenId, infoAfterUse.mergeBox);
+          } catch (e) {}
+
+          await new Promise((r) => setTimeout(r, 600));
+        }
+
+        // —— 步骤3：道具用完后，最终合成（每轮领奖）——
+        if (!shouldStop.value) {
+          let finalMergeLoop = 0;
+          const MAX_FINAL_MERGE = 10;
+          while (finalMergeLoop < MAX_FINAL_MERGE && !shouldStop.value) {
+            finalMergeLoop++;
+            const info = await getMergeBoxInfo(tokenId);
+            const merged = await runMergeRound(tokenId, info.mergeBox);
+            if (!merged) break;
+
+            // 每轮合成后立刻领奖，再判断是否继续
+            const infoAfter = await getMergeBoxInfo(tokenId);
+            await claimMergeRewards(tokenId, infoAfter.mergeBox);
+            await new Promise((r) => setTimeout(r, 800));
+          }
+          // 末次兜底再领一次
+          const finalInfo = await getMergeBoxInfo(tokenId);
+          await claimMergeRewards(tokenId, finalInfo.mergeBox);
+          log(`${token.name} 最终合成完成`, "success");
+        }
+
+        // —— 步骤4：领取累计使用奖励 ——
+        await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "mergebox_claimcostprogress",
+          { actType: 1 },
+          5000,
+        ).catch(() => {});
+        log(`${token.name} 已尝试领取累计使用奖励`, "info");
+
+        tokenStatus.value[tokenId] = "completed";
+        log(
+          `=== ${token.name} 一键领取合成道具结束：使用道具 ${usedCount} 个，合成 ${mergeCount} 轮 ===`,
+          "success",
+        );
+      } catch (error) {
+        console.error(error);
+        tokenStatus.value[tokenId] = "failed";
+        log(`${token.name} 一键领取合成道具失败: ${error.message}`, "error");
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        log(`${token.name} 断开连接`, "info");
+      }
+    });
+
+    await Promise.all(taskPromises);
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("批量一键领取合成道具结束");
+  };
+
   return {
     climbTower,
     climbWeirdTower,
@@ -1427,6 +1726,7 @@ export function createTasksTower(deps) {
     skinChallenge,
     batchUseItems,
     batchMergeItems,
+    batchClaimAndUseItems,
   };
 }
 

@@ -577,6 +577,17 @@
                 >
                   一键领取怪异塔免费道具
                 </n-button>
+                <n-button
+                  size="small"
+                  @click="batchClaimAndUseItems"
+                  :disabled="
+                    isRunning ||
+                    selectedTokens.length === 0 ||
+                    !isWeirdTowerActivityOpen
+                  "
+                >
+                  一键领取合成道具
+                </n-button>
               </n-space>
             </n-tab-pane>
             <n-tab-pane name="resource" tab="资源">
@@ -3807,6 +3818,7 @@ const taskGroupDefinitions = [
       "batchUseItems",
       "batchMergeItems",
       "batchClaimFreeEnergy",
+      "batchClaimAndUseItems",
     ],
   },
   {
@@ -6118,6 +6130,7 @@ const {
   skinChallenge,
   batchUseItems,
   batchMergeItems,
+  batchClaimAndUseItems,
 } = tasksTower;
 
 
