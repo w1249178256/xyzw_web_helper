@@ -1425,8 +1425,9 @@ export function createTasksTower(deps) {
   };
 
   /**
-   * 一键领取合成道具（逐账号编排版）：每个账号独立执行完整流程
+   * 一键领取合成道具（逐账号并发编排版）
    * 单账号流程：领取免费道具 → 循环[使用道具 → 合成] → 该账号道具归零后最终合成
+   * 并发模型复用现有批量任务模式：全组 Promise.all + connectionQueue 槽位限流（maxActive）
    * 通过临时切换 selectedTokens 为单账号，复用现有三个批量函数
    */
   const batchClaimAndUseItems = async () => {
@@ -1441,10 +1442,11 @@ export function createTasksTower(deps) {
       addLog({ time: new Date().toLocaleTimeString(), message: `${msg}`, type });
 
     // 编排现有函数：临时把 selectedTokens 切换为单账号，调用后恢复状态
-    // 注意：子函数入口会重置 shouldStop=false，因此每轮循环需显式检查 stopRequested
+    // 子函数入口同步捕获 selectedTokens（.map()），JS 单线程保证「设置→捕获」原子性
+    // 注意：子函数入口会重置 shouldStop=false，用 stopRequested 显式跟踪用户停止请求
     let stopRequested = false;
     const runForToken = async (fn, tokenId, name) => {
-      if (stopRequested) return 0;
+      if (stopRequested || shouldStop.value) { stopRequested = true; return 0; }
       isRunning.value = true;
       shouldStop.value = false;
       selectedTokens.value = [tokenId];   // 切换为单账号
@@ -1461,55 +1463,59 @@ export function createTasksTower(deps) {
 
     let totalUsed = 0;
 
+    // 单账号完整流程
+    const runAccountFlow = async (tokenId) => {
+      const token = tokens.value.find((t) => t.id === tokenId);
+      if (!token) return;
+
+      log(`=== 开始账号流程: ${token.name} ===`, "info");
+      tokenStatus.value[tokenId] = "running";
+
+      // ① 领取免费道具（现有功能，单账号）
+      await runForToken(batchClaimFreeEnergy, tokenId, "领取免费道具");
+
+      // ② 循环 [使用道具 → 合成]，直到该账号道具归零
+      const MAX_OUTER_LOOPS = 50;
+      let outerLoop = 0;
+      let accountUsed = 0;
+
+      while (!stopRequested && outerLoop < MAX_OUTER_LOOPS) {
+        outerLoop++;
+
+        const usedThisRound = await runForToken(batchUseItems, tokenId, "使用道具");
+        accountUsed += usedThisRound;
+
+        // 本账号没使用任何道具 = 道具已归零（或受阻），进入最终合成
+        if (usedThisRound === 0) {
+          log(`${token.name} 第 ${outerLoop} 轮未使用道具，道具已用完`, "info");
+          break;
+        }
+
+        log(`${token.name} 第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
+        await runForToken(batchMergeItems, tokenId, "合成");
+      }
+
+      // ③ 该账号道具归零后，最终合成一次（含领奖）
+      if (!stopRequested) {
+        log(`${token.name} 执行最终合成`, "info");
+        await runForToken(batchMergeItems, tokenId, "最终合成");
+      }
+
+      totalUsed += accountUsed;   // JS 单线程，同步累加无竞态
+      tokenStatus.value[tokenId] = stopRequested ? "failed" : "completed";
+      log(`=== ${token.name} 账号流程结束：共使用道具 ${accountUsed} 个 ===`, "success");
+    };
+
     try {
       log("=== 一键领取合成道具开始 ===", "info");
 
-      // ———— 逐账号执行完整流程 ————
-      for (const tokenId of originalSelection) {
-        if (stopRequested) break;
-        const token = tokens.value.find((t) => t.id === tokenId);
-        if (!token) continue;
-
-        log(`=== 开始账号流程: ${token.name} ===`, "info");
-        tokenStatus.value[tokenId] = "running";
-
-        // ① 领取免费道具（现有功能，单账号）
-        await runForToken(batchClaimFreeEnergy, tokenId, "领取免费道具");
-        if (shouldStop.value) { stopRequested = true; break; }
-
-        // ② 循环 [使用道具 → 合成]，直到该账号道具归零
-        const MAX_OUTER_LOOPS = 50;
-        let outerLoop = 0;
-        let accountUsed = 0;
-
-        while (!stopRequested && outerLoop < MAX_OUTER_LOOPS) {
-          outerLoop++;
-
-          const usedThisRound = await runForToken(batchUseItems, tokenId, "使用道具");
-          accountUsed += usedThisRound;
-
-          // 本账号没使用任何道具 = 道具已归零（或受阻），进入最终合成
-          if (usedThisRound === 0) {
-            log(`${token.name} 第 ${outerLoop} 轮未使用道具，道具已用完`, "info");
-            break;
-          }
-
-          if (shouldStop.value) { stopRequested = true; break; }
-
-          log(`${token.name} 第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
-          await runForToken(batchMergeItems, tokenId, "合成");
-        }
-
-        // ③ 该账号道具归零后，最终合成一次（含领奖）
-        if (!stopRequested) {
-          log(`${token.name} 执行最终合成`, "info");
-          await runForToken(batchMergeItems, tokenId, "最终合成");
-        }
-
-        totalUsed += accountUsed;
-        tokenStatus.value[tokenId] = "completed";
-        log(`=== ${token.name} 账号流程结束：共使用道具 ${accountUsed} 个 ===`, "success");
-      }
+      // ———— 复用现有并发模型：全组 Promise.all + connectionQueue 槽位限流 ————
+      // 与 startBatch / batchUseItems 等所有批量任务的调度方式一致：
+      // 每个账号一个 async 任务，实际并发由「最大并发连接数」(maxActive) 自动控制
+      const accountFlows = originalSelection.map(async (tokenId) => {
+        await runAccountFlow(tokenId);
+      });
+      await Promise.all(accountFlows);
 
       log(`=== 一键领取合成道具全部结束：共使用道具 ${totalUsed} 个 ===`, "success");
     } finally {
