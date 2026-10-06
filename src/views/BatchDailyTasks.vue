@@ -393,6 +393,13 @@
                 </n-button>
                 <n-button
                   size="small"
+                  @click="batchGachaFree"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键抽扭蛋
+                </n-button>
+                <n-button
+                  size="small"
                   @click="batchGenieSweep"
                   :disabled="isRunning || selectedTokens.length === 0"
                 >
@@ -3775,6 +3782,7 @@ const taskGroupDefinitions = [
       "store_syncpurchaseconfig",
       "store_purchase",
       "collection_claimfreereward",
+      "batchGachaFree",
       "batchGenieSweep",
       "batchXuanwuBlessing",
     ],
@@ -6142,6 +6150,7 @@ const {
   store_syncpurchaseconfig,
   store_purchase,
   collection_claimfreereward,
+  batchGachaFree,
 } = tasksStore;
 
 const tasksLegacy = createTasksLegacy(createTaskDeps());

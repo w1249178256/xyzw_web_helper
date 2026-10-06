@@ -1,7 +1,7 @@
 /**
  * 商店类任务
  * 包含: legion_storebuygoods, legionStoreBuySkinCoins, store_purchase,
- * store_syncpurchaseconfig, collection_claimfreereward
+ * store_syncpurchaseconfig, collection_claimfreereward, batchGachaFree
  */
 
 import {
@@ -413,6 +413,90 @@ export function createTasksStore(deps) {
   };
 
   /**
+   * 一键抽免费扭蛋（对选中账号批量执行）
+   * 命令与一键补差中的「免费扭蛋」一致: gacha_drawreward { num: 1, isGroup: false }
+   */
+  const batchGachaFree = async () => {
+    if (selectedTokens.value.length === 0) return;
+
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 开始免费扭蛋: ${token.name} ===`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 发送免费扭蛋请求...`,
+          type: "info",
+        });
+
+        const result = await tokenStore.sendMessageWithPromise(
+          tokenId,
+          "gacha_drawreward",
+          { num: 1, isGroup: false },
+          5000,
+        );
+
+        await sleep(delayConfig.action);
+
+        if (result.error) {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 免费扭蛋失败: ${result.error}`,
+            type: "error",
+          });
+          tokenStatus.value[tokenId] = "failed";
+        } else {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 免费扭蛋成功`,
+            type: "success",
+          });
+          tokenStatus.value[tokenId] = "completed";
+        }
+      } catch (error) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 免费扭蛋过程出错: ${error.message}`,
+          type: "error",
+        });
+        tokenStatus.value[tokenId] = "failed";
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭 (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+          type: "info",
+        });
+      }
+    });
+
+    await Promise.all(taskPromises);
+
+    currentRunningTokenId.value = null;
+    isRunning.value = false;
+    shouldStop.value = false;
+  };
+
+  /**
    * 一键配置黑市采购清单
    */
   const store_syncpurchaseconfig = async () => {
@@ -555,5 +639,6 @@ export function createTasksStore(deps) {
     store_purchase,
     store_syncpurchaseconfig,
     collection_claimfreereward,
+    batchGachaFree,
   };
 }
