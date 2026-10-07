@@ -1425,10 +1425,10 @@ export function createTasksTower(deps) {
   };
 
   /**
-   * 一键领取合成道具（逐账号并发编排版）
-   * 单账号流程：领取免费道具 → 循环[使用道具 → 合成] → 该账号道具归零后最终合成
+   * 一键领取合成道具（逐账号并发编排版，单连接贯穿全流程）
+   * 单账号流程：建立连接(一次) → 领取免费道具 → 循环[使用道具 → 合成] → 最终合成 → 断连
    * 并发模型复用现有批量任务模式：全组 Promise.all + connectionQueue 槽位限流（maxActive）
-   * 通过临时切换 selectedTokens 为单账号，复用现有三个批量函数
+   * 连接复用：流程期间拦截子函数的断连调用，一个账号全程只建一次连接
    */
   const batchClaimAndUseItems = async () => {
     if (selectedTokens.value.length === 0) return;
@@ -1441,10 +1441,18 @@ export function createTasksTower(deps) {
     const log = (msg, type = "info") =>
       addLog({ time: new Date().toLocaleTimeString(), message: `${msg}`, type });
 
-    // 编排现有函数：临时把 selectedTokens 切换为单账号，调用后恢复状态
-    // 子函数入口同步捕获 selectedTokens（.map()），JS 单线程保证「设置→捕获」原子性
-    // 注意：子函数入口会重置 shouldStop=false，用 stopRequested 显式跟踪用户停止请求
+    // —— 连接复用机制 ①：拦截流程中账号的断连，保持连接贯穿整个账号流程 ——
+    // 只在本函数执行期间生效（finally 恢复原方法），只拦截 flowActiveTokens 中的账号
+    const originalClose = tokenStore.closeWebSocketConnection.bind(tokenStore);
+    const flowActiveTokens = new Set();
+    tokenStore.closeWebSocketConnection = (id, ...args) => {
+      if (flowActiveTokens.has(id)) return;   // 流程中的账号：跳过断连，连接复用
+      return originalClose(id, ...args);      // 其他账号：原行为
+    };
+
     let stopRequested = false;
+
+    // 编排现有函数：临时把 selectedTokens 切换为单账号，调用后恢复状态
     const runForToken = async (fn, tokenId, name) => {
       if (stopRequested || shouldStop.value) { stopRequested = true; return 0; }
       isRunning.value = true;
@@ -1458,12 +1466,18 @@ export function createTasksTower(deps) {
       } finally {
         selectedTokens.value = originalSelection;   // 恢复勾选
         isRunning.value = true;
+        // —— 连接复用机制 ③：槽位计数补偿 ——
+        // 子函数 finally 已 releaseConnectionSlot（active--），但连接被机制①保持，
+        // 若连接仍存活则补回计数，保证 maxActive 并发限制不失效
+        if (flowActiveTokens.has(tokenId) && tokenStore.getWebSocketStatus(tokenId) === "connected") {
+          connectionQueue.active++;
+        }
       }
     };
 
     let totalUsed = 0;
 
-    // 单账号完整流程
+    // —— 单账号完整流程（开头建连一次，结尾真正断连） ——
     const runAccountFlow = async (tokenId) => {
       const token = tokens.value.find((t) => t.id === tokenId);
       if (!token) return;
@@ -1471,43 +1485,56 @@ export function createTasksTower(deps) {
       log(`=== 开始账号流程: ${token.name} ===`, "info");
       tokenStatus.value[tokenId] = "running";
 
-      // ① 领取免费道具（现有功能，单账号）
-      await runForToken(batchClaimFreeEnergy, tokenId, "领取免费道具");
-
-      // ② 循环 [使用道具 → 合成]，直到该账号道具归零
-      const MAX_OUTER_LOOPS = 50;
-      let outerLoop = 0;
+      flowActiveTokens.add(tokenId);
       let accountUsed = 0;
 
-      while (!stopRequested && outerLoop < MAX_OUTER_LOOPS) {
-        outerLoop++;
+      try {
+        // 开头建立一次连接（占槽位），整个流程复用
+        // 子函数内 ensureConnection 检测到已连接会直接返回，不再重复建连
+        await ensureConnection(tokenId);
 
-        const usedThisRound = await runForToken(batchUseItems, tokenId, "使用道具");
-        accountUsed += usedThisRound;
+        // ① 领取免费道具（现有功能，单账号）
+        await runForToken(batchClaimFreeEnergy, tokenId, "领取免费道具");
 
-        // 本账号没使用任何道具 = 道具已归零（或受阻），进入最终合成
-        if (usedThisRound === 0) {
-          log(`${token.name} 第 ${outerLoop} 轮未使用道具，道具已用完`, "info");
-          break;
+        // ② 循环 [使用道具 → 合成]，直到该账号道具归零
+        const MAX_OUTER_LOOPS = 50;
+        let outerLoop = 0;
+
+        while (!stopRequested && outerLoop < MAX_OUTER_LOOPS) {
+          outerLoop++;
+
+          const usedThisRound = await runForToken(batchUseItems, tokenId, "使用道具");
+          accountUsed += usedThisRound;
+
+          // 本账号没使用任何道具 = 道具已归零（或受阻），进入最终合成
+          if (usedThisRound === 0) {
+            log(`${token.name} 第 ${outerLoop} 轮未使用道具，道具已用完`, "info");
+            break;
+          }
+
+          log(`${token.name} 第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
+          await runForToken(batchMergeItems, tokenId, "合成");
         }
 
-        log(`${token.name} 第 ${outerLoop} 轮使用道具 ${usedThisRound} 个，开始合成`, "info");
-        await runForToken(batchMergeItems, tokenId, "合成");
-      }
+        // ③ 该账号道具归零后，最终合成一次（含领奖）
+        if (!stopRequested) {
+          log(`${token.name} 执行最终合成`, "info");
+          await runForToken(batchMergeItems, tokenId, "最终合成");
+        }
+      } finally {
+        // —— 连接复用机制 ②：账号流程结束，真正断连并释放槽位 ——
+        flowActiveTokens.delete(tokenId);
+        originalClose(tokenId);
+        releaseConnectionSlot();
 
-      // ③ 该账号道具归零后，最终合成一次（含领奖）
-      if (!stopRequested) {
-        log(`${token.name} 执行最终合成`, "info");
-        await runForToken(batchMergeItems, tokenId, "最终合成");
+        totalUsed += accountUsed;   // JS 单线程，同步累加无竞态
+        tokenStatus.value[tokenId] = stopRequested ? "failed" : "completed";
+        log(`=== ${token.name} 账号流程结束：共使用道具 ${accountUsed} 个 ===`, "success");
       }
-
-      totalUsed += accountUsed;   // JS 单线程，同步累加无竞态
-      tokenStatus.value[tokenId] = stopRequested ? "failed" : "completed";
-      log(`=== ${token.name} 账号流程结束：共使用道具 ${accountUsed} 个 ===`, "success");
     };
 
     try {
-      log("=== 一键领取合成道具开始 ===", "info");
+      log("=== 一键领取合成道具开始（单连接模式） ===", "info");
 
       // ———— 复用现有并发模型：全组 Promise.all + connectionQueue 槽位限流 ————
       // 与 startBatch / batchUseItems 等所有批量任务的调度方式一致：
@@ -1519,6 +1546,7 @@ export function createTasksTower(deps) {
 
       log(`=== 一键领取合成道具全部结束：共使用道具 ${totalUsed} 个 ===`, "success");
     } finally {
+      tokenStore.closeWebSocketConnection = originalClose;   // 恢复原断连方法
       selectedTokens.value = originalSelection;   // 确保勾选恢复
       isRunning.value = false;
       currentRunningTokenId.value = null;
