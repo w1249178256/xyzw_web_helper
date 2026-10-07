@@ -888,23 +888,63 @@ const handleDuel = async () => {
     dieStats.ourDieHeroGameCount = 0;
     dieStats.enemyDieHeroGameCount = 0;
 
+    // ===== 限频保护（400340，对齐 V2 一键切磋已验证的错误码）=====
+    const RATE_LIMIT_CODE = 400340;
+
+    // 单场切磋：识别限频并指数退避后重试，最多退避 3 次
+    // 限频两种表现形式都处理：响应带 code 字段 / 异常消息含错误码
+    const doOneDuel = async (roundLabel) => {
+      let backoff = 11000; // 首次退避 11s（V2 验证有效的冷却时长）
+      for (let attempt = 0; attempt < 4; attempt++) {
+        let result = null;
+        try {
+          result = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "fight_startpvp",
+            {
+              targetId: playerInfo.value.id,
+            },
+            10000,
+          );
+        } catch (e) {
+          // 异常形式的限频
+          if (String(e?.message || "").includes(String(RATE_LIMIT_CODE))) {
+            result = { code: RATE_LIMIT_CODE };
+          } else {
+            throw e;
+          }
+        }
+
+        // 响应形式的限频
+        if (result && result.code === RATE_LIMIT_CODE) {
+          if (attempt >= 3) return null; // 退避 3 次仍限频，放弃本场
+          message.warning(
+            `${roundLabel} 触发限频(400340)，退避 ${Math.round(backoff / 1000)}s 后重试（第 ${attempt + 1}/3 次）`,
+          );
+          await new Promise((r) => setTimeout(r, backoff));
+          backoff = Math.min(backoff * 2, 60000); // 指数退避：11s→22s→44s
+          continue;
+        }
+        return result;
+      }
+      return null;
+    };
+
+    // ===== 连续失败熔断：连续 3 场无战斗数据（退避后仍限频）= 冷却窗口异常，停止并保留已有结果 =====
+    let consecutiveFailures = 0;
+    const MAX_CONSECUTIVE_FAILURES = 3;
+
     // 执行连续切磋
     for (let i = 0; i < totalCount; i++) {
       message.info(`正在进行第 ${i + 1}/${totalCount} 场切磋`);
 
-      // 调用实际的切磋API
-      const result = await tokenStore.sendMessageWithPromise(
-        tokenId,
-        "fight_startpvp",
-        {
-          targetId: playerInfo.value.id,
-        },
-        10000,
-      );
+      // 调用切磋（带限频退避保护）
+      const result = await doOneDuel(`第 ${i + 1}/${totalCount} 场`);
 
       console.log(`第 ${i + 1} 场切磋结果:`, result);
 
       if (result && result.battleData) {
+        consecutiveFailures = 0;
         // 处理掉将情况
         let leftCount = 0;
         let rightCount = 0;
@@ -961,16 +1001,27 @@ const handleDuel = async () => {
         // 更新切磋进度
         updateFightProgress(i + 1, winCount, lossCount);
 
-        // 短暂延迟，避免请求过于频繁
+        // 短暂延迟 + 随机抖动（原固定500ms是机器人节奏）
         if (i < totalCount - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 600 + Math.random() * 400));
         }
       } else {
-        // 单场切磋失败，继续下一场
+        // 切磋失败（退避后仍限频或无战斗数据）：不计入胜负统计（服务器拒绝≠战斗输）
+        consecutiveFailures++;
         message.warning(
-          `第 ${i + 1} 场切磋失败: ${result?.message || "未返回战斗数据"}`,
+          `第 ${i + 1} 场切磋失败: ${result?.message || "未返回战斗数据"} (连续失败 ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES})`,
         );
-        lossCount++;
+
+        // 熔断：连续 3 场失败 = 限频冷却窗口异常，停止并保留已完成统计
+        if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+          message.error(
+            `连续 ${MAX_CONSECUTIVE_FAILURES} 场无战斗数据，限频未恢复，已停止（完成 ${i} 场，跳过 ${totalCount - i} 场）`,
+          );
+          break;
+        }
+
+        // 失败后间隔拉长，给限频窗口恢复时间
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         updateFightProgress(i + 1, winCount, lossCount);
       }
     }
