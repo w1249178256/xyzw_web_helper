@@ -528,13 +528,6 @@ const playerInfo = ref(null);
 const fightCount = ref(1);
 const isFightCountValid = ref(true);
 
-// ===== 自适应间隔器（组件级，跨轮次保留学习成果）=====
-// 限频是滑动窗口计数，优化对象是「切磋之间的间隔」而非轮次
-// 触发限频 = 间隔不够 → 上调；连续稳定 → 缓慢回落试探
-let requestInterval = 800;   // 当前生效间隔（ms）
-const MIN_INTERVAL = 800;    // 间隔下限
-const MAX_INTERVAL = 4000;   // 间隔上限
-
 // 切磋进度状态
 const fightProgress = reactive({
   visible: false,
@@ -852,7 +845,7 @@ const handleDuel = async () => {
   }
 
   const totalCount = parseInt(fightCount.value);
-  message.info(`开始连续切磋: ${playerInfo.value.name}，共${totalCount}次（当前间隔 ${(requestInterval / 1000).toFixed(1)}s）`);
+  message.info(`开始连续切磋: ${playerInfo.value.name}，共${totalCount}次`);
 
   if (!tokenStore.selectedToken) {
     message.warning("请先选择游戏角色");
@@ -895,80 +888,23 @@ const handleDuel = async () => {
     dieStats.ourDieHeroGameCount = 0;
     dieStats.enemyDieHeroGameCount = 0;
 
-    // ===== 限频保护（400340，对齐 V2 一键切磋已验证的错误码）=====
-    const RATE_LIMIT_CODE = 400340;
-
-    // 自适应间隔器方法（状态在组件级 requestInterval，跨轮保留）
-    let stableStreak = 0;   // 连续成功场次（用于回落试探）
-
-    // 触发限频：间隔上调 1.6 倍（封顶 4s），重置稳定计数
-    const penalizeInterval = () => {
-      requestInterval = Math.min(requestInterval * 1.6, MAX_INTERVAL);
-      stableStreak = 0;
-    };
-
-    // 成功一场：连续 15 场稳定则回落 10%（试探更快节奏）
-    const rewardInterval = () => {
-      stableStreak++;
-      if (stableStreak >= 15) {
-        requestInterval = Math.max(requestInterval * 0.9, MIN_INTERVAL);
-        stableStreak = 0;
-      }
-    };
-
-    // 单场切磋：限频时上调间隔并短冷却（10s，等当前窗口转过去）后重试本场
-    const doOneDuel = async (roundLabel) => {
-      for (let attempt = 0; attempt < 3; attempt++) {
-        let result = null;
-        try {
-          result = await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "fight_startpvp",
-            {
-              targetId: playerInfo.value.id,
-            },
-            10000,
-          );
-        } catch (e) {
-          // 异常形式的限频
-          if (String(e?.message || "").includes(String(RATE_LIMIT_CODE))) {
-            result = { code: RATE_LIMIT_CODE };
-          } else {
-            throw e;
-          }
-        }
-
-        // 响应形式的限频
-        if (result && result.code === RATE_LIMIT_CODE) {
-          if (attempt >= 2) return null; // 短冷却重试 2 次仍限频，放弃本场
-          penalizeInterval();   // 间隔上调（800→1280→2048…封顶4000ms）
-          message.warning(
-            `${roundLabel} 触发限频(400340)，间隔已上调至 ${(requestInterval / 1000).toFixed(1)}s，10s 后重试本场`,
-          );
-          await new Promise((r) => setTimeout(r, 10000));
-          continue;
-        }
-        return result;
-      }
-      return null;
-    };
-
-    // ===== 连续失败熔断：连续 5 场无战斗数据（限频持续未恢复）= 停止并保留已有结果 =====
-    // 阈值放宽到 5：给自适应间隔器收敛时间（间隔上调初期几次失败是预期的）
-    let consecutiveFailures = 0;
-    const MAX_CONSECUTIVE_FAILURES = 5;
-
     // 执行连续切磋
     for (let i = 0; i < totalCount; i++) {
       message.info(`正在进行第 ${i + 1}/${totalCount} 场切磋`);
 
-      // 调用切磋（带限频退避保护）
-      const result = await doOneDuel(`第 ${i + 1}/${totalCount} 场`);
+      // 调用实际的切磋API
+      const result = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "fight_startpvp",
+        {
+          targetId: playerInfo.value.id,
+        },
+        10000,
+      );
 
       console.log(`第 ${i + 1} 场切磋结果:`, result);
 
       if (result && result.battleData) {
-        consecutiveFailures = 0;
         // 处理掉将情况
         let leftCount = 0;
         let rightCount = 0;
@@ -1025,30 +961,16 @@ const handleDuel = async () => {
         // 更新切磋进度
         updateFightProgress(i + 1, winCount, lossCount);
 
-        // 自适应间隔 + 随机抖动（间隔随限频自动调整，连续稳定后缓慢回落）
+        // 短暂延迟，避免请求过于频繁
         if (i < totalCount - 1) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, requestInterval + Math.random() * 400),
-          );
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
-        rewardInterval();   // 成功一场，累计稳定计数（用于回落试探）
       } else {
-        // 切磋失败（退避后仍限频或无战斗数据）：不计入胜负统计（服务器拒绝≠战斗输）
-        consecutiveFailures++;
+        // 单场切磋失败，继续下一场
         message.warning(
-          `第 ${i + 1} 场切磋失败: ${result?.message || "未返回战斗数据"} (连续失败 ${consecutiveFailures}/${MAX_CONSECUTIVE_FAILURES})`,
+          `第 ${i + 1} 场切磋失败: ${result?.message || "未返回战斗数据"}`,
         );
-
-        // 熔断：连续 3 场失败 = 限频冷却窗口异常，停止并保留已完成统计
-        if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-          message.error(
-            `连续 ${MAX_CONSECUTIVE_FAILURES} 场无战斗数据，限频未恢复，已停止（完成 ${i} 场，跳过 ${totalCount - i} 场）`,
-          );
-          break;
-        }
-
-        // 失败后间隔拉长，给限频窗口恢复时间
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        lossCount++;
         updateFightProgress(i + 1, winCount, lossCount);
       }
     }
