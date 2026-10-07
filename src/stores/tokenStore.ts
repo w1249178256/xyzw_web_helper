@@ -45,7 +45,8 @@ declare interface TokenData {
 }
 
 declare interface WebSocketConnection {
-  status: "connecting" | "connected" | "disconnected" | "error";
+  status:
+    "connecting" | "connected" | "disconnecting" | "disconnected" | "error";
   client: XyzwWebSocketClient | null;
   lastError: { timestamp: string; error: string } | null;
   tokenId: string;
@@ -817,8 +818,14 @@ export const useTokenStore = defineStore("tokens", () => {
         lastRandomSeed: null,
       };
 
+      // Capture the reactive record: an older client's callbacks must not update its replacement.
+      const connection = wsConnections.value[tokenId];
+      const isCurrentConnection = () =>
+        wsConnections.value[tokenId] === connection;
+
       // 9. 设置事件监听（增强版）
       wsClient.onConnect = () => {
+        if (!isCurrentConnection()) return;
         wsLogger.wsConnect(tokenId);
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].status = "connected";
@@ -839,25 +846,28 @@ export const useTokenStore = defineStore("tokens", () => {
       };
 
       wsClient.onDisconnect = async (event) => {
+        if (!isCurrentConnection()) return;
         const reason = event.code === 1006 ? "异常断开" : event.reason || "";
         wsLogger.wsDisconnect(tokenId, reason);
         if (wsConnections.value[tokenId]) {
           const conn = wsConnections.value[tokenId];
+          const wasDisconnecting = conn.status === "disconnecting";
           conn.status = "disconnected";
           conn.randomSeedSynced = false;
+          updateCrossTabConnectionState(tokenId, "disconnected");
 
           // 如果连接异常断开(1006)且从未连接成功(握手失败)，尝试刷新Token
           // connectedAt 为 null 表示 socket.onopen 还没触发就断开了，通常意味着握手失败（如403 Forbidden）
-          if (event.code === 1006 && !conn.connectedAt) {
+          if (event.code === 1006 && !conn.connectedAt && !wasDisconnecting) {
             wsLogger.warn(`检测到握手失败(1006)，尝试刷新Token [${tokenId}]`);
             // 强制刷新并重连
             await attemptTokenRefresh(tokenId, true);
           }
         }
-        updateCrossTabConnectionState(tokenId, "disconnected");
       };
 
       wsClient.onError = (error) => {
+        if (!isCurrentConnection()) return;
         wsLogger.wsError(tokenId, error);
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].status = "error";
@@ -872,6 +882,7 @@ export const useTokenStore = defineStore("tokens", () => {
 
       // 10. 设置消息监听
       wsClient.setMessageListener((message: ProtoMsg) => {
+        if (!isCurrentConnection()) return;
         const cmd = message?.cmd || "unknown";
         wsLogger.wsMessage(tokenId, cmd, true);
 
@@ -898,7 +909,11 @@ export const useTokenStore = defineStore("tokens", () => {
     }
   };
 
-  // 异步版本的关闭连接（优雅关闭）
+  /**
+   * Close the current transport before replacing its connection record.
+   * @param {string} tokenId Account connection to close.
+   * @returns {Promise<void>} Resolves after transport closure or the five-second limit.
+   */
   const closeWebSocketConnectionAsync = async (tokenId: string) => {
     const lockAcquired = await acquireConnectionLock(tokenId, "disconnect");
     if (!lockAcquired) {
@@ -914,23 +929,33 @@ export const useTokenStore = defineStore("tokens", () => {
         connection.status = "disconnecting";
         updateCrossTabConnectionState(tokenId, "disconnecting");
 
+        // disconnect() clears client.socket immediately, before the native close event.
+        const socket = connection.client.socket;
         connection.client.disconnect();
 
         // 等待连接完全关闭
-        await new Promise((resolve) => {
+        await new Promise<void>((resolve) => {
+          let pollTimer: ReturnType<typeof setTimeout> | undefined;
+          const finish = () => {
+            clearTimeout(timeoutTimer);
+            clearTimeout(pollTimer);
+            resolve();
+          };
+          const timeoutTimer = setTimeout(finish, 5000);
           const checkDisconnected = () => {
-            if (!connection.client.connected) {
-              resolve();
+            if (!socket || socket.readyState === WebSocket.CLOSED) {
+              finish();
             } else {
-              setTimeout(checkDisconnected, 100);
+              pollTimer = setTimeout(checkDisconnected, 100);
             }
           };
-          setTimeout(resolve, 5000); // 最多等待5秒
           checkDisconnected();
         });
 
-        delete wsConnections.value[tokenId];
-        updateCrossTabConnectionState(tokenId, "disconnected");
+        if (wsConnections.value[tokenId] === connection) {
+          delete wsConnections.value[tokenId];
+          updateCrossTabConnectionState(tokenId, "disconnected");
+        }
         wsLogger.info(`连接已优雅关闭: ${tokenId}`);
       }
     } catch (error) {

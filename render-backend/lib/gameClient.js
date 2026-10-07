@@ -146,6 +146,9 @@ class GameClient {
     this.ack = 0;
     this.seq = 0;
     this.promises = {};
+    this.connectionTimer = null;
+    this.connectionReject = null;
+    this.heartbeatStartTimer = null;
     this.heartbeatTimer = null;
     this.lastMsgAt = Date.now();
     this._log = (...args) =>
@@ -161,75 +164,106 @@ class GameClient {
   }
 
   connect(timeoutMs = 15000) {
+    this.disconnect();
     return new Promise((resolve, reject) => {
       this.log("连接中:", this._wsUrl.split("?")[0]);
 
-      let timer;
-      if (timeoutMs) {
-        timer = setTimeout(() => {
-          if (this.ws) this.ws.close();
-          reject(new Error("连接超时"));
-        }, timeoutMs);
-      }
-
+      let socket;
       try {
-        this.ws = new WebSocket(this._wsUrl);
+        socket = new WebSocket(this._wsUrl);
       } catch (err) {
-        clearTimeout(timer);
         reject(err);
         return;
       }
+      this.ws = socket;
+      // Each new transport starts a fresh server-side sequence space.
+      this.seq = 0;
+      this.ack = 0;
+      socket.binaryType = "arraybuffer";
 
-      this.ws.binaryType = "arraybuffer";
+      let timer;
+      let settled = false;
+      const finish = (error) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (this.connectionReject === finish) {
+          this.connectionReject = null;
+          this.connectionTimer = null;
+        }
+        if (error) reject(error);
+        else resolve();
+      };
+      this.connectionReject = finish;
+      if (timeoutMs) {
+        timer = setTimeout(() => {
+          if (this.ws !== socket || this.connectionTimer !== timer) return;
+          finish(new Error("连接超时"));
+          this.disconnect();
+        }, timeoutMs);
+        this.connectionTimer = timer;
+      }
 
-      this.ws.on("open", () => {
+      socket.on("open", () => {
+        if (this.ws !== socket) return;
         this.connected = true;
         this.log("连接成功");
-        clearTimeout(timer);
+        finish();
         this._startHeartbeat();
-        resolve();
       });
 
-      this.ws.on("message", (data) => {
+      socket.on("message", (data) => {
+        if (this.ws !== socket) return;
         this._handleMessage(data);
       });
 
-      this.ws.on("close", (code, reason) => {
-        clearTimeout(timer);
-        if (!this.connected) reject(new Error("连接在建立前已关闭"));
+      socket.on("close", (code, reason) => {
+        finish(new Error("连接在建立前已关闭"));
+        if (this.ws !== socket) return;
+        this.ws = null;
         this.connected = false;
         this._stopHeartbeat();
         this.log("连接关闭:", code, reason.toString());
-        for (const id in this.promises) {
-          clearTimeout(this.promises[id].timer);
-          this.promises[id].reject(new Error("连接已关闭"));
-          delete this.promises[id];
-        }
+        this._rejectPendingRequests();
       });
 
-      this.ws.on("error", (err) => {
+      socket.on("error", (err) => {
+        if (this.ws !== socket) return;
         this.log("错误:", err.message);
-        clearTimeout(timer);
-        if (!this.connected) reject(err);
+        if (!this.connected) finish(err);
       });
     });
   }
 
   disconnect() {
-    this._stopHeartbeat();
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
+    const socket = this.ws;
+    this.ws = null;
     this.connected = false;
+    this._stopHeartbeat();
+    clearTimeout(this.connectionTimer);
+    this.connectionTimer = null;
+    const rejectConnection = this.connectionReject;
+    this.connectionReject = null;
+    rejectConnection?.(new Error("连接已关闭"));
+    this._rejectPendingRequests();
+    socket?.close();
+  }
+
+  /** Reject the previous transport's requests before its sequence space is reset. */
+  _rejectPendingRequests() {
+    for (const [id, request] of Object.entries(this.promises)) {
+      clearTimeout(request.timer);
+      delete this.promises[id];
+      request.reject(new Error("连接已关闭"));
+    }
   }
 
   send(cmd, params = {}) {
-    if (!this.connected) {
+    if (!this.connected || this.ws?.readyState !== WebSocket.OPEN) {
       this.log("未连接，无法发送:", cmd);
       return;
     }
-    const assignedSeq = cmd === "heart_beat" ? 0 : ++this.seq;
+    const assignedSeq = cmd === "heart_beat" ? 0 : this.seq + 1;
     const defaultBody = CMD_DEFAULTS[cmd] || {};
     const mergedParams = { ...defaultBody, ...params };
     const rawMsg = {
@@ -241,31 +275,49 @@ class GameClient {
     };
     const encoded = encode(rawMsg, getEnc("x"));
     this.ws.send(encoded);
+    // Unsent commands must not create sequence gaps rejected by the server.
+    if (cmd !== "heart_beat") this.seq = assignedSeq;
     this.log("发送:", cmd, "seq:", assignedSeq);
     return assignedSeq;
   }
 
+  /**
+   * Send a command and wait for its response, releasing pending state on failure.
+   * @param {string} cmd Protocol command name.
+   * @param {object} params Command parameters merged with protocol defaults.
+   * @param {number} timeoutMs Maximum response wait in milliseconds.
+   * @returns {Promise<object>} Decoded server response.
+   */
   sendWithPromise(cmd, params = {}, timeoutMs = 8000) {
     return new Promise((resolve, reject) => {
-      if (!this.connected) return reject(new Error("未连接"));
-      const requestSeq = ++this.seq;
+      if (!this.connected || this.ws?.readyState !== WebSocket.OPEN) {
+        return reject(new Error("未连接"));
+      }
+      const requestSeq = this.seq + 1;
       const timer = setTimeout(() => {
         delete this.promises[requestSeq];
         reject(new Error(`请求超时: ${cmd} (${timeoutMs}ms)`));
       }, timeoutMs);
       this.promises[requestSeq] = { resolve, reject, originalCmd: cmd, timer };
-      const defaultBody = CMD_DEFAULTS[cmd] || {};
-      const mergedParams = { ...defaultBody, ...params };
-      const rawMsg = {
-        cmd,
-        ack: this.ack,
-        seq: requestSeq,
-        time: Date.now(),
-        body: bon.encode(mergedParams),
-      };
-      const encoded = encode(rawMsg, getEnc("x"));
-      this.ws.send(encoded);
-      this.log("发送并等待:", cmd, "seq:", requestSeq);
+      try {
+        const defaultBody = CMD_DEFAULTS[cmd] || {};
+        const mergedParams = { ...defaultBody, ...params };
+        const rawMsg = {
+          cmd,
+          ack: this.ack,
+          seq: requestSeq,
+          time: Date.now(),
+          body: bon.encode(mergedParams),
+        };
+        const encoded = encode(rawMsg, getEnc("x"));
+        this.ws.send(encoded);
+        this.seq = requestSeq;
+        this.log("发送并等待:", cmd, "seq:", requestSeq);
+      } catch (error) {
+        clearTimeout(timer);
+        delete this.promises[requestSeq];
+        reject(error);
+      }
     });
   }
 
@@ -361,23 +413,37 @@ class GameClient {
   }
 
   _startHeartbeat() {
-    setTimeout(() => {
-      if (this.connected) this._sendHeartbeat();
+    this._stopHeartbeat();
+    const socket = this.ws;
+    const startTimer = setTimeout(() => {
+      if (this.heartbeatStartTimer !== startTimer) return;
+      this.heartbeatStartTimer = null;
+      if (this.ws === socket && this.connected) this._sendHeartbeat();
     }, 3000);
-    this.heartbeatTimer = setInterval(() => {
-      if (this.connected) this._sendHeartbeat();
+    this.heartbeatStartTimer = startTimer;
+    const heartbeatTimer = setInterval(() => {
+      if (
+        this.heartbeatTimer === heartbeatTimer &&
+        this.ws === socket &&
+        this.connected
+      ) {
+        this._sendHeartbeat();
+      }
     }, 5000);
+    this.heartbeatTimer = heartbeatTimer;
   }
 
   _stopHeartbeat() {
-    if (this.heartbeatTimer) {
+    clearTimeout(this.heartbeatStartTimer);
+    this.heartbeatStartTimer = null;
+    if (this.heartbeatTimer !== null) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
   }
 
   _sendHeartbeat() {
-    if (!this.connected) return;
+    if (!this.connected || this.ws?.readyState !== WebSocket.OPEN) return;
     try {
       const rawMsg = {
         cmd: "_sys/ack",
