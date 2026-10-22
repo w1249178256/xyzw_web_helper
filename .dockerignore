@@ -1,0 +1,30 @@
+# 依赖与构建产物
+node_modules
+**/node_modules
+dist
+
+# 版本库与本地数据
+.git
+.gitignore
+scratch
+xyzw_data
+_patched
+*.md
+
+# 敏感文件：绝不进镜像（.env.docker 由 compose env_file 注入，不需要打进上下文）
+.env
+.env.local
+.env.*.local
+*.bin
+
+# 编辑器与系统文件
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# 临时与测试产物
+*.log
+/tmp
+coverage
+.env.docker

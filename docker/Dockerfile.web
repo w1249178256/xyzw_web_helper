@@ -1,0 +1,28 @@
+# 语法说明：Dockerfile 放在 docker/ 目录，构建上下文是仓库根（见 .dockerignore）
+
+# ---------- 前端：多阶段构建（pnpm 构建 → nginx 托管） ----------
+FROM node:24-alpine AS build
+
+RUN corepack enable && corepack prepare pnpm@10.19.0 --activate
+
+WORKDIR /app
+# 先拷清单利用层缓存：依赖不变则跳过安装
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+# 私有扩展开关通过 build-arg 可选注入（默认关闭 = 公开部署形态）
+ARG VITE_LOCAL_EXT=0
+ARG VITE_LOCAL_EXT_ENTRY=""
+ARG VITE_LOCAL_EXT_TAB=""
+ARG VITE_LOCAL_EXT_LABEL=""
+ENV VITE_LOCAL_EXT=$VITE_LOCAL_EXT \
+    VITE_LOCAL_EXT_ENTRY=$VITE_LOCAL_EXT_ENTRY \
+    VITE_LOCAL_EXT_TAB=$VITE_LOCAL_EXT_TAB \
+    VITE_LOCAL_EXT_LABEL=$VITE_LOCAL_EXT_LABEL
+RUN pnpm build
+
+FROM nginx:1.27-alpine
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
