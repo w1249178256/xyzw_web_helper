@@ -129,6 +129,7 @@ export class XyzwLegionWarWebSocketClient {
 
     this.dialogStatus = false;
     this.messageListener = null;
+    this._pushWaiters = []; // 等待指定命令推送的私有等待队列（盐场阵容功能使用）
     this.showMsg = false;
     this.connected = false;
     this.isReconnecting = false; // 重连状态标志
@@ -247,6 +248,7 @@ export class XyzwLegionWarWebSocketClient {
                 }
 
                 // 回调处理
+                this._notifyPushWaiters(packet);
                 if (this.messageListener) {
                   this.messageListener(packet);
                 }
@@ -323,6 +325,7 @@ export class XyzwLegionWarWebSocketClient {
         }
 
         // 回调处理
+        this._notifyPushWaiters(packet);
         if (this.messageListener) {
           this.messageListener(packet);
         }
@@ -489,6 +492,49 @@ export class XyzwLegionWarWebSocketClient {
     this.connected = false;
     this._clearTimers();
     socket?.close();
+  }
+
+  /**
+   * 等待下一条指定命令的推送。
+   * 战场服务器的部分响应（如 war_getteaminforesp）以推送形式到达且不回显请求 seq，
+   * 无法用 sendWithPromise 匹配，需按命令名捕获下一条推送。
+   * @param {string} cmd 响应命令名（如 "war_getteaminforesp"）
+   * @param {number} timeoutMs 超时毫秒
+   * @returns {Promise<object>} 推送负载（rawData / decodedBody / body）
+   */
+  waitForPush(cmd, timeoutMs = 8000) {
+    return new Promise((resolve, reject) => {
+      const waiter = {
+        cmd,
+        resolve: null,
+        timer: null,
+      };
+      waiter.resolve = (payload) => {
+        clearTimeout(waiter.timer);
+        resolve(payload);
+      };
+      waiter.timer = setTimeout(() => {
+        this._pushWaiters = this._pushWaiters.filter((w) => w !== waiter);
+        reject(new Error(`推送超时: ${cmd} (${timeoutMs}ms)`));
+      }, timeoutMs);
+      this._pushWaiters.push(waiter);
+    });
+  }
+
+  /** 将解析后的包分发给按命令名等待的私有等待者 */
+  _notifyPushWaiters(packet) {
+    const cmd = packet?.cmd;
+    if (!cmd || !this._pushWaiters?.length) return;
+    const hit = this._pushWaiters.find((w) => w.cmd === cmd);
+    if (!hit) return;
+    this._pushWaiters = this._pushWaiters.filter((w) => w !== hit);
+    const body =
+      packet.rawData !== undefined
+        ? packet.rawData
+        : packet.decodedBody !== undefined
+          ? packet.decodedBody
+          : packet.body;
+    hit.resolve(body ?? packet);
   }
 
   /** 发送消息 */
