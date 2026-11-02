@@ -6,6 +6,19 @@ import { PEACH_TASKS } from "@/utils/PeachTaskIds";
  * 包含: batchOpenBox, batchClaimBoxPointReward, batchFish, batchRecruit
  */
 
+/** 服务器限频业务码(同爬塔/切磋的 400340 治理), 多账号并行连发时触发 */
+const RATE_LIMIT_CODES = [400340, 200400];
+/** 限频退避基数(ms): 第 n 次重试等待 n*3s(3s/6s/9s) */
+const RATE_LIMIT_BACKOFF_MS = 3000;
+/** 单英雄限频自动重试上限; 退避后仍被限频说明进入长冷却, 提前结束该账号避免零延迟风暴 */
+const MAX_RATE_LIMIT_RETRIES = 3;
+
+const isRateLimitError = (err) =>
+  RATE_LIMIT_CODES.includes(err?.code) ||
+  RATE_LIMIT_CODES.some((code) =>
+    String(err?.message || "").includes(String(code)),
+  );
+
 /**
  * 创建物品类任务执行器
  * @param {object} deps - 依赖项
@@ -230,10 +243,13 @@ export function createTasksItem(deps) {
 
         await ensureConnection(tokenId);
 
+        // 限频(400340/200400)不消耗尝试次数: 退避后重试同一英雄, 连续退避仍被限频则提前结束该账号
+        let rateLimitedOut = false;
         for (const heroId of heroIds) {
           if (shouldStop.value) break;
 
           // 每个英雄尝试最多10次(resolve即成功继续; reject说明碎片不足/满星/未拥有, 跳过该英雄)
+          let rateLimitRetries = 0;
           for (let i = 1; i <= 10; i++) {
             if (shouldStop.value) break;
 
@@ -250,7 +266,29 @@ export function createTasksItem(deps) {
                 message: `${token.name} 英雄ID:${heroId}(${HERO_DICT[heroId]?.name || heroId}) ${label}成功 (第${i}次)`,
                 type: "success",
               });
+              rateLimitRetries = 0;
             } catch (err) {
+              if (isRateLimitError(err)) {
+                rateLimitRetries++;
+                if (rateLimitRetries > MAX_RATE_LIMIT_RETRIES) {
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 持续限频(400340), 提前结束${label}, 可稍后重跑`,
+                    type: "error",
+                  });
+                  rateLimitedOut = true;
+                  break;
+                }
+                const backoffMs = RATE_LIMIT_BACKOFF_MS * rateLimitRetries;
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 服务器限频, ${backoffMs / 1000}s 后重试 (${rateLimitRetries}/${MAX_RATE_LIMIT_RETRIES})`,
+                  type: "warning",
+                });
+                await new Promise((r) => setTimeout(r, backoffMs));
+                i--;
+                continue;
+              }
               addLog({
                 time: new Date().toLocaleTimeString(),
                 message: `${token.name} 英雄ID:${heroId}(${HERO_DICT[heroId]?.name || heroId}) 停止${label}: ${err.message || "未知错误"}`,
@@ -260,14 +298,25 @@ export function createTasksItem(deps) {
             }
             await new Promise((r) => setTimeout(r, delayConfig.action));
           }
+          if (rateLimitedOut) break;
+          // 跳过英雄的路径不走成功延迟, 这里统一补间隔, 防止满星/无碎片英雄被零延迟连发触发限频
+          await new Promise((r) => setTimeout(r, delayConfig.action));
         }
 
         tokenStatus.value[tokenId] = "completed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} === ${label}完成 ===`,
-          type: "success",
-        });
+        addLog(
+          rateLimitedOut
+            ? {
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} === ${label}因持续限频提前结束 ===`,
+                type: "warning",
+              }
+            : {
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} === ${label}完成 ===`,
+                type: "success",
+              },
+        );
       } catch (error) {
         console.error(error);
         tokenStatus.value[tokenId] = "failed";
