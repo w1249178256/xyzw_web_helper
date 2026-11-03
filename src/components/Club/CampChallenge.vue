@@ -370,129 +370,255 @@
             </span>
           </div>
           <div class="map-metrics-summary">
-            <NTag type="info" size="small" round :bordered="false">
-              总据点: {{ mapStats.total }}
+            <NTag round size="small" type="info" :bordered="false">
+              {{ positionsConfirmed ? "已布阵" : "已获取" }}:
+              {{ mapStats.total }}/{{ CAMP_SLOT_COUNT }}
             </NTag>
-            <NTag type="success" size="small" round :bordered="false">
-              坚守存活: {{ mapStats.aliveCount }} 人
+            <NTag round size="small" :bordered="false">
+              空位: {{ mapStats.emptyCount ?? "待核实" }}
             </NTag>
-            <NTag type="error" size="small" round :bordered="false">
-              已被击破: {{ mapStats.defeatedCount }} 人 ({{
+            <NTag round size="small" type="success" :bordered="false">
+              坚守: {{ mapStats.aliveCount }} 据点
+            </NTag>
+            <NTag round size="small" type="error" :bordered="false">
+              已被击破: {{ mapStats.defeatedCount }} 据点 ({{
                 mapStats.defeatedRate
               }}%)
             </NTag>
           </div>
           <div class="map-filters-group">
-            <n-radio-group v-model:value="mapFilter" size="small">
-              <n-radio-button value="all"
-                >全部 ({{ mapStats.total }})</n-radio-button
-              >
-              <n-radio-button value="alive"
-                >🛡️ 仅坚守 ({{ mapStats.aliveCount }})</n-radio-button
-              >
-              <n-radio-button value="defeated"
-                >💥 仅击破 ({{ mapStats.defeatedCount }})</n-radio-button
-              >
+            <n-radio-group size="small" v-model:value="mapFilter">
+              <n-radio-button value="all">
+                全部位置 ({{ CAMP_SLOT_COUNT }})
+              </n-radio-button>
+              <n-radio-button value="alive">
+                🛡️ 突出坚守 ({{ mapStats.aliveCount }})
+              </n-radio-button>
+              <n-radio-button value="defeated">
+                💥 突出击破 ({{ mapStats.defeatedCount }})
+              </n-radio-button>
             </n-radio-group>
-            <NSelect
-              v-model:value="mapSort"
-              :options="mapSortOptions"
-              size="small"
-              style="width: 175px; margin-left: 8px"
-            />
           </div>
         </div>
 
-        <!-- 30 人据点卡片网格 -->
-        <div class="fortress-grid">
-          <div
-            v-for="item in displayMapList"
-            :key="`slot_${item.slot}_${item.id}_${item.mirror ? 'mirror' : 'real'}`"
-            class="fortress-card"
-            :class="{
-              'is-defeated': item.defeated,
-              'is-alive': !item.defeated,
-              'is-mirror': item.mirror,
-            }"
-            @click="openDuelModal(item)"
-          >
-            <!-- 卡片顶部据点编号与状态印章 -->
-            <div class="card-header-bar">
-              <span class="slot-badge">
-                #{{ item.slot || "?" }} 据点
-                <NTag
-                  v-if="item.mirror"
-                  size="tiny"
-                  type="warning"
-                  round
-                  :bordered="false"
-                  style="
-                    margin-left: 4px;
-                    transform: scale(0.9);
-                    transform-origin: left center;
-                  "
-                >
-                  镜像
-                </NTag>
-              </span>
-              <div class="stamp-wrapper">
-                <span v-if="item.defeated" class="stamp stamp-defeated"
-                  >💥 已攻破</span
-                >
-                <span v-else class="stamp stamp-alive">🛡️ 坚守中</span>
-              </div>
-            </div>
-
-            <!-- 卡片中间：头像与基本信息 -->
-            <div class="card-body">
-              <div class="avatar-box">
-                <NAvatar
-                  round
-                  :size="46"
-                  :src="item.headImg || '/icons/xiaoyugan.png'"
-                  class="fortress-avatar"
-                />
-                <NTag
-                  v-if="item.redQuench > 0"
-                  size="tiny"
-                  round
-                  :bordered="false"
-                  class="red-quench-tag"
-                >
-                  {{ item.redQuench }}红
-                </NTag>
-              </div>
-              <div class="member-detail">
-                <div class="member-name" :title="item.name">
-                  {{ item.name }}
-                  <span
-                    v-if="item.mirror"
-                    class="mirror-text"
-                    style="font-size: 11px; color: #f0a020; margin-left: 2px"
-                    >(镜像)</span
+        <p class="map-layout-note">
+          按游戏位置排列，每个区域两排、每排五个据点。筛选时保留全部位置。
+          <span class="map-scroll-hint">窄屏可左右滑动查看完整五列。</span>
+        </p>
+        <div
+          aria-label="营地三区据点沙盘"
+          class="camp-regions-scroll"
+          tabindex="0"
+        >
+          <div class="camp-regions">
+            <section
+              v-for="region in mapRegions"
+              :key="region.id"
+              class="camp-region"
+              :aria-label="`${region.name}，${region.start}至${region.end}号据点`"
+              :class="`camp-region-${region.id}`"
+            >
+              <div class="region-header">
+                <div class="region-title">
+                  <span class="region-number">{{ region.label }}</span>
+                  <span class="region-name">{{ region.name }}</span>
+                  <span class="region-range"
+                    >#{{ region.start }}–{{ region.end }}</span
                   >
                 </div>
-                <div class="member-power">{{ formatPower(item.power) }}</div>
-                <div class="member-lineup">
-                  <NTag size="tiny" :bordered="false" type="info">
-                    {{ item.lineupType || "常规阵容" }}
-                  </NTag>
+                <div
+                  class="region-progress"
+                  title="缺刀按成功攻击计算：困难 3 次、炼狱 4 次、击破 5 次；空位不计入统计。"
+                >
+                  <template v-if="positionsConfirmed">
+                    <span
+                      class="region-defeated-count"
+                      :class="{
+                        'is-complete':
+                          region.deployedCount > 0 &&
+                          region.defeatedCount === region.deployedCount,
+                      }"
+                    >
+                      已攻破
+                      <strong
+                        >{{ region.defeatedCount }} /
+                        {{ region.deployedCount }}</strong
+                      >
+                    </span>
+                    <template
+                      v-if="region.defeatedCount < region.deployedCount"
+                    >
+                      <template v-if="region.remainingAttacks">
+                        <span class="region-attacks-needed is-hard">
+                          全部困难缺
+                          <strong>{{ region.remainingAttacks.hard }}</strong> 刀
+                        </span>
+                        <span class="region-attacks-needed is-inferno">
+                          全部炼狱缺
+                          <strong>{{ region.remainingAttacks.inferno }}</strong>
+                          刀
+                        </span>
+                        <span class="region-attacks-needed is-defeat">
+                          全部击破缺
+                          <strong>{{ region.remainingAttacks.defeat }}</strong>
+                          刀
+                        </span>
+                      </template>
+                      <span v-else class="region-progress-pending"
+                        >缺刀数待核实</span
+                      >
+                    </template>
+                  </template>
+                  <span v-else class="region-progress-pending"
+                    >区域统计待核实</span
+                  >
+                </div>
+                <div class="region-summary">
+                  {{ positionsConfirmed ? "已布阵" : "已定位" }}
+                  <strong>{{ region.deployedCount }}/10</strong>
+                  <span
+                    >· 空位
+                    {{
+                      positionsConfirmed ? region.emptyCount : "待核实"
+                    }}</span
+                  >
                 </div>
               </div>
-            </div>
+              <div class="fortress-grid">
+                <template
+                  v-for="{ slot, member: item } in region.slots"
+                  :key="`${selectedSide}_${slot}`"
+                >
+                  <div
+                    v-if="item"
+                    class="fortress-card"
+                    role="button"
+                    tabindex="0"
+                    :aria-label="`查看 #${slot} 据点 ${item.name} 的战报`"
+                    :class="{
+                      'is-defeated': item.defeated,
+                      'is-alive': !item.defeated,
+                      'is-mirror': item.mirror,
+                      'is-muted': isMapMemberMuted(item),
+                    }"
+                    :data-slot="slot"
+                    @click="openDuelModal(item)"
+                    @keydown.enter.prevent="openDuelModal(item)"
+                    @keydown.space.prevent="openDuelModal(item)"
+                  >
+                    <div class="card-header-bar">
+                      <span class="slot-badge">#{{ slot }} 据点</span>
+                      <div class="stamp-wrapper">
+                        <span v-if="item.defeated" class="stamp stamp-defeated"
+                          >💥 已攻破</span
+                        >
+                        <span v-else class="stamp stamp-alive">🛡️ 坚守中</span>
+                      </div>
+                    </div>
 
-            <!-- 卡片底部：交战统计与操作引导 -->
-            <div class="card-footer-bar">
-              <div class="combat-stat-text">
-                遭遇 <span class="num">{{ item.challengeCnt || 0 }}</span> 次 |
-                防守成功
-                <span class="num error">{{ item.failCnt || 0 }}</span>
-                次
+                    <div class="card-body">
+                      <div class="avatar-box">
+                        <NAvatar
+                          round
+                          class="fortress-avatar"
+                          :size="40"
+                          :src="item.headImg || '/icons/xiaoyugan.png'"
+                        ></NAvatar>
+                        <NTag
+                          round
+                          class="red-quench-tag"
+                          size="tiny"
+                          :bordered="false"
+                          :class="{ 'is-pending': item.redQuench == null }"
+                          :title="
+                            item.redQuenchReason ||
+                            (item.lineupSource === 'role'
+                              ? '普通阵容红淬，供参考'
+                              : '营地布阵红淬')
+                          "
+                        >
+                          {{
+                            item.redQuench == null
+                              ? "待核实"
+                              : `${item.redQuench}红`
+                          }}
+                        </NTag>
+                      </div>
+                      <div class="member-detail">
+                        <div class="member-name" :title="item.name">
+                          {{ item.name }}
+                        </div>
+                        <div class="member-power">
+                          {{ formatPower(item.power) }}
+                        </div>
+                        <div class="member-lineup">
+                          <NTag
+                            v-if="item.mirror"
+                            size="tiny"
+                            type="warning"
+                            :bordered="false"
+                            >镜像</NTag
+                          >
+                          <NTag
+                            class="lineup-tag"
+                            size="tiny"
+                            :bordered="false"
+                            :title="
+                              item.lineupSource === 'unavailable'
+                                ? '布阵详情未获取'
+                                : item.lineupType
+                            "
+                            :type="
+                              item.lineupSource === 'unavailable'
+                                ? 'warning'
+                                : 'info'
+                            "
+                          >
+                            {{
+                              item.lineupSource === "unavailable"
+                                ? "布阵详情未获取"
+                                : item.lineupType
+                            }}
+                          </NTag>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="card-footer-bar"
+                      :class="getDefenseFooterClass(item)"
+                    >
+                      <div class="combat-stat-text">
+                        遭遇
+                        <span class="num">{{ item.challengeCnt ?? "—" }}</span>
+                        次 | 防守成功
+                        <span class="num error">{{ item.failCnt ?? "—" }}</span>
+                        次
+                      </div>
+                      <div class="card-action-hint"><span>战报流水</span></div>
+                    </div>
+                  </div>
+                  <div
+                    v-else
+                    class="fortress-card is-empty"
+                    :class="{ 'is-unknown': !positionsConfirmed }"
+                    :data-slot="slot"
+                  >
+                    <div class="card-header-bar">
+                      <span class="slot-badge">#{{ slot }} 据点</span>
+                    </div>
+                    <div class="empty-slot-content">
+                      <span aria-hidden="true" class="empty-slot-symbol">{{
+                        positionsConfirmed ? "—" : "?"
+                      }}</span>
+                      <span>{{
+                        positionsConfirmed ? "未布阵" : "位置待核实"
+                      }}</span>
+                    </div>
+                  </div>
+                </template>
               </div>
-              <div class="card-action-hint">
-                <span>战报流水</span>
-              </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>
@@ -675,7 +801,9 @@
           <div class="attendance-header">
             <div class="att-title-group">
               <n-icon class="att-icon"><FlameOutline /></n-icon>
-              <span class="att-title">公会今日出刀督促台</span>
+              <span class="att-title"
+                >公会{{ attendanceDate.label }}出刀督促台</span
+              >
               <NTag
                 size="small"
                 :type="
@@ -734,18 +862,46 @@
                   attendanceStats.unattackedCount
                 }}人，急需催刀）：</span
               >
-              <div class="unattacked-tags">
-                <NTag
-                  v-for="m in attendanceStats.unattacked"
-                  :key="m.id"
-                  size="small"
-                  type="error"
-                  :bordered="false"
-                  class="member-reminder-tag"
-                  @click="openDuelModal(m)"
+              <div class="attendance-table-scroll">
+                <table
+                  class="attendance-members-table is-unattacked"
+                  aria-label="0 刀未动成员"
                 >
-                  {{ m.name }} ({{ formatPower(m.power) }} · 0/3次)
-                </NTag>
+                  <colgroup>
+                    <col span="6" />
+                  </colgroup>
+                  <tbody>
+                    <tr
+                      v-for="(row, rowIndex) in unattackedRows"
+                      :key="rowIndex"
+                    >
+                      <td v-for="m in row" :key="m.id">
+                        <button
+                          class="attendance-member-button"
+                          type="button"
+                          @click="openDuelModal(m, 'own')"
+                        >
+                          <span
+                            class="attendance-member-name"
+                            :title="m.name"
+                            >{{ m.name }}</span
+                          >
+                          <span class="attendance-member-power"
+                            >营地布阵：{{
+                              formatAttendancePower(m.power)
+                            }}</span
+                          >
+                          <span class="attendance-member-status">0/3次</span>
+                          <span class="attendance-member-club-power"
+                            >PVP布阵：{{
+                              formatAttendancePower(m.clubPower)
+                            }}</span
+                          >
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -760,20 +916,50 @@
                   attendanceStats.incompleteCount
                 }}人，仍有剩余免费挑战机会）：</span
               >
-              <div class="unattacked-tags">
-                <NTag
-                  v-for="m in attendanceStats.incomplete"
-                  :key="m.id"
-                  size="small"
-                  type="warning"
-                  :bordered="false"
-                  class="member-reminder-tag"
-                  @click="openDuelModal(m)"
+              <div class="attendance-table-scroll">
+                <table
+                  class="attendance-members-table is-incomplete"
+                  aria-label="未打满成员"
                 >
-                  {{ m.name }} (出战{{ m.realAttackCnt }}/3次 · 剩{{
-                    3 - m.realAttackCnt
-                  }}次)
-                </NTag>
+                  <colgroup>
+                    <col span="6" />
+                  </colgroup>
+                  <tbody>
+                    <tr
+                      v-for="(row, rowIndex) in incompleteRows"
+                      :key="rowIndex"
+                    >
+                      <td v-for="m in row" :key="m.id">
+                        <button
+                          class="attendance-member-button"
+                          type="button"
+                          @click="openDuelModal(m, 'own')"
+                        >
+                          <span
+                            class="attendance-member-name"
+                            :title="m.name"
+                            >{{ m.name }}</span
+                          >
+                          <span class="attendance-member-power"
+                            >营地布阵：{{
+                              formatAttendancePower(m.power)
+                            }}</span
+                          >
+                          <span class="attendance-member-status"
+                            >出战{{ m.realAttackCnt }}/3次 · 剩{{
+                              3 - m.realAttackCnt
+                            }}次</span
+                          >
+                          <span class="attendance-member-club-power"
+                            >PVP布阵：{{
+                              formatAttendancePower(m.clubPower)
+                            }}</span
+                          >
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -781,12 +967,15 @@
             <div
               class="all-attacked-box"
               v-if="
+                attendanceStats.total > 0 &&
                 attendanceStats.unattackedCount === 0 &&
                 attendanceStats.incompleteCount === 0
               "
             >
               <NTag size="medium" type="success" :bordered="false">
-                🎉 太强了！我方 30 名成员今日免费挑战次数已全部出战打满！
+                🎉 太强了！我方
+                {{ attendanceStats.total }}
+                名成员在所选比赛日的免费挑战次数已全部打满！
               </NTag>
             </div>
           </div>
@@ -1098,7 +1287,7 @@
                   </div>
                   <div class="combat-center">
                     <span class="vs-text">{{
-                      selectedSide === "opponent"
+                      targetPlayerSide === "opponent"
                         ? "我方进攻成员:"
                         : "进攻目标对手:"
                     }}</span>
@@ -1204,7 +1393,7 @@
                   </div>
                   <div class="combat-center">
                     <span class="vs-text">{{
-                      selectedSide === "opponent"
+                      targetPlayerSide === "opponent"
                         ? "交战对手:"
                         : "敌方来袭对手:"
                     }}</span>
@@ -1275,9 +1464,15 @@ import {
   TrophyOutline,
 } from "@vicons/ionicons5";
 import html2canvas from "html2canvas";
-import { NAvatar, NButton, NSelect, NTag, useMessage } from "naive-ui";
+import { NAvatar, NButton, NTag, useMessage } from "naive-ui";
 import { computed, h, onMounted, ref, watch } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
+import {
+  buildCampMap,
+  CAMP_SLOT_COUNT,
+  getAttendanceDate,
+  getAttendanceMembers,
+} from "@/utils/campChallengeView";
 import {
   formatWeapon,
   getLineupType,
@@ -1315,13 +1510,6 @@ const activeViewTab = ref<
   "battleMap" | "todayDetails" | "weekRoster" | "lineupTable"
 >("battleMap");
 const mapFilter = ref<"all" | "alive" | "defeated">("all");
-const mapSort = ref<"slot" | "powerAsc" | "powerDesc">("slot");
-const mapSortOptions = [
-  { label: "据点序号 (#1 ~ #30)", value: "slot" },
-  { label: "战力升序 (挑软柿子)", value: "powerAsc" },
-  { label: "战力降序 (核心高战)", value: "powerDesc" },
-];
-
 // 今日与当周战绩详表多维排序维度 ('score' 贡献积分 | 'attackWinRate' 出手胜率 | 'defWinRate' 防守胜率)
 const todaySortBy = ref<"score" | "attackWinRate" | "defWinRate">("score");
 const weeklySortBy = ref<"score" | "attackWinRate" | "defWinRate">("score");
@@ -1349,6 +1537,8 @@ const selectedMatchDay = ref<number>(2);
 const rawClubData = ref<any>(null);
 const rawSiegeData = ref<any>(null);
 const cachedAttackRecords = ref<any[]>([]);
+// Preserve the existing legion response for the attendance table's PVP power.
+const ownClubMembers = ref<Record<string, any>>({});
 
 // 防竞态标识（比赛日数据一律实时拉取接口，不做本地缓存）
 let currentFetchToken = 0;
@@ -1363,6 +1553,7 @@ const emptyHint = ref("暂无营地挑战对阵数据");
 // 对战详情模态框与状态
 const showDuelModal = ref(false);
 const targetPlayer = ref<any>(null);
+const targetPlayerSide = ref<"own" | "opponent">("own");
 const modalLoading = ref(false);
 const playerAttackRecords = ref<any[]>([]);
 const playerDefenseRecords = ref<any[]>([]);
@@ -1665,34 +1856,43 @@ const weeklyStats = computed(() => {
   };
 });
 
-// 视图切换与沙盘据点筛选
-const displayMapList = computed(() => {
-  let list = [...currentMemberList.value];
-  if (mapFilter.value === "alive") {
-    list = list.filter((m) => !m.defeated);
-  } else if (mapFilter.value === "defeated") {
-    list = list.filter((m) => m.defeated);
-  }
-
-  if (mapSort.value === "powerAsc") {
-    list.sort((a, b) => (a.power || 0) - (b.power || 0));
-  } else if (mapSort.value === "powerDesc") {
-    list.sort((a, b) => (b.power || 0) - (a.power || 0));
-  } else {
-    list.sort((a, b) => (a.slot || 0) - (b.slot || 0));
-  }
-  return list;
-});
-
+// Fixed map slots preserve all three regions while filters highlight matching members.
+const campMap = computed(() =>
+  buildCampMap(
+    currentMemberList.value,
+    selectedSide.value === "own"
+      ? rawClubData.value?.members
+      : matchDayList.value.find((day) => day.day === selectedMatchDay.value)
+          ?.defenders,
+  ),
+);
+const mapRegions = computed(() => campMap.value.regions);
+const positionsConfirmed = computed(() => campMap.value.positionsConfirmed);
+const isMapMemberMuted = (member: any) =>
+  mapFilter.value === "alive"
+    ? member.defeated
+    : mapFilter.value === "defeated" && !member.defeated;
+const getDefenseFooterClass = (member: any) => {
+  if (selectedSide.value !== "opponent" || member.defeated) return "";
+  const losses = Math.max(
+    0,
+    Number(member.challengeCnt || 0) - Number(member.failCnt || 0),
+  );
+  return losses >= 4 ? "is-critical" : losses === 3 ? "is-weakened" : "";
+};
 const mapStats = computed(() => {
-  const total = currentMemberList.value.length || 30;
+  const total = currentMemberList.value.length;
   const defeatedCount = currentMemberList.value.filter(
-    (m) => m.defeated,
+    (member) => member.defeated,
   ).length;
-  const aliveCount = Math.max(0, total - defeatedCount);
-  const defeatedRate =
-    total > 0 ? ((defeatedCount / total) * 100).toFixed(1) : "0.0";
-  return { total, defeatedCount, aliveCount, defeatedRate };
+  return {
+    total,
+    defeatedCount,
+    aliveCount: Math.max(0, total - defeatedCount),
+    defeatedRate:
+      total > 0 ? ((defeatedCount / total) * 100).toFixed(1) : "0.0",
+    emptyCount: positionsConfirmed.value ? CAMP_SLOT_COUNT - total : null,
+  };
 });
 
 // 我方防守状态统计
@@ -1710,8 +1910,12 @@ const currentOppoDayScore = computed(() => {
 
 // 督战催刀统计（按真实出刀 0/3次未动刀 与 1~2/3次未打满 精确统计）
 const attendanceStats = computed(() => {
-  const members = ownMembers.value;
-  const total = members.length || 30;
+  const members = getAttendanceMembers(
+    ownMembers.value,
+    rawClubData.value?.members,
+    ownClubMembers.value,
+  );
+  const total = members.length;
 
   // 1. 完全未动刀 (真实出刀 0 次，不论得分如何，必须催刀)
   const unattacked = members.filter((m: any) => (m.realAttackCnt || 0) === 0);
@@ -1738,59 +1942,71 @@ const attendanceStats = computed(() => {
   };
 });
 
-// 通用剪贴板复制工具
-const copyToClipboard = (text: string, successMsg: string) => {
-  if (navigator?.clipboard?.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      message.success(successMsg);
-    });
-  } else {
-    const input = document.createElement("textarea");
-    input.value = text;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand("copy");
-    document.body.removeChild(input);
+const getAttendanceRows = (members: any[]) =>
+  Array.from({ length: Math.ceil(members.length / 6) }, (_, row) =>
+    members.slice(row * 6, (row + 1) * 6),
+  );
+const unattackedRows = computed(() =>
+  getAttendanceRows(attendanceStats.value.unattacked),
+);
+const incompleteRows = computed(() =>
+  getAttendanceRows(attendanceStats.value.incomplete),
+);
+const attendanceDate = computed(() =>
+  getAttendanceDate(rawClubData.value?.phase, selectedMatchDay.value),
+);
+const formatAttendancePower = (power: number | null | undefined) =>
+  power == null ? "—" : formatPower(power);
+
+// The copied roster uses the same members and values as the six-column tables.
+const copyToClipboard = async (text: string, successMsg: string) => {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const input = document.createElement("textarea");
+      input.value = text;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      try {
+        input.select();
+        if (!document.execCommand("copy")) throw new Error("浏览器未允许复制");
+      } finally {
+        input.remove();
+      }
+    }
     message.success(successMsg);
+  } catch {
+    message.error("复制失败，请检查浏览器剪贴板权限");
   }
 };
-
-// 一键复制未动刀名单 (0/3次)
-const copyUnattackedList = () => {
-  const unattacked = attendanceStats.value.unattacked;
-  if (!unattacked.length) {
-    message.success("太棒了！我方全员今日均已出战动刀！");
+const copyAttendanceList = async (kind: "unattacked" | "incomplete") => {
+  const members = attendanceStats.value[kind];
+  const description =
+    kind === "unattacked" ? "0 刀未动成员" : "未打满 3 刀成员";
+  if (!members.length) {
+    message.info("当前没有可复制的名单");
     return;
   }
-  const names = unattacked.map((m: any) => m.name).join("、");
-  const text = `【营地挑战今日催刀提醒（0刀未动）】\n截至目前，我方 0 刀未动成员（共${unattacked.length}人）：\n${names}\n请以上成员尽快上线使用免费挑战次数，为俱乐部争夺排位积分！`;
-  copyToClipboard(
-    text,
-    `未动刀催刀名单已复制到剪贴板（共${unattacked.length}人）！`,
-  );
+  const details = members.map((member: any) => {
+    const count = member.realAttackCnt || 0;
+    const status =
+      kind === "unattacked" ? "0/3次" : `出战${count}/3次 · 剩${3 - count}次`;
+    return `${member.name}（营地布阵：${formatAttendancePower(member.power)}  PVP布阵：${formatAttendancePower(member.clubPower)}）  ${status}`;
+  });
+  const text = [
+    `【营地挑战${attendanceDate.value.label} · ${description}】`,
+    `我方${description}（共${members.length}人）：`,
+    ...details,
+    attendanceDate.value.isToday
+      ? "请以上成员及时上线补满免费挑战次数，助力俱乐部积分。"
+      : "请结合对应比赛日的游戏记录核对后使用。",
+  ].join("\n");
+  await copyToClipboard(text, `名单已复制到剪贴板（共${members.length}人）`);
 };
-
-// 一键复制未打满补刀名单 (1~2/3次)
-const copyIncompleteList = () => {
-  const incomplete = attendanceStats.value.incomplete;
-  if (!incomplete.length) {
-    message.success("太棒了！我方出战成员均已打满 3 刀！");
-    return;
-  }
-  const details = incomplete
-    .map(
-      (m: any) =>
-        `${m.name}(已出战${m.realAttackCnt || 0}/3次，剩${
-          3 - (m.realAttackCnt || 0)
-        }次)`,
-    )
-    .join("、");
-  const text = `【营地挑战今日补刀提醒（未打满 3 刀）】\n截至目前，我方未打满免费次数成员（共${incomplete.length}人）：\n${details}\n请以上成员及时上线补满挑战次数，助力俱乐部积分登顶！`;
-  copyToClipboard(
-    text,
-    `未打满补刀名单已复制到剪贴板（共${incomplete.length}人）！`,
-  );
-};
+const copyUnattackedList = () => copyAttendanceList("unattacked");
+const copyIncompleteList = () => copyAttendanceList("incomplete");
 
 // 我方 30 人当周战功排行榜与防守胜率考核基础数据
 const weeklyRosterRanked = computed(() => {
@@ -2430,6 +2646,7 @@ const fetchCampChallengeData = async () => {
     const ownClubData =
       ownClubRes?.info || ownClubRes?.legionData || ownClubRes || {};
     const ownLegionId = ownClubData.id;
+    ownClubMembers.value = ownClubData.members || {};
 
     // 2. 调用 club_getinfo 获取营地挑战全量活动数据
     const clubInfoRes: any = await tokenStore.sendMessageWithPromise(
@@ -3155,8 +3372,9 @@ const handleMatchDayChange = async (day: number) => {
  *
  * @param {object} player 目标玩家对象
  */
-const openDuelModal = async (player: any) => {
+const openDuelModal = async (player: any, side = selectedSide.value) => {
   targetPlayer.value = player;
+  targetPlayerSide.value = side;
   showDuelModal.value = true;
   modalLoading.value = true;
   playerAttackRecords.value = [];
@@ -3166,7 +3384,7 @@ const openDuelModal = async (player: any) => {
     const tokenId = tokenStore.selectedToken?.id;
     if (!tokenId) return;
 
-    const isOpponent = selectedSide.value === "opponent";
+    const isOpponent = side === "opponent";
 
     if (isOpponent) {
       // 目标是匹配敌方据点守军：
@@ -4192,39 +4410,242 @@ onMounted(() => {
   align-items: center;
 }
 
+.map-layout-note {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.map-scroll-hint {
+  color: #2563eb;
+}
+
+.camp-regions-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.camp-regions {
+  display: flex;
+  flex-direction: column;
+  min-width: 1100px;
+  gap: 14px;
+}
+
+.camp-region {
+  --region-accent: #2563eb;
+  --region-tint: #eff6ff;
+  border: 1px solid var(--n-border-color, #e2e8f0);
+  border-radius: 12px;
+  background: var(--n-card-color, #fff);
+  padding: 12px;
+}
+
+.camp-region-middle {
+  --region-accent: #7c3aed;
+  --region-tint: #f5f3ff;
+}
+
+.camp-region-lower {
+  --region-accent: #0f766e;
+  --region-tint: #f0fdfa;
+}
+
+.region-title,
+.region-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.region-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.region-title,
+.region-summary {
+  white-space: nowrap;
+}
+
+.region-summary {
+  justify-self: end;
+}
+
+.region-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.region-defeated-count,
+.region-attacks-needed {
+  padding: 3px 6px;
+  border-radius: 5px;
+}
+
+.region-defeated-count {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.region-defeated-count.is-complete,
+.region-attacks-needed.is-defeat {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.region-attacks-needed.is-hard {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.region-attacks-needed.is-inferno {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.region-progress-pending {
+  color: #64748b;
+}
+
+.region-number {
+  border-radius: 6px;
+  background: var(--region-tint);
+  color: var(--region-accent);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.region-name {
+  color: var(--n-text-color, #334155);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.region-range,
+.region-summary {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.region-summary strong {
+  color: var(--region-accent);
+  font-size: 14px;
+}
+
 .fortress-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-auto-rows: minmax(140px, 1fr);
+  gap: 10px;
 }
 
 .fortress-card {
   position: relative;
+  box-sizing: border-box;
+  min-width: 0;
   background: var(--n-card-color, #ffffff);
   border-radius: 10px;
   border: 1px solid var(--n-border-color, #e2e8f0);
-  padding: 12px 14px;
+  padding: 9px 10px 0;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 7px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .fortress-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   border-color: #3b82f6;
 }
 
+.fortress-card:focus-visible,
+.camp-regions-scroll:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+
+.fortress-card.is-muted {
+  opacity: 0.4;
+}
+
+.fortress-card.is-muted:hover,
+.fortress-card.is-muted:focus-visible {
+  opacity: 0.85;
+}
+
+.fortress-card.is-empty,
+.fortress-card.is-empty:hover {
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px dashed #cbd5e1;
+  box-shadow: none;
+  cursor: default;
+  transform: none;
+}
+
+.empty-slot-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 10px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.empty-slot-symbol {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.fortress-card.is-unknown .empty-slot-content {
+  color: #b45309;
+}
+
 .fortress-card.is-defeated {
-  background: linear-gradient(
-    180deg,
-    rgba(239, 68, 68, 0.04) 0%,
-    rgba(239, 68, 68, 0.01) 100%
-  );
-  border-color: rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #fecaca 0%, #fee2e2 100%);
+  border-color: #f87171;
+}
+
+.fortress-card.is-defeated .slot-badge {
+  background: rgba(185, 28, 28, 0.1);
+  color: #991b1b;
+}
+
+.fortress-card.is-defeated .member-name {
+  color: #7f1d1d;
+}
+
+.fortress-card.is-defeated .card-footer-bar {
+  border-top-color: #fca5a5;
+  color: #991b1b;
 }
 
 .fortress-card.is-alive {
@@ -4244,15 +4665,17 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  gap: 4px;
+  white-space: nowrap;
 }
 
 .slot-badge {
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 18px;
   font-weight: 700;
   color: #64748b;
   background: rgba(100, 116, 139, 0.1);
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 6px;
 }
 
@@ -4263,16 +4686,16 @@ onMounted(() => {
 
 .stamp {
   font-size: 11px;
+  line-height: 16px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: 4px;
-  letter-spacing: 0.5px;
 }
 
 .stamp-defeated {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px dashed #ef4444;
+  color: #fff;
+  background: #dc2626;
+  border: 1px solid #b91c1c;
 }
 
 .stamp-alive {
@@ -4284,8 +4707,7 @@ onMounted(() => {
 .card-body {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 9px;
 }
 
 .avatar-box {
@@ -4296,7 +4718,8 @@ onMounted(() => {
 .red-quench-tag {
   position: absolute;
   bottom: -4px;
-  right: -6px;
+  right: -5px;
+  height: 16px;
   font-size: 10px;
   font-weight: 800;
   background: #ff4d4f;
@@ -4304,39 +4727,74 @@ onMounted(() => {
   padding: 0 4px;
 }
 
+.red-quench-tag.is-pending {
+  background: #d97706;
+}
+
 .member-detail {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
 }
 
 .member-name {
   font-size: 14px;
+  line-height: 19px;
   font-weight: 700;
   color: var(--n-text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .member-power {
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 16px;
   font-weight: 700;
-  color: #f59e0b;
-  margin-bottom: 4px;
+  color: #b45309;
+  margin-bottom: 3px;
+}
+
+.member-lineup {
+  display: flex;
+  gap: 4px;
+}
+
+.member-lineup :deep(.n-tag) {
+  flex-shrink: 0;
+}
+
+.member-lineup .lineup-tag {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.lineup-tag :deep(.n-tag__content) {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .card-footer-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px dashed var(--n-border-color, #e2e8f0);
-  padding-top: 8px;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: auto -10px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0 0 9px 9px;
+  padding: 6px 8px;
   font-size: 11px;
+  line-height: 16px;
 }
 
 .combat-stat-text {
   color: #64748b;
+  font-variant-numeric: tabular-nums;
 }
 
 .combat-stat-text .num {
@@ -4345,12 +4803,33 @@ onMounted(() => {
 }
 
 .combat-stat-text .num.error {
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .card-action-hint {
-  color: #3b82f6;
+  flex-shrink: 0;
+  color: #2563eb;
   font-weight: 600;
+}
+
+.card-footer-bar.is-weakened {
+  background: #f3e8ff;
+  border-top-color: #e9d5ff;
+  color: #6b21a8;
+}
+
+.card-footer-bar.is-critical {
+  background: #fee2e2;
+  border-top-color: #fecaca;
+  color: #991b1b;
+}
+
+.card-footer-bar:is(.is-weakened, .is-critical)
+  :is(.combat-stat-text, .num, .card-action-hint),
+.fortress-card.is-defeated
+  .card-footer-bar
+  :is(.combat-stat-text, .num, .card-action-hint) {
+  color: inherit;
 }
 
 /* ================= 视图 2：今日公会对战详细 (催刀督战) ================= */
@@ -4607,6 +5086,91 @@ onMounted(() => {
 
 .member-reminder-tag:hover {
   transform: scale(1.05);
+}
+
+.attendance-table-scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.attendance-members-table {
+  --attendance-accent: #ef4444;
+  --attendance-hover: rgba(239, 68, 68, 0.08);
+  width: 100%;
+  min-width: 1080px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.attendance-members-table.is-incomplete {
+  --attendance-accent: #b45309;
+  --attendance-hover: rgba(245, 158, 11, 0.08);
+}
+
+.attendance-members-table td {
+  padding: 0;
+  border: 1px solid var(--n-border-color, #e2e8f0);
+  vertical-align: top;
+}
+
+.attendance-member-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--n-text-color, #334155);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.attendance-member-button:hover,
+.attendance-member-button:focus-visible {
+  background: var(--attendance-hover);
+}
+
+.attendance-member-button:focus-visible {
+  outline: 2px solid var(--attendance-accent);
+  outline-offset: -2px;
+}
+
+.attendance-member-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attendance-member-power,
+.attendance-member-status {
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.attendance-member-power {
+  color: var(--n-text-color-3, #64748b);
+}
+
+.attendance-member-status {
+  color: var(--attendance-accent);
+}
+
+.attendance-member-club-power {
+  color: var(--n-text-color-3, #64748b);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .table-card {
