@@ -3,7 +3,9 @@ import * as autoRoutes from "vue-router/auto-routes";
 import { useTokenStore } from "@/stores/tokenStore";
 import { isNowInLegionWarTime } from "@/utils/clubBattleUtils";
 
-const generatedRoutes = autoRoutes.routes ?? [];
+const generatedRoutes = (autoRoutes.routes ?? []).filter(
+  (route) => route.path.toLowerCase() !== "/link-games",
+);
 
 const my_routes = [
   {
@@ -129,6 +131,12 @@ const my_routes = [
           title: "主线推关",
           requiresToken: true,
         },
+      },
+      {
+        path: "Link-Games",
+        name: "LinkGames",
+        component: () => import("@/views/Link-Games.vue"),
+        meta: { title: "在线游戏", requiresToken: false, linkGames: true },
       },
       // 增加自动路由引用
       ...generatedRoutes,

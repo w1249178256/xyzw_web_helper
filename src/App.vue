@@ -6,6 +6,10 @@
           <n-dialog-provider>
             <div id="app">
               <router-view />
+              <GameWorkspace
+                v-if="gameWorkspaceVisited"
+                :active="gamePageActive"
+              />
             </div>
           </n-dialog-provider>
         </n-notification-provider>
@@ -16,8 +20,30 @@
 
 <script setup>
 import { darkTheme } from "naive-ui";
-import { computed, onMounted, onUnmounted } from "vue";
+import {
+  computed,
+  defineAsyncComponent,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch,
+} from "vue";
+import { useRoute } from "vue-router";
 import { useTheme } from "@/composables/useTheme";
+
+const route = useRoute();
+const GameWorkspace = defineAsyncComponent(
+  () => import("@/components/game/GameWorkspace.vue"),
+);
+const gameWorkspaceVisited = ref(false);
+const gamePageActive = computed(() => route.meta.linkGames === true);
+watch(
+  gamePageActive,
+  (active) => {
+    if (active) gameWorkspaceVisited.value = true;
+  },
+  { immediate: true },
+);
 
 const { isDark, initTheme, setupSystemThemeListener, updateReactiveState } =
   useTheme();

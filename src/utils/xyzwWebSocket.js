@@ -477,7 +477,8 @@ export function registerDefaultCommands(reg) {
  * XYZW WebSocket 客户端
  */
 export class XyzwWebSocketClient {
-  constructor({ url, utils, heartbeatMs = 5000 }) {
+  constructor({ url, utils, heartbeatMs = 5000, canConnect = () => true }) {
+    this.canConnect = canConnect;
     this.url = url;
     this.utils = utils || g_utils;
     this.enc = this.utils?.getEnc ? this.utils.getEnc("auto") : undefined;
@@ -519,6 +520,7 @@ export class XyzwWebSocketClient {
 
   /** 初始化连接 */
   init() {
+    if (!this.canConnect()) return;
     wsLogger.info(`连接: ${this.url.split("?")[0]}`);
 
     if (this.reconnectTimer !== null) {
@@ -827,6 +829,7 @@ export class XyzwWebSocketClient {
 
   /** 重连（防重复连接版本） */
   reconnect() {
+    if (!this.canConnect()) return;
     // 防止重复重连
     if (this.isReconnecting) {
       wsLogger.debug("重连已在进行中，跳过此次重连请求");
