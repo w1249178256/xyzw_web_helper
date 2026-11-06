@@ -482,7 +482,8 @@ app.get("/health", (req, res) => {
 const FRONTEND_LOG_MAX_BATCH = 50;
 const FRONTEND_LOG_MAX_LEN = 2000;
 
-app.post("/api/frontend-log", (req, res) => {
+// 前端埋点：公开接口，不放 /api 下（/api 全部要求 x-api-key，浏览器端没有）
+app.post("/frontend-log", (req, res) => {
   const items = Array.isArray(req.body?.logs) ? req.body.logs : [req.body];
   if (!items.length || items.length > FRONTEND_LOG_MAX_BATCH) {
     return res.status(400).json({ error: "logs 需为 1~50 条的数组" });

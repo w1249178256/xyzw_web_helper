@@ -9,10 +9,10 @@
  *  - 批量 + 定时上报，避免每次打点都发请求；页面隐藏/卸载时用 sendBeacon 兜底。
  *  - 任何失败都静默（打点不能影响业务），最多在控制台 debug 一下。
  *  - 全局只初始化一次；未初始化时调用 logEvent 也能缓存后再发。
- *  - 上报地址默认走 vite 代理 /api/frontend-log，可用 VITE_LOG_ENDPOINT 覆盖。
+ *  - 上报地址默认走 vite 代理 /frontend-log，可用 VITE_LOG_ENDPOINT 覆盖。
  */
 
-const ENDPOINT = import.meta.env?.VITE_LOG_ENDPOINT || "/api/frontend-log";
+const ENDPOINT = import.meta.env?.VITE_LOG_ENDPOINT || "/frontend-log";
 const MAX_BUFFER = 20;
 const FLUSH_INTERVAL = 3000;
 const MAX_MESSAGE_LEN = 2000;

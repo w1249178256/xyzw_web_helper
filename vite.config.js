@@ -139,7 +139,7 @@ export default defineConfig(async () => {
       host: true,
       proxy: {
         // 前端埋点日志：转发到本地 render-backend（默认 3001），由后端写入 logs/
-        "/api/frontend-log": {
+        "/frontend-log": {
           target: "http://127.0.0.1:3001",
           changeOrigin: true,
         },
