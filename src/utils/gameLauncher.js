@@ -172,6 +172,64 @@ export function convertBinToLx(buffer, random = Math.random) {
   return bytes;
 }
 
+/**
+ * 单开进入游戏前的准备：把 BIN 数据转成 lx 并写进 localStorage，
+ * /game 页面（cocos 壳）启动时会读 bin_data_<id> 与 current_bin_id。
+ *
+ * 与 Dashboard「快速操作 → 打开游戏」完全同一套逻辑，抽出来给多处复用。
+ *
+ * @returns {{ok: true, byteLength: number} | {ok: false, reason: string}} 成功时返回字节数，失败时返回原因码
+ */
+export async function launchSingleGame({
+  token,
+  getArrayBuffer,
+  storage = globalThis.localStorage,
+}) {
+  if (!token) return { ok: false, reason: "no-token" };
+
+  let binData;
+  try {
+    binData = await getArrayBuffer(token.id);
+  } catch {
+    return { ok: false, reason: "read-failed" };
+  }
+  if (!binData) return { ok: false, reason: "missing-bin" };
+
+  let converted;
+  try {
+    converted = convertBinToLx(binData);
+  } catch {
+    return { ok: false, reason: "convert-failed" };
+  }
+
+  const hex = Array.from(converted)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  storage.setItem(`bin_data_${token.id}`, hex);
+  storage.setItem("current_bin_id", token.id);
+
+  let binList = [];
+  try {
+    binList = JSON.parse(storage.getItem("bin_file_list") || "[]");
+  } catch {
+    binList = [];
+  }
+  if (!Array.isArray(binList)) binList = [];
+  if (!binList.find((item) => item.id === token.id)) {
+    binList.push({
+      id: token.id,
+      name: token.name || "Token",
+      byteLength: binData.byteLength,
+      size: `${(binData.byteLength / 1024).toFixed(1)} KB`,
+      order: binList.length,
+    });
+    storage.setItem("bin_file_list", JSON.stringify(binList));
+  }
+
+  return { ok: true, byteLength: binData.byteLength };
+}
+
+
 export function readActiveMultiGameLaunch(storage) {
   try {
     const parsed = JSON.parse(
