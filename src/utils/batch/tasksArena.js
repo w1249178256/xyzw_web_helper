@@ -78,14 +78,14 @@ export function createTasksArena(deps) {
           type: "info",
         });
 
+        // 每日前几次挑战免费（服务器内置计费，协议不暴露免费次数），
+        // 门票只影响免费次数用完后的额外挑战，故不再因门票为 0 直接放弃。
         if (ticketCount <= 0) {
           addLog({
             time: new Date().toLocaleTimeString(),
-            message: `${token.name} 咸神门票不足，无法进行竞技场战斗`,
-            type: "warning",
+            message: `${token.name} 咸神门票为 0，仍尝试使用每日免费次数`,
+            type: "info",
           });
-          tokenStatus.value[tokenId] = "completed";
-          return;
         }
 
         const teamInfo = await tokenStore.sendMessageWithPromise(
@@ -125,22 +125,26 @@ export function createTasksArena(deps) {
           });
         }
 
-        const fights = Math.min(3, ticketCount);
-        if (fights < 3) {
-          addLog({
-            time: new Date().toLocaleTimeString(),
-            message: `${token.name} 咸神门票仅剩 ${ticketCount} 张，将执行 ${fights} 次战斗`,
-            type: "warning",
-          });
-        }
+        // 每日免费次数优先打满 3 次；免费用完后是否扣票由服务端判断
+        // （user2 实测：协议不暴露免费次数，服务器内置计费）
+        const fights = 3;
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 计划执行 ${fights} 次竞技场战斗（每日免费优先，当前门票 ${ticketCount} 张）`,
+          type: "info",
+        });
 
-        for (let i = 0; i < fights; i++) {
-          if (shouldStop.value) break;
+        // 进场一次即可：重复 arena_startarea 会被服务端拒绝并中断后续挑战
+        try {
           await tokenStore.sendMessageWithPromise(
             tokenId,
             "arena_startarea",
             {},
           );
+        } catch {}
+
+        for (let i = 0; i < fights; i++) {
+          if (shouldStop.value) break;
           let targets;
           try {
             targets = await tokenStore.sendMessageWithPromise(
