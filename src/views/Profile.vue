@@ -123,7 +123,7 @@
           <div class="security-item">
             <div class="security-info">
               <h3>数据导出</h3>
-              <p>导出您的所有数据</p>
+              <p>导出全部账号 Token、BIN 登录凭据及所有本地配置</p>
             </div>
             <n-button @click="exportData"> 导出 </n-button>
           </div>
@@ -146,6 +146,7 @@ import { useDialog, useMessage } from "naive-ui";
 import { onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
+import { collectFullBackup, downloadBackupFile } from "@/utils/fullBackup";
 
 useRouter();
 const message = useMessage();
@@ -244,8 +245,21 @@ const viewLoginHistory = () => {
   message.info("登录历史查看功能开发中...");
 };
 
-const exportData = () => {
-  message.info("数据导出功能开发中...");
+// Export a full backup (localStorage config + IndexedDB incl. BIN credentials).
+const exportData = async () => {
+  try {
+    const backup = await collectFullBackup();
+    const accountCount =
+      backup.indexedDB?.xyzw_token_db?.gameTokens?.length ?? 0;
+    const binCount = backup.indexedDB?.xyzw?.tokens?.length ?? 0;
+    downloadBackupFile(backup);
+    message.success(
+      `备份已下载：账号记录 ${accountCount} 条，BIN 凭据 ${binCount} 份`,
+    );
+  } catch (error) {
+    console.error("导出失败:", error);
+    message.error(`导出失败：${error.message}`);
+  }
 };
 
 const deleteAccount = () => {

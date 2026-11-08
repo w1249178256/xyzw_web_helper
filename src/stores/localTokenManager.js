@@ -413,8 +413,16 @@ export const useLocalTokenStore = defineStore("localToken", () => {
     let cleanedCount = 0;
 
     Object.entries(gameTokens.value).forEach(([roleId, tokenData]) => {
+      // 与 tokenStore 保持一致：长期有效的 token（BIN/扫码/手机号/URL 导入
+      // 或已升级）不参与 24 小时过期清理，避免恢复备份后账号被立即删除。
+      const isPermanent =
+        tokenData?.upgradedToPermanent === true ||
+        ["url", "bin", "wxQrcode", "mobile", "wxForceLogout"].includes(
+          tokenData?.importMethod,
+        );
+
       const lastUsed = new Date(tokenData.lastUsed || tokenData.createdAt);
-      if (lastUsed > oneDayAgo) {
+      if (isPermanent || lastUsed > oneDayAgo) {
         cleanedTokens[roleId] = tokenData;
       } else {
         cleanedCount++;

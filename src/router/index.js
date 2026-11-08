@@ -103,6 +103,16 @@ const my_routes = [
           requiresToken: true,
         },
       },
+      // Full backup / restore page (export or import all accounts + config).
+      {
+        path: "backup",
+        name: "BackupRestore",
+        component: () => import("@/views/BackupRestore.vue"),
+        meta: {
+          title: "备份恢复",
+          requiresToken: true,
+        },
+      },
       {
         path: "daily-tasks",
         name: "DailyTasks",
