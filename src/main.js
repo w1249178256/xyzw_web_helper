@@ -4,6 +4,7 @@ import { createApp } from "vue";
 
 import App from "./App.vue";
 import router from "./router";
+import { startBgTicker } from "./utils/bgTicker";
 import { initFrontendLog, logInfo } from "./utils/frontendLog";
 import "@arco-design/web-vue/dist/arco.css";
 import "virtual:uno.css";
@@ -59,4 +60,5 @@ const applyTheme = () => {
 applyTheme();
 
 // 挂载应用
+startBgTicker();
 app.mount("#app");
