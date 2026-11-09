@@ -90,6 +90,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.3(jiti@2.6.1))
+      fake-indexeddb:
+        specifier: 6.2.8
+        version: 6.2.8
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
@@ -2092,6 +2095,10 @@ packages:
 
   exsolve@1.0.8:
     resolution: {integrity: sha512-LmDxfWXwcTArk8fUEnOfSZpHOJ6zOMUJKOtFLFqJLoKJetuQG874Uc7/Kki7zFLzYybmZhp1M7+98pfMqeX8yA==}
+
+  fake-indexeddb@6.2.8:
+    resolution: {integrity: sha512-mpVW/HLUqwKXJ6F/s0hMgdK1eQfM4ncTHDioNGHWL0WKV3VcZCoZq1NKgboBbAge07aRCO7L48yziKssL59XEQ==}
+    engines: {node: '>=18'}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -5172,6 +5179,8 @@ snapshots:
   evtd@0.2.4: {}
 
   exsolve@1.0.8: {}
+
+  fake-indexeddb@6.2.8: {}
 
   fast-deep-equal@3.1.3: {}
 

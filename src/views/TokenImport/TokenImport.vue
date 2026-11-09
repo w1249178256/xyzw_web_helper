@@ -53,6 +53,27 @@
             <n-radio-button value="singlebin"> BIN单角色获取 </n-radio-button>
           </n-radio-group>
         </div>
+
+        <!-- One-click import from a backup / config file -->
+        <div class="config-import-bar">
+          <span class="config-import-tip">
+            已有备份文件？可直接导入账号与全部配置
+          </span>
+          <n-upload
+            :show-file-list="false"
+            accept=".json"
+            :custom-request="handleImportConfigFile"
+          >
+            <n-button size="small" type="info" ghost>
+              <template #icon>
+                <NIcon>
+                  <CloudUpload />
+                </NIcon>
+              </template>
+              导入配置
+            </n-button>
+          </n-upload>
+        </div>
         <div class="card-body">
           <ManualTokenForm
             @cancel="() => (showImportForm = false)"
@@ -719,6 +740,7 @@
 <script setup>
 import {
   Add,
+  CloudUpload,
   Copy,
   Create,
   DownloadOutline,
@@ -747,6 +769,7 @@ import {
   getBinPayload,
   getRoleBinFileName,
 } from "@/utils/binFile";
+import { restoreFullBackup, validateBackup } from "@/utils/fullBackup";
 import { prepareMultiGameLaunch } from "@/utils/gameLauncher";
 import {
   pruneTokenSelection,
@@ -1608,6 +1631,155 @@ const importTokenFile = () => {
   input.click();
 };
 
+// Import a config file. Supports three formats, auto-detected:
+//  1. Full backup  (from BackupRestore page / Profile "数据导出")
+//  2. Batch-daily export  { version, tokens, scheduledTasks, ... }
+//  3. Plain token export  { tokens: [...] }
+const handleImportConfigFile = ({ file }) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch (error) {
+      message.error("配置文件解析失败，请确认文件未损坏");
+      return;
+    }
+
+    // 1. Full backup file -> let the user pick a restore mode.
+    if (!validateBackup(data)) {
+      dialog.warning({
+        title: "恢复配置",
+        content:
+          "检测到全量备份文件。覆盖模式会先清空当前浏览器的数据再写入备份；合并模式只补充本地不存在的条目。",
+        positiveText: "覆盖",
+        negativeText: "合并",
+        onPositiveClick: () => runFullBackupRestore(data, "replace"),
+        onNegativeClick: () => runFullBackupRestore(data, "merge"),
+      });
+      return;
+    }
+
+    // 2. Batch-daily "导出配置" format.
+    if (
+      data.version &&
+      Array.isArray(data.tokens) &&
+      Array.isArray(data.scheduledTasks)
+    ) {
+      importBatchConfig(data);
+      return;
+    }
+
+    // 3. Plain token export format.
+    if (Array.isArray(data.tokens)) {
+      const result = tokenStore.importTokens(data);
+      if (result.success) {
+        message.success(result.message);
+      } else {
+        message.error(result.message);
+      }
+      return;
+    }
+
+    message.error("无法识别的配置文件格式");
+  };
+  reader.readAsText(file.file);
+};
+
+// Restore a full backup; reload afterwards so all stores re-read fresh data.
+const runFullBackupRestore = async (data, mode) => {
+  try {
+    const result = await restoreFullBackup(data, mode);
+    const idbSummary = Object.entries(result.indexedDB)
+      .map(([name, count]) => `${name} ${count} 条`)
+      .join("，");
+    message.success(
+      `恢复完成：localStorage ${result.localStorageKeys} 项${
+        idbSummary ? `，IndexedDB ${idbSummary}` : ""
+      }。页面将刷新以生效`,
+    );
+    window.setTimeout(() => window.location.reload(), 800);
+  } catch (error) {
+    console.error("恢复失败:", error);
+    message.error(`恢复失败：${error.message}`);
+  }
+};
+
+// Import a batch-daily config export: tokens, scheduled tasks, batch settings
+// and per-account daily settings. Existing entries are skipped (add-only).
+const importBatchConfig = (data) => {
+  try {
+    let importedTokens = 0;
+    let importedTasks = 0;
+
+    data.tokens.forEach((token) => {
+      const exists = tokenStore.gameTokens.some(
+        (t) => t.token === token.token || t.id === token.id,
+      );
+      if (!exists && token.token) {
+        tokenStore.gameTokens.push({
+          id:
+            token.id ||
+            `token_${Date.now()}${Math.random().toString(36).slice(2)}`,
+          name: token.name || "",
+          token: token.token,
+          server: token.server || "",
+          wsUrl: token.wsUrl || null,
+          remark: token.remark || "",
+          importMethod: token.importMethod || "import",
+          sourceUrl: token.sourceUrl || null,
+          upgradedToPermanent: true,
+          upgradedAt: token.upgradedAt || null,
+          updatedAt: token.updatedAt || new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          lastUsed: new Date().toISOString(),
+        });
+        importedTokens++;
+      }
+    });
+
+    // Scheduled tasks: append only the ones not present locally.
+    const existingTasks = JSON.parse(
+      localStorage.getItem("scheduledTasks") || "[]",
+    );
+    const existingTaskIds = new Set(existingTasks.map((t) => t.id));
+    data.scheduledTasks.forEach((task) => {
+      if (task.id && !existingTaskIds.has(task.id)) {
+        existingTasks.push(task);
+        importedTasks++;
+      }
+    });
+    localStorage.setItem("scheduledTasks", JSON.stringify(existingTasks));
+
+    // Batch settings and per-account daily settings (overwrite if present).
+    if (data.batchSettings) {
+      localStorage.setItem("batchSettings", JSON.stringify(data.batchSettings));
+    }
+
+    if (Array.isArray(data.tokenSettings)) {
+      data.tokenSettings.forEach((item) => {
+        if (item.tokenId && item.settings) {
+          localStorage.setItem(
+            `daily-settings:${item.tokenId}`,
+            JSON.stringify(item.settings),
+          );
+        }
+      });
+    }
+
+    message.success(
+      `导入成功：${importedTokens} 个新账号，${importedTasks} 个新定时任务${
+        data.tokenSettings?.length
+          ? `，${data.tokenSettings.length} 份账号设置`
+          : ""
+      }`,
+    );
+  } catch (error) {
+    console.error("导入配置失败:", error);
+    message.error(`导入失败：${error.message}`);
+  }
+};
+
 const cleanExpiredTokens = async () => {
   const count = await tokenStore.cleanExpiredTokens();
   message.success(`已清理 ${count} 个过期Token`);
@@ -2049,6 +2221,32 @@ onUnmounted(() => {
   margin: 0;
   color: #ffffff;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.config-import-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px dashed var(--border-light);
+  border-radius: var(--border-radius-medium);
+  background: var(--bg-tertiary);
+}
+
+.config-import-tip {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .header-content p {
