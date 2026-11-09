@@ -132,6 +132,19 @@ test("credential database open errors reject without replacing local settings", 
   assert.equal(localStorage.getItem("gameTokens"), "old accounts");
 });
 
+test("full export rejects when credential databases cannot be read", async () => {
+  localStorage.setItem(
+    "gameTokens",
+    JSON.stringify([{ id: "bin", importMethod: "bin" }]),
+  );
+  globalThis.indexedDB = {
+    open() {
+      throw new DOMException("Database unavailable", "UnknownError");
+    },
+  };
+  await assert.rejects(collectFullBackup(), /Database unavailable/);
+});
+
 test("a failed database write rolls back already restored credential stores", async () => {
   await seedDatabase("xyzw", { tokens: [{ id: "old-bin", data: "original" }] });
   await seedDatabase("xyzw_token_db", {

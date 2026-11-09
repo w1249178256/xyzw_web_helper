@@ -231,16 +231,12 @@ function readAllStores(dbName, schema) {
   });
 }
 
-// Collect all app databases; a failing DB is skipped instead of aborting.
+// A full backup must include credentials; failed reads must reach the UI.
 async function collectIndexedDB() {
   const result = {};
   for (const [dbName, schema] of Object.entries(IDB_SCHEMA)) {
-    try {
-      const stores = await readAllStores(dbName, schema);
-      if (Object.keys(stores).length > 0) result[dbName] = stores;
-    } catch (error) {
-      console.warn(`[backup] Failed to read ${dbName}, skipping:`, error);
-    }
+    const stores = await readAllStores(dbName, schema);
+    if (Object.keys(stores).length > 0) result[dbName] = stores;
   }
   return result;
 }
