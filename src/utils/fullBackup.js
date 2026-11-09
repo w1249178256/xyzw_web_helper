@@ -297,20 +297,37 @@ function parseJson(raw) {
 }
 
 // Merge two JSON arrays by primary key; existing local items win.
-function mergeJsonArray(existingRaw, incomingRaw, idField) {
+function mergeJsonArray(
+  existingRaw,
+  incomingRaw,
+  idField,
+  mergeMembers = false,
+) {
   const existing = Array.isArray(parseJson(existingRaw))
     ? parseJson(existingRaw)
     : [];
   const incoming = Array.isArray(parseJson(incomingRaw))
     ? parseJson(incomingRaw)
     : [];
-  const seen = new Set(existing.map((item) => item?.[idField]).filter(Boolean));
+  const byId = new Map(
+    existing
+      .filter((item) => item?.[idField])
+      .map((item) => [item[idField], item]),
+  );
   const merged = [...existing];
   for (const item of incoming) {
     const id = item?.[idField];
-    if (id && !seen.has(id)) {
-      seen.add(id);
+    if (id && !byId.has(id)) {
+      byId.set(id, item);
       merged.push(item);
+    } else if (id && mergeMembers) {
+      const group = byId.get(id);
+      group.tokenIds = [
+        ...new Set([
+          ...(Array.isArray(group.tokenIds) ? group.tokenIds : []),
+          ...(Array.isArray(item.tokenIds) ? item.tokenIds : []),
+        ]),
+      ];
     }
   }
   return merged;
@@ -351,16 +368,28 @@ function applyLocalStorageWrites(entries, keysToClear) {
       localStorage.setItem(key, value);
     }
   } catch (error) {
-    // Best-effort rollback to the pre-restore snapshot. A rollback write can
-    // itself fail (e.g. quota), so it must never mask the original error.
+    // Release incoming values before restoring originals at the same quota.
+    const rollbackErrors = [];
     for (const key of snapshot.keys()) {
-      const oldValue = snapshot.get(key);
       try {
-        if (oldValue === null) localStorage.removeItem(key);
-        else localStorage.setItem(key, oldValue);
-      } catch {
-        // Ignore: report the original failure below.
+        localStorage.removeItem(key);
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
       }
+    }
+    for (const [key, oldValue] of snapshot) {
+      if (oldValue === null) continue;
+      try {
+        localStorage.setItem(key, oldValue);
+      } catch (rollbackError) {
+        rollbackErrors.push(rollbackError);
+      }
+    }
+    if (rollbackErrors.length) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        `${error.message}; original storage could not be fully restored`,
+      );
     }
     throw error;
   }
@@ -400,7 +429,9 @@ function restoreLocalStorage(backupData, mode) {
     if (idField) {
       entries.push([
         key,
-        JSON.stringify(mergeJsonArray(current, raw, idField)),
+        JSON.stringify(
+          mergeJsonArray(current, raw, idField, key === "tokenGroups"),
+        ),
       ]);
     }
     // Otherwise keep the local value and skip this key.
@@ -420,7 +451,7 @@ async function restoreStore(
   mode,
   options = {},
 ) {
-  if (!Array.isArray(records) || records.length === 0) return 0;
+  if (!Array.isArray(records)) return 0;
 
   const { touchLastUsed = false } = options;
   const now = new Date().toISOString();
@@ -431,20 +462,22 @@ async function restoreStore(
     }
     return value;
   };
+  const prepared = records.map(prepare);
 
   if (mode === "replace") {
     return new Promise((resolve, reject) => {
       const tx = db.transaction(storeName, "readwrite");
       const store = tx.objectStore(storeName);
-      store.clear();
-      let count = 0;
-      for (const record of records) {
-        store.put(prepare(record));
-        count += 1;
+      let writeError;
+      tx.oncomplete = () => resolve(prepared.length);
+      tx.onabort = () => reject(writeError || tx.error);
+      try {
+        store.clear();
+        for (const record of prepared) store.put(record);
+      } catch (error) {
+        writeError = error;
+        tx.abort();
       }
-      tx.oncomplete = () => resolve(count);
-      tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
     });
   }
 
@@ -456,7 +489,7 @@ async function restoreStore(
     req.onerror = () => reject(req.error);
   });
 
-  const missing = records.filter((record) => {
+  const missing = prepared.filter((record) => {
     const key = record?.[keyPath];
     return key !== undefined && !existingKeys.has(key);
   });
@@ -465,48 +498,77 @@ async function restoreStore(
   return new Promise((resolve, reject) => {
     const tx = db.transaction(storeName, "readwrite");
     const store = tx.objectStore(storeName);
-    for (const record of missing) store.put(prepare(record));
+    let writeError;
     tx.oncomplete = () => resolve(missing.length);
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
+    tx.onabort = () => reject(writeError || tx.error);
+    try {
+      for (const record of missing) store.put(record);
+    } catch (error) {
+      writeError = error;
+      tx.abort();
+    }
   });
 }
 
-// Restore every known DB; returns a per-store count of written records.
-async function restoreIndexedDB(backupData, mode) {
-  const stats = {};
-  const incoming = backupData || {};
-
-  for (const [dbName, schema] of Object.entries(IDB_SCHEMA)) {
-    const storesData = incoming[dbName];
-    if (!storesData || typeof storesData !== "object") continue;
-
-    let db;
-    try {
-      db = await openAppDB(dbName, schema);
-    } catch (error) {
-      console.warn(`[backup] Failed to open ${dbName}, skipping:`, error);
-      continue;
+// Open and snapshot every required database before changing any storage.
+async function prepareRestoreDatabases(backupData) {
+  const databases = [];
+  try {
+    for (const [dbName, schema] of Object.entries(IDB_SCHEMA)) {
+      const storesData = backupData?.[dbName];
+      if (!storesData || typeof storesData !== "object") continue;
+      const db = await openAppDB(dbName, schema);
+      if (!db) throw new Error(`Cannot restore database ${dbName}`);
+      const entry = { dbName, db, schema, storesData };
+      databases.push(entry);
+      for (const storeName of Object.keys(schema.stores)) {
+        if (!db.objectStoreNames.contains(storeName)) {
+          throw new Error(`Missing database store ${dbName}.${storeName}`);
+        }
+        if (
+          Object.hasOwn(storesData, storeName) &&
+          !Array.isArray(storesData[storeName])
+        ) {
+          throw new Error(`Invalid backup records for ${dbName}.${storeName}`);
+        }
+      }
+      entry.snapshot = await readAllStores(dbName, schema);
     }
-    if (!db) continue;
+    return databases;
+  } catch (error) {
+    for (const { db } of databases) db.close();
+    throw error;
+  }
+}
 
-    try {
-      for (const [storeName, cfg] of Object.entries(schema.stores)) {
+async function restoreIndexedDB(databases, mode, rollback = false) {
+  const stats = {};
+  const errors = [];
+  for (const { dbName, db, schema, storesData, snapshot } of databases) {
+    const records = rollback ? snapshot : storesData;
+    for (const [storeName, cfg] of Object.entries(schema.stores)) {
+      if (!Object.hasOwn(storesData, storeName)) continue;
+      try {
         const count = await restoreStore(
           db,
           storeName,
           cfg.keyPath,
-          storesData[storeName],
+          records[storeName],
           mode,
-          { touchLastUsed: cfg.touchLastUsed === true },
+          { touchLastUsed: !rollback && cfg.touchLastUsed === true },
         );
         if (count > 0) stats[`${dbName}.${storeName}`] = count;
+      } catch (error) {
+        if (!rollback) throw error;
+        errors.push(error);
       }
-    } finally {
-      db.close();
     }
   }
-
+  if (errors.length)
+    throw new AggregateError(
+      errors,
+      "Original databases could not be fully restored",
+    );
   return stats;
 }
 
@@ -529,11 +591,22 @@ export async function restoreFullBackup(data, mode = "replace") {
   const error = validateBackup(data);
   if (error) throw new Error(error);
 
-  const localCount = restoreLocalStorage(data.localStorage, mode);
-  const idbStats = await restoreIndexedDB(data.indexedDB, mode);
-
-  return {
-    localStorageKeys: localCount,
-    indexedDB: idbStats,
-  };
+  const databases = await prepareRestoreDatabases(data.indexedDB);
+  try {
+    const idbStats = await restoreIndexedDB(databases, mode);
+    const localCount = restoreLocalStorage(data.localStorage, mode);
+    return { localStorageKeys: localCount, indexedDB: idbStats };
+  } catch (error) {
+    try {
+      await restoreIndexedDB(databases, "replace", true);
+    } catch (rollbackError) {
+      throw new AggregateError(
+        [error, rollbackError],
+        `${error.message}; original databases could not be fully restored`,
+      );
+    }
+    throw error;
+  } finally {
+    for (const { db } of databases) db.close();
+  }
 }
