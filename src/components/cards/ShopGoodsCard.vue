@@ -300,7 +300,7 @@
           <NSpace justify="end">
             <template v-if="planView === 'setup'">
               <NButton size="small" @click="clearPlanItems">清空勾选</NButton>
-              <NButton size="small" @click="planVisible = false">关闭</NButton>
+              <NButton size="small" @click="closePlan">关闭</NButton>
               <NButton
                 size="small"
                 type="primary"
@@ -317,7 +317,7 @@
             </template>
             <template v-else>
               <NButton size="small" @click="backToSetup">返回设置</NButton>
-              <NButton size="small" @click="planVisible = false">关闭</NButton>
+              <NButton size="small" @click="closePlan">关闭</NButton>
             </template>
           </NSpace>
         </template>
@@ -600,6 +600,27 @@ const planCostOverBudget = computed(
   () => planEstimatedCost.value > Number(goldBrick.value || 0),
 );
 
+/** 当前草稿与已保存计划是否不同 */
+function isPlanDirty() {
+  const token = tokenStore.selectedToken;
+  if (!token) return false;
+  const saved = loadShopPlan(token.id);
+  const draft = planDraft.value;
+  const draftItems = Object.keys(draft.items || {}).sort();
+  const savedItems = Object.keys(saved.items || {}).sort();
+  if (draftItems.join(",") !== savedItems.join(",")) return true;
+  if (draftItems.some((k) => Number(draft.items[k]) !== Number(saved.items[k]))) return true;
+  return Number(draft.maxRefresh || 0) !== Number(saved.maxRefresh || 0);
+}
+
+/** 关闭配置弹窗：有改动就提醒一下，避免「改了没保存就直接执行」 */
+function closePlan() {
+  if (isPlanDirty()) {
+    message.warning("计划有未保存的修改，点「保存计划」后执行才会生效", 5000);
+  }
+  planVisible.value = false;
+}
+
 async function openPlan() {
   const token = tokenStore.selectedToken;
   if (!token) {
@@ -709,6 +730,13 @@ async function runSavedPlan() {
     message.warning("计划里还没有勾选商品，请先配置并保存");
     await openPlan();
     return;
+  }
+  // 刷新次数 0 就只买当前批次，先说明白，避免以为「没自动刷新」
+  if (Number(plan.maxRefresh) <= 0) {
+    message.info(
+      `已保存的计划是「只买当前批次」（刷新 0 次）。需要边刷边买，请在「编辑计划」里设置刷新次数。`,
+      6000,
+    );
   }
   planDraft.value = plan;
   await runPlan();
