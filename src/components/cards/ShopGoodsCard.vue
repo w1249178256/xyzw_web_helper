@@ -78,7 +78,7 @@
       </div>
 
       <p v-if="rows.length" class="shop-note">
-        读取商品不会触发商店刷新；「刷新商店」会重置整批商品与折扣，点击后需二次确认。VIP0 每天 1 次免费刷新，用完后按钮自动置灰。
+        读取商品不会触发商店刷新；「刷新商店」会重置整批商品与折扣，点击后需二次确认。购买计划的规则：本批清单买齐后自动刷新继续，没买齐或金砖不足立即终止。
       </p>
 
       <NModal
@@ -734,7 +734,7 @@ async function runSavedPlan() {
   // 刷新次数 0 就只买当前批次，先说明白，避免以为「没自动刷新」
   if (Number(plan.maxRefresh) <= 0) {
     message.info(
-      `已保存的计划是「只买当前批次」（刷新 0 次）。需要边刷边买，请在「编辑计划」里设置刷新次数。`,
+      `已保存的计划是「只买当前批次」（刷新 0 次）。要在买齐后自动刷新继续，请在「编辑计划」里设置刷新次数。`,
       6000,
     );
   }
@@ -767,37 +767,52 @@ async function runPlan() {
     if (!connected) throw new Error("WebSocket 未连接");
 
     planLog(
-      `开始执行：勾选 ${ids.length} 件，最多刷新 ${plan.maxRefresh} 次，金砖 ${formatNum(goldBrick.value)}`,
+      `开始执行：勾选 ${ids.length} 件，每批买齐后最多刷新 ${plan.maxRefresh} 次，金砖 ${formatNum(goldBrick.value)}`,
     );
     await readGoodsRows(token.id);
 
-    let round = 0;
+    let round = 0; // 已刷新次数
+    const maxRefresh = Number(plan.maxRefresh || 0);
+
     while (true) {
       if (planStopRequested.value) {
         planLog("已手动停止", "warn");
         break;
       }
 
-      // ---- 逐件购买 ----
+      // ---- 逐件购买，记录本批没买到的 ----
+      const missed = [];
       for (const goodsId of ids) {
         if (planStopRequested.value) break;
         const row = rows.value.find((r) => Number(r.goodsId) === goodsId);
         const name = nameOf(goodsId);
         if (!row) {
-          planLog(`${name}：本批没刷到，跳过`, "muted");
+          planLog(`${name}：本批没有这件商品`, "warn");
+          missed.push(name);
           continue;
         }
         if (Number(row.buy_quantity ?? 0) >= 1) {
-          // 计划不看已购状态：本批次买过的直接视为已满足（每件限购 1 次，再买也会被服务端拒）
-          planLog(`${name}：本批次已购买，视为满足`, "muted");
+          planLog(`${name}：本批已买到`, "muted");
           continue;
         }
         const price = getGoodsFinalPrice(goodsId, row.discount);
         const limit = Number(plan.items[String(goodsId)]);
-        if (price == null) continue;
-        if (price > limit) {
-          planLog(`${name}：现价 ${price} 高于心理价 ${limit}，不买`, "muted");
+        if (price == null) {
+          missed.push(name);
           continue;
+        }
+        if (price > limit) {
+          planLog(`${name}：现价 ${price} 高于心理价 ${limit}，未购买`, "warn");
+          missed.push(name);
+          continue;
+        }
+        // 金砖不足：买之前就判定，立即终止（不等服务端报错）
+        if (price > Number(goldBrick.value)) {
+          planLog(
+            `${name}：金砖不足（需 ${price}，剩 ${formatNum(goldBrick.value)}），立即终止`,
+            "err",
+          );
+          throw new Error(`金砖不足，${name} 需要 ${price}`);
         }
         planLog(`${name}：现价 ${price} ≤ ${limit}，购买中…`);
         const result = await buyGoodsOnce(token.id, goodsId);
@@ -807,22 +822,32 @@ async function runPlan() {
         );
       }
 
-      // ---- 是否买齐 ----
-      const allDone = ids.every((goodsId) => {
-        const row = rows.value.find((r) => Number(r.goodsId) === goodsId);
-        return row ? Number(row.buy_quantity ?? 0) >= 1 : true;
-      });
-      if (allDone) {
-        planLog("清单已全部买到，计划完成", "ok");
+      if (planStopRequested.value) {
+        planLog("已手动停止", "warn");
         break;
       }
 
-      // ---- 刷新 ----
-      if (round >= plan.maxRefresh) {
-        planLog(`已刷新 ${round} 次，达到计划上限，结束`, "warn");
+      // ---- 没买齐：立即终止，不浪费刷新 ----
+      if (missed.length) {
+        planLog(
+          `本批还有 ${missed.length} 件没买到（${missed.join("、")}），商品未购买完毕，终止`,
+          "warn",
+        );
         break;
       }
-      planLog(`第 ${round + 1}/${plan.maxRefresh} 次刷新…`, "info");
+
+      // ---- 全部买到：刷新进入下一批 ----
+      if (round >= maxRefresh) {
+        planLog(
+          `本批已全部买到，刷新次数已用完（${round}/${maxRefresh}），结束`,
+          "ok",
+        );
+        break;
+      }
+      planLog(
+        `本批已全部买到，第 ${round + 1}/${maxRefresh} 次刷新，继续下一批…`,
+        "ok",
+      );
       const refreshed = await doRefreshStore(token.id);
       round += 1;
       planLog(
@@ -832,6 +857,10 @@ async function runPlan() {
         "ok",
       );
       await sleep(500);
+    }
+
+    if (round > 0) {
+      planLog(`本次共刷新 ${round} 次，共买到 ${ids.length * (round + 1)} 件次商品`, "info");
     }
   } catch (error) {
     const reason = String(error?.message || error);
