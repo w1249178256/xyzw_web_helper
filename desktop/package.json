@@ -1,0 +1,22 @@
+{
+  "name": "xyzw-desktop",
+  "version": "2.0.1",
+  "private": true,
+  "description": "XYZW 原版网页的独立桌面外壳",
+  "author": "XYZW Team",
+  "license": "CC-BY-NC-SA-4.0",
+  "main": "main.cjs",
+  "scripts": {
+    "build": "node build.mjs",
+    "start": "electron .",
+    "test": "node --test test/*.test.cjs",
+    "smoke": "electron . --desktop-smoke-test",
+    "pack:mac": "node build.mjs mac",
+    "pack:win": "node build.mjs win",
+    "pack:all": "node build.mjs all"
+  },
+  "devDependencies": {
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8"
+  }
+}

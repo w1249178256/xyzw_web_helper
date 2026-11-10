@@ -154,6 +154,24 @@ pnpm run lint     # 代码检查和修复
 pnpm run format   # 代码格式化
 ```
 
+### 桌面版打包（Windows / macOS）
+
+桌面外壳位于独立的 `desktop/` 目录，不修改原版源码、路由或 Web 构建配置。
+应用启动时自动运行本地 HTTP 服务并打开 Electron 窗口，使用者无需安装 Node.js。
+
+```bash
+# 在项目根目录执行；先按上文安装原版项目依赖
+npm ci --prefix desktop
+
+node desktop/build.mjs win   # Windows 安装包
+node desktop/build.mjs mac   # macOS DMG（需在 macOS 上构建）
+node desktop/build.mjs all   # 两个平台（在 macOS 上执行）
+```
+
+安装包输出到 `desktop/release/`。Windows 原生构建最可靠，macOS 交叉构建 Windows
+时需下载 Wine 等辅助工具。默认未签名，系统可能显示安全提示。
+详细说明及测试命令见 [桌面打包说明](desktop/README.md)。
+
 ### 部署代理服务 (Cloudflare Pages)
 
 本项目推荐使用 Cloudflare Pages 进行部署，内置了对 API 代理的支持。
