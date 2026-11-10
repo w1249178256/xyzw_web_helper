@@ -29,6 +29,9 @@
         width="52rem"
         :footer="false"
         :default-visible="!tokenStore.hasTokens"
+        :closable="!importLocked"
+        :mask-closable="!importLocked"
+        :esc-to-close="!importLocked"
       >
         <template #title>
           <h2>
@@ -44,6 +47,7 @@
             v-model:value="importMethod"
             class="import-method-tabs"
             size="small"
+            :disabled="importLocked"
           >
             <n-radio-button value="manual"> 手动输入 </n-radio-button>
             <n-radio-button value="url"> URL获取 </n-radio-button>
@@ -101,6 +105,7 @@
             v-if="importMethod === 'bin'"
           />
           <SingleBinTokenForm
+            @lock="(locked) => (importLocked = locked)"
             @cancel="() => (showImportForm = false)"
             @ok="() => (showImportForm = false)"
             v-if="importMethod === 'singlebin'"
@@ -306,6 +311,14 @@
             </template>
 
             <template #default>
+              <NAlert
+                v-if="getLoginError(gameToken.id)"
+                type="error"
+                class="token-login-error"
+                @click.stop
+              >
+                {{ getLoginError(gameToken.id) }}
+              </NAlert>
               <div class="token-display">
                 <span class="token-label">Token:</span>
                 <code class="token-value">{{
@@ -669,6 +682,14 @@
                 </n-dropdown>
               </n-space>
             </n-space>
+            <NAlert
+              v-if="getLoginError(gameToken.id)"
+              type="error"
+              class="token-login-error"
+              @click.stop
+            >
+              {{ getLoginError(gameToken.id) }}
+            </NAlert>
           </n-card>
         </div>
       </div>
@@ -758,7 +779,7 @@ import {
 import lz4 from "lz4js";
 import { NAlert, NIcon, useDialog, useMessage } from "naive-ui";
 import { computed, h, onMounted, onUnmounted, reactive, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { onBeforeRouteLeave, useRouter } from "vue-router";
 import useIndexedDB from "@/hooks/useIndexedDB";
 
 import { $emit } from "@/stores/events/index.ts";
@@ -809,6 +830,7 @@ const rateLimitMessage = ref("");
 
 // 响应式数据
 const showImportForm = ref(false);
+const importLocked = ref(false);
 const isImporting = ref(false);
 const showEditModal = ref(false);
 
@@ -817,6 +839,44 @@ const editingToken = ref(null);
 const importMethod = ref("manual");
 const refreshingTokens = ref(new Set());
 const connectingTokens = ref(new Set());
+
+onBeforeRouteLeave(() => {
+  if (importLocked.value) {
+    message.warning("正在读取或保存 BIN，请完成或停止后再离开");
+    return false;
+  }
+});
+
+const getLoginError = (tokenId) =>
+  tokenStore.wsConnections[tokenId]?.lastError?.error || "";
+
+watch(
+  () =>
+    tokenStore.gameTokens.map((token) => ({
+      id: token.id,
+      name: token.name,
+      authenticated: tokenStore.wsConnections[token.id]?.authenticated,
+      error: tokenStore.wsConnections[token.id]?.lastError,
+    })),
+  (states, previous = []) => {
+    for (const state of states) {
+      const old = previous.find((item) => item.id === state.id);
+      if (state.error && state.error !== old?.error) {
+        connectingTokens.value.delete(state.id);
+        message.error(`${state.name}：${state.error.error}`, {
+          duration: 6000,
+        });
+      } else if (state.authenticated && connectingTokens.value.has(state.id)) {
+        connectingTokens.value.delete(state.id);
+        message.success(`${state.name} 登录成功`);
+      }
+    }
+    for (const id of connectingTokens.value) {
+      if (!states.some((state) => state.id === id))
+        connectingTokens.value.delete(id);
+    }
+  },
+);
 // 从localStorage读取上次的视图模式，默认为列表视图
 const viewMode = ref(localStorage.getItem("tokenViewMode") || "list");
 const dragIndex = ref(null);
@@ -1193,57 +1253,32 @@ const selectToken = (token, forceReconnect = false) => {
     return;
   }
 
-  const isAlreadySelected = selectedTokenId.value === token.id;
   const connectionStatus = getConnectionStatus(token.id);
 
-  // 降噪日志已移除
-
-  // 如果已经选中且已连接，断开连接
   if (
-    isAlreadySelected &&
-    connectionStatus === "connected" &&
-    !forceReconnect
+    connectingTokens.value.has(token.id) ||
+    connectionStatus === "connecting"
   ) {
-    // 断开连接
-    tokenStore.closeWebSocketConnection(token.id);
-    message.success(`已断开 ${token.name} 的连接`);
+    message.info(`${token.name} 正在登录，请稍候`);
     return;
   }
 
-  // 如果未选中但已连接，断开连接
-  if (
-    !isAlreadySelected &&
-    connectionStatus === "connected" &&
-    !forceReconnect
-  ) {
+  // 已连接的账号再次点击时断开连接。
+  if (connectionStatus === "connected" && !forceReconnect) {
     // 断开连接
     tokenStore.closeWebSocketConnection(token.id);
     message.success(`已断开 ${token.name} 的连接`);
-    return;
-  }
-
-  // 如果已经选中但正在连接，也不执行操作
-  if (
-    isAlreadySelected &&
-    connectionStatus === "connecting" &&
-    !forceReconnect
-  ) {
-    message.info(`${token.name} 正在连接中...`);
     return;
   }
 
   // 选择token（带智能连接判断）
+  connectingTokens.value.add(token.id);
   const result = tokenStore.selectToken(token.id, forceReconnect);
 
   if (result) {
-    if (forceReconnect) {
-      message.success(`强制重连：${token.name}`);
-    } else if (isAlreadySelected) {
-      message.success(`重新连接：${token.name}`);
-    } else {
-      message.success(`已选择：${token.name}`);
-    }
+    message.info(`正在登录：${token.name}`);
   } else {
+    connectingTokens.value.delete(token.id);
     message.error(`选择Token失败：${token.name}`);
   }
 };
@@ -1254,6 +1289,11 @@ const getConnectionStatus = (tokenId) => {
 
 const getConnectionStatusText = (tokenId) => {
   const status = getConnectionStatus(tokenId);
+  if (
+    status === "connected" &&
+    !tokenStore.wsConnections[tokenId]?.authenticated
+  )
+    return "登录中...";
   const statusMap = {
     connected: "已连接",
     connecting: "连接中...",
@@ -1266,6 +1306,11 @@ const getConnectionStatusText = (tokenId) => {
 
 const getTokenStyle = (tokenId) => {
   const status = getConnectionStatus(tokenId);
+  if (
+    status === "connected" &&
+    !tokenStore.wsConnections[tokenId]?.authenticated
+  )
+    return "warning";
   const statusMap = {
     connected: "success",
     connecting: "warning",
@@ -2160,6 +2205,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.token-login-error {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
 .token-import-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { enc, lib, MD5 } from "crypto-js";
 import { g_utils } from "@/utils/bonProtocol";
+import { getAuthUserData } from "@/utils/tokenLogin";
 
 /**
  * Derive the existing storage identity from the exact credential bytes.
@@ -26,8 +27,12 @@ class RateLimiter {
     this.windowMs = windowMs;
   }
 
-  onWait(callback: WaitCallback): void {
+  onWait(callback: WaitCallback | null): void {
     this.onWaitCallback = callback;
+  }
+
+  getWaitCallback(): WaitCallback | null {
+    return this.onWaitCallback;
   }
 
   private cleanOldRequests(): void {
@@ -71,6 +76,7 @@ class RateLimiter {
         await new Promise((resolve) => setTimeout(resolve, totalWaitTime));
       } finally {
         clearInterval(intervalId);
+        this.onWaitCallback?.(0, this.queueSize);
       }
     }
 
@@ -81,20 +87,23 @@ class RateLimiter {
     this.queueSize++;
     try {
       await this.waitForSlot();
-      return fn();
+      return await fn();
     } finally {
       this.queueSize--;
     }
   }
 }
 
-const authUserRateLimiter = new RateLimiter(25, 60000);
+const authUserRateLimiter = new RateLimiter(20, 60000);
 
 export const setAuthUserRateLimiterCallback = (
-  callback: WaitCallback,
+  callback: WaitCallback | null,
 ): void => {
   authUserRateLimiter.onWait(callback);
 };
+
+export const getAuthUserRateLimiterCallback = (): WaitCallback | null =>
+  authUserRateLimiter.getWaitCallback();
 
 /**
  * Schedule a login operation within the shared authentication rate window.
@@ -127,10 +136,11 @@ export const transformToken = async (arrayBuffer: ArrayBuffer) => {
           referrerPolicy: "no-referrer",
         },
         responseType: "arraybuffer",
+        timeout: 20000,
       },
     );
     const msg = g_utils.parse(res.data);
-    const data = msg.getData();
+    const data = getAuthUserData(msg);
     const currentTime = Date.now();
     const sessId = currentTime * 100 + Math.floor(Math.random() * 100);
     const connId = currentTime + Math.floor(Math.random() * 10);
