@@ -14,9 +14,13 @@
             gap: 12px;
           "
         >
-          <div style="display: flex; align-items: center; gap: 16px">
+          <div
+            class="header-title-row"
+            style="display: flex; align-items: center; gap: 16px"
+          >
             <h2>批量日常任务</h2>
             <div
+              class="header-info-bar"
               style="
                 display: flex;
                 align-items: center;
@@ -41,7 +45,7 @@
               <div v-else style="font-size: 14px; color: #6c757d">
                 暂无定时任务
               </div>
-              <div style="display: flex; gap: 8px">
+              <div class="header-info-buttons" style="display: flex; gap: 8px">
                 <n-button type="primary" size="small" @click="openTaskModal">
                   新增定时任务
                 </n-button>
@@ -75,6 +79,7 @@
             </div>
           </div>
           <div
+            class="header-action-bar"
             style="
               display: flex;
               align-items: center;
@@ -6617,9 +6622,11 @@ const stopBatch = () => {
 @media (max-width: 768px) {
   .batch-daily-tasks {
     padding: 12px;
-    height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* Use the natural document flow instead of a fixed 100vh so the page can
+       actually scroll on mobile (100vh ignores the sticky navbar height and
+       the dynamic iOS toolbars, which pushed content off-screen). */
+    height: auto;
+    overflow: visible;
   }
 
   .main-layout {
@@ -6645,6 +6652,32 @@ const stopBatch = () => {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
+  }
+
+  /* Every nested flex row in the header must be able to wrap, otherwise the
+     Chinese labels get squeezed into one character per line and the buttons
+     overflow the viewport. */
+  .header-title-row,
+  .header-info-bar,
+  .header-info-buttons,
+  .header-action-bar,
+  .setting-item {
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-title-row h2 {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .header-info-bar {
+    flex-direction: column;
+  }
+
+  .header-info-buttons {
+    width: 100%;
   }
 
   .page-header .actions {
