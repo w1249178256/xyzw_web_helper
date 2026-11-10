@@ -2,6 +2,10 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname.startsWith("/api/link-games/")) {
+      return handleGameResource(request);
+    }
+
     // CORS headers
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
@@ -123,3 +127,142 @@ export default {
     return new Response("Not Found", { status: 404, headers: corsHeaders });
   },
 };
+
+// Fixed public game origins. No account, cookie or authorization headers are forwarded.
+export function gameResourceTarget(value, method) {
+  const url = new URL(value);
+  const prefix = "/api/link-games/";
+  if (!url.pathname.startsWith(prefix))
+    throw new Error("Unsupported resource path");
+  const path = url.pathname.slice(prefix.length);
+  if (path === "manifest" && ["GET", "HEAD", "POST"].includes(method)) {
+    return new URL(
+      `https://xxz-xyzw.hortorgames.com/login/manifest${url.search}`,
+    );
+  }
+  const hosts = {
+    assets: "xxz-xyzw-res.hortorgames.com",
+    "ali-assets": "xxz-xyzw-alires.hortorgames.com",
+    wxmini: "wxmini-resource.hortorgames.com",
+    scripts: "xyzw11001.baby",
+  };
+  const slash = path.indexOf("/");
+  const alias = path.slice(0, slash);
+  if (
+    slash < 0 ||
+    !Object.hasOwn(hosts, alias) ||
+    !["GET", "HEAD"].includes(method)
+  )
+    throw new Error("Unsupported resource request");
+  const target = new URL(`https://${hosts[alias]}`);
+  target.pathname = path.slice(slash);
+  target.search = url.search;
+  return target;
+}
+
+export async function handleGameResource(request, fetcher = fetch) {
+  let target;
+  try {
+    target = gameResourceTarget(request.url, request.method);
+  } catch {
+    return new Response("Unsupported game resource", { status: 400 });
+  }
+  const headers = new Headers();
+  for (const key of ["accept", "content-type"]) {
+    const value = request.headers.get(key);
+    if (value && value.length < 1024) headers.set(key, value);
+  }
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  request.signal.addEventListener("abort", abort, { once: true });
+  if (request.signal.aborted) abort();
+  const timeout = setTimeout(abort, 65000);
+  const cleanup = () => {
+    clearTimeout(timeout);
+    request.signal.removeEventListener("abort", abort);
+  };
+  try {
+    let body;
+    if (request.method === "POST") {
+      if (Number(request.headers.get("content-length")) > 65536)
+        throw new Error("Request too large");
+      const chunks = [];
+      let size = 0;
+      const input = request.body?.getReader();
+      if (input) {
+        while (true) {
+          const { value, done } = await input.read();
+          if (done) break;
+          size += value.byteLength;
+          if (size > 65536) {
+            await input.cancel();
+            throw new Error("Request too large");
+          }
+          chunks.push(value);
+        }
+      }
+      body = new Uint8Array(size);
+      let offset = 0;
+      for (const chunk of chunks) {
+        body.set(chunk, offset);
+        offset += chunk.byteLength;
+      }
+    }
+    const upstream = await fetcher(target, {
+      method: request.method,
+      headers,
+      body,
+      redirect: "manual",
+      signal: controller.signal,
+    });
+    const responseHeaders = new Headers({
+      "x-game-status": String(upstream.status),
+      "cache-control": "no-store",
+      "content-type":
+        upstream.headers.get("content-type") || "application/octet-stream",
+    });
+    if (upstream.headers.has("location"))
+      responseHeaders.set("x-game-location", upstream.headers.get("location"));
+    if (!upstream.body || request.method === "HEAD") {
+      await upstream.body?.cancel();
+      cleanup();
+      return new Response(null, { headers: responseHeaders });
+    }
+    const reader = upstream.body.getReader();
+    let bytes = 0;
+    const stream = new ReadableStream({
+      async pull(output) {
+        try {
+          const { value, done } = await reader.read();
+          if (done) {
+            cleanup();
+            output.close();
+            return;
+          }
+          bytes += value.byteLength;
+          if (bytes > 32 * 1024 * 1024) {
+            controller.abort();
+            await reader.cancel();
+            throw new Error("Game resource too large");
+          }
+          output.enqueue(value);
+        } catch (error) {
+          cleanup();
+          output.error(error);
+        }
+      },
+      async cancel() {
+        cleanup();
+        controller.abort();
+        await reader.cancel();
+      },
+    });
+    return new Response(stream, { headers: responseHeaders });
+  } catch {
+    cleanup();
+    return new Response("Game resource request failed", {
+      status: 502,
+      headers: { "x-game-status": "502" },
+    });
+  }
+}

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="referrer" content="no-referrer">
+  <title>游戏窗口</title>
+  <link rel="stylesheet" href="style-mobile.css">
+  <link rel="icon" href="favicon.ico">
+  <style>#local-status{position:fixed;z-index:10;left:8px;bottom:8px;color:#aaa;font:12px/1.4 sans-serif;pointer-events:none}</style>
+</head>
+<body>
+  <canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
+  <div id="splash"><div class="progress-bar stripes"><span style="width:0%"></span></div></div>
+  <div id="local-status">正在初始化游戏窗口…</div>
+  <script src="storage.js?v=20261028.1"></script>
+  <script type="module" src="runtime.js?v=20261028.4"></script>
+</body>
+</html>

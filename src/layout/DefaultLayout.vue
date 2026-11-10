@@ -61,6 +61,14 @@
             <span>主线推关</span>
           </router-link>
           <router-link
+            to="/admin/Link-Games"
+            class="nav-item"
+            active-class="active"
+          >
+            <n-icon><GameController /></n-icon>
+            <span>在线游戏</span>
+          </router-link>
+          <router-link
             to="/admin/message-test"
             class="nav-item"
             active-class="active"
@@ -183,6 +191,14 @@
           <span>主线推关</span>
         </router-link>
         <router-link
+          to="/admin/Link-Games"
+          class="drawer-item"
+          @click="isMobileMenuOpen = false"
+        >
+          <n-icon><GameController /></n-icon>
+          <span>在线游戏</span>
+        </router-link>
+        <router-link
           to="/admin/message-test"
           class="drawer-item"
           @click="isMobileMenuOpen = false"
@@ -238,6 +254,7 @@ import {
   ChatbubbleEllipsesSharp,
   ChevronDown,
   Cube,
+  GameController,
   Home,
   Layers,
   LockOpen,
@@ -332,6 +349,8 @@ const handleUserAction = async (key) => {
   display: flex;
   gap: var(--spacing-md);
   flex: 1;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .nav-item {
@@ -342,6 +361,8 @@ const handleUserAction = async (key) => {
   border-radius: var(--border-radius-medium);
   color: var(--text-secondary);
   text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all var(--transition-fast);
 
   &:hover {

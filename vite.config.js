@@ -1,8 +1,11 @@
+import { Buffer } from "node:buffer";
 import fs from "node:fs";
 import path from "node:path";
+import { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
+import { handleGameResource } from "./worker.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -94,7 +97,54 @@ export default defineConfig(async () => {
     include: path.resolve(__dirname, "./src/locales/**"),
   });
 
+  const linkGameResources = (server) => {
+    server.middlewares.use("/api/link-games", async (req, res) => {
+      const controller = new AbortController();
+      res.on("close", () => controller.abort());
+      try {
+        let size = 0;
+        const chunks = [];
+        for await (const chunk of req) {
+          size += chunk.length;
+          if (size > 65536) {
+            res.statusCode = 413;
+            res.end("Request too large");
+            return;
+          }
+          chunks.push(chunk);
+        }
+        const request = new Request(
+          `http://localhost/api/link-games${req.url}`,
+          {
+            method: req.method,
+            headers: req.headers,
+            signal: controller.signal,
+            body: ["GET", "HEAD"].includes(req.method)
+              ? undefined
+              : Buffer.concat(chunks),
+          },
+        );
+        const response = await handleGameResource(request);
+        res.statusCode = response.status;
+        response.headers.forEach((value, key) => res.setHeader(key, value));
+        if (response.body) {
+          const stream = Readable.fromWeb(response.body);
+          stream.on("error", () => res.destroy());
+          stream.pipe(res);
+        } else res.end();
+      } catch {
+        if (!res.headersSent) res.statusCode = 502;
+        res.end("Game resource request failed");
+      }
+    });
+  };
+
   const plugins = [
+    {
+      name: "link-game-resources",
+      configureServer: linkGameResources,
+      configurePreviewServer: linkGameResources,
+    },
     routerPlugin && { ...routerPlugin, enforce: "pre" },
     vue(),
     vueDevToolsPlugin,

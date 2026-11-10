@@ -44,6 +44,7 @@ declare module 'vue' {
     FightPvp: typeof import('./src/components/cards/FightPvp.vue')['default']
     FishHelperCard: typeof import('./src/components/cards/FishHelperCard.vue')['default']
     GameStatus: typeof import('./src/components/GameStatus.vue')['default']
+    GameWorkspace: typeof import('./src/components/game/GameWorkspace.vue')['default']
     GoldRankListPageCard: typeof import('./src/components/cards/GoldRankListPageCard.vue')['default']
     GreatRouteRankListPageCard: typeof import('./src/components/Club/GreatRouteRankListPageCard.vue')['default']
     HangUpStatusCard: typeof import('./src/components/cards/HangUpStatusCard.vue')['default']
