@@ -45,6 +45,12 @@
 - **WebSocket调试**：实时WebSocket连接和消息调试
 - **协议验证**：游戏协议消息格式验证工具
 
+### 💾 备份与恢复
+- **一键全量备份**：账号 Token、BIN 登录凭据及所有本地配置导出为单个 JSON 文件
+- **跨浏览器 / 跨设备迁移**：数据按源隔离，换浏览器或设备后可用备份文件完整还原
+- **两种恢复模式**：覆盖模式先清空再写入；合并模式只补充本地不存在的条目
+- **恢复可回滚**：写入前先快照，任一步失败即整体回滚，不会只写一半
+
 ### 🎨 主题系统
 - **智能主题切换**：支持深浅主题无缝切换，自动适应系统主题偏好
 - **实时响应**：主题切换立即生效，无需刷新页面
@@ -95,13 +101,16 @@ src/
 │   ├── bonProtocol.js     # BON协议实现
 │   ├── xyzwWebSocket.js   # WebSocket客户端
 │   ├── gameCommands.js    # 游戏命令封装
+│   ├── fullBackup.js      # 全量备份/恢复
 │   └── wsAgent.js         # 连接代理
 │
 ├── 📱 views/               # 主要页面
-│   ├── TokenImport.vue    # Token导入管理
+│   ├── TokenImport/       # Token导入管理
+│   │   └── TokenImport.vue
 │   ├── Dashboard.vue      # 主控制台
 │   ├── DailyTasks.vue     # 日常任务
 │   ├── GameFeatures.vue   # 游戏功能
+│   ├── BackupRestore.vue  # 备份恢复
 │   └── Profile.vue        # 用户设置
 │
 └── 🧩 components/         # 可复用组件
@@ -333,6 +342,27 @@ const { isDark, toggleTheme } = useTheme()
 - 职业和技能信息
 - 服务器状态监控
 - 在线时长统计
+
+### 6. 备份与恢复
+
+数据存放在浏览器本地（localStorage + IndexedDB）且按源隔离，换浏览器或设备后不会自动带过去，需要用备份文件迁移。
+
+**备份内容**：localStorage 的全部业务配置，加上 IndexedDB 的 `xyzw_token_db`（账号记录）与 `xyzw`（BIN 登录凭据）。`bin_data_*`、`ws_connection_*` 等可再生或瞬时数据不包含在内。
+
+**入口**：导航栏「备份恢复」、个人设置页「数据导出」，均下载 `xyzw_full_backup_YYYY-MM-DD.json`；Token 导入弹窗的「导入配置」只负责导入。
+
+**恢复模式**：
+
+- **覆盖**：先清空本地数据再写入，结果与备份时一致
+- **合并**：只补充本地不存在的条目，`gameTokens`、`tokenGroups` 按 `id` 求并集
+
+写入前先快照，任一步失败即整体回滚。恢复完成后页面自动刷新。
+
+**「导入配置」可识别三种 JSON**：
+
+1. 全量备份文件（含 `localStorage` 与 `indexedDB` 字段），可选覆盖或合并
+2. 批量日常导出配置（含 `version`、`tokens`、`scheduledTasks`）
+3. 纯 Token 导出文件（仅 `tokens` 数组）
 
 ---
 
