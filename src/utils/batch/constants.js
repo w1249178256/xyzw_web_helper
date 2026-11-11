@@ -78,6 +78,9 @@ export const availableTasks = [
   { label: "一键玄武赐福", value: "batchXuanwuBlessing" },
 ];
 
+// 常用兑换码（官方活动码，新增官方兑换码时在此追加，兑换弹窗可一键填入）
+export const presetCdkCodes = ["26XYZW1111"];
+
 // 月度任务目标
 export const FISH_TARGET = 320;
 export const ARENA_TARGET = 240;
