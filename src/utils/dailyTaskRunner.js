@@ -518,65 +518,82 @@ export class DailyTaskRunner {
       });
     }
 
-    // 2. 竞技场
-    if (!isTaskCompleted(13) && settings.arenaEnable) {
-      taskList.push({
-        name: "竞技场战斗",
-        condition: 13,
-        execute: async () => {
-          this.log("开始竞技场战斗流程");
-          const hour = new Date().getHours();
-          if (hour < 6) {
-            this.log("当前时间未到6点，跳过竞技场战斗", "warning");
-            return false;
-          }
-          if (hour > 22) {
-            this.log("当前时间已过22点，跳过竞技场战斗", "warning");
-            return false;
-          }
+    // 2. 竞技场 (每日免费 3 次)
+    if (settings.arenaEnable) {
+      let alreadyArena = statistics["area:arena:reward:cnt"] ?? 0;
+      if (isTodayAvailable(statisticsTime["area:arena:reward:cnt"])) {
+        alreadyArena = 0;
+      }
+      const remainingArena = Math.max(3 - alreadyArena, 0);
 
-          await this.switchToFormationIfNeeded(
-            tokenId,
-            settings.arenaFormation,
-            "竞技场阵容",
-          );
-          await this.executeGameCommand(
-            tokenId,
-            "arena_startarea",
-            {},
-            "开始竞技场",
-          );
+      if (remainingArena > 0 || !isTaskCompleted(13)) {
+        const attemptsToRun = Math.max(
+          remainingArena,
+          isTaskCompleted(13) ? 0 : 1,
+        );
+        if (attemptsToRun > 0) {
+          taskList.push({
+            name: `竞技场战斗（打满免费3次，本次${attemptsToRun}次）`,
+            ...(isTaskCompleted(13) ? {} : { condition: 13 }),
+            execute: async () => {
+              this.log(`开始竞技场战斗流程，计划执行 ${attemptsToRun} 次`);
+              const hour = new Date().getHours();
+              if (hour < 6) {
+                this.log("当前时间未到6点，跳过竞技场战斗", "warning");
+                return false;
+              }
+              if (hour > 22) {
+                this.log("当前时间已过22点，跳过竞技场战斗", "warning");
+                return false;
+              }
 
-          const arenaAttempts = Math.min(3, this.getTaskState(13).remaining);
-          for (let i = 1; i <= arenaAttempts; i++) {
-            this.log(`竞技场战斗 ${i}/${arenaAttempts}`);
-            const targets = await this.executeGameCommand(
-              tokenId,
-              "arena_getareatarget",
-              {},
-              `获取竞技场目标${i}`,
-            );
-
-            const targetId = pickArenaTargetId(targets);
-            if (targetId) {
-              await this.executeGameCommand(
+              await this.switchToFormationIfNeeded(
                 tokenId,
-                "fight_startareaarena",
-                { targetId },
-                `竞技场战斗${i}`,
-                10000,
+                settings.arenaFormation,
+                "竞技场阵容",
               );
-            } else {
-              this.log(
-                `竞技场战斗${i} - 未找到目标: ${JSON.stringify(targets)}`,
-                "warning",
-              );
-              return false;
-            }
-            await this.sleep(1000);
-          }
-        },
-      });
+              try {
+                await this.executeGameCommand(
+                  tokenId,
+                  "arena_startarea",
+                  {},
+                  "开始竞技场",
+                );
+              } catch (e) {
+                this.log(`进入竞技场提示: ${e.message}`, "info");
+              }
+
+              for (let i = 1; i <= attemptsToRun; i++) {
+                this.log(`竞技场战斗 ${i}/${attemptsToRun}`);
+                const targets = await this.executeGameCommand(
+                  tokenId,
+                  "arena_getareatarget",
+                  {},
+                  `获取竞技场目标${i}`,
+                );
+
+                const targetId = pickArenaTargetId(targets);
+                if (targetId) {
+                  await this.executeGameCommand(
+                    tokenId,
+                    "fight_startareaarena",
+                    { targetId },
+                    `竞技场战斗${i}`,
+                    10000,
+                  );
+                } else {
+                  this.log(
+                    `竞技场战斗${i} - 未找到目标: ${JSON.stringify(targets)}`,
+                    "warning",
+                  );
+                  return false;
+                }
+                await this.sleep(1000);
+              }
+            },
+          });
+        }
+      }
     }
 
     // 3. BOSS
