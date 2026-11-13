@@ -53,6 +53,9 @@
     <!-- 挂机状态（提取组件） -->
     <HangUpStatusCard v-show="activeSection === 'daily'" />
 
+    <!-- 商店商品（只读，第一阶段先看数据） -->
+    <ShopGoodsCard v-show="activeSection === 'daily'" class="shop-goods-span" />
+
     <!-- 无限阵容助手（提取组件） -->
     <Unlimitedlineup v-show="activeSection === 'tools'" />
 
@@ -385,6 +388,7 @@ import MonthlyTasksCard from "./cards/MonthlyTasksCard.vue";
 import RecruitHelperCard from "./cards/RecruitHelperCard.vue";
 import RefineHelperCard from "./cards/RefineHelperCard.vue";
 import ServerRankList from "./cards/ServerRankListPageCard.vue";
+import ShopGoodsCard from "./cards/ShopGoodsCard.vue";
 import SkinChallengeCard from "./cards/SkinChallengeCard.vue";
 import StarUpgradeCard from "./cards/StarUpgradeCard.vue";
 import StudyChallengeCard from "./cards/StudyChallengeCard.vue";
@@ -641,6 +645,17 @@ onUnmounted(() => {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
+
+  // 商店商品表格列多，需要整行宽度
+  .shop-goods-span {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 900px) {
+    .shop-goods-span {
+      grid-column: auto;
+    }
+  }
 
   // 在大屏幕上限制最大列数以确保卡片有足够宽度
   @media (min-width: 1400px) {

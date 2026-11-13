@@ -7,6 +7,7 @@ import useIndexedDB from "@/hooks/useIndexedDB";
 import router from "@/router";
 import { g_utils } from "@/utils/bonProtocol";
 
+import { logInfo } from "@/utils/frontendLog";
 import { gameLogger, tokenLogger, wsLogger } from "@/utils/logger";
 import { generateRandomSeed } from "@/utils/randomSeed";
 import {
@@ -827,6 +828,7 @@ export const useTokenStore = defineStore("tokens", () => {
       wsClient.onConnect = () => {
         if (!isCurrentConnection()) return;
         wsLogger.wsConnect(tokenId);
+        logInfo("WS 连接成功", { tokenId, sessionId: currentSessionId, url: wsUrl });
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].status = "connected";
           wsConnections.value[tokenId].connectedAt = new Date().toISOString();
@@ -849,6 +851,15 @@ export const useTokenStore = defineStore("tokens", () => {
         if (!isCurrentConnection()) return;
         const reason = event.code === 1006 ? "异常断开" : event.reason || "";
         wsLogger.wsDisconnect(tokenId, reason);
+        const connectedAt = wsConnections.value[tokenId]?.connectedAt;
+        logInfo("WS 断开", {
+          tokenId,
+          code: event.code,
+          reason: event.reason || "",
+          wasClean: event.wasClean,
+          aliveMs: connectedAt ? Date.now() - new Date(connectedAt).getTime() : null,
+          reconnectAttempts: wsConnections.value[tokenId]?.reconnectAttempts ?? 0,
+        });
         if (wsConnections.value[tokenId]) {
           const conn = wsConnections.value[tokenId];
           const wasDisconnecting = conn.status === "disconnecting";
@@ -869,6 +880,7 @@ export const useTokenStore = defineStore("tokens", () => {
       wsClient.onError = (error) => {
         if (!isCurrentConnection()) return;
         wsLogger.wsError(tokenId, error);
+        logInfo("WS 错误", { tokenId, error: String(error?.message || error) });
         if (wsConnections.value[tokenId]) {
           wsConnections.value[tokenId].status = "error";
           wsConnections.value[tokenId].lastError = {
@@ -1045,6 +1057,7 @@ export const useTokenStore = defineStore("tokens", () => {
     cmd: string,
     params = {},
     timeout = 5000,
+    retryLeft = 1,
   ) => {
     const connection = wsConnections.value[tokenId];
     if (!connection || connection.status !== "connected") {
@@ -1087,6 +1100,15 @@ export const useTokenStore = defineStore("tokens", () => {
       // 特殊日志：fight_starttower 错误
       if (cmd === "fight_starttower") {
         wsLogger.error(`🗼 [咸将塔] 爬塔请求失败 [${tokenId}]:`, error.message);
+      }
+
+      // 服务端限流：批量推关时多号并发容易触发「200400 操作太快」，
+      // 退避一下重试一次，避免把整个号判成失败。
+      const errMsg = String(error?.message || error);
+      if (retryLeft > 0 && errMsg.includes("200400")) {
+        logInfo("请求被限流，退避重试", { tokenId, cmd });
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        return sendMessageWithPromise(tokenId, cmd, params, timeout, retryLeft - 1);
       }
       return Promise.reject(error);
     }

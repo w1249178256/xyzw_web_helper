@@ -78,15 +78,19 @@ import MyCard from "../Common/MyCard.vue";
 const tokenStore = useTokenStore();
 const message = useMessage();
 
-const HeroOptions = computed(() => [
-  ...Object.values(tokenStore.gameData.roleInfo.role.heroes).map((item) => {
+const HeroOptions = computed(() =>
+  Object.values(tokenStore.gameData?.roleInfo?.role?.heroes || {}).map((item) => {
+    const heroId = item?.heroId;
+    // 字典里可能没有这个 heroId（新武将 / 数据未同步），不能让整个 computed 抛错
+    const dict = HERO_DICT[heroId];
+    const heroName = dict?.name || `武将${heroId ?? "?"}`;
     return {
-      label: `${HERO_DICT[item.heroId].name}(${item.level}/6000)`,
-      value: item.heroId,
-      disabled: isSameGameValue(item.level, 6000),
+      label: `${heroName}(${item?.level ?? 0}/6000)`,
+      value: heroId,
+      disabled: isSameGameValue(item?.level, 6000),
     };
   }),
-]);
+);
 
 const HeroValue = ref(null);
 const HeroItem = ref(null);
@@ -101,11 +105,12 @@ const state = ref({
 });
 
 const handleUpdateValue = (value) => {
-  HeroItem.value = Object.assign(
-    {},
-    tokenStore.gameData.roleInfo.role.heroes[value],
-    HERO_DICT[value],
-  );
+  const hero = tokenStore.gameData?.roleInfo?.role?.heroes?.[value];
+  if (!hero) {
+    HeroItem.value = null;
+    return;
+  }
+  HeroItem.value = Object.assign({}, hero, HERO_DICT[value]);
 };
 
 const levelOptions = [
@@ -128,23 +133,19 @@ const levelOptions = [
 ];
 
 watch(
-  () => tokenStore.gameData.roleInfo.heroes,
+  // 原来是 tokenStore.gameData.roleInfo.heroes（少了 .role），永远监听不到变化
+  () => tokenStore.gameData?.roleInfo?.role?.heroes,
   () => {
-    if (HeroValue.value) {
-      if (
-        !isSameGameValue(
-          tokenStore.gameData.roleInfo.role.heroes[HeroValue.value].level,
-          6000,
-        )
-      ) {
-        HeroItem.value = Object.assign(
-          {},
-          tokenStore.gameData.roleInfo.role.heroes[HeroValue.value],
-          HERO_DICT[HeroValue.value],
-        );
-      } else {
-        HeroItem.value = null;
-      }
+    if (!HeroValue.value) return;
+    const hero = tokenStore.gameData?.roleInfo?.role?.heroes?.[HeroValue.value];
+    if (!hero) {
+      HeroItem.value = null;
+      return;
+    }
+    if (!isSameGameValue(hero.level, 6000)) {
+      HeroItem.value = Object.assign({}, hero, HERO_DICT[HeroValue.value]);
+    } else {
+      HeroItem.value = null;
     }
   },
   { deep: true }, // 深度监听内部变化

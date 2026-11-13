@@ -282,6 +282,12 @@ import {
   watch,
 } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
+import {
+  bgSleep,
+  startAudioKeepAlive,
+  startBgTicker,
+  stopAudioKeepAlive,
+} from "@/utils/bgTicker";
 import { BOSS_NAMES } from "./boss_names.js";
 
 const MAX_LOGS = 2000;
@@ -750,8 +756,13 @@ function progressPercent(card) {
   );
 }
 
+/**
+ * 等待指定毫秒。
+ * 用 bgSleep 而不是原生 setTimeout：切到后台时原生定时器会被压到每分钟一次，
+ * 推关循环就会卡死；bgSleep 由 Worker 节拍驱动，后台依旧按秒唤醒。
+ */
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return bgSleep(ms);
 }
 
 async function waitConnected(tokenId, timeoutMs = 3000) {
@@ -1183,6 +1194,20 @@ async function startOne(tokenId) {
   initState(tokenId, tokenName);
   addLog(tokenId, tokenName, "开始推图", "success");
 
+  // 后台保活：Worker 节拍器保证定时器不被节流；静音音频让浏览器放宽节流策略。
+  // 必须在用户点击的同步上下文里调用，否则 AudioContext 会被拦截。
+  startBgTicker();
+  startAudioKeepAlive().then((ok) => {
+    addLog(
+      tokenId,
+      tokenName,
+      ok
+        ? "已开启后台保活，可放心切到其它窗口"
+        : "后台保活未生效（浏览器拦截了静音音频），切后台仍可能断线",
+      ok ? "success" : "warning",
+    );
+  });
+
   if (!(await ensureConnected(tokenId))) {
     runningStates[tokenId].running = false;
     runningStates[tokenId].lastError = "WebSocket 未连接";
@@ -1407,6 +1432,8 @@ onBeforeUnmount(() => {
     clearInterval(tickTimer);
     tickTimer = null;
   }
+  // 离开页面就停掉静音音频，避免一直占着音频输出
+  stopAudioKeepAlive();
   Object.values(runningStates).forEach((state) => {
     if (state?.running) {
       state.stopFlag = true;

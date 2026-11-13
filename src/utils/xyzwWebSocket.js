@@ -4,6 +4,7 @@
  */
 
 import { $CacheManager } from "@/stores/cache";
+import { onBgTick } from "./bgTicker.js";
 import { g_utils } from "./bonProtocol.js";
 import { sleep } from "./helperTaskRunner.js";
 import { gameLogger, wsLogger } from "./logger.js";
@@ -492,6 +493,10 @@ export class XyzwWebSocketClient {
     this.sendQueueTimer = null;
     this.heartbeatTimer = null;
     this.heartbeatStartTimer = null;
+    /** 后台兜底：Worker tick 的回调取消函数 */
+    this.offBgHeartbeat = null;
+    /** 上次心跳时间，用于判断后台是否漏发 */
+    this.lastHeartbeatAt = 0;
     this.reconnectTimer = null;
     this.reconnectResetTimer = null;
     this.dialogResetTimer = null;
@@ -503,6 +508,8 @@ export class XyzwWebSocketClient {
     this.showMsg = false;
     this.connected = false;
     this.isReconnecting = false; // 重连状态标志
+    /** 连续重连次数，用于指数退避（连上成功即清零） */
+    this.reconnectAttempts = 0;
 
     this.promises = Object.create(null);
     this.registry = registerDefaultCommands(
@@ -537,6 +544,8 @@ export class XyzwWebSocketClient {
       if (this.socket !== socket) return;
       wsLogger.info("连接成功");
       this.connected = true;
+      // 连上就清零，下次断开重新从 1 秒起步
+      this.reconnectAttempts = 0;
       // 启动心跳机制
       this._setupHeartbeat();
       // 启动消息队列处理
@@ -839,7 +848,15 @@ export class XyzwWebSocketClient {
     this.disconnect();
     this.isReconnecting = true;
 
-    // 延迟重连，避免过于频繁
+    // 指数退避：1s → 2s → 4s → 8s → 16s → 32s → 60s（上限）
+    // 服务端拒绝/风控时，固定 1 秒重试会变成「疯狂敲门」，反而拖长恢复时间
+    const attempt = this.reconnectAttempts || 0;
+    const delay = Math.min(1000 * 2 ** attempt, 60000);
+    this.reconnectAttempts = attempt + 1;
+    if (attempt > 0) {
+      wsLogger.warn(`第 ${attempt + 1} 次重连，${delay}ms 后重试`);
+    }
+
     const reconnectTimer = setTimeout(() => {
       if (this.reconnectTimer !== reconnectTimer) return;
       this.reconnectTimer = null;
@@ -854,7 +871,7 @@ export class XyzwWebSocketClient {
         }, 2000); // 2秒后允许下次重连
         this.reconnectResetTimer = resetTimer;
       }
-    }, 1000);
+    }, delay);
     this.reconnectTimer = reconnectTimer;
   }
 
@@ -970,6 +987,7 @@ export class XyzwWebSocketClient {
 
   /** 发送心跳 */
   sendHeartbeat() {
+    this.lastHeartbeatAt = Date.now();
     wsLogger.verbose("发送心跳消息");
     this.send("heart_beat", {}, { respKey: "_sys/ack" });
   }
@@ -1026,6 +1044,17 @@ export class XyzwWebSocketClient {
         wsLogger.warn("心跳检查失败: 连接状态异常");
       }
     }, this.heartbeatInterval);
+
+    // 后台兜底：浏览器切到后台时上面的 setInterval 会被压到每分钟一次，
+    // 由 Worker 每 1 秒 tick 一次来补发，保证心跳不断、不会被服务端踢线。
+    if (this.offBgHeartbeat) this.offBgHeartbeat();
+    this.offBgHeartbeat = onBgTick(() => {
+      if (this.socket !== socket || !this.connected) return;
+      if (socket?.readyState !== WebSocket.OPEN) return;
+      if (Date.now() - this.lastHeartbeatAt < this.heartbeatInterval) return;
+      wsLogger.debug("后台兜底心跳");
+      this.sendHeartbeat();
+    });
   }
 
   /** 队列处理循环 */
@@ -1413,6 +1442,10 @@ export class XyzwWebSocketClient {
     }
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
+      if (this.offBgHeartbeat) {
+        this.offBgHeartbeat();
+        this.offBgHeartbeat = null;
+      }
       this.heartbeatTimer = null;
     }
     if (this.sendQueueTimer) {
