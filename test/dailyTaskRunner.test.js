@@ -92,9 +92,9 @@ function fixture(progress = {}) {
       if (cmd === "arena_getareatarget")
         return { roleList: [{ roleId: 999 }] };
       if (cmd === "fight_startareaarena") {
-        role.statistics["area:arena:reward:cnt"] =
-          (role.statistics["area:arena:reward:cnt"] || 0) + 1;
-        role.statisticsTime["area:arena:reward:cnt"] = 1700000010;
+        role.statistics["area:arena:last"] =
+          (role.statistics["area:arena:last"] || 0) + 1;
+        role.statisticsTime["area:arena:last"] = 1700000010;
         role.dailyTask.complete[13] =
           (role.dailyTask.complete[13] === -1
             ? -1
@@ -648,7 +648,7 @@ test("a reward acknowledgement without a server claim remains pending in the fin
 test("arena runs all 3 free fights when none have been done today", async () => {
   const arenaSettings = { ...settings, arenaEnable: true };
   const f = fixture({ 13: 0 }); // condition 13 未完成
-  // area:arena:reward:cnt 不存在 → 今日0次
+  // area:arena:last 不存在 → 今日0次
   const result = await f.runner().run("account-a", {}, arenaSettings);
   const arenaCalls = f.calls.filter((c) => c.cmd === "fight_startareaarena");
   assert.equal(arenaCalls.length, 3, "免费3次全部打出");
@@ -658,8 +658,8 @@ test("arena runs all 3 free fights when none have been done today", async () => 
 test("arena skips if all 3 free fights already done today", async () => {
   const arenaSettings = { ...settings, arenaEnable: true };
   const f = fixture({ 13: -1 }); // condition 13 已领奖
-  f.role.statistics["area:arena:reward:cnt"] = 3;
-  f.role.statisticsTime["area:arena:reward:cnt"] = 1700000010; // 在 dailyTime 之后
+  f.role.statistics["area:arena:last"] = 3;
+  f.role.statisticsTime["area:arena:last"] = 1700000010; // 在 dailyTime 之后
   const result = await f.runner().run("account-a", {}, arenaSettings);
   const arenaCalls = f.calls.filter((c) => c.cmd === "fight_startareaarena");
   assert.equal(arenaCalls.length, 0, "今日已打满3次，不应再发起战斗");
@@ -669,11 +669,23 @@ test("arena skips if all 3 free fights already done today", async () => {
 test("arena runs only remaining free fights when 1 already done today", async () => {
   const arenaSettings = { ...settings, arenaEnable: true };
   const f = fixture({ 13: 1 }); // condition 13 已打1次未领奖
-  f.role.statistics["area:arena:reward:cnt"] = 1;
-  f.role.statisticsTime["area:arena:reward:cnt"] = 1700000010;
+  f.role.statistics["area:arena:last"] = 1;
+  f.role.statisticsTime["area:arena:last"] = 1700000010;
   const result = await f.runner().run("account-a", {}, arenaSettings);
   const arenaCalls = f.calls.filter((c) => c.cmd === "fight_startareaarena");
   assert.equal(arenaCalls.length, 2, "今日已打1次，应补足剩余2次");
+  assert.equal(result.failed, 0);
+});
+
+test("arena runs remaining free fights even when daily task 13 is already claimed", async () => {
+  const arenaSettings = { ...settings, arenaEnable: true };
+  const f = fixture({ 13: -1 }); // 每日任务13已领奖完成
+  // area:arena:last 为 1，说明只打了1次，还剩2次免费
+  f.role.statistics["area:arena:last"] = 1;
+  f.role.statisticsTime["area:arena:last"] = 1700000010;
+  const result = await f.runner().run("account-a", {}, arenaSettings);
+  const arenaCalls = f.calls.filter((c) => c.cmd === "fight_startareaarena");
+  assert.equal(arenaCalls.length, 2, "每日任务13虽已领奖，仍应把剩余2次免费打满");
   assert.equal(result.failed, 0);
 });
 
