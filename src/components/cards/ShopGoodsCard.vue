@@ -78,7 +78,7 @@
       </div>
 
       <p v-if="rows.length" class="shop-note">
-        读取商品不会触发商店刷新；「刷新商店」会重置整批商品与折扣，点击后需二次确认。购买计划的规则：本批清单买齐后自动刷新继续，没买齐或金砖不足立即终止。
+        读取商品不会触发商店刷新；「刷新商店」会重置整批商品与折扣，点击后需二次确认。购买计划：价格高于心理价的商品自动跳过，每批处理完继续刷新；金砖不足或刷新次数用完即停止。
       </p>
 
       <NModal
@@ -210,23 +210,10 @@
                 @update:value="copyPlanFrom"
               />
             </div>
-
-            <div class="plan-toolbar-item">
-              <span>按折扣换算</span>
-              <NButton
-                v-for="rate in DISCOUNT_PRESETS"
-                :key="rate"
-                size="tiny"
-                secondary
-                @click="applyDiscount(rate)"
-              >
-                {{ Math.round(rate * 10) }}折
-              </NButton>
-            </div>
           </div>
 
           <p class="plan-tip">
-            勾选想买的商品并填写心理价：只有「现价 ≤ 心理价」才会购买，原价仅供参考。
+            勾选想买的商品并填写心理价：现价 ≤ 心理价才会买，超价的商品会跳过；每行可以单独按折扣快速换算。
           </p>
 
           <NAlert v-if="!rows.length" type="info" :bordered="false" class="plan-empty">
@@ -259,6 +246,14 @@
               <span class="plan-origin">
                 原价 {{ getGoodsBasePrice(row.goodsId) }}
               </span>
+              <NSelect
+                :value="null"
+                :options="DISCOUNT_OPTIONS"
+                size="tiny"
+                placeholder="折扣"
+                class="plan-discount-select"
+                @update:value="(v) => applyRowDiscount(row.goodsId, v)"
+              />
               <NInputNumber
                 :value="planDraft.items[String(row.goodsId)] ?? null"
                 :min="1"
@@ -480,13 +475,29 @@ const refreshConfirmVisible = ref(false);
  * 服务端只在刷过之后才下发该字段（没刷过时返回里根本没有 refresh）。
  */
 const refreshCount = ref(0);
-/** VIP 0 每天只有 1 次免费刷新，用完后再点服务端会直接拒绝（实测报「无刷新次数」） */
-const isVipZero = computed(
-  () => Number(tokenStore.gameData?.roleInfo?.role?.vip ?? 0) === 0,
+const vipLevel = computed(
+  () => Number(tokenStore.gameData?.roleInfo?.role?.vip ?? 0) || 0,
 );
-/** 今天已经刷不动了：VIP0 且已刷满 1 次 */
+
+/**
+ * 每日黑市免费刷新次数上限（按 VIP 等级）。
+ * - VIP0 每天 1 次（游戏内常识题与实测一致）
+ * - VIP1+ 取自配置表 VipConf → vipBenefit 中 type=10 的数值序列
+ *   （1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,10,10,11,11）
+ *   该 type 的含义是从数值规律推断的；若与实际不符，直接调整这张表即可。
+ */
+const DAILY_REFRESH_LIMIT = [1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 10, 11, 11];
+
+function dailyRefreshLimit(level) {
+  const lv = Math.max(0, Math.min(DAILY_REFRESH_LIMIT.length - 1, Number(level) || 0));
+  return DAILY_REFRESH_LIMIT[lv];
+}
+
+/** 今日可用的免费刷新次数上限 */
+const refreshLimit = computed(() => dailyRefreshLimit(vipLevel.value));
+/** 今天已经刷不动了：已达到该 VIP 等级的每日上限 */
 const refreshExhausted = computed(
-  () => isVipZero.value && refreshCount.value >= 1,
+  () => refreshCount.value >= refreshLimit.value,
 );
 const refreshConfirmDisabled = computed(
   () =>
@@ -526,8 +537,11 @@ const planDraft = ref({ items: {}, maxRefresh: 0 });
 const planRunning = ref(false);
 const planStopRequested = ref(false);
 /** 执行日志：[{ text, type }]，type = info|ok|warn|err|muted */
-/** 折扣快捷换算：1 折 ~ 10 折 */
-const DISCOUNT_PRESETS = Array.from({ length: 10 }, (_, i) => (i + 1) / 10);
+/** 单行折扣选项：1 折 ~ 10 折（选中后只换算这一行的心理价） */
+const DISCOUNT_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
+  label: `${i + 1}折`,
+  value: (i + 1) / 10,
+}));
 const planLogs = ref([]);
 
 /** 可复制的其他账户计划（打开弹窗时刷新） */
@@ -676,19 +690,14 @@ function setPlanPrice(goodsId, value) {
   planDraft.value = { ...planDraft.value, items };
 }
 
-/** 按折扣把「所有已勾选商品」的心理价换算成 原价 × 折扣 */
-function applyDiscount(rate) {
-  const items = { ...(planDraft.value.items || {}) };
-  if (!Object.keys(items).length) {
-    message.warning("请先勾选要购买的商品");
+/** 只换算单件商品的心理价：原价 × 折扣 */
+function applyRowDiscount(goodsId, rate) {
+  const base = getGoodsBasePrice(goodsId);
+  if (base == null) {
+    message.warning("这件商品没有原价数据，无法按折扣换算");
     return;
   }
-  for (const key of Object.keys(items)) {
-    const base = getGoodsBasePrice(Number(key));
-    if (base != null) items[key] = Math.max(1, Math.round(base * rate));
-  }
-  planDraft.value = { ...planDraft.value, items };
-  message.success(`已按 ${Math.round(rate * 10)} 折换算心理价`);
+  setPlanPrice(goodsId, Math.max(1, Math.round(base * rate)));
 }
 
 function clearPlanItems() {
@@ -771,6 +780,18 @@ async function runPlan() {
     );
     await readGoodsRows(token.id);
 
+    // ---- 开局预检：本批已经买过的商品直接跳过，不重复提交购买 ----
+    const boughtBefore = ids.filter((goodsId) => {
+      const row = rows.value.find((r) => Number(r.goodsId) === goodsId);
+      return Number(row?.buy_quantity ?? 0) >= 1;
+    });
+    if (boughtBefore.length) {
+      planLog(
+        `本批已买过 ${boughtBefore.length} 件（${boughtBefore.map(nameOf).join("、")}），直接跳过`,
+        "muted",
+      );
+    }
+
     let round = 0; // 已刷新次数
     const maxRefresh = Number(plan.maxRefresh || 0);
 
@@ -780,19 +801,22 @@ async function runPlan() {
         break;
       }
 
-      // ---- 逐件购买，记录本批没买到的 ----
+      // ---- 逐件购买，只处理本批还没买到的 ----
       const missed = [];
-      for (const goodsId of ids) {
+      const pendingIds = ids.filter((goodsId) => {
+        const row = rows.value.find((r) => Number(r.goodsId) === goodsId);
+        return Number(row?.buy_quantity ?? 0) < 1;
+      });
+      if (!pendingIds.length) {
+        planLog("清单内商品本批已全部买过，无需再买", "info");
+      }
+      for (const goodsId of pendingIds) {
         if (planStopRequested.value) break;
         const row = rows.value.find((r) => Number(r.goodsId) === goodsId);
         const name = nameOf(goodsId);
         if (!row) {
           planLog(`${name}：本批没有这件商品`, "warn");
           missed.push(name);
-          continue;
-        }
-        if (Number(row.buy_quantity ?? 0) >= 1) {
-          planLog(`${name}：本批已买到`, "muted");
           continue;
         }
         const price = getGoodsFinalPrice(goodsId, row.discount);
@@ -802,7 +826,7 @@ async function runPlan() {
           continue;
         }
         if (price > limit) {
-          planLog(`${name}：现价 ${price} 高于心理价 ${limit}，未购买`, "warn");
+          planLog(`${name}：现价 ${price} 高于心理价 ${limit}，跳过`, "muted");
           missed.push(name);
           continue;
         }
@@ -815,7 +839,18 @@ async function runPlan() {
           throw new Error(`金砖不足，${name} 需要 ${price}`);
         }
         planLog(`${name}：现价 ${price} ≤ ${limit}，购买中…`);
-        const result = await buyGoodsOnce(token.id, goodsId);
+        let result;
+        try {
+          result = await buyGoodsOnce(token.id, goodsId);
+        } catch (error) {
+          // 已达购买上限这类错误：跳过该商品，不影响其它商品和后续刷新
+          if (error?.skippable) {
+            planLog(`${error.message}，跳过`, "muted");
+            missed.push(name);
+            continue;
+          }
+          throw error;
+        }
         planLog(
           `${name}：已买到，花费 ${formatNum(result.spent)} 金砖（余额 ${formatNum(goldBrick.value)}）`,
           "ok",
@@ -827,27 +862,27 @@ async function runPlan() {
         break;
       }
 
-      // ---- 没买齐：立即终止，不浪费刷新 ----
+      // ---- 超价跳过的商品只记录，不影响继续刷新 ----
       if (missed.length) {
         planLog(
-          `本批还有 ${missed.length} 件没买到（${missed.join("、")}），商品未购买完毕，终止`,
+          `本批 ${missed.length} 件跳过（${missed.join("、")}）`,
+          "muted",
+        );
+      }
+
+      // ---- 刷新前先验证还能不能刷，避免刷完再买一轮才报错 ----
+      if (refreshExhausted.value) {
+        planLog(
+          `今日免费刷新次数已用完（VIP${vipLevel.value} 每日 ${refreshLimit.value} 次，已刷 ${refreshCount.value} 次），终止`,
           "warn",
         );
         break;
       }
-
-      // ---- 全部买到：刷新进入下一批 ----
       if (round >= maxRefresh) {
-        planLog(
-          `本批已全部买到，刷新次数已用完（${round}/${maxRefresh}），结束`,
-          "ok",
-        );
+        planLog(`计划刷新次数已用完（${round}/${maxRefresh}），结束`, "ok");
         break;
       }
-      planLog(
-        `本批已全部买到，第 ${round + 1}/${maxRefresh} 次刷新，继续下一批…`,
-        "ok",
-      );
+      planLog(`第 ${round + 1}/${maxRefresh} 次刷新，继续下一批…`, "info");
       const refreshed = await doRefreshStore(token.id);
       round += 1;
       planLog(
@@ -864,9 +899,13 @@ async function runPlan() {
     }
   } catch (error) {
     const reason = String(error?.message || error);
-    if (/次数/.test(reason)) {
-      refreshCount.value = Math.max(refreshCount.value, 1);
-      planLog(`刷新被拒：${reason}（今日次数已用完），计划终止`, "err");
+    if (/次数/.test(reason) || reason.includes("1300030")) {
+      // 服务端确认没次数了，把本地计数对齐到上限，避免下次再白试
+      refreshCount.value = Math.max(refreshCount.value, refreshLimit.value);
+      planLog(
+        `刷新被拒：今日免费刷新次数已用完（VIP${vipLevel.value} 每日 ${refreshLimit.value} 次），计划终止`,
+        "warn",
+      );
     } else {
       planLog(`计划终止：${reason}`, "err");
     }
@@ -1129,15 +1168,55 @@ async function doRefreshStore(tokenId) {
  * 买一件商品并校验是否真的到账，失败抛错（供购买计划使用）。
  * 到账判断：已购数量必须变化，否则视为没买到。
  */
+/**
+ * 购买接口已知错误码 → 用户能看懂的说法。
+ * 服务端原始返回形如「服务器错误: 1300030 - 未知错误」，直接展示没有意义。
+ */
+const BUY_ERROR_HINTS = {
+  // 配置表 ErrocodeLanguageConf.1300030 = 「刷新次数超过上限」
+  1300030: { text: "今日刷新次数已用完", skippable: false },
+  // 金砖不足
+  1300029: { text: "金砖不足", skippable: false },
+};
+
+/** 从错误信息里提取错误码 */
+function extractErrCode(message) {
+  const m = String(message || "").match(/(\d{6,8})/);
+  return m ? Number(m[1]) : null;
+}
+
+/**
+ * 把服务端错误翻译成可读文案。
+ * @returns {{ text: string, skippable: boolean }} text 为展示文案，skippable 表示该错误可跳过（不终止计划）
+ */
+function explainBuyError(error, goodsName) {
+  const raw = String(error?.message || error);
+  const code = extractErrCode(raw);
+  const hint = code != null ? BUY_ERROR_HINTS[code] : null;
+  if (hint) {
+    return { text: `${goodsName}：${hint.text}`, skippable: !!hint.skippable };
+  }
+  return { text: raw, skippable: false };
+}
+
 async function buyGoodsOnce(tokenId, goodsId) {
   const beforeQty = boughtQty(rows.value, goodsId);
   const beforeGold = goldBrick.value;
-  await tokenStore.sendMessageWithPromise(
-    tokenId,
-    "store_buy",
-    { goodsId },
-    8000,
-  );
+  try {
+    await tokenStore.sendMessageWithPromise(
+      tokenId,
+      "store_buy",
+      { goodsId },
+      8000,
+    );
+  } catch (error) {
+    const name = getGoodsName(goodsId) || `${goodsId} 号`;
+    const explained = explainBuyError(error, name);
+    const wrapped = new Error(explained.text);
+    // 标记为「可跳过」的错误：不终止整个计划，继续处理其它商品
+    wrapped.skippable = explained.skippable;
+    throw wrapped;
+  }
   await sleep(800);
   const after = await readGoodsRows(tokenId);
   await refreshGoldBrick(tokenId);
@@ -1269,7 +1348,11 @@ async function runPurchase() {
       sent = true;
       log(`${goodsId} 号已提交购买`);
     } catch (error) {
-      log(`购买失败：${error?.message || error}`, "err");
+      const explained = explainBuyError(
+        error,
+        getGoodsName(goodsId) || `${goodsId} 号`,
+      );
+      log(`购买失败：${explained.text}`, "err");
     }
 
     await sleep(800);
@@ -1393,7 +1476,7 @@ async function runPurchase() {
 
 .plan-row {
   display: grid;
-  grid-template-columns: 26px minmax(110px, 1fr) 96px 124px;
+  grid-template-columns: 26px minmax(110px, 1fr) 96px 76px 124px;
   align-items: center;
   gap: var(--spacing-xs);
   padding: 6px var(--spacing-sm);
@@ -1429,6 +1512,11 @@ async function runPurchase() {
   background: rgba(24, 160, 88, 0.12);
   color: var(--success-color, #18a058);
   font-size: 10px;
+}
+
+.plan-discount-select {
+  width: 76px;
+  flex-shrink: 0;
 }
 
 .plan-price-input {
