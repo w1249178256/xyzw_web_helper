@@ -66,6 +66,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import useIndexedDB from "@/hooks/useIndexedDB";
 import { useTokenStore } from "@/stores/tokenStore";
+import { startPayloadBattleFlow } from "@/utils/payloadBattleRunner";
 
 const router = useRouter();
 const message = useMessage();
@@ -162,6 +163,16 @@ const openGame = async () => {
       order: binList.length,
     });
     localStorage.setItem("bin_file_list", JSON.stringify(binList));
+  }
+  // 蟠桃: 打开游戏时自动挂战场实时连接（未开放自动跳过，不影响进游戏）
+  // 延迟 20s：先让游戏完成登录/进场，避免助手临时会话与游戏登录期互踢引发"服务端异常"；
+  // localStorage.setItem("payload_auto", "0") 可彻底关闭自动参战。
+  if (localStorage.getItem("payload_auto") !== "0") {
+    setTimeout(() => {
+      startPayloadBattleFlow(tokenStore, token.id).catch((e) =>
+        console.warn("[蟠桃] 战场连接失败:", e?.message),
+      );
+    }, 20_000);
   }
   router.push("/game");
 };

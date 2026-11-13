@@ -81,8 +81,7 @@ export const useLegionWarStore = defineStore("legionWar", () => {
       const baseWsUrl =
         "wss://xxz-xyzw-new.hortorgames.com/agent" +
         `?p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
-        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese` +
-        `&sid2=${getbattlefield.info.sid}`;
+        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese`;
 
       // 3. 建立连接
       legionWarWebSocket = new XyzwLegionWarWebSocketClient({
@@ -215,6 +214,22 @@ export const useLegionWarStore = defineStore("legionWar", () => {
     });
   };
 
+  /**
+   * 战场内命令请求：部分响应以推送形式到达（不回显请求 seq），
+   * 用「发送 + 等待下一条同名推送」实现。盐场阵容私有功能使用。
+   */
+  const warRequest = async (cmd, params = {}, timeoutMs = 8000) => {
+    if (!legionWarWebSocket || !isConnected.value) {
+      throw new Error('战场未连接');
+    }
+    const push = legionWarWebSocket.waitForPush(
+      cmd.endsWith('resp') ? cmd : `${cmd}resp`,
+      timeoutMs,
+    );
+    legionWarWebSocket.send(cmd, params);
+    return push;
+  };
+
   const fetchLegionDetail = async (legionId) => {
     if (!tokenStore.selectedToken) return;
     try {
@@ -246,6 +261,7 @@ export const useLegionWarStore = defineStore("legionWar", () => {
     connect,
     disconnect,
     refreshData,
+    warRequest,
     fetchLegionDetail,
   };
 });

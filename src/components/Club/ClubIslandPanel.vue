@@ -190,8 +190,7 @@ const ISLAND_NAMES = Object.fromEntries(
 /**
  * 当前赛制：取自游戏配置表 `LegionWarMapConf`（对应 `legion_getinfo.emLegionWarMap`
  * 与 `legion_getbattlefield.info.legionWarMapType`）。
- * ⚠️ 项目原有的 `clubBattleUtils.getWarTypeName` 用的是 `legionWarType` 枚举且名称有误
- * （15 写成"灰岩岛"、24/25 写成"天宫周赛/月赛"），这里改用配置表原文。
+ * 注意：历史上有过一个基于 `legionWarType` 枚举且名称有误的映射（已删除），这里统一用配置表原文。
  */
 const MAP_NAMES = {
   13: "灰盐岛周赛",
