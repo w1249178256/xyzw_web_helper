@@ -1165,6 +1165,207 @@ export function createTasksTower(deps) {
     message.success("批量使用道具结束");
   };
 
+  // Reward names/descriptions for merge-progress tasks, keyed by task level
+  // (last two digits of taskId). Used for log messages only.
+  const mergeRewardMapping = {
+    2: { name: "短裙手套", reward: "10随机红色碎片" },
+    3: { name: "拽拽菜篮", reward: "2黄金鱼竿" },
+    4: { name: "狂野菜板", reward: "2招募令" },
+    5: { name: "大胃锅", reward: "2珍珠" },
+    6: { name: "幽影茶壶", reward: "5皮肤币" },
+    7: { name: "愤怒面包机", reward: "2珍珠" },
+    8: { name: "惊讶榨汁机", reward: "1四圣宝珠碎片" },
+    9: { name: "动感电饭锅", reward: "5000白玉" },
+    10: { name: "迅捷烤炉", reward: "12珍珠" },
+    11: { name: "至尊打蛋机", reward: "15彩玉" },
+    12: { name: "完美烤炉", reward: "24珍珠" },
+  };
+
+  /**
+   * Run a single merge round against the merge box:
+   * 1. claim finished merge-progress (level) rewards,
+   * 2. merge same-id item pairs on the grid (server auto-merge at level 8+).
+   *
+   * Extracted from batchMergeItems so the combined "use + merge" task can
+   * reuse it to free up grid slots when the board is full.
+   *
+   * @param {string} tokenId - token id
+   * @param {string} tokenName - token display name (for logs)
+   * @returns {Promise<{ok: boolean, merged: boolean, claimed: boolean}>}
+   *   ok      - false when the board state could not be read (caller decides
+   *             whether to retry or fail; do not treat as "nothing to merge")
+   *   merged  - a merge command actually succeeded (real grid progress)
+   *   claimed - at least one level reward was claimed successfully
+   */
+  const runMergeRound = async (tokenId, tokenName) => {
+    const failed = { ok: false, merged: false, claimed: false };
+    let claimed = false;
+
+    let infoRes = null;
+    try {
+      infoRes = await tokenStore.sendMessageWithPromise(
+        tokenId,
+        "mergebox_getinfo",
+        { actType: 1 },
+        5000,
+      );
+    } catch (err) {
+      // Treat like other commands: a transient failure here should not kill
+      // the whole token; the caller's dead-loop guard handles the fallout.
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${tokenName} 获取活动信息失败: ${err?.message || err}`,
+        type: "error",
+      });
+      return failed;
+    }
+
+    if (!infoRes || !infoRes.mergeBox) {
+      addLog({
+        time: new Date().toLocaleTimeString(),
+        message: `${tokenName} 返回数据缺少 mergeBox`,
+        type: "warning",
+      });
+      return failed;
+    }
+
+    // Claim finished merge-progress (level) rewards
+    if (infoRes.mergeBox.taskMap) {
+      const taskMap = infoRes.mergeBox.taskMap;
+      const taskClaimMap = infoRes.mergeBox.taskClaimMap || {};
+
+      for (const taskId in taskMap) {
+        if (shouldStop.value) break;
+        if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
+          // Only count/log on success so callers can tell claimed rewards
+          // apart from real grid progress.
+          const claimRes = await tokenStore
+            .sendMessageWithPromise(
+              tokenId,
+              "mergebox_claimmergeprogress",
+              { actType: 1, taskId: Number.parseInt(taskId) },
+              2000,
+            )
+            .catch(() => null);
+          if (claimRes === null) continue;
+
+          const idStr = String(taskId);
+          const lastTwo = Number.parseInt(idStr.slice(-2));
+          const taskInfo = mergeRewardMapping[lastTwo];
+          const taskDesc = taskInfo
+            ? `${lastTwo}级 ${taskInfo.reward ? ` 奖励${taskInfo.reward}` : ""}`
+            : `任务${taskId}`;
+
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${tokenName} 领取合成奖励: ${taskDesc}`,
+            type: "success",
+          });
+          claimed = true;
+          await new Promise((res) => setTimeout(res, 500));
+        }
+      }
+    }
+
+    // Parse gridMap and merge same-id items pairwise
+    const gridMap = infoRes.mergeBox.gridMap || {};
+    const items = [];
+
+    // Collect all items with gridConfId === 0
+    for (const xStr in gridMap) {
+      for (const yStr in gridMap[xStr]) {
+        const item = gridMap[xStr][yStr];
+        if (
+          isSameGameValue(item.gridConfId, 0) &&
+          item.gridItemId > 0 &&
+          !item.isLock
+        ) {
+          items.push({
+            x: Number.parseInt(xStr),
+            y: Number.parseInt(yStr),
+            id: item.gridItemId,
+          });
+        }
+      }
+    }
+
+    // Group by gridItemId
+    const groupedItems = {};
+    items.forEach((item) => {
+      if (!groupedItems[item.id]) {
+        groupedItems[item.id] = [];
+      }
+      groupedItems[item.id].push(item);
+    });
+
+    // Check whether any merge is possible
+    let hasPotentialMerge = false;
+    for (const id in groupedItems) {
+      if (groupedItems[id].length >= 2) {
+        hasPotentialMerge = true;
+        break;
+      }
+    }
+
+    if (!hasPotentialMerge) {
+      return { ok: true, merged: false, claimed };
+    }
+
+    const isLevel8OrAbove =
+      infoRes.mergeBox.taskMap &&
+      infoRes.mergeBox.taskMap["251212208"] &&
+      infoRes.mergeBox.taskMap["251212208"] !== 0;
+
+    if (isLevel8OrAbove) {
+      // Level 8+: one server-side auto-merge call handles the whole board
+      // Only report progress when the call actually succeeds.
+      const autoRes = await tokenStore
+        .sendMessageWithPromise(
+          tokenId,
+          "mergebox_automergeitem",
+          { actType: 1 },
+          10000,
+        )
+        .catch(() => null);
+      await new Promise((res) => setTimeout(res, 1500));
+      return { ok: true, merged: autoRes !== null, claimed };
+    }
+
+    // Below level 8: merge pairs client-side
+    let merged = false;
+    for (const id in groupedItems) {
+      if (shouldStop.value) break;
+      const group = groupedItems[id];
+      // Merge two at a time
+      while (group.length >= 2) {
+        if (shouldStop.value) break;
+        const source = group.shift();
+        const target = group.shift();
+
+        // Only count successful merges so the caller's dead-loop guard
+        // reflects real server-side grid progress.
+        const mergeRes = await tokenStore
+          .sendMessageWithPromise(
+            tokenId,
+            "mergebox_mergeitem",
+            {
+              actType: 1,
+              sourcePos: { gridX: source.x, gridY: source.y },
+              targetPos: { gridX: target.x, gridY: target.y },
+            },
+            1000,
+          )
+          .catch(() => null);
+        if (mergeRes !== null) {
+          merged = true;
+        }
+        await new Promise((res) => setTimeout(res, 300));
+      }
+    }
+
+    return { ok: true, merged, claimed };
+  };
+
   /**
    * 批量合成
    */
@@ -1197,112 +1398,17 @@ export function createTasksTower(deps) {
         while (loopCount < MAX_LOOPS && !shouldStop.value) {
           loopCount++;
 
-          // 获取当前信息
-          const infoRes = await tokenStore.sendMessageWithPromise(
-            tokenId,
-            "mergebox_getinfo",
-            { actType: 1 },
-            5000,
-          );
+          // One round: claim level rewards + merge same-id pairs
+          const round = await runMergeRound(tokenId, token.name);
 
-          if (!infoRes || !infoRes.mergeBox) {
-            addLog({
-              time: new Date().toLocaleTimeString(),
-              message: `${token.name} 返回数据缺少 mergeBox`,
-              type: "warning",
-            });
-            break;
+          // Board state could not be read: surface it as a task failure
+          // instead of disguising it as "nothing to merge".
+          if (!round.ok) {
+            throw new Error("获取合成盒子信息失败");
           }
 
-          // 领取合成奖励
-          if (infoRes.mergeBox.taskMap) {
-            const taskMap = infoRes.mergeBox.taskMap;
-            const taskClaimMap = infoRes.mergeBox.taskClaimMap || {};
-
-            const rewardMapping = {
-              2: { name: "短裙手套", reward: "10随机红色碎片" },
-              3: { name: "拽拽菜篮", reward: "2黄金鱼竿" },
-              4: { name: "狂野菜板", reward: "2招募令" },
-              5: { name: "大胃锅", reward: "2珍珠" },
-              6: { name: "幽影茶壶", reward: "5皮肤币" },
-              7: { name: "愤怒面包机", reward: "2珍珠" },
-              8: { name: "惊讶榨汁机", reward: "1四圣宝珠碎片" },
-              9: { name: "动感电饭锅", reward: "5000白玉" },
-              10: { name: "迅捷烤炉", reward: "12珍珠" },
-              11: { name: "至尊打蛋机", reward: "15彩玉" },
-              12: { name: "完美烤炉", reward: "24珍珠" },
-            };
-
-            for (const taskId in taskMap) {
-              if (shouldStop.value) break;
-              if (taskMap[taskId] !== 0 && !taskClaimMap[taskId]) {
-                await tokenStore
-                  .sendMessageWithPromise(
-                    tokenId,
-                    "mergebox_claimmergeprogress",
-                    { actType: 1, taskId: Number.parseInt(taskId) },
-                    2000,
-                  )
-                  .catch(() => {});
-
-                const idStr = String(taskId);
-                const lastTwo = Number.parseInt(idStr.slice(-2));
-                const taskInfo = rewardMapping[lastTwo];
-                const taskDesc = taskInfo
-                  ? `${lastTwo}级 ${taskInfo.reward ? ` 奖励${taskInfo.reward}` : ""}`
-                  : `任务${taskId}`;
-
-                addLog({
-                  time: new Date().toLocaleTimeString(),
-                  message: `${token.name} 领取合成奖励: ${taskDesc}`,
-                  type: "success",
-                });
-                await new Promise((res) => setTimeout(res, 500));
-              }
-            }
-          }
-
-          // 解析 gridMap
-          const gridMap = infoRes.mergeBox.gridMap || {};
-          const items = [];
-
-          // 收集所有 gridConfId === 0 的物品
-          for (const xStr in gridMap) {
-            for (const yStr in gridMap[xStr]) {
-              const item = gridMap[xStr][yStr];
-              if (
-                isSameGameValue(item.gridConfId, 0) &&
-                item.gridItemId > 0 &&
-                !item.isLock
-              ) {
-                items.push({
-                  x: Number.parseInt(xStr),
-                  y: Number.parseInt(yStr),
-                  id: item.gridItemId,
-                });
-              }
-            }
-          }
-
-          // 按 gridItemId 分组
-          const groupedItems = {};
-          items.forEach((item) => {
-            if (!groupedItems[item.id]) {
-              groupedItems[item.id] = [];
-            }
-            groupedItems[item.id].push(item);
-          });
-
-          // 检查是否有可合成项
-          let hasPotentialMerge = false;
-          for (const id in groupedItems) {
-            if (groupedItems[id].length >= 2) {
-              hasPotentialMerge = true;
-              break;
-            }
-          }
-
-          if (!hasPotentialMerge) {
+          // Nothing claimed and nothing merged -> nothing left to do
+          if (!round.merged && !round.claimed) {
             if (loopCount === 1) {
               addLog({
                 time: new Date().toLocaleTimeString(),
@@ -1313,49 +1419,7 @@ export function createTasksTower(deps) {
             break;
           }
 
-          const isLevel8OrAbove =
-            infoRes.mergeBox.taskMap &&
-            infoRes.mergeBox.taskMap["251212208"] &&
-            infoRes.mergeBox.taskMap["251212208"] !== 0;
-
-          if (isLevel8OrAbove) {
-            // 8级以上使用智能合成
-            await tokenStore.sendMessageWithPromise(
-              tokenId,
-              "mergebox_automergeitem",
-              { actType: 1 },
-              10000,
-            );
-            await new Promise((res) => setTimeout(res, 1500));
-          } else {
-            // 8级以下手动合成
-            for (const id in groupedItems) {
-              if (shouldStop.value) break;
-              const group = groupedItems[id];
-              // 两两合成
-              while (group.length >= 2) {
-                if (shouldStop.value) break;
-                const source = group.shift();
-                const target = group.shift();
-
-                await tokenStore
-                  .sendMessageWithPromise(
-                    tokenId,
-                    "mergebox_mergeitem",
-                    {
-                      actType: 1,
-                      sourcePos: { gridX: source.x, gridY: source.y },
-                      targetPos: { gridX: target.x, gridY: target.y },
-                    },
-                    1000,
-                  )
-                  .catch(() => {});
-                await new Promise((res) => setTimeout(res, 300));
-              }
-            }
-          }
-
-          // 继续下一轮循环
+          // Continue to the next round
           await new Promise((res) => setTimeout(res, 500));
         }
 
@@ -1390,6 +1454,347 @@ export function createTasksTower(deps) {
     message.success("批量一键合成结束");
   };
 
+  /**
+   * 一键怪异塔领取+使用+合成（组合任务）
+   *
+   * Full pipeline per token:
+   * 1. claim free merge-box items (freeEnergy),
+   * 2. loop: use keys (mergebox_openbox) until keys run out or the grid is
+   *    full (server error 12300040), then run one merge round to free slots,
+   *    then claim the cumulative-cost reward; repeat while keys remain,
+   * 3. final summary log.
+   *
+   * Guards: consecutive rounds without any successful open and without real
+   * merge progress abort the task; unreadable board state is retried; a hard
+   * cap on outer iterations bounds the whole run.
+   */
+  const batchUseAndMergeItems = async () => {
+    if (selectedTokens.value.length === 0) return;
+    isRunning.value = true;
+    shouldStop.value = false;
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+
+      try {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== 开始怪异塔领取+使用+合成: ${token.name} ===`,
+          type: "info",
+        });
+
+        await ensureConnection(tokenId);
+
+        // ---- Step 1: claim free merge-box items (best-effort) ----
+        try {
+          const freeRes = await tokenStore.sendMessageWithPromise(
+            tokenId,
+            "mergebox_getinfo",
+            { actType: 1 },
+            5000,
+          );
+          const freeEnergy = freeRes?.mergeBox?.freeEnergy || 0;
+          if (freeEnergy > 0) {
+            const claimRes = await tokenStore
+              .sendMessageWithPromise(
+                tokenId,
+                "mergebox_claimfreeenergy",
+                { actType: 1 },
+                5000,
+              )
+              .catch(() => null);
+            if (claimRes !== null) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 领取免费道具 ${freeEnergy} 个`,
+                type: "success",
+              });
+            }
+          } else {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 暂无免费道具可领取`,
+              type: "info",
+            });
+          }
+        } catch {
+          // Free-item claim is best-effort; the main loop re-fetches state
+          // anyway, so a transient failure here should not abort the run.
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 查询免费道具失败，继续主流程`,
+            type: "warning",
+          });
+        }
+
+        // ---- Step 2: use/merge main loop ----
+        let totalUsed = 0;
+        let mergeRounds = 0;
+        let consecutiveErrors = 0;
+        let stallRounds = 0; // consecutive rounds with zero successful opens
+        const MAX_ROUNDS = 50;
+        const MAX_CONSECUTIVE_ERRORS = 3;
+        let aborted = false;
+        let costRewardClaimed = false;
+
+        while (!shouldStop.value && !aborted) {
+          // Re-fetch remaining keys every round: claiming free items and
+          // merging may both change lotteryLeftCnt server-side.
+          let lotteryLeftCnt = 0;
+          try {
+            const towerInfoRes = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "evotower_getinfo",
+              {},
+              5000,
+            );
+            lotteryLeftCnt = towerInfoRes?.evoTower?.lotteryLeftCnt || 0;
+            consecutiveErrors = 0;
+          } catch (err) {
+            // Treat info fetch like openbox: retry, abort after repeated failures
+            consecutiveErrors++;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 获取怪异塔信息失败(${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}): ${err?.message || err}`,
+              type: "error",
+            });
+            if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+              aborted = true;
+              break;
+            }
+            await new Promise((res) => setTimeout(res, 500));
+            continue;
+          }
+
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} 第 ${mergeRounds + 1} 轮，剩余钥匙 ${lotteryLeftCnt}`,
+            type: "info",
+          });
+
+          // Inner loop: use keys until exhausted or grid full
+          let usedThisRound = 0;
+          let costTotalCnt = null; // fetched lazily for pos selection
+          let openFailed = false; // an openbox call failed this round
+          let gridFullThisRound = false; // server reported 12300040 this round
+
+          while (lotteryLeftCnt > 0 && !shouldStop.value) {
+            // Fetch cumulative use count once per round for pos selection
+            if (costTotalCnt === null) {
+              try {
+                const infoRes = await tokenStore.sendMessageWithPromise(
+                  tokenId,
+                  "mergebox_getinfo",
+                  { actType: 1 },
+                  5000,
+                );
+                costTotalCnt = infoRes?.mergeBox?.costTotalCnt || 0;
+              } catch (err) {
+                consecutiveErrors++;
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 获取活动信息失败(${consecutiveErrors}/${MAX_CONSECUTIVE_ERRORS}): ${err?.message || err}`,
+                  type: "error",
+                });
+                if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+                  aborted = true;
+                  break;
+                }
+                await new Promise((res) => setTimeout(res, 500));
+                continue;
+              }
+            }
+
+            // Hard-coded open positions, same as batchUseItems
+            let pos = {};
+            if (costTotalCnt < 2) {
+              pos = { gridX: 4, gridY: 5 };
+            } else if (costTotalCnt < 102) {
+              pos = { gridX: 7, gridY: 3 };
+            } else {
+              pos = { gridX: 6, gridY: 3 };
+            }
+
+            try {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "mergebox_openbox",
+                { actType: 1, pos },
+                5000,
+              );
+              costTotalCnt++;
+              lotteryLeftCnt--;
+              totalUsed++;
+              usedThisRound++;
+              consecutiveErrors = 0;
+              openFailed = false;
+              await new Promise((res) => setTimeout(res, 500));
+            } catch (err) {
+              const msg = String(err?.message || err);
+              openFailed = true;
+              if (msg.includes("12300040")) {
+                // Grid full: leave the inner loop so the merge round can
+                // free slots, then retry.
+                gridFullThisRound = true;
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 棋盘已满，执行合成腾位`,
+                  type: "warning",
+                });
+                break;
+              }
+              // Any other failure may also be slot-related, so merge first and
+              // retry. The stall counter bounds repeated failures.
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 使用道具失败，合成后重试: ${msg}`,
+                type: "error",
+              });
+              break;
+            }
+          }
+
+          if (aborted) break;
+
+          // Merge round: claim level rewards + free grid slots
+          mergeRounds++;
+          const round = await runMergeRound(tokenId, token.name);
+
+          // Track rounds without any successful open: this bounds both
+          // "board full" retries and repeated openbox failures. Reset as soon
+          // as a key is actually used.
+          if (usedThisRound > 0) {
+            stallRounds = 0;
+          } else {
+            stallRounds++;
+          }
+
+          // Dead-loop guard: nothing used and no real merge happened.
+          // A failed openbox still gets a few merge-and-retry attempts.
+          if (usedThisRound === 0 && !round.merged) {
+            if (!openFailed) {
+              // No keys left (or never had any) and the board is settled.
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: gridFullThisRound
+                  ? `${token.name} 棋盘已满且无可合成物品，停止任务`
+                  : `${token.name} 无钥匙可用且无可合成物品，停止任务`,
+                type: "warning",
+              });
+              break;
+            }
+            if (stallRounds >= MAX_CONSECUTIVE_ERRORS) {
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 连续 ${stallRounds} 轮无法使用道具且合成无进展，停止任务`,
+                type: "error",
+              });
+              aborted = true;
+              break;
+            }
+          }
+
+          // Board state unreadable: skip reward claims, retry next round.
+          if (!round.ok) {
+            await new Promise((res) => setTimeout(res, 500));
+            continue;
+          }
+
+          // Claim cumulative-cost reward (idempotent, ignore failures).
+          // Always send the request — later rounds may unlock new milestones —
+          // but log only the first success to avoid per-round noise.
+          const costRes = await tokenStore
+            .sendMessageWithPromise(
+              tokenId,
+              "mergebox_claimcostprogress",
+              { actType: 1 },
+              5000,
+            )
+            .catch(() => null);
+          if (costRes !== null && !costRewardClaimed) {
+            costRewardClaimed = true;
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 已领取累计消耗奖励`,
+              type: "success",
+            });
+          }
+
+          // Opportunistic: claim newly regenerated free items
+          try {
+            const freeCheck = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "mergebox_getinfo",
+              { actType: 1 },
+              5000,
+            );
+            if ((freeCheck?.mergeBox?.freeEnergy || 0) > 0) {
+              await tokenStore.sendMessageWithPromise(
+                tokenId,
+                "mergebox_claimfreeenergy",
+                { actType: 1 },
+                5000,
+              );
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 补领免费道具 ${freeCheck.mergeBox.freeEnergy} 个`,
+                type: "success",
+              });
+            }
+          } catch {
+            // Free-item top-up is best-effort; ignore failures
+          }
+
+          // Hard cap on outer iterations
+          if (mergeRounds >= MAX_ROUNDS) {
+            addLog({
+              time: new Date().toLocaleTimeString(),
+              message: `${token.name} 已达最大轮次 ${MAX_ROUNDS}，停止任务`,
+              type: "warning",
+            });
+            break;
+          }
+
+          await new Promise((res) => setTimeout(res, 500));
+        }
+
+        tokenStatus.value[tokenId] = aborted ? "failed" : "completed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `=== ${token.name} 怪异塔领取+使用+合成完成: 使用钥匙 ${totalUsed} 个，合成 ${mergeRounds} 轮 ===`,
+          type: aborted ? "error" : "success",
+        });
+      } catch (error) {
+        console.error(error);
+        tokenStatus.value[tokenId] = "failed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 怪异塔领取+使用+合成失败: ${error.message || "未知错误"}`,
+          type: "error",
+        });
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 断开连接`,
+          type: "info",
+        });
+      }
+    });
+
+    await Promise.all(taskPromises);
+    isRunning.value = false;
+    currentRunningTokenId.value = null;
+    message.success("批量怪异塔领取+使用+合成结束");
+  };
+
   return {
     climbTower,
     climbWeirdTower,
@@ -1397,6 +1802,7 @@ export function createTasksTower(deps) {
     skinChallenge,
     batchUseItems,
     batchMergeItems,
+    batchUseAndMergeItems,
   };
 }
 
