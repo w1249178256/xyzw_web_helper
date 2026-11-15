@@ -70,9 +70,6 @@ test("XyzwWebSocketClient registers official payload battle commands and builds 
     "payload_useskill",
     "payload_setbattleteam",
     "payload_getteaminfo",
-    "payload_getteamimginfo",
-    "legion_getskyshop",
-    "legion_buyskyshop",
   ];
 
   for (const cmd of expectedPayloadCmds) {

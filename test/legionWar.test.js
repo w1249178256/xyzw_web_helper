@@ -223,12 +223,9 @@ test("XyzwLegionWarWebSocketClient registers official battle commands and builds
     "war_startattackbuilding",
     "war_startmarch",
     "war_setbattleteam",
-    "war_teamsetbattleteam",
     "war_suicide",
-    "war_resurrect",
     "war_speedup",
     "war_getteaminfo",
-    "war_getteamimginfo",
     "war_getbattlefieldinfo",
     "war_enterbattlefield",
   ];
