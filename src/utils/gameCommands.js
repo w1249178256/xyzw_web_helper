@@ -743,7 +743,6 @@ export class GameCommands {
     return {
       ack,
       body: this.g_utils.bon.encode({
-        date: "2025/10/04",
         ...params,
       }),
       cmd: "legionwar_getdetails",

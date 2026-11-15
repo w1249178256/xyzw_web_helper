@@ -514,11 +514,11 @@ export class DailyTaskRunner {
         execute: async () => {
           this.log("开始竞技场免费战斗流程");
           const hour = new Date().getHours();
-          if (hour < 6) {
+          if (!settings.ignoreTimeCheck && hour < 6) {
             this.log("当前时间未到6点，跳过竞技场战斗", "warning");
             return false;
           }
-          if (hour > 22) {
+          if (!settings.ignoreTimeCheck && hour > 22) {
             this.log("当前时间已过22点，跳过竞技场战斗", "warning");
             return false;
           }
