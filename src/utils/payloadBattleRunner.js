@@ -29,7 +29,7 @@ function isNotOpenError(err) {
  * @param {object} tokenStore token store 实例
  * @param {string} tokenId 账号 id
  * @param {(level: string, msg: string) => void} [log]
- * @returns {Promise<{status: string, detail?: string}>}
+ * @returns {Promise<{status: string, detail?: string}>} 启动流程执行结果
  */
 export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}) {
   if (running) return { status: "busy" };

@@ -120,6 +120,58 @@ export class PayloadBattleClient {
     }
   }
 
+  /**
+   * 带 Promise 回调的实时命令请求
+   */
+  async requestAction(action, params = {}, timeoutMs = 10000) {
+    if (!this.client || this.closed) throw new Error("战场服连接已关闭");
+    const cmd = action.startsWith("payload_") ? action : `payload_${action.toLowerCase()}`;
+    return await this.client.sendWithPromise(
+      cmd,
+      { bfId: this.bfInfo.bfId, ...params },
+      timeoutMs,
+    );
+  }
+
+  /** 发起单挑开战 */
+  async startBattle(targetId) {
+    return await this.requestAction("payload_startbattle", { targetId: Number(targetId) });
+  }
+
+  /** 行军移动 / 护送运粮车 */
+  async startMarch(path, carId = 0) {
+    return await this.requestAction("payload_startmarch", { carId: Number(carId), path });
+  }
+
+  /** 取消行军 */
+  async cancelMarch() {
+    return await this.requestAction("payload_cancelmarch");
+  }
+
+  /** 同步出战阵容（出战前置依赖） */
+  async setBattleTeam(teamData = {}) {
+    return await this.requestAction("payload_setbattleteam", {
+      battleTeam: teamData.battleTeam || [],
+      lordWeaponId: teamData.lordWeaponId ?? 0,
+      petUId: teamData.petUId || "",
+    });
+  }
+
+  /** 使用技能（落雷 / 花盆） */
+  async useSkill(point, skillId) {
+    return await this.requestAction("payload_useskill", { point, skillId });
+  }
+
+  /** 使用道具 */
+  async useItem(carId) {
+    return await this.requestAction("payload_useitem", { carId });
+  }
+
+  /** 获取队伍详情 */
+  async getTeamInfo(roleId) {
+    return await this.requestAction("payload_getteaminfo", { roleId: Number(roleId) });
+  }
+
   close() {
     this.closed = true;
     this._stopPing();

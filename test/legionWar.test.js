@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { loadModule } from "./helpers/loadModule.js";
 import {
   BuildingType,
   BuildingTypeColor,
@@ -17,6 +16,7 @@ import {
   typeName,
   WarLegionNameColor,
 } from "../src/utils/legionWar.js";
+import { loadModule } from "./helpers/loadModule.js";
 
 test("official building types and color palettes align with reverse-engineered constants", () => {
   assert.equal(BuildingType.Bronze, 1);

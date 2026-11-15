@@ -86,11 +86,8 @@ export const useLegionWarStore = defineStore("legionWar", () => {
           ? warDomain
           : `wss://${warDomain}`;
 
-      const baseWsUrl =
-        `${normalizedDomain}` +
-        (normalizedDomain.includes("?") ? "&" : "?") +
-        `p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
-        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese`;
+      const queryDelimiter = normalizedDomain.includes("?") ? "&" : "?";
+      const baseWsUrl = `${normalizedDomain}${queryDelimiter}p=${encodeURIComponent(tokenStore.selectedToken.token)}&e=x&sid2=${getbattlefield.info.sid}&lang=chinese`;
 
       // 3. 建立连接
       legionWarWebSocket = new XyzwLegionWarWebSocketClient({
@@ -268,7 +265,7 @@ export const useLegionWarStore = defineStore("legionWar", () => {
       throw new Error("未获取到战场ID");
     }
     const codeId = Number(targetCodeId);
-    if (!codeId || isNaN(codeId)) {
+    if (!codeId || Number.isNaN(codeId)) {
       throw new Error("目标部队编号无效");
     }
     return await legionWarWebSocket.send("war_startbattle", {
@@ -313,7 +310,7 @@ export const useLegionWarStore = defineStore("legionWar", () => {
 
   /**
    * 同步出战阵容（盐场出战前置同步）
-   * @param {Object} teamData 包含 battleTeam, lordWeaponId, petUId
+   * @param {object} teamData 包含 battleTeam, lordWeaponId, petUId
    */
   const setBattleTeam = async (teamData = {}) => {
     if (!isConnected.value || !legionWarWebSocket) {
