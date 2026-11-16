@@ -12,6 +12,7 @@ import express from "express";
 import cron from "node-cron";
 import { createApiKeyMiddleware } from "./lib/apiKeyAuth.js";
 import { GameClient } from "./lib/gameClient.js";
+import { PushingRunner } from "./lib/pushingRunner.js";
 
 dotenv.config();
 
@@ -509,11 +510,20 @@ app.post("/frontend-log", (req, res) => {
 });
 
 // Every API route uses the same credentials; /health remains public.
+/**
+ * 后台推关执行器：循环跑在 Node 里，浏览器只负责展示。
+ * 状态全部在内存，进程重启即清空，不自动续推。
+ */
+const pushingRunner = new PushingRunner({
+  log: (level, source, message, meta) => addLog(level, source, message, meta),
+  loadTokens,
+});
+
 app.use("/api", createApiKeyMiddleware());
 
 // 未配置 Supabase 时（例如本地只想收前端日志），业务接口直接给出明确原因。
 // 不依赖数据库的接口（内存日志、任务定义、前端日志文件）放行。
-const NO_DB_ROUTES = ["/logs", "/task-definitions"];
+const NO_DB_ROUTES = ["/logs", "/task-definitions", "/pushing"];
 app.use("/api", (req, res, next) => {
   if (supabase) return next();
   if (NO_DB_ROUTES.some((p) => req.path === p || req.path.startsWith(`${p}/`))) {
@@ -664,6 +674,49 @@ app.get("/api/task-definitions", (req, res) => {
     commands: val.commands.map((c) => c.cmd),
   }));
   res.json(list);
+});
+
+// ============ 后台推关 ============
+
+/** 开始推关：{ tokenIds: [], options: { maxRetries, maxLevel, maxConsecutiveErrors } } */
+app.post("/api/pushing/start", async (req, res) => {
+  const { tokenIds, tokens, options } = req.body || {};
+  const hasIds = Array.isArray(tokenIds) && tokenIds.length > 0;
+  const hasTokens = Array.isArray(tokens) && tokens.length > 0;
+  if (!hasIds && !hasTokens) {
+    return res.status(400).json({ error: "tokenIds 或 tokens 至少要传一个" });
+  }
+  try {
+    const result = await pushingRunner.start({ tokenIds, tokens, options });
+    addLog("INFO", "pushing", `后台推关启动：${hasTokens ? tokens.length : tokenIds.length} 个账号`);
+    res.json(result);
+  } catch (error) {
+    addLog("ERROR", "pushing", `启动后台推关失败: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** 推关状态：账户列表（运行中的排前面） */
+app.get("/api/pushing/status", (req, res) => {
+  res.json({ rows: pushingRunner.getStatus() });
+});
+
+/** 停止推关：{ tokenId } 或 { all: true } */
+app.post("/api/pushing/stop", (req, res) => {
+  const { tokenId, all } = req.body || {};
+  const result = all
+    ? pushingRunner.stopAll()
+    : pushingRunner.stop(String(tokenId || ""));
+  addLog("INFO", "pushing", all ? "停止全部后台推关" : `停止后台推关: ${tokenId}`);
+  res.json(result);
+});
+
+/** 增量日志：?tokenId=xxx&after=<上次最大 seq> */
+app.get("/api/pushing/logs", (req, res) => {
+  const tokenId = String(req.query.tokenId || "");
+  const after = Number(req.query.after) || 0;
+  if (!tokenId) return res.status(400).json({ error: "缺少 tokenId" });
+  res.json(pushingRunner.getLogs(tokenId, after));
 });
 
 // 本地默认 3001：3000 被 Vite dev server 占用（见 vite.config.js）

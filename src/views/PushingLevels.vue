@@ -267,6 +267,9 @@
         />
       </div>
     </n-card>
+
+    <!-- 后台推关：循环跑在本地服务里，与页面推关互不影响 -->
+    <PushingBackend :tokens="selectedTokens" />
   </div>
 </template>
 
@@ -281,6 +284,7 @@ import {
   ref,
   watch,
 } from "vue";
+import PushingBackend from "@/components/PushingBackend.vue";
 import { useTokenStore } from "@/stores/tokenStore";
 import {
   bgSleep,
@@ -299,6 +303,13 @@ const message = useMessage();
 const tokenStore = useTokenStore();
 
 const selectedTokenIds = ref([]);
+
+/** 当前勾选的账号对象（传给后台推关） */
+const selectedTokens = computed(() =>
+  (tokenStore.gameTokens || []).filter((token) =>
+    selectedTokenIds.value.includes(token.id),
+  ),
+);
 const selectedGroupIds = ref([]);
 const searchKeyword = ref("");
 const autoContinue = ref(true);
