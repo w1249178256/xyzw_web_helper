@@ -1,6 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
-chcp 936 >nul 2>nul
+rem 本文件是 UTF-8 编码，必须把控制台切到 65001，否则中文会乱码
+chcp 65001 >nul 2>nul
 cd /d "%~dp0"
 title XYZW 一键启动
 
