@@ -799,110 +799,27 @@ export class XyzwLegionWarWebSocketClient {
       return;
     }
 
-    // 兼容旧的基于cmd名称的匹配方式（保留为向后兼容）
+    // 基于 cmd 名称的匹配方式
     const cmd =
       packet.cmd || (typeof responseId === "string" ? responseId : undefined);
     if (!cmd) return;
-    const respCmdKey = typeof cmd === "string" ? cmd.toLowerCase() : cmd;
+    const respCmdKey =
+      typeof cmd === "string" ? cmd.toLowerCase() : String(cmd);
+    const strippedCmdKey = respCmdKey.endsWith("resp")
+      ? respCmdKey.slice(0, -4)
+      : respCmdKey;
 
-    // 命令到响应的映射 - 处理响应命令与原始命令不匹配的情况
-    const responseToCommandMap = {
-      // 盐场战场核心响应映射
-      war_getbattlefieldinforesp: "war_getbattlefieldinfo",
-      war_enterbattlefieldresp: "war_enterbattlefield",
-      war_startbattleresp: "war_startbattle",
-      war_startattackbuildingresp: "war_startattackbuilding",
-      war_startmarchresp: "war_startmarch",
-      war_setbattleteamresp: "war_setbattleteam",
-      war_suicideresp: "war_suicide",
-      war_speedupresp: "war_speedup",
-      war_getteaminforesp: "war_getteaminfo",
-
-      // 1:1 响应映射（优先级高）
-      fight_startpvpresp: "fight_startpvp",
-      activity_getresp: "activity_get",
-      collection_goodslistresp: "collection_goodslist",
-      collection_claimfreerewardresp: "collection_claimfreereward",
-      legion_getarearankresp: "legion_getarearank",
-      legionwar_getgoldmonthwarrankresp: "legionwar_getgoldmonthwarrank",
-      nightmare_getroleinforesp: "nightmare_getroleinfo",
-      studyresp: "study_startgame",
-      role_getroleinforesp: "role_getroleinfo",
-      hero_recruitresp: "hero_recruit",
-      friend_batchresp: "friend_batch",
-      system_claimhanguprewardresp: "system_claimhangupreward",
-      item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
-      bottlehelper_claimresp: "bottlehelper_claim",
-      bottlehelper_startresp: "bottlehelper_start",
-      bottlehelper_stopresp: "bottlehelper_stop",
-      legion_signinresp: "legion_signin",
-      fight_startbossresp: "fight_startboss",
-      fight_startlegionbossresp: "fight_startlegionboss",
-      fight_startareaarenaresp: "fight_startareaarena",
-      arena_startarearesp: "arena_startarea",
-      arena_getareatargetresp: "arena_getareatarget",
-      arena_getarearankresp: "arena_getarearank",
-      presetteam_saveteamresp: "presetteam_saveteam",
-      presetteam_getinforesp: "presetteam_getinfo",
-      mail_claimallattachmentresp: "mail_claimallattachment",
-      store_buyresp: "store_purchase",
-      system_getdatabundleverresp: "system_getdatabundlever",
-      tower_claimrewardresp: "tower_claimreward",
-      fight_starttowerresp: "fight_starttower",
-      evotowerinforesp: "evotower_getinfo",
-      evotower_fightresp: "evotower_fight",
-      item_openpackresp: "item_openpack",
-      // 咸王宝库
-      matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
-      bosstower_getinforesp: "bosstower_getinfo",
-      bosstower_startbossreso: "bosstower_startboss",
-      bosstower_startboxresp: "bosstower_startbox",
-      discount_getdiscountinforesp: "discount_getdiscountinfo",
-      // 升星相关响应映射
-      hero_heroupgradestarresp: "hero_heroupgradestar",
-      book_upgraderesp: "book_upgrade",
-      book_claimpointrewardresp: "book_claimpointreward",
-      // 军团信息
-      legion_getinforesp: "legion_getinfo",
-      legion_getinforresp: "legion_getinfo",
-      role_gettargetteamresp: "role_gettargetteam",
-      activity_warorderclaimresp: "activity_recyclewarorderrewardclaim",
-      bosstower_gethelprankresp: "bosstower_gethelprank",
-      // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
-      task_claimdailyrewardresp: "task_claimdailyreward",
-      task_claimweekrewardresp: "task_claimweekreward",
-
-      // 同步响应映射（优先级低）
-      syncresp: ["system_mysharecallback", "task_claimdailypoint"],
-      syncrewardresp: [
-        "system_buygold",
-        "discount_claimreward",
-        "card_claimreward",
-        "artifact_lottery",
-        "genie_sweep",
-        "genie_buysweep",
-        "system_signinreward",
-        "dungeon_selecthero",
-      ],
-    };
-
-    // 获取原始命令名（支持一对一和一对多映射）
-    // 使用小写进行映射匹配，兼容服务端大小写差异
-    let originalCmds = responseToCommandMap[respCmdKey];
-    if (!originalCmds) {
-      originalCmds = [respCmdKey]; // 如果没有映射，使用响应命令本身（小写）
-    } else if (typeof originalCmds === "string") {
-      originalCmds = [originalCmds]; // 转换为数组
-    }
-
-    // 查找对应的 Promise - 遍历所有等待中的 Promise（向后兼容）
+    // 查找对应的 Promise - 遍历等待中的 Promise
     for (const [requestId, promiseData] of Object.entries(this.promises)) {
-      // 检查 Promise 是否匹配当前响应的任一原始命令
-      if (originalCmds.includes(promiseData.originalCmd)) {
+      const origCmd = promiseData.originalCmd?.toLowerCase();
+      if (
+        origCmd === respCmdKey ||
+        origCmd === strippedCmdKey ||
+        `${origCmd}resp` === respCmdKey
+      ) {
         clearTimeout(promiseData.timer);
         delete this.promises[requestId];
 
-        // 获取响应数据，优先使用 rawData（ProtoMsg 自动解码），然后 decodedBody（手动解码），最后 body
         const responseBody =
           packet.rawData !== undefined
             ? packet.rawData
