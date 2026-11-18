@@ -133,6 +133,10 @@ export class PushingRunner {
         stopFlag: false,
         logs: [],
         client: null,
+        /** 启动时的原始 token 记录，重连直接复用，不再去查 token 库 */
+        rawToken: token,
+        /** 连接级心跳定时器 */
+        heartbeatTimer: null,
       };
       this.runs.set(token.id, run);
       this.#appendLog(run, `开始后台推关（最多失败 ${opts.maxRetries} 次）`, "info");
@@ -276,6 +280,7 @@ export class PushingRunner {
     const client = new GameClient(tokenData, wsUrl);
     await client.connect(15000);
     run.client = client;
+    this.#startHeartbeat(run);
     const fp = String(tokenData.roleToken || "");
     this.#appendLog(
       run,
@@ -295,8 +300,33 @@ export class PushingRunner {
     return client;
   }
 
+  /**
+   * 连接级心跳：每 25 秒发一次，避免「战斗间隙/空闲」时服务端超时把连接踢掉。
+   * 心跳自己失败不影响主流程，真断了由下一次请求暴露出来。
+   * @param {object} run 运行态
+   */
+  #startHeartbeat(run) {
+    this.#stopHeartbeat(run);
+    run.heartbeatTimer = setInterval(() => {
+      try {
+        run.client?.send("heart_beat", {}, { respKey: "_sys/ack" });
+      } catch {
+        /* 忽略，交给业务请求暴露问题 */
+      }
+    }, 25000);
+  }
+
+  /** 停掉心跳定时器 */
+  #stopHeartbeat(run) {
+    if (run.heartbeatTimer) {
+      clearInterval(run.heartbeatTimer);
+      run.heartbeatTimer = null;
+    }
+  }
+
   /** 断开连接（静默） */
   #disconnect(run) {
+    this.#stopHeartbeat(run);
     try {
       run.client?.close?.();
     } catch {
@@ -373,7 +403,7 @@ export class PushingRunner {
   async #fightOnce(run) {
     if (!run.client) {
       try {
-        const token = await this.#findToken(run.tokenId);
+        const token = run.rawToken || (await this.#findToken(run.tokenId));
         if (!token) throw new Error("token 已不存在");
         await this.#connect(run, token);
       } catch (error) {
@@ -510,7 +540,7 @@ export class PushingRunner {
     this.#appendLog(run, `连续异常 ${run.consecutiveErrors} 次，尝试重连`, "warning");
     this.#disconnect(run);
     try {
-      const token = await this.#findToken(run.tokenId);
+      const token = run.rawToken || (await this.#findToken(run.tokenId));
       if (!token) throw new Error("token 已不存在");
       await this.#connect(run, token);
       // 注意：这里不清零计数。重连成功不代表链路稳定，
@@ -522,9 +552,20 @@ export class PushingRunner {
     }
   }
 
-  /** 按 id 找 token */
+  /**
+   * 按 id 找 token（仅在没拿到 rawToken 时兜底）。
+   * 注意：本地没配 Supabase 时 loadTokens 会失败，这里必须兜住，
+   * 否则会冒出「Cannot read properties of null (reading 'from')」这种无从下手的报错。
+   * @param {string} tokenId 账号 id
+   * @returns {Promise<object|null>} 找到的 token 记录，没有则 null
+   */
   async #findToken(tokenId) {
-    const all = await this.loadTokens();
-    return all.find((token) => token.id === tokenId) || null;
+    try {
+      const all = await this.loadTokens();
+      return all.find((token) => token.id === tokenId) || null;
+    } catch {
+      this.log("WARN", "pushing", "token 库不可用（未配置 Supabase），重连只能用启动时的 token");
+      return null;
+    }
   }
 }
