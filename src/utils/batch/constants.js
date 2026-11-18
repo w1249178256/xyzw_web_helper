@@ -44,8 +44,6 @@ export const availableTasks = [
   { label: "批量钓鱼", value: "batchFish" },
   { label: "批量招募", value: "batchRecruit" },
   { label: "一键使用兑换码", value: "batchRedeemCodes" },
-  { label: "一键宝库前3层", value: "batchbaoku13" },
-  { label: "一键宝库4,5层", value: "batchbaoku45" },
   { label: "一键梦境", value: "batchmengjing" },
   { label: "一键俱乐部签到", value: "batchclubsign" },
   { label: "营地挑战", value: "batchCampChallenge" },
