@@ -8,6 +8,24 @@ import { getTowerActId } from "../towerActId.js";
 import { normalizeWeirdTowerMaxClimb } from "../towerClimbLimit.js";
 
 /**
+ * 服务器返回「模块/活动未开启」类错误码。
+ * 这是账号级的永久状态，重试不会改变结果，应直接跳过该账号而不是判为失败。
+ * 200160: 模块未开启
+ */
+const PERMANENT_SKIP_ERROR_CODES = ["200160"];
+
+/**
+ * 判断错误是否为「模块未开启」这类永久不可用状态。
+ * 错误信息格式为 `服务器错误: 200160 - 模块未开启`。
+ * @param {unknown} error - 捕获到的异常
+ * @returns {boolean} true 表示应跳过而非重试
+ */
+function isPermanentSkipError(error) {
+  const msg = String(error?.message || error || "");
+  return PERMANENT_SKIP_ERROR_CODES.some((code) => msg.includes(code));
+}
+
+/**
  * 补领怪异塔未领取的章节通关奖励
  *
  * evoTower.towerId 是层号（如 240 表示已通关第 24 章），rewardTowerId 是已领取到的章号。
@@ -1191,11 +1209,12 @@ export function createTasksTower(deps) {
    *
    * @param {string} tokenId - token id
    * @param {string} tokenName - token display name (for logs)
-   * @returns {Promise<{ok: boolean, merged: boolean, claimed: boolean}>}
-   *   ok      - false when the board state could not be read (caller decides
-   *             whether to retry or fail; do not treat as "nothing to merge")
-   *   merged  - a merge command actually succeeded (real grid progress)
-   *   claimed - at least one level reward was claimed successfully
+   * @returns {Promise<{ok: boolean, merged: boolean, claimed: boolean, unavailable?: boolean}>}
+   *   ok          - false when the board state could not be read (caller decides
+   *                 whether to retry or fail; do not treat as "nothing to merge")
+   *   merged      - a merge command actually succeeded (real grid progress)
+   *   claimed     - at least one level reward was claimed successfully
+   *   unavailable - the merge module is not open for this role (skip the token)
    */
   const runMergeRound = async (tokenId, tokenName) => {
     const failed = { ok: false, merged: false, claimed: false };
@@ -1210,6 +1229,15 @@ export function createTasksTower(deps) {
         5000,
       );
     } catch (err) {
+      // Module not open for this role: let the caller skip instead of failing.
+      if (isPermanentSkipError(err)) {
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${tokenName} 合成模块未开启`,
+          type: "warning",
+        });
+        return { ...failed, unavailable: true };
+      }
       // Treat like other commands: a transient failure here should not kill
       // the whole token; the caller's dead-loop guard handles the fallout.
       addLog({
@@ -1466,7 +1494,9 @@ export function createTasksTower(deps) {
    *
    * Guards: consecutive rounds without any successful open and without real
    * merge progress abort the task; unreadable board state is retried; a hard
-   * cap on outer iterations bounds the whole run.
+   * cap on outer iterations bounds the whole run; a "module not open" server
+   * error (200160) skips the token immediately without retrying, and the token
+   * is marked completed rather than failed.
    */
   const batchUseAndMergeItems = async () => {
     if (selectedTokens.value.length === 0) return;
@@ -1541,6 +1571,7 @@ export function createTasksTower(deps) {
         const MAX_ROUNDS = 50;
         const MAX_CONSECUTIVE_ERRORS = 3;
         let aborted = false;
+        let skipped = false; // module not open for this role -> skip gracefully
         let costRewardClaimed = false;
 
         while (!shouldStop.value && !aborted) {
@@ -1557,6 +1588,16 @@ export function createTasksTower(deps) {
             lotteryLeftCnt = towerInfoRes?.evoTower?.lotteryLeftCnt || 0;
             consecutiveErrors = 0;
           } catch (err) {
+            // Module not open for this role: skip immediately, no retry.
+            if (isPermanentSkipError(err)) {
+              skipped = true;
+              addLog({
+                time: new Date().toLocaleTimeString(),
+                message: `${token.name} 怪异塔模块未开启，跳过该账号`,
+                type: "warning",
+              });
+              break;
+            }
             // Treat info fetch like openbox: retry, abort after repeated failures
             consecutiveErrors++;
             addLog({
@@ -1596,6 +1637,16 @@ export function createTasksTower(deps) {
                 );
                 costTotalCnt = infoRes?.mergeBox?.costTotalCnt || 0;
               } catch (err) {
+                // Module not open for this role: skip immediately, no retry.
+                if (isPermanentSkipError(err)) {
+                  skipped = true;
+                  addLog({
+                    time: new Date().toLocaleTimeString(),
+                    message: `${token.name} 合成模块未开启，跳过该账号`,
+                    type: "warning",
+                  });
+                  break;
+                }
                 consecutiveErrors++;
                 addLog({
                   time: new Date().toLocaleTimeString(),
@@ -1636,6 +1687,16 @@ export function createTasksTower(deps) {
               openFailed = false;
               await new Promise((res) => setTimeout(res, 500));
             } catch (err) {
+              // Module not open for this role: skip immediately, no retry.
+              if (isPermanentSkipError(err)) {
+                skipped = true;
+                addLog({
+                  time: new Date().toLocaleTimeString(),
+                  message: `${token.name} 合成模块未开启，跳过该账号`,
+                  type: "warning",
+                });
+                break;
+              }
               const msg = String(err?.message || err);
               openFailed = true;
               if (msg.includes("12300040")) {
@@ -1660,11 +1721,17 @@ export function createTasksTower(deps) {
             }
           }
 
-          if (aborted) break;
+          if (aborted || skipped) break;
 
           // Merge round: claim level rewards + free grid slots
           mergeRounds++;
           const round = await runMergeRound(tokenId, token.name);
+
+          // Module closed: skip this token instead of retrying.
+          if (round.unavailable) {
+            skipped = true;
+            break;
+          }
 
           // Track rounds without any successful open: this bounds both
           // "board full" retries and repeated openbox failures. Reset as soon
@@ -1764,12 +1831,22 @@ export function createTasksTower(deps) {
           await new Promise((res) => setTimeout(res, 500));
         }
 
-        tokenStatus.value[tokenId] = aborted ? "failed" : "completed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `=== ${token.name} 怪异塔领取+使用+合成完成: 使用钥匙 ${totalUsed} 个，合成 ${mergeRounds} 轮 ===`,
-          type: aborted ? "error" : "success",
-        });
+        if (skipped) {
+          // Module not open: mark completed (skipped) instead of failed.
+          tokenStatus.value[tokenId] = "completed";
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `=== ${token.name} 怪异塔模块未开启，已跳过 ===`,
+            type: "warning",
+          });
+        } else {
+          tokenStatus.value[tokenId] = aborted ? "failed" : "completed";
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `=== ${token.name} 怪异塔领取+使用+合成完成: 使用钥匙 ${totalUsed} 个，合成 ${mergeRounds} 轮 ===`,
+            type: aborted ? "error" : "success",
+          });
+        }
       } catch (error) {
         console.error(error);
         tokenStatus.value[tokenId] = "failed";
