@@ -86,6 +86,16 @@ const my_routes = [
         },
       },
       {
+        // 临时实验台：验证十殿组队协议（matchteam_create/join/memberprepare）
+        path: "nightmare-lab",
+        name: "NightmareTeamLab",
+        component: () => import("@/views/NightmareTeamLab.vue"),
+        meta: {
+          title: "十殿组队实验台",
+          requiresToken: true,
+        },
+      },
+      {
         path: "legion-war",
         name: "LegionWar",
         component: () => import("@/views/LegionWar.vue"),

@@ -115,6 +115,39 @@ src/
 
 ---
 
+## ⚠️ 长时间挂机必读（重要）
+
+浏览器的省电策略会把**后台标签页**的定时器压缩到每分钟只执行一次，这会直接导致：
+
+- WebSocket 心跳发不出去 → 反复掉线重连
+- 推关 / 批量任务的等待间隔被拉长 → 任务卡住、结算超时
+
+典型表现：**页面放前台一切正常，一切到别的窗口就开始断联、任务频繁失败。**
+
+### 解决办法：用带参数的 Chrome 启动
+
+```
+chrome.exe --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding
+```
+
+**必须先完全退出 Chrome**（任务栏图标右键 → 退出，或任务管理器确认没有 chrome.exe 残留）再启动，否则参数不会生效。
+
+### 建议做成桌面快捷方式
+
+新建快捷方式，目标填：
+
+```
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding --profile-directory=Default
+```
+
+以后都用这个快捷方式打开，切后台也能稳定挂机。
+
+> Edge 等其他 Chromium 内核浏览器有同样的问题，参数完全一致，把路径换成 Edge 的 exe 即可。
+>
+> 实测：加参数后后台挂机，WS 连接保持稳定，主线推关不再中断。
+
+---
+
 ## 🚀 快速开始
 
 ### 环境要求
