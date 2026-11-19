@@ -343,6 +343,10 @@ export function registerDefaultCommands(reg) {
     .register("dungeon_buymerchant")
     // 活动/任务
     .register("activity_get")
+    // 赛事（PK 房间）预约：查询当前赛事 / 详情 / 预约（预约请求体为空，服务端按当前赛事处理）
+    .register("pkroom_getfightroominfo")
+    .register("pkroom_getfightroomdetail", { roomId: "" })
+    .register("pkroom_appoint")
     .register("activity_recyclewarorderrewardclaim")
     // 玄武赐福活动
     .register("activity_warorderget")
@@ -404,6 +408,55 @@ export function registerDefaultCommands(reg) {
 
     // 咸王宝库
     .register("matchteam_getroleteaminfo")
+    // 十殿试炼（NightMare）组队 —— 命令与字段来自 2026-11-10 实机抓包确认
+    .register("matchteam_create", {
+      teamCfgId: 1,
+      setting: {
+        name: "",
+        notice: "",
+        secret: 1,
+        apply: 0,
+        applyList: [],
+        star: 0,
+      },
+      param: 0,
+      custom: {},
+      extParam: 0,
+    })
+    .register("matchteam_join", { teamId: "" })
+    .register("matchteam_memberprepare", { teamId: "" })
+    .register("matchteam_getteaminfo", { teamId: "" })
+    .register("matchteam_dismiss", { teamId: "" })
+    // 十殿开团：队长进入房间（房间号由 nightmare_roominfo_notify 推送，不在返回值里）
+    .register("matchteam_openteam", { teamId: "" })
+    // 十殿战斗：指定上场者 / 发起战斗（服务端模拟，请求体只有 roomId + roleId）/ 队长确认本层完成
+    .register("nightmare_setfighter", { roomId: "", roleId: 0 })
+    .register("nightmare_fight", { roomId: "", roleId: 0 })
+    .register("nightmare_leadercomplete", { roomId: "" })
+    // 房间全量快照：客户端进房间（含从战斗返回）时发，返回 roomInfo（含 boss curMonsterData）
+    .register("nightmare_getroominfo", { roomId: "" })
+    // 恢复（阵亡武将回满）：队长可替队员发，body = { roomId, roleId: 被恢复的人 }
+    .register("nightmare_restore", { roomId: "", roleId: 0 })
+    .register("nightmare_roominfo_notify")
+    .register("nightmare_fightnotify")
+    .register("matchteam_getrandteamlist")
+    // 建队前置：为组队玩法（teamType=3）设置上阵阵容，游戏客户端建队前必发
+    .register("team_setteam", {
+      teamType: 3,
+      battleTeam: {},
+      lordWeaponId: 0,
+      petUId: "",
+      cCMonsterId: 0,
+    })
+    // 建队前置：按当前阵容算战力，游戏在 team_setteam 之前先发这条
+    .register("hero_calcpowerbyteam", {
+      battleTeam: {},
+      lordWeaponId: 0,
+      petUId: "",
+    })
+    .register("matchteam_notify")
+    .register("queue_getinfo")
+    .register("nmext_getinfo")
     .register("bosstower_getinfo")
     .register("bosstower_startboss")
     .register("bosstower_startbox")
@@ -427,12 +480,14 @@ export function registerDefaultCommands(reg) {
 
     // 逐鹿盐山竞猜
     .register("apex_getroleinfo")
+    .register("apex_taskclaim", { confId: 0 })
     .register("apex_getguesslist", { scheduleId: 0, idx: 0 })
     .register("apex_guess", { teamId: "" })
     .register("apex_get64oppomap", { scheduleId: 0, groupId: 0 })
     // —— APEX 逐鹿盐山：按需注册，仅登记组件实际调用的命令 ——
-    .register("apex_getvotelist")
-    .register("apex_vote", { round: 0, teamId: "" });
+    // 助威：groupId=第几组（界面「第1组」），round=赛期，voteCnt=投入票数
+    .register("apex_getvotelist", { groupId: 0, idx: 0, round: 0 })
+    .register("apex_vote", { round: 0, teamId: "", voteCnt: 0 });
   registry.commands.set(
     "fight_startareaarena",
     (ack = 0, seq = 0, params = {}) => {
@@ -1102,6 +1157,46 @@ export class XyzwWebSocketClient {
 
         // 编码并发送
         const bin = this.registry.encodePacket(raw);
+
+        // 调试埋点：把本客户端发出的组队命令原始帧也录进前端埋点日志，
+        // 便于和游戏页抓到的同一命令做字节级对比（仅开发环境）
+        if (
+          import.meta.env?.DEV &&
+          /^matchteam_|^team_setteam$/.test(raw.cmd)
+        ) {
+          try {
+            const bytes = new Uint8Array(bin);
+            let binary = "";
+            for (let i = 0; i < bytes.length; i += 0x8000) {
+              binary += String.fromCharCode.apply(
+                null,
+                bytes.subarray(i, i + 0x8000),
+              );
+            }
+            fetch("/frontend-log", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                logs: [
+                  {
+                    ts: new Date().toISOString(),
+                    level: "debug",
+                    message: `helper-ws:${raw.cmd}`,
+                    page: "/helper-ws",
+                    meta: {
+                      dir: "out",
+                      kind: "bin",
+                      b64: btoa(binary),
+                      ws: "helper",
+                    },
+                  },
+                ],
+              }),
+            }).catch(() => {});
+          } catch {
+            // 忽略埋点失败
+          }
+        }
         if (
           this.socket !== socket ||
           !this.connected ||
@@ -1190,11 +1285,19 @@ export class XyzwWebSocketClient {
       } else {
         // 获取错误描述
         const errorDesc =
-          errorCodeMap[packet.code] || packet.hint || "未知错误";
+          errorCodeMap[packet.code] ||
+          packet.hint ||
+          packet.error ||
+          "未知错误";
 
-        promiseData.reject(
-          new Error(`服务器错误: ${packet.code} - ${errorDesc}`),
-        );
+        const err = new Error(`服务器错误: ${packet.code} - ${errorDesc}`);
+        // 把原始错误包挂出来，便于离线看服务端到底回了什么（hint/params/body）
+        err.code = packet.code;
+        err.cmd = promiseData.originalCmd;
+        err.hint = packet.hint;
+        err.rawPacket = packet;
+        err.rawBody = responseBody;
+        promiseData.reject(err);
       }
       return;
     }
@@ -1210,6 +1313,9 @@ export class XyzwWebSocketClient {
       // 1:1 响应映射（优先级高）
       fight_startpvpresp: "fight_startpvp",
       activity_getresp: "activity_get",
+      pkroom_getfightroominforesp: "pkroom_getfightroominfo",
+      pkroom_getfightroomdetailresp: "pkroom_getfightroomdetail",
+      pkroom_appointresp: "pkroom_appoint",
       collection_goodslistresp: "collection_goodslist",
       collection_claimfreerewardresp: "collection_claimfreereward",
       legion_getarearankresp: "legion_getarearank",
@@ -1221,6 +1327,7 @@ export class XyzwWebSocketClient {
       studyresp: "study_startgame",
       role_getroleinforesp: "role_getroleinfo",
       apex_getroleinforesp: "apex_getroleinfo",
+      apex_taskclaimresp: "apex_taskclaim",
       apex_getguesslistresp: "apex_getguesslist",
       apex_guessresp: "apex_guess",
       apex_get64oppomapresp: "apex_get64oppomap",
@@ -1287,6 +1394,22 @@ export class XyzwWebSocketClient {
       pearl_unloadskillresp: "pearl_unloadskill",
       // 咸王宝库
       matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
+      // 十殿试炼组队
+      matchteam_createresp: "matchteam_create",
+      matchteam_joinresp: "matchteam_join",
+      matchteam_memberprepareresp: "matchteam_memberprepare",
+      matchteam_getteaminforesp: "matchteam_getteaminfo",
+      matchteam_dismissresp: "matchteam_dismiss",
+      matchteam_getrandteamlistresp: "matchteam_getrandteamlist",
+      hero_calcpowerbyteamresp: "hero_calcpowerbyteam",
+      matchteam_openteamresp: "matchteam_openteam",
+      nightmare_setfighterresp: "nightmare_setfighter",
+      nightmare_fightresp: "nightmare_fight",
+      nightmare_leadercompleteresp: "nightmare_leadercomplete",
+      nightmare_getroominforesp: "nightmare_getroominfo",
+      nightmare_restoreresp: "nightmare_restore",
+      queue_getinforesp: "queue_getinfo",
+      nmext_getinforesp: "nmext_getinfo",
       bosstower_getinforesp: "bosstower_getinfo",
       bosstower_startbossresp: "bosstower_startboss",
       bosstower_startboxresp: "bosstower_startbox",
@@ -1396,11 +1519,18 @@ export class XyzwWebSocketClient {
         } else {
           // 获取错误描述
           const errorDesc =
-            errorCodeMap[packet.code] || packet.hint || "未知错误";
+            errorCodeMap[packet.code] ||
+            packet.hint ||
+            packet.error ||
+            "未知错误";
 
-          promiseData.reject(
-            new Error(`服务器错误: ${packet.code} - ${errorDesc}`),
-          );
+          const err = new Error(`服务器错误: ${packet.code} - ${errorDesc}`);
+          err.code = packet.code;
+          err.cmd = promiseData.originalCmd;
+          err.hint = packet.hint;
+          err.rawPacket = packet;
+          err.rawBody = responseBody;
+          promiseData.reject(err);
         }
         break;
       }

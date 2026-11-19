@@ -712,6 +712,46 @@
                 </n-button>
               </n-space>
             </n-tab-pane>
+            <n-tab-pane name="pkroom" tab="赛事">
+              <n-space>
+                <n-button
+                  size="small"
+                  @click="batchAppointPkRoom"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键预约赛事活动
+                </n-button>
+                <n-button
+                  size="small"
+                  @click="batchApexClaimTasks"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键领取赛事每日奖励
+                </n-button>
+                <n-select
+                  v-model:value="voteRank"
+                  size="small"
+                  style="width: 96px"
+                  :options="voteRankOptions"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                />
+                <n-button
+                  size="small"
+                  @click="batchApexVote(voteRank)"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键助威（第{{ voteRank }}名）
+                </n-button>
+              </n-space>
+              <div class="pkroom-hint">
+                预约服务端当前推送的赛事（`pkroom_appoint`，请求体为空）。成功后开赛
+                可领奖励；已预约的账号会显示"已预约"并跳过，日志里会带上房间名与开赛时间。
+                <br />
+                每日奖励走 `apex_taskclaim { confId }`：先读
+                `apex_getroleinfo`， 已领取的（taskClaimedMap）和进度为 0
+                的（taskProgress）直接跳过，只领真正可领的任务。
+              </div>
+            </n-tab-pane>
           </n-tabs>
         </n-card>
       </div>
@@ -3079,6 +3119,7 @@ import {
   createTasksHangUp,
   createTasksItem,
   createTasksLegacy,
+  createTasksPkRoom,
   createTasksStore,
   createTasksTower,
   createTasksXuanwuBlessing,
@@ -4684,6 +4725,9 @@ const scheduleTaskExecution = () => {
 function getScheduledTask(taskName) {
   const tasks = {
     startBatch,
+    batchAppointPkRoom,
+    batchApexClaimTasks,
+    batchApexVote,
     claimHangUpRewards,
     batchAddHangUpTime,
     resetBottles,
@@ -6190,8 +6234,18 @@ const { batchLegacyClaim, batchLegacyGiftSendEnhanced } = tasksLegacy;
 const tasksFootball = createTasksFootball(createTaskDeps());
 const { batchFootballBet } = tasksFootball;
 
+const tasksPkRoom = createTasksPkRoom(createTaskDeps());
+const { batchAppointPkRoom } = tasksPkRoom;
+
 const tasksApex = createTasksApex(createTaskDeps());
-const { batchApexGuess } = tasksApex;
+const { batchApexGuess, batchApexClaimTasks, batchApexVote } = tasksApex;
+
+// 助威目标名次（按票数倒序，默认第 1 名），对应界面「第1组」里的第 N 行
+const voteRank = ref(1);
+const voteRankOptions = Array.from({ length: 7 }, (_, index) => ({
+  label: `第${index + 1}名`,
+  value: index + 1,
+}));
 
 const tasksCampChallenge = createTasksCampChallenge(createTaskDeps());
 const { batchCampChallenge, batchCampChallengePet, batchCampClaimTasks } =
@@ -6351,6 +6405,13 @@ const stopBatch = () => {
 </script>
 
 <style scoped>
+.pkroom-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #6b7280;
+}
+
 .batch-daily-tasks {
   padding: 20px;
   height: 100vh;

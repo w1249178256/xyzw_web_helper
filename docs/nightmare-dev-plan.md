@@ -132,10 +132,25 @@ node render-backend/scripts/probe-nightmare.js --token token.json --probe-read
 
 > **为什么不建议抓包解码**
 >
-> 试过了：BON 帧的 `parse(buf, enc)` 需要**会话密钥**（登录握手时交换），
+> ~~试过了：BON 帧的 `parse(buf, enc)` 需要**会话密钥**（登录握手时交换），
 > 浏览器抓到的原始帧离线解不开（报 `enc.decrypt is not a function`）。
 > 而游戏自身的 WS 不经过本项目，项目日志也拿不到命令名。
-> 所以只能靠「用合法连接主动试命令」这条路——也就是上面的消息测试页 / 探测脚本。
+> 所以只能靠「用合法连接主动试命令」这条路——也就是上面的消息测试页 / 探测脚本。~~
+
+> **⚠️ 以上结论已被推翻（2026-11-10 复核）**
+>
+> 抓包解码是**可行**的，而且比猜命令名快得多。之前的失败是调用方式不对：
+> `parse(buf, enc)` 的第二个参数必须传 `getEnc("auto")`（项目里 `g_utils.parse(bytes, "auto")`），
+> 它内部会按帧头魔数（`pl` / `px` / `pt`）自动选通道并解密；
+> `lx` / `x` 两个通道的算法在 `src/utils/bonProtocol.js` 里是**自包含实现**，
+> 只有 `xtm` 需要 `globalThis.XXTEA`。游戏 H5 走的是 `e=x` 通道，离线完全解得开。
+>
+> 已验证：2026-11-05 抓游戏 H5 的帧，成功解出 `fight_endlevel` 的完整请求体
+> （`levelId` / `battleTime` / `tapTimes` / `autoTapTimes` / `outputCode`）。
+>
+> 因此 P0 的推荐做法改为：**实机操作一次 → 抓包 → 解码 → 直接拿到命令名和字段**，
+> 不再靠候选命令表逐个试。埋点实现见 `public/game/ws-trace.js`，
+> 解码脚本见 `tools/decode-frontend-ws.mjs`。
 
 ### V2. 结算包结构（决定战斗循环怎么写）
 
@@ -169,6 +184,418 @@ node render-backend/scripts/probe-nightmare.js --token token.json --probe-read
 - 是否需要队员「准备」(ready)
 
 ---
+
+## 4.5 P0 实测结果（2026-11-10，已确认）
+
+通过游戏 H5 实机操作 + WS 报文抓包确认，**命令前缀不是 `team_` / `nightmare_`，而是 `matchteam_` 和 `nmext_`**。
+抓包工具：`public/game/ws-trace.js` → `/frontend-log` → `render-backend/logs/`，
+解码：`node tools/decode-frontend-ws.mjs`。
+
+### 命令清单（已实测跑通）
+
+| 命令 | 作用 | 请求体 |
+|---|---|---|
+| `matchteam_create` | 创建队伍 | 见下 |
+| `matchteam_createresp` | 建队返回（含 teamId 与 teamInfo） | — |
+| `matchteam_join` | 加入队伍 | `{ teamId }` |
+| `matchteam_joinresp` | 加入返回（`joinType` + teamInfo） | — |
+| `matchteam_memberprepare` | 队员准备 | `{ teamId }` |
+| `matchteam_getteaminfo` | 查队伍 | `{ teamId }` |
+| `matchteam_getroleteaminfo` | 查角色所在队伍 | `{}` |
+| `matchteam_dismiss` | 解散/离开队伍 | `{ teamId }` |
+| `matchteam_notify` | **服务端主动推送**队伍状态 | — |
+| `matchteam_getrandteamlist` | 随机队伍列表（匹配用） | — |
+| `queue_getinfo` | 匹配队列状态 | `{}` |
+| `nmext_getinfo` | **十殿扩展状态**（`roleNMExt`） | `{}` |
+| `nightmare_getroleinfo` | 十殿角色信息 | `{}` |
+
+> `teamCfgId: 1` 就是 `MatchTeam` 表中 `matchTeamType=1` 的十殿组队配置（2~5 人、存活 3600s）。
+
+### 创建队伍
+
+请求：
+
+```js
+matchteam_create, {
+  teamCfgId: 1,
+  setting: {
+    name: "♪Iain的队伍",
+    notice: "",
+    secret: 1,      // 1 = 需要申请/邀请才能进？实测设为 1 仍可直接 join，待确认
+    apply: 0,
+    applyList: [],
+    star: 0,
+  },
+  param: 0,
+  custom: {},
+  extParam: 0,
+}
+```
+
+返回 `matchteam_createresp`：
+
+```js
+{
+  roleMTData: { gDMTData: { "10005921": { teamId: "10005921", teamCfgId: 1, endTime: 0 } } },
+  teamInfo: {
+    teamId: "10005921",     // 字符串
+    teamCfgId: 1,
+    serverId: 7358,
+    leaderId: 88983360,
+    createAt: 1794319010,
+    fightRoleBase: [ /* 成员列表，见下 */ ],
+    extParam: 0,
+  },
+}
+```
+
+### 加入队伍
+
+```js
+matchteam_join, { teamId: "10005921" }
+```
+
+返回 `matchteam_joinresp`：
+
+```js
+{ joinType: 1, roleMTData: {...}, teamInfo: { /* 同 create，含全部成员 */ } }
+```
+
+要点：
+- **只需 `teamId`，不需要邀请码**（队友把 ID 发给你就能加）
+- `teamId` 是**字符串**，不是数字
+- 加入后服务端会向所有成员推 `matchteam_notify`
+
+### 队伍状态推送 `matchteam_notify`
+
+```js
+{ matchTeamData: { teamId, teamCfgId, state, stateEndTime, serverId, leaderId, createAt, fightRoleBase: [...] } }
+```
+
+实测到两种 `state`：
+
+| state | 含义（推测） |
+|---|---|
+| 0 | 组队中 / 可准备 |
+| 2 | 已结束或已解散（带 `fighting: false` 的简报形态） |
+
+### 成员对象 `fightRoleBase[i]`（关键字段）
+
+```js
+{
+  roleId, name, headImg, serverId,
+  prepared: 0,          // 0 未准备 / 1 已准备（配合 matchteam_memberprepare）
+  power: 13299852001,   // 战力
+  legionName, legionId,
+  battleData: null,     // 战斗时的上阵数据
+  charmData, charmResetTime,
+  extParam: {
+    nightmareLove: 3866,  // 十殿相关计数
+    redQuenchCnt: 46,
+    totalPower: 13299852001,
+    pass8: 1794153600,    // 通关第 8 层的时间戳（0/缺失=未通关）
+    itemCnt: 4,           // 可用道具数（对应 useItem 5054）
+    privilege5: 1,        // 特权标记
+  },
+  avatarFrame, customCard,
+}
+```
+
+**`pass8` 是关键**：队长据此判断谁有资格/谁已通关；`itemCnt` 是本周剩余次数或门票。
+
+### 组队流程：已验证的正确顺序（2026-11-10 22:49 实跑通过）
+
+5 个账号（1 队长 + 4 队员）全流程跑通，最终 `prepared` 全部为 1。**顺序不能随便调**：
+
+```
+① 并行连接所有账号（15s 超时 + 1 次重试），连不上的直接排除
+② 队长查 matchteam_getroleteaminfo → 已有 cfg=1 队伍就复用，没有才建
+③ 分析队伍：matchteam_getteaminfo → 谁在队里 / 谁是 leaderId / 谁 prepared=1
+④ 补齐未加入：不在成员列表里的才 join，已在的跳过
+⑤ 加入后重新分析一次，拿到最新 prepared
+⑥ 只给"在队里 + 非队长 + prepared=0"的人发 memberprepare
+⑦ 再查一次，输出最终状态
+```
+
+#### 一键组队（自动校正版，2026-11-18）
+
+实验台「一键组队」在旧流程上加了三步校正，逻辑按「服务端事实」而不是「本地勾选顺序」：
+
+```
+① 队长 roleId：房间帧 room.leaderId > 目标队伍 leaderId > 第一个勾选账号
+② 队长连接：按房间帧昵称自动匹配 token 并连上；仍找不到 →
+   直接报错「缺少队长连接：<昵称>(roleId)，请勾选并连接队长账号」并中止
+③ 目标队伍：room.matchTeamId > 输入框 > 队长当前 cfg=1 队伍 > 新建
+④ 逐个账号查 matchteam_getroleteaminfo：
+     在别的 cfg=1 队伍 → matchteam_dismiss { teamId } 退出（仅非队长），再 join 队长队伍
+     已在队长队伍       → 跳过加入
+     队长本人           → 不退出、不准备（服务端不允许队长准备）
+⑤ 重新 getteaminfo，只对 prepared=0 的队员发 memberprepare
+⑥ 再查一次输出最终状态，并把 fightRoleBase 的 5 人布阵渲染成卡片
+```
+
+注意：`matchteam_dismiss` 对队长是「解散」、对普通成员是「离队」，所以只在非队长身上调用。
+目标队伍若已失效（analyzeTeam 拿不到队长），会回退到队长当前所在队伍，避免拿旧 teamId 白跑。
+
+**三个必须注意的坑：**
+
+| 坑 | 现象 | 处理 |
+|---|---|---|
+| `matchteam_memberprepare` 是**开关** | 对已准备的人再调一次会**取消准备**（实测 prepared 1→0，两次都返回 ok） | 必须先 `getteaminfo` 读 `prepared`，只对 0 的发 |
+| 未加入就准备 | `7800320 不在队伍中` | 以服务端成员列表为准，只处理真实成员 |
+| 重复加入 | `7100020 已经加入队伍`（幂等） | 当成成功，不要中断流程 |
+
+**常见返回码**
+
+| code | 服务端 error | 含义 |
+|---|---|---|
+| `7100020` | 已经加入队伍 | 幂等成功 |
+| `7800320` | 不在队伍中 | 尚未加入就准备 / 已退出 |
+| `200110` | 内容包含非法字符 | **队名**命中敏感词（「十殿测试」会被拒，改用「123」正常） |
+| `200020` | 出了点小问题 | 服务端早期异常，多为请求体缺字段/编码错 |
+
+> **重要**：错误包除 `code` 外还有 `error` 字段（如 `{"code":200110,"error":"内容包含非法字符"}`）。
+> `xyzwWebSocket.js` 原来只读 `errorCodeMap[code] || packet.hint`，所以一直显示「未知错误」，
+> 排查时务必把 `packet.error` 一并纳入，并把整个错误包挂到 `err.rawPacket`。
+
+**建队前置（缺了会 200110 之外的失败，也不该省）**
+
+```js
+role_gettargetteam { targetId: <roleId>, teamType: 3, cCMonsterId: 0 }  // teamInfo.team 是真实站位
+hero_calcpowerbyteam { battleTeam, lordWeaponId, petUId }
+team_setteam { teamType: 3, battleTeam, lordWeaponId, petUId, cCMonsterId: 0 }
+matchteam_getrandteamlist { teamCfgId: 1, param: 0, custom: {} }
+// 等 4~6 秒（与游戏节奏一致）再 matchteam_create
+```
+
+- 站位必须用 `role_gettargetteam` 的 `team`（真实出战顺序），
+  不能用 `presetteam_getinfo` 的预设阵容——两者顺序不同（2/4 号位会错位）
+- `lordWeaponId` 取 `teamInfo.weaponId`
+- `petUId`：`teamInfo` 里**没有**这个字段，`role_getroleinfo.petData.pets` 也是空的
+  （宠物走独立命令）。实测传空串不影响建队，真要打战斗时再补
+
+### 开战全链路（2026-11-10 23:15 实机抓包，已跑通第 1 层）
+
+```
+15:15:08 → matchteam_openteam   { teamId: "10006740" }                  // 队长开团，进入十殿房间
+15:15:18 ← nightmare_roominfo_notify  14KB                               // 房间全量状态（全员布阵 + 血量）
+15:15:23 → nightmare_setfighter { roomId: "33687645", roleId: 88983360 } // 指定上场者（自己）
+15:15:24 → nightmare_fight      { roomId: "33687645", roleId: 88983360 } // 发起战斗
+15:15:25 ← nightmare_fightnotify 7.5KB                                   // 战报（含 result.isWin）
+15:15:25 ← nightmare_fightresp  { roomId, roleId }                       // 回执
+15:16:28 → nightmare_leadercomplete { roomId }                           // 队长标记本层完成 → 进下一层
+```
+
+**最关键的一条：`nightmare_fight` 请求只有 `{ roomId, roleId }`，战斗由服务端模拟。**
+
+这和主线推关完全不同——主线必须客户端跑出 `outputCode` 校验码，十殿**不需要**。
+战报里的 `outputCode` 是服务端返回的结果，不是我们要算的东西。所以十殿可以全自动。
+
+### 快速模式（实验台开关，跳过战斗播放）
+
+时间账（抓包）：
+
+| 环节 | 耗时 | 谁决定 |
+|---|---|---|
+| `nightmare_fight` → `nightmare_fightnotify` | 0.2~0.3 s | 服务端计算 |
+| 战报 → 可操作（`state=1`） | 帧数 × ~24 ms（实测 65~130 s） | 客户端播放动画（时长由服务端按帧数估） |
+| 两场之间 CD | 15 s | 配置表 `fightIntervalTime` |
+
+所以实验台加了「快速模式」：开战后**等 N 秒（最小 5）**直接由队长发
+`nightmare_leadercomplete { roomId }`，把 `state` 从 1 改 0，跳过剩余播放。
+发完立刻回读前端帧，检查 `room.state` 是否真的变成 0：
+
+- `state=0` → 提前发被采纳，每场可压到 ~6 s + 剩余 CD
+- `state=1` → 服务端仍按播放时长计时，只能等播放完（日志会明确提示）
+
+等待秒数可在页面上调（默认 5，最小 5）。`leadercomplete` 的回执**不一定有**
+（同 `setfighter` 可能不回包），所以发送后只等 2.5 秒，真正的判定是回读的
+`room.state`；页面上的「手动发 leadercomplete」按钮走同一条路径，方便单点验证。
+CD 倒计时只是显示提示，不阻塞操作。**基准是 state 结束**：实测唯一一条带
+`fightLimitTime` 的帧为 `stateEndTime + 15`，所以普通模式用 `stateEndTime + 15s`，
+快速模式在 leadercomplete 生效（state→0）那一刻起算 15s。
+
+### 恢复：`nightmare_restore`（2026-11-12 23:14 实机抓包）
+
+```
+nightmare_restore { roomId, roleId }        // roleId = 被恢复的成员，队长可替任意队员发
+← nightmare_roominfo_notify { roomInfo: { fightRoleBase, restoreCnt, playerTeamInfo } }
+← nightmare_restoreresp { roomId, roleId }
+```
+
+- **队长可以替队员恢复**（实测页面登录的是队长 88983360，restore 的 roleId 是 89026144）
+- 效果：该成员阵亡武将全部回满血，`curEnergy` 变 `-1`（满怒）
+- `restoreCnt` 是**房间级**计数（第 1 次恢复后 1，换个人恢复后 2），不是每人一份
+- 推送 patch 里 `playerTeamInfo` 只带变化的武将，缺字段 ≠ 血量为 0，别误判成阵亡
+- `reliveCnt`（复活）仍是独立命令，尚未抓到
+
+### 恢复：`nightmare_restore`（2026-11-12 23:14 实机抓包）
+
+```
+nightmare_restore { roomId, roleId }        // roleId = 被恢复的成员，队长可替任意队员发
+← nightmare_roominfo_notify { roomInfo: { fightRoleBase, restoreCnt, playerTeamInfo } }
+← nightmare_restoreresp { roomId, roleId }
+```
+
+- **队长可以替队员恢复**（实测页面登录的是队长 88983360，restore 的 roleId 是 89026144）
+- 效果：该成员阵亡武将全部回满血，`curEnergy` 变 `-1`（满怒）
+- `restoreCnt` 是**房间级**计数（第 1 次恢复后 1，换个人恢复后 2），不是每人一份
+- 推送 patch 里 `playerTeamInfo` 只带变化的武将，缺字段 ≠ 血量为 0，别误判成阵亡
+- `reliveCnt`（复活）仍是独立命令，尚未抓到
+
+### 读取房间：`nightmare_getroominfo`（2026-11-12 实机补抓）
+
+```
+nightmare_getroominfo { roomId }  →  nightmare_getroominforesp { roomInfo }   // 全量，不是 patch
+```
+
+客户端从战斗**返回房间**时发的就是它。返回的 `roomInfo` 与推送结构一致，且一次性带全：
+
+- `monsterTeamInfo[layer].curMonsterData[怪物id].curHp` —— **真实 boss 血量**（不再需要靠战报推算）
+- `monsterTeamInfo[layer].fightSnapData[roleId]` —— 每人 `attackedNum / round / charmed`
+- `playerTeamInfo[roleId].curHeroData` —— 每人 5 个武将的 `curHp / curEnergy`
+- `fightRoleBase[]` —— 5 人 + `prepared` + `battleData.team`（布阵）
+- `curMonsterCfgId` / `fighterId` / `fightLimitTime`（下次可战时刻）
+
+**快照里没有 `state` / `stateEndTime`**（这两个只在战斗中的推送帧里出现），
+所以判断"是不是在播动画"仍要看 `nightmare_roominfo_notify`；CD 则可以直接用 `fightLimitTime`。
+
+> 这条命令解决了一个大问题：以前以为房间只能靠推送/日志重放，实际助手连接自己就能查。
+
+### 房间状态 `nightmare_roominfo_notify.roomInfo`
+
+**这个 notify 是增量 patch**，不是全量：多次推送里很多字段是 `undefined`，客户端必须自己合并。
+
+| 字段 | 含义 |
+|---|---|
+| `roomId` / `roomName` / `matchTeamId` | 房间号 / 队名 / 对应队伍 |
+| `state` | `1` = 战斗中，`0` = 结束/待开始 |
+| `stateEndTime` | 当前状态结束时间 |
+| `leaderId` | 队长 |
+| `fighterId` | 当前上场者 roleId |
+| `curMonsterCfgId` | **当前层数/boss**（实测 1 → 2） |
+| `lastMonsterId` | 上一只怪 |
+| `reliveCnt` / `restoreCnt` / `saveCnt` | 复活 / 恢复 / 存档已用次数 |
+| `power` / `rank` / `season` | 战力 / 排行 / 赛季（48） |
+| `fightLimitTime` | **下次可战时刻**（实测 = `stateEndTime + 15`，即 15 秒 CD 从播放结束算） |
+| `auto` | 是否自动战斗 |
+| `fightRoleBase[]` | 5 个成员，见下 |
+
+> **两个关键坑（2026-11-10 帧实测）**
+>
+> 1. `monsterTeamInfo[layer].monsterTeam.team` **不存在**（只有 `teamInfo: null`），
+>    boss 实时血量在 `monsterTeamInfo[layer].curMonsterData[怪物id].curHp`
+>    （id 与配置表 `10001 / 1000101` 一致）。未交战的层会被下发成全 0 占位。
+> 2. `fightSnapData[roleId]`（挂在每一层下）记录本层每人 `attackedNum / round / fightTime / charmed`，
+>    而层上的 `totalAttacked` 只统计总次数。
+> 3. `state=1` 的那帧里 `curMonsterCfgId` **已经跳到下一层**（首战 bossCfgId=1，同帧 layer=2），
+>    所以"正在结算第几层"要看 `lastFight.bossCfgId`。
+
+### 每个成员的上阵与实时状态：`roomInfo.fightRoleBase[i].battleData`
+
+**注意：这个 `battleData` 只有在房间里（`openteam` 之后）才有值，`matchteam_getteaminfo` 里永远是 null。**
+
+```js
+battleData = {
+  roleId, power, tapAttack,
+  weaponId, weaponActiveLevelId,      // 武器（兵符）
+  petId, petUId, petEvo, petActiveSkillId, petPassiveSkillIds,  // 宠物
+  team: {                              // 0~4 号位
+    0: {
+      id: 110, level: 6000, star: 30, order: 19, skin: 11005, activeSkill: 1105,
+      curHp: 9706155568, hp: 9706155568,   // 当前血量 / 最大血量
+      curEnergy: -1,                        // 怒气（-1 = 未初始化/满怒）
+      attack: 421056944, defense: 159295037, speed: 0,
+      skill: [1106, 1107, 1108, 1033013, 112150],
+      enchantMap: {}, attribute: {}, power: 0,
+    },
+    ...
+  },
+}
+```
+
+实测 5 个账号的十殿布阵（20 个武将全部 Lv6000 / 30★ 上下）：
+
+| 账号 | 战力 | 武器 | 宠物 | 0~4 号位武将 |
+|---|---|---|---|---|
+| ♪Iain（队长） | 128.66 亿 | 8 | 无 | 110 黄月英 / 113 曹仁 / 120 张角 / 104 诸葛亮 / 106 太史慈 |
+| 罐子21 | 100.26 亿 | 8 | 501 `102-6cS` | 110 / 101 司马懿 / 113 / 106 / 104 |
+| 罐子23 | 85.87 亿 | 2 | 601 `205-Tnf` | 107 吕布 / 116 公孙瓒 / 106 / 104 / 102 郭嘉 |
+| ༺陆沉༻ | 86.03 亿 | 4 | 无 | 111 孙策 / 102 / 106 / 104 / 105 周瑜 |
+| 罐子22 | 66.38 亿 | 3 | 601 `272-eTt` | 116 / 107 / 112 贾诩 / 104 / 106 |
+
+> 这几个武将 id → 名字来自 `src/utils/HeroList.js` 的 `HERO_DICT`。
+> 队长的 `petId=0 / petUId=""`，说明他没带宠物，服务端也不报错。
+
+### 战报 `nightmare_fightnotify`
+
+```js
+{
+  roleId, bossCfgId,          // 谁打的、打的第几层
+  battleData: { id, mode: 13, randomSeed, version, maxRound: 15,
+                leftTeam, rightTeam, outputCode, result, fightTime, statistic },
+  result: {
+    id, isWin, totalFrame, seed, version, battleVersion,
+    type: 13, round: 7, isTimeout: 0, memoMode: 3,
+    inputCode, outputCode, log,
+    sponsor: { roleId, power, teamInfo: [ ... ] },   // 我方每个武将的战报
+    accept:  { ... teamInfo }                        // 对手（怪）的
+  }
+}
+```
+
+**`result.sponsor.teamInfo[i]` 才是"每个角色的战斗数据"**：
+
+| 字段 | 含义 |
+|---|---|
+| `heroId` / `level` / `star` / `slot` / `order` | 武将、站位 |
+| `hp` / `energy` | 血量 / **结束时怒气**（实测 0 / 50 / 100） |
+| `damage` | **造成伤害**（131.78 亿） |
+| `takeDamage` | **承受伤害**（20.96 亿） |
+| `treatment` | **治疗量**（195.29 亿） |
+| `maxAttr` | `{2: 最大血量, 3: 最大防御, 4: 最大攻击}` |
+| `skillDamage` / `skillTreatment` | 技能伤害/治疗明细（本次为空） |
+
+**对手（boss）的 `accept.teamInfo` 是残缺的**：`hp` 恒为 0、`maxAttr` 全 0，
+只有 `takeDamage` 有意义。所以：
+
+- boss 当前血量 → 只能取房间帧的 `curMonsterData[*].curHp`
+- boss 最大血量 → 只能靠"开战前快照"反推（`max(curHp)` 历史最大值）
+- 单场"boss 还剩多少" → 战前快照 − 本场 `takeDamage`（首次打某层没有快照，只能报承伤）
+
+实测两场：
+
+| 层 | bossCfgId | isWin | totalFrame | round |
+|---|---|---|---|---|
+| 第 1 层 | 1 | **true** | 2484 | — |
+| 第 2 层 | 2 | **false** | 5459 | 7 |
+
+### 仍未抓到的（下一轮实机补）
+
+| 待确认 | 说明 |
+|---|---|
+| 恢复 | `nightmare_recover` 之类未验证（`restoreCnt` 字段存在） |
+| 复活 | `reliveCnt` 字段存在，命令未知 |
+| 多人同时出战 | 本次只有队长 `setfighter`，其他成员是否需要各自 `setfighter` 未验证 |
+| 星级挑战 | `nmext_getinfo` 里的 `starFightCntMap` 已看到，但触发命令未知 |
+
+`nmext_getinforesp` 已解出的状态结构（可用于 P1 只读面板）：
+
+```js
+{ roleNMExt: {
+    roleId, starResetTime,
+    starFightCntMap: {},           // 各星级已打次数
+    privilegeStarFightCntMap: {},  // 特权额外次数
+    starBossCompleteMap: {},       // { 层: { 序号: true } } 通关标记
+    starRewardsClaimedMap: {},
+    hasKeyCntMap: {},
+    weekAward: {},
+    raceUnlockRaceId, raceFightCnt, raceTaskRewardsClaimedMap,
+    topArriveRecord: {}, topJoinTimes: {},
+    taskProgress: { "1": 0, "2": 0, "3": 0, "4": 0 },
+    param: 0,
+} }
+```
 
 ## 5. 分阶段计划
 

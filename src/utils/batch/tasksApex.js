@@ -75,6 +75,25 @@ const resolveOpenGuesses = (nowMs) => {
  * @param {object} deps - 依赖项
  * @returns {object} 任务函数集合
  */
+/**
+ * 赛事（逐鹿盐山）每周任务配置 —— 从客户端任务界面反推（2026-11-18 22:32 截图）：
+ *   胜出1场 / 胜出2场 / 胜出4场 / 参与1次盐场 / 助威1次 / 活跃度50 / 活跃度100
+ *
+ * 注意 `taskProgress` 的 key 是「进度类型」，不是 confId：
+ *   1 = 本周胜场数，2 = 本周活跃度，3 = 盐场参与次数，4 = 助威次数（没出现即 0）
+ * 实测：活跃度 330 时 confId 4、5 可领（奖励 16001x5 / x10，与界面一致）；
+ * 胜场 0 时 confId 2 会被服务端回 200020 —— 说明不能拿 progress[confId] 直接比。
+ */
+const APEX_TASK_RULES = [
+  { confId: 1, name: "本周胜出1场", type: "1", need: 1 },
+  { confId: 2, name: "本周胜出2场", type: "1", need: 2 },
+  { confId: 3, name: "本周胜出4场", type: "1", need: 4 },
+  { confId: 4, name: "本周活跃度50", type: "2", need: 50 },
+  { confId: 5, name: "本周活跃度100", type: "2", need: 100 },
+  { confId: 6, name: "参与1次盐场", type: "3", need: 1 },
+  { confId: 7, name: "本周助威1次", type: "4", need: 1 },
+];
+
 export function createTasksApex(deps) {
   const {
     selectedTokens,
@@ -338,7 +357,320 @@ export function createTasksApex(deps) {
     message.success("批量逐鹿盐山竞猜结束");
   };
 
+  /**
+   * 赛事每日任务领奖（apex_taskclaim）。
+   *
+   * 抓包（2026-11-18 22:15，账号 89072645）：
+   *   apex_taskclaim { confId: 4 } → { reward:[{type:3,itemId:16001,value:5}],
+   *                                   apexRoleInfo:{ taskClaimedMap:{"4":true}, voteItemCnt:50 } }
+   *   apex_getroleinfo {}          → apexRoleInfo.taskClaimedMap / taskProgress / resetTime.day
+   *
+   * 任务配置表不在本地，confId 只能按序号尝试；已领/未完成都会返回错误码，
+   * 这里按文案区分「跳过」和「失败」，不会中断其它任务。
+   */
+  const batchApexClaimTasks = async () => {
+    if (isRunning.value || selectedTokens.value.length === 0) return;
+    isRunning.value = true;
+    shouldStop.value = false;
+    const label = "领取赛事每日奖励";
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+      if (!token) {
+        tokenStatus.value[tokenId] = "failed";
+        return;
+      }
+
+      const log = (text, type = "info") =>
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name}: ${text}`,
+          type,
+        });
+
+      try {
+        await ensureConnection(tokenId);
+
+        // 1) 已领取状态 + 进度（resetTime.day 也用于时间校准）
+        const roleResp = await sendApex(ApexAction.READ, (queuedMs) =>
+          tokenStore.sendMessageWithPromise(
+            tokenId,
+            "apex_getroleinfo",
+            {},
+            TIMEOUT_MS + queuedMs,
+          ),
+        );
+        const apexInfo = roleResp?.apexRoleInfo || {};
+        const claimed = apexInfo.taskClaimedMap || {};
+        const progress = apexInfo.taskProgress || {};
+        log(
+          `赛事任务进度 ${JSON.stringify(apexInfo.taskProgress || {})}｜已领取 ${
+            Object.keys(claimed).join(",") || "无"
+          }`,
+        );
+
+        let got = 0;
+        for (const rule of APEX_TASK_RULES) {
+          const confId = rule.confId;
+          if (shouldStop.value) break;
+          if (claimed[String(confId)]) {
+            log(`任务 ${confId}（${rule.name}）已领取，跳过`);
+            continue;
+          }
+          // 只领真正达标的：进度取自 taskProgress[进度类型]，不是 taskProgress[confId]
+          const value = Number(progress[rule.type] || 0);
+          if (value < rule.need) {
+            log(
+              `任务 ${confId}（${rule.name}）未达成：${value}/${rule.need}，跳过`,
+            );
+            continue;
+          }
+          try {
+            const res = await sendApex(ApexAction.READ, (queuedMs) =>
+              tokenStore.sendMessageWithPromise(
+                tokenId,
+                "apex_taskclaim",
+                { confId },
+                TIMEOUT_MS + queuedMs,
+              ),
+            );
+            const rewards = res?.reward || [];
+            if (rewards.length) {
+              got += 1;
+              claimed[String(confId)] = true;
+              log(
+                `任务 ${confId}（${rule.name}）领取成功：${rewards
+                  .map((item) => `${item.itemId}x${item.value}`)
+                  .join(" ")}`,
+                "success",
+              );
+            } else {
+              log(`任务 ${confId} 已处理（无可领奖励）`, "warning");
+            }
+          } catch (error) {
+            const text = String(error.message || error);
+            const code = Number(error.code) || 0;
+            const clean = text.replace(/^服务器错误:\s*\d+\s*-\s*/, "");
+            if (code === 200020) {
+              // 服务端把“条件未满足”也回成 200020（出了点小问题），当软失败处理
+              log(`任务 ${confId} 未达领取条件（200020），跳过`, "warning");
+            } else if (
+              /已领取|已经领取|已完成|不存在|未完成|未达成|不满足|条件|不足/.test(
+                text,
+              )
+            ) {
+              log(`任务 ${confId} 暂不可领：${clean}`);
+            } else {
+              log(
+                `任务 ${confId} 领取失败${code ? `（${code}）` : ""}：${clean}`,
+                "error",
+              );
+            }
+          }
+          // apex_* 有频控（200400 操作太快），逐条之间留间隔
+          await new Promise((resolve) => setTimeout(resolve, 700));
+        }
+
+        tokenStatus.value[tokenId] = "completed";
+        log(
+          got ? `领取完成，共 ${got} 个任务奖励` : "没有可领取的任务奖励",
+          got ? "success" : "warning",
+        );
+      } catch (error) {
+        tokenStatus.value[tokenId] = "failed";
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} ${label}失败: ${error.message || "未知错误"}`,
+          type: "error",
+        });
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+          type: "info",
+        });
+      }
+    });
+
+    try {
+      await Promise.all(taskPromises);
+    } finally {
+      isRunning.value = false;
+      currentRunningTokenId.value = null;
+    }
+    message.success(`批量${label}结束`);
+  };
+
+  /**
+   * 一键助威：给「第1组票数第1名」的队伍投出全部剩余助威票。
+   *
+   * 抓包（2026-11-18 22:38，账号 89072645）：
+   *   apex_getvotelist { groupId:1, idx:0, round:7 }
+   *     → apexVoteList:[{ teamId:"A10000409", name:"助威别投", cheerCnt, power, isOut... }]
+   *   apex_vote { teamId:"A10000409", round:7, voteCnt:30 }
+   *     → { apexRoleInfo:{ voteMap:{ "7":{ "A10000409":{cnt:30} } }, taskProgress:{"4":1}, voteItemCnt:0 },
+   *         newVoteCnt:15970544, reward:[ 1006x150, 0x100, 1022x20, 1003x40, 1016x40 ] }
+   * 助威会消耗全部余票（voteItemCnt），并把「本周助威1次」的进度 taskProgress["4"] 置 1。
+   */
+  const batchApexVote = async (rank = 1) => {
+    if (isRunning.value || selectedTokens.value.length === 0) return;
+    isRunning.value = true;
+    shouldStop.value = false;
+    const label = "一键助威";
+
+    selectedTokens.value.forEach((id) => {
+      tokenStatus.value[id] = "waiting";
+    });
+
+    const taskPromises = selectedTokens.value.map(async (tokenId) => {
+      if (shouldStop.value) return;
+      tokenStatus.value[tokenId] = "running";
+      const token = tokens.value.find((t) => t.id === tokenId);
+      if (!token) {
+        tokenStatus.value[tokenId] = "failed";
+        return;
+      }
+
+      const log = (text, type = "info") =>
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name}: ${text}`,
+          type,
+        });
+
+      try {
+        await ensureConnection(tokenId);
+
+        const roleResp = await sendApex(
+          ApexAction.READ,
+          (queuedMs) =>
+            tokenStore.sendMessageWithPromise(
+              tokenId,
+              "apex_getroleinfo",
+              {},
+              TIMEOUT_MS + queuedMs,
+            ),
+          READ_MAX_RETRY,
+        );
+        const apexInfo = roleResp?.apexRoleInfo || {};
+        const votes = Number(apexInfo.voteItemCnt || 0);
+        log(`本周剩余助威票 ${votes}`);
+        if (votes <= 0) {
+          tokenStatus.value[tokenId] = "completed";
+          log("没有助威票，跳过", "warning");
+          return;
+        }
+
+        const nowMs = calibrateServerTime(Date.now(), apexInfo.resetTime?.day);
+        const season = getCurrentSeason(nowMs);
+        const rounds = getCurrentRounds(season, nowMs);
+        if (!rounds.length) {
+          tokenStatus.value[tokenId] = "completed";
+          log("当前没有进行中的赛段，跳过", "warning");
+          return;
+        }
+
+        // 逐个赛期试第1组，取第一个有队伍的
+        let picked = null;
+        for (const round of rounds) {
+          if (shouldStop.value) break;
+          const resp = await sendApex(ApexAction.VOTE, (queuedMs) =>
+            tokenStore.sendMessageWithPromise(
+              tokenId,
+              "apex_getvotelist",
+              { groupId: 1, idx: 0, round },
+              TIMEOUT_MS + queuedMs,
+            ),
+          );
+          const teams = resp?.apexVoteList || [];
+          if (teams.length) {
+            picked = { round, teams };
+            break;
+          }
+        }
+        if (!picked) {
+          tokenStatus.value[tokenId] = "completed";
+          log("第1组当前没有可助威的队伍", "warning");
+          return;
+        }
+
+        // 按票数倒序，取用户选的第 N 名（默认第 1 名）
+        const ranked = [...picked.teams].sort(
+          (a, b) => Number(b.cheerCnt || 0) - Number(a.cheerCnt || 0),
+        );
+        const wantIndex = Math.max(1, Number(rank) || 1) - 1;
+        const target = ranked[wantIndex] || ranked[0];
+        if (wantIndex + 1 > ranked.length) {
+          log(
+            `第${wantIndex + 1}名不存在（第1组只有 ${ranked.length} 支），改投第1名`,
+            "warning",
+          );
+        }
+        log(
+          `第${picked.round}期 第1组第${ranked.indexOf(target) + 1}名：${target.name}（票数 ${target.cheerCnt}），投入 ${votes} 票`,
+        );
+
+        const res = await sendApex(ApexAction.VOTE, (queuedMs) =>
+          tokenStore.sendMessageWithPromise(
+            tokenId,
+            "apex_vote",
+            { teamId: target.teamId, round: picked.round, voteCnt: votes },
+            TIMEOUT_MS + queuedMs,
+          ),
+        );
+        const rewards = res?.reward || [];
+        const rewardText = rewards.length
+          ? `｜奖励 ${rewards.map((item) => `${item.itemId}x${item.value}`).join(" ")}`
+          : "";
+        tokenStatus.value[tokenId] = "completed";
+        log(
+          `助威成功，队伍总票数 → ${res?.newVoteCnt ?? "?"}${rewardText}`,
+          "success",
+        );
+      } catch (error) {
+        const text = String(error.message || error);
+        const code = Number(error.code) || 0;
+        tokenStatus.value[tokenId] = "failed";
+        if (code === 200400) {
+          log(`操作过快被限流（200400），稍后再试`, "warning");
+        } else {
+          addLog({
+            time: new Date().toLocaleTimeString(),
+            message: `${token.name} ${label}失败: ${text}`,
+            type: "error",
+          });
+        }
+      } finally {
+        tokenStore.closeWebSocketConnection(tokenId);
+        releaseConnectionSlot();
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+          type: "info",
+        });
+      }
+    });
+
+    try {
+      await Promise.all(taskPromises);
+    } finally {
+      isRunning.value = false;
+      currentRunningTokenId.value = null;
+    }
+    message.success(`批量${label}结束`);
+  };
+
   return {
     batchApexGuess,
+    batchApexClaimTasks,
+    batchApexVote,
   };
 }
