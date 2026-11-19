@@ -313,15 +313,16 @@ const handleUserAction = async (key) => {
   display: flex;
   align-items: center;
   height: 64px;
-  max-width: 1400px;
+  max-width: 1680px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  margin-right: var(--spacing-xl);
+  margin-right: 12px;
 }
 
 .brand-logo {
@@ -350,15 +351,28 @@ const handleUserAction = async (key) => {
 
 .nav-menu {
   display: flex;
-  gap: var(--spacing-md);
+  align-items: center;
+  /* 入口多时靠 padding 撑开，gap 过大会挤到换行 */
+  gap: 2px;
   flex: 1;
+  min-width: 0;
+  justify-content: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-sm) var(--spacing-md);
+  gap: 4px;
+  padding: 8px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 15px;
   border-radius: var(--border-radius-medium);
   color: var(--text-secondary);
   text-decoration: none;
