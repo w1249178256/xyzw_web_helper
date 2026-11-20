@@ -173,11 +173,41 @@ export async function loadDailyTaskConfig(
     throw new Error("服务器未提供有效的任务配置版本");
   if (!configsByVersion.has(version)) {
     const loading = (async () => {
-      const response = await fetchConfig(
-        `https://xxz-xyzw-res.hortorgames.com/data/${version}/config.json`,
-        { signal: AbortSignal.timeout(30000) },
-      );
-      if (!response.ok) throw new Error("官方任务配置读取失败");
+      const base = "https://xxz-xyzw-res.hortorgames.com/data";
+      // 15MB 的配置，慢网 30 秒可能不够
+      const opts = { signal: AbortSignal.timeout(60000) };
+      let usedVersion = version;
+      let response = await fetchConfig(`${base}/${version}/config.json`, opts);
+
+      // dataBundleVer 可能领先 CDN：游戏刚更新时资源目录还没传完，
+      // 这时回退到 version.json 指向的版本再试一次。
+      if (!response.ok) {
+        try {
+          const verRes = await fetchConfig(`${base}/version.json`, opts);
+          if (verRes.ok) {
+            const { version: fallback } = await verRes.json();
+            if (
+              fallback &&
+              fallback !== version &&
+              /^[\w-]+$/.test(fallback)
+            ) {
+              const retry = await fetchConfig(`${base}/${fallback}/config.json`, opts);
+              if (retry.ok) {
+                response = retry;
+                usedVersion = fallback;
+              }
+            }
+          }
+        } catch {
+          /* 回退失败就保留原始错误 */
+        }
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `官方任务配置读取失败（HTTP ${response.status}，版本 ${usedVersion}）`,
+        );
+      }
       const config = await response.json();
       return validateDailyTaskConfig(config);
     })();
