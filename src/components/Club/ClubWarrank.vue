@@ -854,6 +854,7 @@ import {
 import { isSameGameValue } from "@/utils/gameValue.js";
 import { HERO_DICT, HeroFillInfo, legacycolor } from "@/utils/HeroList";
 import { downloadCanvasAsImage } from "@/utils/imageExport";
+import { formatPower } from "@/utils/legionWar";
 
 defineProps({
   visible: {
@@ -1620,17 +1621,6 @@ const getActiveAllianceCount = (alliance) => {
 };
 
 // 格式化战力
-const formatPower = (power) => {
-  if (!power) return "0";
-  if (power >= 100000000) {
-    return `${(power / 100000000).toFixed(2)}亿`;
-  }
-  if (power >= 10000) {
-    return `${(power / 10000).toFixed(2)}万`;
-  }
-  return power.toString();
-};
-
 const formatScore = (Score) => {
   return Score ? Score.toFixed(0).toString() : "0";
 };
