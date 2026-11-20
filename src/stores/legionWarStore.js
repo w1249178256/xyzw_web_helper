@@ -81,8 +81,7 @@ export const useLegionWarStore = defineStore("legionWar", () => {
       const baseWsUrl =
         "wss://xxz-xyzw-new.hortorgames.com/agent" +
         `?p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
-        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese` +
-        `&sid2=${getbattlefield.info.sid}`;
+        `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese`;
 
       // 3. 建立连接
       legionWarWebSocket = new XyzwLegionWarWebSocketClient({

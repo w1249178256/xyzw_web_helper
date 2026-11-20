@@ -38,7 +38,7 @@ const formatBodyForLog = (body) => {
 /**
  * 命令注册器：保存每个 cmd 的默认体，发送时与 params 合并
  */
-export class CommandRegistry {
+class CommandRegistry {
   constructor(encoder, enc, hint) {
     this.encoder = encoder;
     this.enc = enc;
@@ -94,7 +94,7 @@ export class CommandRegistry {
 }
 
 /** 预注册游戏命令 */
-export function registerDefaultCommands(reg) {
+function registerDefaultCommands(reg) {
   const registry = reg
     .registerHeartbeat()
     //盐场-获取战场信息
