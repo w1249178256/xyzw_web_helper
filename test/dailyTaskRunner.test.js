@@ -38,6 +38,7 @@ const settings = {
   arenaFormation: 1,
   bossFormation: 1,
   payRecruit: true,
+  ignoreTimeCheck: true,
   claimHangUp: false,
   openBox: true,
   arenaEnable: false,

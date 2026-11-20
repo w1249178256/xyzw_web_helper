@@ -1335,56 +1335,12 @@ const battleRecords = ref(null);
 
 const queryDate = ref(getLastSunday());
 
-// 格式化战力
-const formatPower = (power) => {
-  if (!power) return "0";
-  if (power >= 100000000) {
-    return `${(power / 100000000).toFixed(2)}亿`;
-  }
-  if (power >= 10000) {
-    return `${(power / 10000).toFixed(2)}万`;
-  }
-  return power.toString();
-};
-
 const formatDateToShort = (dateStr) => {
   if (!dateStr) return "";
   const parts = dateStr.split("/");
   if (parts.length !== 3) return dateStr;
   const [year, month, day] = parts;
   return year.slice(2) + month + day;
-};
-
-// 获取最大击杀数
-const getMaxKills = (clubData) => {
-  if (!clubData || !clubData.killRank) return 0;
-  return Math.max(...clubData.killRank.map((p) => p.killCnt || 0), 0);
-};
-
-// 计算百分比
-const getPercent = (val, max) => {
-  if (!max) return 0;
-  return Math.min(100, (val / max) * 100);
-};
-
-const getKillColor = (val) => {
-  if (val >= 50) return "rgba(76, 175, 80, 0.3)";
-  if (val >= 20) return "rgba(139, 195, 74, 0.3)";
-  return "transparent";
-};
-
-const getReviveColor = (val) => {
-  if (val >= 10) return "rgba(200, 230, 201, 0.3)";
-  return "transparent";
-};
-
-// 获取战斗样式类
-
-// 切换成员详情展开状态
-
-// 处理图片加载错误
-const handleImageError = (event) => {
-  event.target.style.display = "none";
 };
 
 const disabledDate = (current) => {
