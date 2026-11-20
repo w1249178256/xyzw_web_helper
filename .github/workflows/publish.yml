@@ -22,6 +22,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 构件一：前端（nginx 托管 dist，:latest 方便别人一条命令直接跑）
+      # 注意：GHCR 镜像名强制小写，${{ github.repository }} 会带出大写 Owner
+      # （SenpeWang），GitHub 表达式无 lower() 函数，故硬编码小写路径。
       - name: Build and push web
         uses: docker/build-push-action@v5
         with:
@@ -29,8 +31,8 @@ jobs:
           file: docker/Dockerfile.web
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:latest-web
+            ghcr.io/senpewang/xyzw_web_helper:latest
+            ghcr.io/senpewang/xyzw_web_helper:latest-web
 
       # 构件二：后端（render-backend，仅内网端口，需配合 web 使用）
       - name: Build and push api
@@ -39,4 +41,4 @@ jobs:
           context: .
           file: docker/Dockerfile.api
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest-api
+          tags: ghcr.io/senpewang/xyzw_web_helper:latest-api
