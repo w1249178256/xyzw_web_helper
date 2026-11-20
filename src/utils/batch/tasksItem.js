@@ -646,10 +646,7 @@ export function createTasksItem(deps) {
                 progressMap[2] || progressMap["2"] || 0;
 
               // Club Rewards - Claim all if progress is greater than claimed progress
-              if (
-                legionPoint > taskGroupprogressMap &&
-                taskGroupprogressMap < 25
-              ) {
+              if (legionPoint > taskGroupprogressMap) {
                 try {
                   await tokenStore.sendMessageWithPromise(
                     tokenId,
@@ -673,10 +670,7 @@ export function createTasksItem(deps) {
               }
 
               // Personal Rewards - Claim all if progress is greater than claimed progress
-              if (
-                selfPoint > selfPointprogressMap &&
-                selfPointprogressMap < 25
-              ) {
+              if (selfPoint > selfPointprogressMap) {
                 try {
                   await tokenStore.sendMessageWithPromise(
                     tokenId,
