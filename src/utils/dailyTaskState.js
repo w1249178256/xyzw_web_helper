@@ -162,13 +162,13 @@ export async function loadDailyTaskConfig(
   tokenId,
   fetchConfig = globalThis.fetch,
 ) {
-  const response = await tokenStore.sendMessageWithPromise(
-    tokenId,
-    "system_getdatabundlever",
-    {},
-    15000,
+  const response = await fetchConfig(
+    "https://xxz-xyzw-res.hortorgames.com/data/version.json",
+    {signal: AbortSignal.timeout(15000)},
   );
-  const version = response?.dataBundleVer;
+  if(!versionResponse.ok)throw new Error("官方任务配置版本读取失败");
+  const versionInfo = await versionResponse.json();
+  const version=versionInfo.version;
   if (typeof version !== "string" || !/^[\w-]+$/.test(version))
     throw new Error("服务器未提供有效的任务配置版本");
   if (!configsByVersion.has(version)) {
