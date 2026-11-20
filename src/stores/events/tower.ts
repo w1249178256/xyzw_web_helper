@@ -4,22 +4,6 @@ import { gameLogger } from "@/utils/logger";
 
 export const TowerPlugin = ({ onSome }: EVM) => {
   onSome(
-    ["bosstower_getinforesp", "bosstower_getinfo"],
-    (data: XyzwSession) => {
-      gameLogger.verbose(`收到咸王宝库信息事件: ${data.tokenId}`, data);
-      const { body } = data;
-      gameLogger.debug("咸王宝库body:", body);
-      if (!body) {
-        gameLogger.debug("咸王宝库响应为空");
-        return;
-      }
-
-      data.gameData.value.bossTowerInfo = body;
-      data.gameData.value.lastUpdated = new Date().toISOString();
-    },
-  );
-
-  onSome(
     ["evotowerinforesp", "evotower_getinforesp", "evotower_getinfo"],
     (data: XyzwSession) => {
       gameLogger.verbose(`收到怪异塔信息事件: ${data.tokenId}`, data);
