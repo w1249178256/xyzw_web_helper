@@ -111,55 +111,67 @@ test("point reward selection uses server points and claimed map for daily and we
   );
 });
 
-test("config version is verified each run while immutable configuration requests are merged", async () => {
-  let reads = 0;
-  let versions = 0;
-  const store = {
-    async sendMessageWithPromise() {
-      versions++;
-      return { dataBundleVer: "test-config-merge" };
-    },
-  };
-  const fetchConfig = async () => {
-    reads++;
+// loadDailyTaskConfig no longer talks to the game server: the version comes
+// from the CDN's version.json, so every fetch mock routes by URL.
+const VERSION_URL = "xxz-xyzw-res.hortorgames.com/data/version.json";
+
+function fetchMock({ version = "test-config", configResults = [] } = {}) {
+  let versionReads = 0;
+  let configReads = 0;
+  const fetchConfig = async (url) => {
+    if (url.includes(VERSION_URL)) {
+      versionReads++;
+      return {
+        ok: true,
+        json: async () => ({
+          version: typeof version === "function" ? version(versionReads) : version,
+        }),
+      };
+    }
+    const result = configResults[Math.min(configReads, configResults.length - 1)];
+    configReads++;
+    if (typeof result === "function") return result(configReads);
+    if (result) return result;
     return { ok: true, json: async () => officialConfig() };
   };
+  return {
+    fetchConfig,
+    reads: () => ({ versionReads, configReads }),
+  };
+}
+
+test("config version comes from the CDN while immutable configuration requests are merged", async () => {
+  const mock = fetchMock();
   const [a, b] = await Promise.all([
-    loadDailyTaskConfig(store, "a", fetchConfig),
-    loadDailyTaskConfig(store, "b", fetchConfig),
+    loadDailyTaskConfig({}, "a", mock.fetchConfig),
+    loadDailyTaskConfig({}, "b", mock.fetchConfig),
   ]);
   assert.equal(a, b);
-  assert.equal(reads, 1);
-  assert.equal(versions, 2);
+  // One version.json read per call, but only one config.json download.
+  assert.deepEqual(mock.reads(), { versionReads: 2, configReads: 1 });
 });
 
 test("failed config reads can be retried and unsafe versions are rejected", async () => {
-  let attempt = 0;
-  const store = {
-    async sendMessageWithPromise() {
-      return { dataBundleVer: "test-config-retry" };
-    },
-  };
-  const fetchConfig = async () => ({
-    ok: ++attempt > 1,
-    json: async () => officialConfig(),
+  // A distinct version per test: configsByVersion is module-scoped and shared.
+  const failingThenWorking = fetchMock({
+    version: "test-config-retry",
+    configResults: [
+      { ok: false, json: async () => ({}) },
+      { ok: true, json: async () => officialConfig() },
+    ],
   });
   await assert.rejects(
-    loadDailyTaskConfig(store, "a", fetchConfig),
+    loadDailyTaskConfig({}, "a", failingThenWorking.fetchConfig),
     /读取失败/,
   );
-  await loadDailyTaskConfig(store, "a", fetchConfig);
-  assert.equal(attempt, 2);
+  await loadDailyTaskConfig({}, "a", failingThenWorking.fetchConfig);
+  assert.deepEqual(failingThenWorking.reads(), {
+    versionReads: 2,
+    configReads: 2,
+  });
+  const unsafe = fetchMock({ version: "../invalid" });
   await assert.rejects(
-    loadDailyTaskConfig(
-      {
-        async sendMessageWithPromise() {
-          return { dataBundleVer: "../invalid" };
-        },
-      },
-      "a",
-      fetchConfig,
-    ),
+    loadDailyTaskConfig({}, "a", unsafe.fetchConfig),
     /有效/,
   );
 });
@@ -172,18 +184,22 @@ test("duplicate point-reward IDs are rejected before duplicate claims can be sch
   }
 });
 
-test("an evicted failed config request cannot remove a newer cached request for the same version", async () => {
+test("an evicted failed config request cannot remove a newer cached request for a new version", async () => {
   let rejectFirst;
   let entered;
   const started = new Promise((resolve) => {
     entered = resolve;
   });
-  let readsA = 0;
-  const store = {
-    sendMessageWithPromise: async (id) => ({ dataBundleVer: id }),
-  };
+  const versions = ["cache-race-a", "cache-race-b"];
+  let versionCalls = 0;
+  let configReadsA = 0;
   const fetchConfig = async (url) => {
-    if (url.includes("cache-race-a") && ++readsA === 1) {
+    if (url.includes(VERSION_URL)) {
+      const current = versions[Math.min(versionCalls, versions.length - 1)];
+      versionCalls++;
+      return { ok: true, json: async () => ({ version: current }) };
+    }
+    if (url.includes("cache-race-a") && ++configReadsA === 1) {
       entered();
       return new Promise((resolve, reject) => {
         rejectFirst = reject;
@@ -191,13 +207,15 @@ test("an evicted failed config request cannot remove a newer cached request for 
     }
     return { ok: true, json: async () => officialConfig() };
   };
-  const first = loadDailyTaskConfig(store, "cache-race-a", fetchConfig);
+  const first = loadDailyTaskConfig({}, "a", fetchConfig);
   const rejected = assert.rejects(first, /first request failed/);
   await started;
-  await loadDailyTaskConfig(store, "cache-race-b", fetchConfig);
-  await loadDailyTaskConfig(store, "cache-race-a", fetchConfig);
+  // A newer CDN version arrives while the first download is still pending.
+  const second = await loadDailyTaskConfig({}, "a", fetchConfig);
   rejectFirst(new Error("first request failed"));
   await rejected;
-  await loadDailyTaskConfig(store, "cache-race-a", fetchConfig);
-  assert.equal(readsA, 2);
+  // The evicted failure must not drop the cached newer-version config.
+  const third = await loadDailyTaskConfig({}, "a", fetchConfig);
+  assert.equal(third, second);
+  assert.equal(configReadsA, 1);
 });
