@@ -558,6 +558,8 @@ export function createTasksItem(deps) {
       tokenStatus.value[tokenId] = "running";
       const token = tokens.value.find((t) => t.id === tokenId);
 
+      let ownsSlot = false;
+
       try {
         addLog({
           time: new Date().toLocaleTimeString(),
@@ -565,7 +567,9 @@ export function createTasksItem(deps) {
           type: "info",
         });
 
-        await ensureConnection(tokenId);
+        await ensureConnection(tokenId, 2, (owned) => {
+          ownsSlot = owned;
+        });
 
         const res = await tokenStore.sendMessageWithPromise(
           tokenId,
@@ -642,10 +646,7 @@ export function createTasksItem(deps) {
                 progressMap[2] || progressMap["2"] || 0;
 
               // Club Rewards - Claim all if progress is greater than claimed progress
-              if (
-                legionPoint > taskGroupprogressMap &&
-                taskGroupprogressMap < 25
-              ) {
+              if (legionPoint > taskGroupprogressMap) {
                 try {
                   await tokenStore.sendMessageWithPromise(
                     tokenId,
@@ -669,10 +670,7 @@ export function createTasksItem(deps) {
               }
 
               // Personal Rewards - Claim all if progress is greater than claimed progress
-              if (
-                selfPoint > selfPointprogressMap &&
-                selfPointprogressMap < 25
-              ) {
+              if (selfPoint > selfPointprogressMap) {
                 try {
                   await tokenStore.sendMessageWithPromise(
                     tokenId,
@@ -734,11 +732,18 @@ export function createTasksItem(deps) {
           type: "error",
         });
       } finally {
-        tokenStore.closeWebSocketConnection(tokenId);
-        releaseConnectionSlot();
+        if (ownsSlot) {
+          try {
+            tokenStore.closeWebSocketConnection(tokenId);
+          } finally {
+            releaseConnectionSlot();
+          }
+        }
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
+          message: ownsSlot
+            ? `${token.name} 连接已关闭  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`
+            : `${token.name} 复用在线连接，保持不断开  (队列: ${connectionQueue.active}/${batchSettings.maxActive})`,
           type: "info",
         });
       }

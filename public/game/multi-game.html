@@ -40,6 +40,19 @@
 
     <script src="multi-game-storage-bridge.js" charset="utf-8"></script>
     <script type="text/javascript">
+      (function () {
+        // helper 托管会话：隐藏注入式浮动面板（上号器 #binTool / 雪花 #script-tool-*），
+        // 保证游戏画面与手机端一致——登录注入与脚本 API 均不受影响。
+        // 调试时需要显示这些工具时，带 ?showTools=1 打开本页面。
+        var params = new URLSearchParams(window.location.search);
+        if (params.get("showTools") === "1") return;
+        var style = document.createElement("style");
+        style.textContent =
+          "#binTool,#binToast,#script-tool-toggle,#script-tool-container,#script-confirm{display:none!important}";
+        (document.head || document.documentElement).appendChild(style);
+      })();
+    </script>
+    <script type="text/javascript">
       (function loadMultiGameRuntime() {
         "use strict";
 

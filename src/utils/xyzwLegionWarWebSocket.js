@@ -38,7 +38,7 @@ const formatBodyForLog = (body) => {
 /**
  * 命令注册器：保存每个 cmd 的默认体，发送时与 params 合并
  */
-export class CommandRegistry {
+class CommandRegistry {
   constructor(encoder, enc, hint) {
     this.encoder = encoder;
     this.enc = enc;
@@ -94,12 +94,21 @@ export class CommandRegistry {
 }
 
 /** 预注册游戏命令 */
-export function registerDefaultCommands(reg) {
+function registerDefaultCommands(reg) {
   const registry = reg
     .registerHeartbeat()
-    //盐场-获取战场信息
+    // 盐场-核心通信与状态
     .register("war_getbattlefieldinfo")
-    .register("war_enterbattlefield");
+    .register("war_enterbattlefield")
+    // 盐场-出征与战斗核心指令
+    .register("war_startbattle")
+    .register("war_startattackbuilding")
+    .register("war_startmarch")
+    .register("war_setbattleteam")
+    .register("war_suicide")
+    .register("war_speedup")
+    // 盐场-队伍与信息查询
+    .register("war_getteaminfo");
 
   return registry;
 }
@@ -129,6 +138,7 @@ export class XyzwLegionWarWebSocketClient {
 
     this.dialogStatus = false;
     this.messageListener = null;
+    this._pushWaiters = []; // 等待指定命令推送的私有等待队列（盐场阵容功能使用）
     this.showMsg = false;
     this.connected = false;
     this.isReconnecting = false; // 重连状态标志
@@ -247,6 +257,7 @@ export class XyzwLegionWarWebSocketClient {
                 }
 
                 // 回调处理
+                this._notifyPushWaiters(packet);
                 if (this.messageListener) {
                   this.messageListener(packet);
                 }
@@ -323,6 +334,7 @@ export class XyzwLegionWarWebSocketClient {
         }
 
         // 回调处理
+        this._notifyPushWaiters(packet);
         if (this.messageListener) {
           this.messageListener(packet);
         }
@@ -489,6 +501,49 @@ export class XyzwLegionWarWebSocketClient {
     this.connected = false;
     this._clearTimers();
     socket?.close();
+  }
+
+  /**
+   * 等待下一条指定命令的推送。
+   * 战场服务器的部分响应（如 war_getteaminforesp）以推送形式到达且不回显请求 seq，
+   * 无法用 sendWithPromise 匹配，需按命令名捕获下一条推送。
+   * @param {string} cmd 响应命令名（如 "war_getteaminforesp"）
+   * @param {number} timeoutMs 超时毫秒
+   * @returns {Promise<object>} 推送负载（rawData / decodedBody / body）
+   */
+  waitForPush(cmd, timeoutMs = 8000) {
+    return new Promise((resolve, reject) => {
+      const waiter = {
+        cmd,
+        resolve: null,
+        timer: null,
+      };
+      waiter.resolve = (payload) => {
+        clearTimeout(waiter.timer);
+        resolve(payload);
+      };
+      waiter.timer = setTimeout(() => {
+        this._pushWaiters = this._pushWaiters.filter((w) => w !== waiter);
+        reject(new Error(`推送超时: ${cmd} (${timeoutMs}ms)`));
+      }, timeoutMs);
+      this._pushWaiters.push(waiter);
+    });
+  }
+
+  /** 将解析后的包分发给按命令名等待的私有等待者 */
+  _notifyPushWaiters(packet) {
+    const cmd = packet?.cmd;
+    if (!cmd || !this._pushWaiters?.length) return;
+    const hit = this._pushWaiters.find((w) => w.cmd === cmd);
+    if (!hit) return;
+    this._pushWaiters = this._pushWaiters.filter((w) => w !== hit);
+    const body =
+      packet.rawData !== undefined
+        ? packet.rawData
+        : packet.decodedBody !== undefined
+          ? packet.decodedBody
+          : packet.body;
+    hit.resolve(body ?? packet);
   }
 
   /** 发送消息 */
@@ -744,99 +799,27 @@ export class XyzwLegionWarWebSocketClient {
       return;
     }
 
-    // 兼容旧的基于cmd名称的匹配方式（保留为向后兼容）
+    // 基于 cmd 名称的匹配方式
     const cmd =
       packet.cmd || (typeof responseId === "string" ? responseId : undefined);
     if (!cmd) return;
-    const respCmdKey = typeof cmd === "string" ? cmd.toLowerCase() : cmd;
+    const respCmdKey =
+      typeof cmd === "string" ? cmd.toLowerCase() : String(cmd);
+    const strippedCmdKey = respCmdKey.endsWith("resp")
+      ? respCmdKey.slice(0, -4)
+      : respCmdKey;
 
-    // 命令到响应的映射 - 处理响应命令与原始命令不匹配的情况
-    const responseToCommandMap = {
-      // 1:1 响应映射（优先级高）
-      fight_startpvpresp: "fight_startpvp",
-      activity_getresp: "activity_get",
-      collection_goodslistresp: "collection_goodslist",
-      collection_claimfreerewardresp: "collection_claimfreereward",
-      legion_getarearankresp: "legion_getarearank",
-      legionwar_getgoldmonthwarrankresp: "legionwar_getgoldmonthwarrank",
-      nightmare_getroleinforesp: "nightmare_getroleinfo",
-      studyresp: "study_startgame",
-      role_getroleinforesp: "role_getroleinfo",
-      hero_recruitresp: "hero_recruit",
-      friend_batchresp: "friend_batch",
-      system_claimhanguprewardresp: "system_claimhangupreward",
-      item_openboxresp: ["item_openbox", "item_batchclaimboxpointreward"],
-      bottlehelper_claimresp: "bottlehelper_claim",
-      bottlehelper_startresp: "bottlehelper_start",
-      bottlehelper_stopresp: "bottlehelper_stop",
-      legion_signinresp: "legion_signin",
-      fight_startbossresp: "fight_startboss",
-      fight_startlegionbossresp: "fight_startlegionboss",
-      fight_startareaarenaresp: "fight_startareaarena",
-      arena_startarearesp: "arena_startarea",
-      arena_getareatargetresp: "arena_getareatarget",
-      arena_getarearankresp: "arena_getarearank",
-      presetteam_saveteamresp: "presetteam_saveteam",
-      presetteam_getinforesp: "presetteam_getinfo",
-      mail_claimallattachmentresp: "mail_claimallattachment",
-      store_buyresp: "store_purchase",
-      system_getdatabundleverresp: "system_getdatabundlever",
-      tower_claimrewardresp: "tower_claimreward",
-      fight_starttowerresp: "fight_starttower",
-      evotowerinforesp: "evotower_getinfo",
-      evotower_fightresp: "evotower_fight",
-      item_openpackresp: "item_openpack",
-      // 咸王宝库
-      matchteam_getroleteaminforesp: "matchteam_getroleteaminfo",
-      bosstower_getinforesp: "bosstower_getinfo",
-      bosstower_startbossreso: "bosstower_startboss",
-      bosstower_startboxresp: "bosstower_startbox",
-      discount_getdiscountinforesp: "discount_getdiscountinfo",
-      // 升星相关响应映射
-      hero_heroupgradestarresp: "hero_heroupgradestar",
-      book_upgraderesp: "book_upgrade",
-      book_claimpointrewardresp: "book_claimpointreward",
-      // 军团信息
-      legion_getinforesp: "legion_getinfo",
-      legion_getinforresp: "legion_getinfo",
-      role_gettargetteamresp: "role_gettargetteam",
-      activity_warorderclaimresp: "activity_recyclewarorderrewardclaim",
-      bosstower_gethelprankresp: "bosstower_gethelprank",
-      // 特殊响应映射 - 有些命令有独立响应，有些用同步响应
-      task_claimdailyrewardresp: "task_claimdailyreward",
-      task_claimweekrewardresp: "task_claimweekreward",
-
-      // 同步响应映射（优先级低）
-      syncresp: ["system_mysharecallback", "task_claimdailypoint"],
-      syncrewardresp: [
-        "system_buygold",
-        "discount_claimreward",
-        "card_claimreward",
-        "artifact_lottery",
-        "genie_sweep",
-        "genie_buysweep",
-        "system_signinreward",
-        "dungeon_selecthero",
-      ],
-    };
-
-    // 获取原始命令名（支持一对一和一对多映射）
-    // 使用小写进行映射匹配，兼容服务端大小写差异
-    let originalCmds = responseToCommandMap[respCmdKey];
-    if (!originalCmds) {
-      originalCmds = [respCmdKey]; // 如果没有映射，使用响应命令本身（小写）
-    } else if (typeof originalCmds === "string") {
-      originalCmds = [originalCmds]; // 转换为数组
-    }
-
-    // 查找对应的 Promise - 遍历所有等待中的 Promise（向后兼容）
+    // 查找对应的 Promise - 遍历等待中的 Promise
     for (const [requestId, promiseData] of Object.entries(this.promises)) {
-      // 检查 Promise 是否匹配当前响应的任一原始命令
-      if (originalCmds.includes(promiseData.originalCmd)) {
+      const origCmd = promiseData.originalCmd?.toLowerCase();
+      if (
+        origCmd === respCmdKey ||
+        origCmd === strippedCmdKey ||
+        `${origCmd}resp` === respCmdKey
+      ) {
         clearTimeout(promiseData.timer);
         delete this.promises[requestId];
 
-        // 获取响应数据，优先使用 rawData（ProtoMsg 自动解码），然后 decodedBody（手动解码），最后 body
         const responseBody =
           packet.rawData !== undefined
             ? packet.rawData

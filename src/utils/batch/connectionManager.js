@@ -205,8 +205,6 @@ export const getActivityStatus = () => {
   return {
     // 梦境活动开放 (周日、周一、周三、周四)
     ismengjingActivityOpen: day === 0 || day === 1 || day === 3 || day === 4,
-    // 宝库活动开放 (非周一、周二)
-    isbaokuActivityOpen: day !== 1 && day !== 2,
     // 竞技场活动开放 (6点到22点)
     isarenaActivityOpen: hour >= 6 && hour < 22,
     // 当前活动周

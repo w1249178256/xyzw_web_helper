@@ -1,10 +1,15 @@
 <template>
   <div class="game-player">
-    <button class="back-btn" @click="goBack">← 返回</button>
-
-    <div class="iframe-wrapper">
-      <iframe :src="gameSrc" class="game-iframe" allow="fullscreen; autoplay" />
+    <div class="game-stage">
+      <div class="game-device">
+        <iframe
+          :src="gameSrc"
+          class="game-iframe"
+          allow="fullscreen; autoplay"
+        />
+      </div>
     </div>
+    <button class="back-btn" @click="goBack">← 返回</button>
   </div>
 </template>
 
@@ -25,24 +30,39 @@ function goBack() {
   position: fixed;
   inset: 0;
   z-index: 1;
-  background: #000;
+  background: #101012;
 }
 
-.iframe-wrapper {
+/* 舞台：居中承载手机比例画面，内容全部限定在设备框内 */
+.game-stage {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* 手机比例设备框（9:16 竖屏），高度优先、宽度自适应，永不出界 */
+.game-device {
+  height: min(calc(100vh - 32px), calc((100vw - 32px) * 16 / 9));
+  aspect-ratio: 9 / 16;
+  max-width: calc(100vw - 32px);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 45%);
 }
 
 .game-iframe {
+  display: block;
   width: 100%;
   height: 100%;
   border: none;
-  display: block;
 }
 
+/* 返回按钮悬浮于舞台角落，不压游戏画面 */
 .back-btn {
   position: absolute;
   top: 8px;

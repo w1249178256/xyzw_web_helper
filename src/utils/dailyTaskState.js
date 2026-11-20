@@ -150,10 +150,17 @@ export async function fillHangUpTime({
 }
 
 /**
- * Load task targets from the official data version returned by the game server.
+ * CDN base URL for official game configuration data.
+ * The version string comes from data/version.json on the CDN, not from
+ * system_getdatabundlever (whose dataBundleVer is a Cocos bundle hash).
+ */
+const CDN_BASE = "https://xxz-xyzw-res.hortorgames.com";
+
+/**
+ * Load task targets from the official CDN data, versioned via data/version.json.
  * Only immutable configuration is cached; role progress is never cached here.
- * @param {object} tokenStore Live command transport.
- * @param {string} tokenId Selected account identity.
+ * @param {object} tokenStore Live command transport (unused; kept for API compat).
+ * @param {string} tokenId Selected account identity (unused; kept for API compat).
  * @param {Function} [fetchConfig] Fetch implementation for the official CDN.
  * @returns {Promise<object>} Validated task definitions and point-reward thresholds.
  */
@@ -162,19 +169,18 @@ export async function loadDailyTaskConfig(
   tokenId,
   fetchConfig = globalThis.fetch,
 ) {
-  const response = await tokenStore.sendMessageWithPromise(
-    tokenId,
-    "system_getdatabundlever",
-    {},
-    15000,
-  );
-  const version = response?.dataBundleVer;
+  const verResp = await fetchConfig(`${CDN_BASE}/data/version.json`, {
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!verResp.ok) throw new Error("官方任务版本信息读取失败");
+  const verJson = await verResp.json();
+  const version = verJson?.version;
   if (typeof version !== "string" || !/^[\w-]+$/.test(version))
-    throw new Error("服务器未提供有效的任务配置版本");
+    throw new Error("CDN 未提供有效的任务配置版本");
   if (!configsByVersion.has(version)) {
     const loading = (async () => {
       const response = await fetchConfig(
-        `https://xxz-xyzw-res.hortorgames.com/data/${version}/config.json`,
+        `${CDN_BASE}/data/${version}/config.json`,
         { signal: AbortSignal.timeout(30000) },
       );
       if (!response.ok) throw new Error("官方任务配置读取失败");
