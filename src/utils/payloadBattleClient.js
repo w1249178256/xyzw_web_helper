@@ -55,7 +55,6 @@ export class PayloadBattleClient {
 
     this.client = new XyzwWebSocketClient({ url, heartbeatMs: 5000 });
     this.client.setMessageListener((msg) => this.onMessage(msg));
-    // 非人为断线 → 通知 runner 自动重连
     this.client.onDisconnect = () => {
       if (this.closed) return;
       this._log("战场连接断开", "warning");
@@ -85,7 +84,6 @@ export class PayloadBattleClient {
     }
     this._log("战场服已连接");
 
-    // 进场
     const enterRes = await this.client.sendWithPromise(
       "payload_enterbf",
       { bfId: this.bfInfo.bfId },
@@ -93,7 +91,6 @@ export class PayloadBattleClient {
     );
     this._log(`payload_enterbf 成功：${JSON.stringify(enterRes ?? {}).slice(0, 200)}`);
 
-    // 业务心跳
     this.pingTimer = setInterval(() => {
       if (this.closed) return;
       this.sendAction("ping");

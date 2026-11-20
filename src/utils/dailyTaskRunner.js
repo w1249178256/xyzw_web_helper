@@ -128,7 +128,6 @@ export class DailyTaskRunner {
       this.log(
         `当前阵容: ${currentFormation}, 目标阵容: ${targetFormation}，开始切换...`,
       );
-      // A lost acknowledgement can still follow a server-side switch.
       this.formationChanged = true;
       await this.executeGameCommand(
         tokenId,
@@ -293,16 +292,18 @@ export class DailyTaskRunner {
 
     this.log("开始执行每日任务补差");
 
-    // A reached target is completed even when its points are not yet claimed.
     const isTaskCompleted = (condition) =>
       this.getTaskState(condition).remaining === 0;
     const statistics = roleData.statistics ?? {};
     const statisticsTime = roleData.statisticsTime ?? {};
-    // Server dailyTime defines the reset boundary; browser dates are not completion evidence.
     const isTodayAvailable = (stamp) =>
       !Number.isFinite(stamp) || stamp < roleData.dailyTask.dailyTime;
 
-    // 官方字段：area:arena:last 记录今日竞技场战斗次数，上限 3 次
+    /**
+     * 官方字段 area:arena:last 记录今日竞技场战斗次数，上限 3 次。
+     * @param {object} [role]
+     * @returns {number} 剩余免费次数
+     */
     const getArenaRemainingFree = (role = this.roleData) => {
       const statKey = "area:arena:last";
       const statsTime = role.statisticsTime?.[statKey] ?? 0;
@@ -315,7 +316,6 @@ export class DailyTaskRunner {
 
     const taskList = [];
 
-    // 1. 基础任务
     if (!isTaskCompleted(2)) {
       taskList.push({
         name: "分享一次游戏",
@@ -419,7 +419,6 @@ export class DailyTaskRunner {
       }
     }
 
-    // Help slots can be empty even after the daily goal and its points were claimed.
     if (settings.claimHangUp) {
       taskList.push({
         name: "按服务器槽位补足挂机加钟",
@@ -504,7 +503,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 2. 竞技场 (根据官方 area:arena:last 动态判断免费，循环打满免费)
     if (
       settings.arenaEnable &&
       (getArenaRemainingFree() > 0 || !isTaskCompleted(13))
@@ -585,7 +583,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 3. BOSS
     if (settings.bossTimes > 0) {
       let alreadyLegionBoss = statistics["legion:boss"] ?? 0;
       if (isTodayAvailable(statisticsTime["legion:boss"])) {
@@ -648,7 +645,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 4. 固定奖励
     const fixedRewards = [
       ...(Object.values(roleData.signInReward ?? {}).some(
         (stamp) => !isTodayAvailable(stamp),
@@ -730,7 +726,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 5. 免费活动
     if (isTodayAvailable(statistics["artifact:normal:lottery:time"])) {
       for (let i = 0; i < 3; i++) {
         taskList.push({
@@ -780,7 +775,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 6. 黑市
     if (!isTaskCompleted(12) && settings.blackMarketPurchase) {
       taskList.push({
         name: "黑市购买1次物品",
@@ -795,7 +789,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 咸王梦境
     const mengyandayOfWeek = new Date(
       (roleData.dailyTask.dailyTime + 8 * 60 * 60) * 1000,
     ).getUTCDay();
@@ -813,7 +806,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // 深海灯神
     if (
       mengyandayOfWeek === 1 &&
       isTodayAvailable(statisticsTime[`genie:daily:free:5`])
@@ -830,7 +822,6 @@ export class DailyTaskRunner {
       });
     }
 
-    // Task IDs are mapped by the official config, not by completion-condition IDs.
     for (const definition of this.taskConfig.tasks) {
       taskList.push({
         name: `领取任务积分${definition.id}`,
@@ -938,7 +929,6 @@ export class DailyTaskRunner {
           summary.failed++;
           if (this.activeCondition === undefined) supplementalIncomplete++;
           this.log(`任务执行失败: ${task.name} - ${error.message}`, "error");
-          // Match the original runner: a business rejection fails this step only.
           if (
             !error.serverStateUnavailable &&
             /服务器错误:\s*\d+/.test(error.message || "") &&

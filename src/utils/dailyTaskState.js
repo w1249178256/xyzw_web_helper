@@ -1,7 +1,6 @@
 const configsByVersion = new Map();
 const activeTokenRuns = new Set();
 
-// The official HangUpInviteDialog exposes four help slots, independently of daily tasks.
 const HANG_UP_HELP_SLOTS = 4;
 
 /**
@@ -111,7 +110,6 @@ export async function fillHangUpTime({
   };
   const readState = async () => {
     assertConnected();
-    // role_getroleinfo is limited independently of the share command.
     await sleep(1000);
     assertConnected();
     const client = tokenStore.wsConnections?.[tokenId]?.client;

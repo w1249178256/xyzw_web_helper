@@ -41,7 +41,6 @@ export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}
     const token = tokens.find((t) => t.id === tokenId);
     if (!token?.token) return { status: "no-token" };
 
-    // 1) 主服临时连接（拿 bfInfo 用）
     if (tokenStore.getWebSocketStatus(tokenId) !== "connected") {
       tokenStore.createWebSocketConnection(tokenId, token.token, token.wsUrl);
       tempMain = true;
@@ -58,7 +57,6 @@ export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}
       }
     }
 
-    // 2) 查询战场信息
     const bfResp = await tokenStore.sendMessageWithPromise(
       tokenId,
       "legion_getpayloadbf",
@@ -67,7 +65,6 @@ export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}
     );
     const info = bfResp?.info || {};
 
-    // 3) 未开放/已结束 → 收尾跳过
     if (!info.domainName || !info.sid || bfResp?.ended) {
       if (tempMain) tokenStore.closeWebSocketConnection(tokenId);
       log(
@@ -79,7 +76,6 @@ export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}
       return { status: bfResp?.ended ? "ended" : "not-open" };
     }
 
-    // 4) 战场连接（复用主服 wsUrl 查询串 + sid2）
     const conns = tokenStore.wsConnections?.value || tokenStore.wsConnections || {};
     const mainWsUrl = conns[tokenId]?.wsUrl;
     if (!mainWsUrl) {
@@ -93,12 +89,10 @@ export async function startPayloadBattleFlow(tokenStore, tokenId, log = () => {}
       onLog: (level, msg) => log(level, `[蟠桃] ${msg}`),
       onDisconnect: () => scheduleReconnect(tokenStore, tokenId, log),
     });
-    await client.connect(); // 内部完成 payload_enterbf + payload_ping 心跳
+    await client.connect();
     activeClient = client;
     reconnectAttempts = 0;
 
-    // 5) 断开主服临时连接：战场连接（sid2）独立鉴权，不影响参战；
-    //    也避免与 iframe 游戏的主服会话互踢
     if (tempMain) tokenStore.closeWebSocketConnection(tokenId);
 
     log("success", "蟠桃战场已连接并进场，实时参战中");
@@ -127,9 +121,8 @@ function scheduleReconnect(tokenStore, tokenId, log) {
       if (r.status === "entered") return;
       if (r.status === "ended" || r.status === "not-open") {
         reconnectAttempts = 0;
-        return; // 战场关闭，不重连
+        return;
       }
-      // 其他失败（如主服连接失败）继续退避重试
       scheduleReconnect(tokenStore, tokenId, log);
     } catch (e) {
       if (isNotOpenError(e)) {
