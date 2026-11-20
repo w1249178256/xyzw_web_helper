@@ -77,10 +77,19 @@ export const useLegionWarStore = defineStore("legionWar", () => {
 
       battlefieldId.value = getbattlefield.info.battlefieldId;
 
-      // 2. 构建 WS URL
+      // 2. 构建 WS URL（动态使用服务端下发的 domainName，若未提供则降级为默认）
+      const warDomain =
+        getbattlefield.info.domainName ||
+        "wss://xxz-xyzw-new.hortorgames.com/agent";
+      const normalizedDomain =
+        warDomain.startsWith("ws://") || warDomain.startsWith("wss://")
+          ? warDomain
+          : `wss://${warDomain}`;
+
       const baseWsUrl =
-        "wss://xxz-xyzw-new.hortorgames.com/agent" +
-        `?p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
+        `${normalizedDomain}` +
+        (normalizedDomain.includes("?") ? "&" : "?") +
+        `p=${encodeURIComponent(tokenStore.selectedToken.token)}` +
         `&e=x&sid2=${getbattlefield.info.sid}&lang=chinese`;
 
       // 3. 建立连接
@@ -247,6 +256,129 @@ export const useLegionWarStore = defineStore("legionWar", () => {
     }
   };
 
+  /**
+   * 发起战斗（攻打玩家/部队）
+   * @param {number|string} targetCodeId 局内部队动态编号（非角色主服永久 roleId）
+   */
+  const startBattle = async (targetCodeId) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    const codeId = Number(targetCodeId);
+    if (!codeId || isNaN(codeId)) {
+      throw new Error("目标部队编号无效");
+    }
+    return await legionWarWebSocket.send("war_startbattle", {
+      battlefieldId: battlefieldId.value,
+      targetCodeId: codeId,
+    });
+  };
+
+  /**
+   * 攻打据点（攻城）
+   * @param {string} buildingId 据点编号（如 "1_1"）
+   */
+  const attackBuilding = async (buildingId) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_startattackbuilding", {
+      battlefieldId: battlefieldId.value,
+      buildingId: String(buildingId),
+    });
+  };
+
+  /**
+   * 行军移动
+   * @param {string} target 目标据点或坐标
+   */
+  const startMarch = async (target) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_startmarch", {
+      battlefieldId: battlefieldId.value,
+      target: String(target),
+    });
+  };
+
+  /**
+   * 同步出战阵容（盐场出战前置同步）
+   * @param {Object} teamData 包含 battleTeam, lordWeaponId, petUId
+   */
+  const setBattleTeam = async (teamData = {}) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_setbattleteam", {
+      battlefieldId: battlefieldId.value,
+      battleTeam: teamData.battleTeam || [],
+      lordWeaponId: teamData.lordWeaponId ?? 0,
+      petUId: teamData.petUId || "",
+    });
+  };
+
+  /**
+   * 自尽撤退
+   */
+  const suicide = async () => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_suicide", {
+      battlefieldId: battlefieldId.value,
+    });
+  };
+
+  /**
+   * 行军加速
+   * @param {number|string} marchId 行军编号
+   */
+  const speedUp = async (marchId) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_speedup", {
+      battlefieldId: battlefieldId.value,
+      marchId,
+    });
+  };
+
+  /**
+   * 获取队伍详情
+   * @param {number|string} roleCodeId 局内部队编号
+   */
+  const getTeamInfo = async (roleCodeId) => {
+    if (!isConnected.value || !legionWarWebSocket) {
+      throw new Error("战场未连接");
+    }
+    if (!battlefieldId.value) {
+      throw new Error("未获取到战场ID");
+    }
+    return await legionWarWebSocket.send("war_getteaminfo", {
+      battlefieldId: battlefieldId.value,
+      roleCodeId: Number(roleCodeId),
+    });
+  };
+
   return {
     // State
     isConnected,
@@ -263,5 +395,12 @@ export const useLegionWarStore = defineStore("legionWar", () => {
     refreshData,
     warRequest,
     fetchLegionDetail,
+    startBattle,
+    attackBuilding,
+    startMarch,
+    setBattleTeam,
+    suicide,
+    speedUp,
+    getTeamInfo,
   };
 });

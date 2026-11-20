@@ -659,7 +659,7 @@ export const PEACH_TASKS = [
     title: "顺风速递",
     group: 2,
     subGroup: 23,
-    pointReward: 1,
+    pointReward: 2,
     rewards: [
       {
         type: 3,
@@ -677,7 +677,7 @@ export const PEACH_TASKS = [
     title: "顺风速递",
     group: 2,
     subGroup: 23,
-    pointReward: 2,
+    pointReward: 3,
     rewards: [
       {
         type: 3,
@@ -695,7 +695,25 @@ export const PEACH_TASKS = [
     title: "顺风速递",
     group: 2,
     subGroup: 23,
-    pointReward: 3,
+    pointReward: 4,
+    rewards: [
+      {
+        type: 3,
+        itemId: 36001,
+        weight: 1,
+        value: 1,
+      },
+    ],
+  },
+  {
+    id: 89,
+    desc: "累计成功争夺32艘蟠桃船",
+    type: 35,
+    target: 32,
+    title: "顺风速递",
+    group: 2,
+    subGroup: 23,
+    pointReward: 5,
     rewards: [
       {
         type: 3,
@@ -1361,7 +1379,7 @@ export const PEACH_TASKS = [
     title: "奔跑吧咸鱼",
     group: 2,
     subGroup: 40,
-    pointReward: 1,
+    pointReward: 2,
     rewards: [
       {
         type: 3,
@@ -1379,7 +1397,7 @@ export const PEACH_TASKS = [
     title: "奔跑吧咸鱼",
     group: 2,
     subGroup: 40,
-    pointReward: 1,
+    pointReward: 3,
     rewards: [
       {
         type: 3,
@@ -1397,7 +1415,7 @@ export const PEACH_TASKS = [
     title: "奔跑吧咸鱼",
     group: 2,
     subGroup: 40,
-    pointReward: 2,
+    pointReward: 4,
     rewards: [
       {
         type: 3,
