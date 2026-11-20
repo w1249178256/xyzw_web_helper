@@ -131,7 +131,7 @@ const MAP_POINT_DEFINITIONS = [
 ];
 
 /**
- * 完整道路与据点节点列表（保持向下兼容）
+ * 完整道路与据点节点列表
  */
 export const roadPointList = MAP_POINT_DEFINITIONS.map(([id, type]) => ({
   id,
