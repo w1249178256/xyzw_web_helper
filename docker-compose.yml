@@ -1,0 +1,32 @@
+services:
+  # 后端：仅容器网络内可达，不映射宿主端口
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    image: xyzw-web-helper-api:latest
+    env_file:
+      - path: .env.docker
+        required: false
+    restart: unless-stopped
+    # 需要持久化时再开：
+    # volumes:
+    #   - ./xyzw_data:/app/xyzw_data
+
+  # 前端：nginx 托管 dist 并反代 /api/v1 -> api:3000
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        # 默认关闭私有扩展；需要时在 .env.docker 里覆盖后取消下面注释
+        VITE_LOCAL_EXT: ${VITE_LOCAL_EXT:-0}
+        VITE_LOCAL_EXT_ENTRY: ${VITE_LOCAL_EXT_ENTRY:-}
+        VITE_LOCAL_EXT_TAB: ${VITE_LOCAL_EXT_TAB:-}
+        VITE_LOCAL_EXT_LABEL: ${VITE_LOCAL_EXT_LABEL:-}
+    image: xyzw-web-helper-web:latest
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+    restart: unless-stopped

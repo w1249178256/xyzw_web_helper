@@ -1,0 +1,17 @@
+# 后端：Express + Supabase + node-cron（render-backend）
+# 仅监听容器内 3000，由 web(nginx) 反代 /api/v1 -> /api
+FROM node:24-alpine
+
+WORKDIR /app
+# render-backend 依赖为纯 JS，无需原生编译；无锁文件故用 npm install
+COPY render-backend/package.json ./render-backend/
+RUN cd render-backend && npm install --omit=dev --no-audit --no-fund
+
+COPY render-backend/ ./render-backend/
+
+# 占位默认值：未提供 .env.docker 时容器仍能启动（/api 返回 500 并在日志提示配置缺失）
+# env_file 提供的真实值会覆盖这些 ENV
+ENV SUPABASE_URL=https://placeholder.supabase.co     SUPABASE_KEY=placeholder-key     API_KEY=dev-placeholder-key
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "render-backend/server.js"]
