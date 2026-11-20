@@ -100,26 +100,15 @@ function registerDefaultCommands(reg) {
     // 盐场-核心通信与状态
     .register("war_getbattlefieldinfo")
     .register("war_enterbattlefield")
-    .register("war_obenterbf")
-    .register("war_obleavebf")
     // 盐场-出征与战斗核心指令
     .register("war_startbattle")
     .register("war_startattackbuilding")
     .register("war_startmarch")
     .register("war_setbattleteam")
-    .register("war_teamsetbattleteam")
     .register("war_suicide")
-    .register("war_resurrect")
     .register("war_speedup")
     // 盐场-队伍与信息查询
-    .register("war_getteaminfo")
-    .register("war_getteamimginfo")
-    .register("war_syncitem")
-    .register("war_adjustteampos")
-    .register("war_kickoutteam")
-    .register("war_leaveteam")
-    .register("war_refusejointeam")
-    .register("war_invitejointeam");
+    .register("war_getteaminfo");
 
   return registry;
 }
@@ -821,24 +810,13 @@ export class XyzwLegionWarWebSocketClient {
       // 盐场战场核心响应映射
       war_getbattlefieldinforesp: "war_getbattlefieldinfo",
       war_enterbattlefieldresp: "war_enterbattlefield",
-      war_obenterbfresp: "war_obenterbf",
-      war_obleavebfresp: "war_obleavebf",
       war_startbattleresp: "war_startbattle",
       war_startattackbuildingresp: "war_startattackbuilding",
       war_startmarchresp: "war_startmarch",
       war_setbattleteamresp: "war_setbattleteam",
-      war_teamsetbattleteamresp: "war_teamsetbattleteam",
       war_suicideresp: "war_suicide",
-      war_resurrectresp: "war_resurrect",
       war_speedupresp: "war_speedup",
       war_getteaminforesp: "war_getteaminfo",
-      war_getteamimginforesp: "war_getteamimginfo",
-      war_syncitemresp: "war_syncitem",
-      war_adjustteamposresp: "war_adjustteampos",
-      war_kickoutteamresp: "war_kickoutteam",
-      war_leaveteamresp: "war_leaveteam",
-      war_refusejointeamresp: "war_refusejointeam",
-      war_invitejointeamresp: "war_invitejointeam",
 
       // 1:1 响应映射（优先级高）
       fight_startpvpresp: "fight_startpvp",
