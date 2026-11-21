@@ -1,4 +1,59 @@
 const configsByVersion = new Map();
+const officialConfigBase = "https://xxz-xyzw-res.hortorgames.com";
+
+async function fetchOfficialTaskConfig(version, fetchConfig) {
+  const url = `${officialConfigBase}/data/${version}/config.json`;
+  try {
+    const response = await fetchConfig(url, {
+      signal: AbortSignal.timeout(30000),
+    });
+    if (response.ok) {
+      return {
+        config: validateDailyTaskConfig(await response.json()),
+        failures: [],
+      };
+    }
+    return {
+      config: null,
+      failures: [
+        { host: new URL(officialConfigBase).hostname, status: response.status },
+      ],
+    };
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    return {
+      config: null,
+      failures: [{ host: new URL(officialConfigBase).hostname, reason }],
+    };
+  }
+}
+
+async function fetchLatestOfficialTaskConfigVersion(fetchConfig) {
+  const host = new URL(officialConfigBase).hostname;
+  try {
+    const response = await fetchConfig(
+      `${officialConfigBase}/data/version.json`,
+      {
+        signal: AbortSignal.timeout(30000),
+      },
+    );
+    if (!response.ok) throw new Error(`${host}: HTTP ${response.status}`);
+    const version = (await response.json())?.version;
+    if (typeof version === "string" && /^[\w-]+$/.test(version)) return version;
+    throw new Error(`${host}: 版本格式无效`);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(`官方最新任务配置版本读取失败（${reason}）`);
+  }
+}
+
+function formatOfficialConfigFailures(failures) {
+  return failures
+    .map(({ host, status, reason }) =>
+      status === undefined ? `${host}: ${reason}` : `${host}: HTTP ${status}`,
+    )
+    .join("；");
+}
 const activeTokenRuns = new Set();
 
 // The official HangUpInviteDialog exposes four help slots, independently of daily tasks.
@@ -173,13 +228,27 @@ export async function loadDailyTaskConfig(
     throw new Error("服务器未提供有效的任务配置版本");
   if (!configsByVersion.has(version)) {
     const loading = (async () => {
-      const response = await fetchConfig(
-        `https://xxz-xyzw-res.hortorgames.com/data/${version}/config.json`,
-        { signal: AbortSignal.timeout(30000) },
+      const requested = await fetchOfficialTaskConfig(version, fetchConfig);
+      if (requested.config) return requested.config;
+
+      const requestedVersionUnavailable = requested.failures[0]?.status === 404;
+      if (requestedVersionUnavailable) {
+        const latestVersion =
+          await fetchLatestOfficialTaskConfigVersion(fetchConfig);
+        if (latestVersion !== version) {
+          const latest = await fetchOfficialTaskConfig(
+            latestVersion,
+            fetchConfig,
+          );
+          if (latest.config) return latest.config;
+          throw new Error(
+            `官方任务配置读取失败（服务器版本 ${version} 已不存在；最新版本 ${latestVersion} 也不可用：${formatOfficialConfigFailures(latest.failures)}）`,
+          );
+        }
+      }
+      throw new Error(
+        `官方任务配置读取失败（版本 ${version}；${formatOfficialConfigFailures(requested.failures)}）`,
       );
-      if (!response.ok) throw new Error("官方任务配置读取失败");
-      const config = await response.json();
-      return validateDailyTaskConfig(config);
     })();
     configsByVersion.set(version, loading);
     loading.catch(() => {
