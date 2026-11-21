@@ -270,12 +270,34 @@ export class DailyTaskRunner {
     }
   }
 
+  /**
+   * 取某个完成条件对应的服务器任务状态。
+   *
+   * 游戏更新后官方配置可能删掉/合并某些条件（例如 13 号竞技场任务被拆分），
+   * 以前这里直接 throw，会让整轮补差中断；现在降级成"该步骤跳过"，
+   * 只警告一次，其余任务照常补差。
+   */
   getTaskState(condition) {
     const task = getDailyTaskStates(this.roleData, this.taskConfig).find(
-      (task) => task.condition === condition,
+      (item) => item.condition === condition,
     );
-    if (!task) throw new Error(`官方任务配置中未找到完成条件 ${condition}`);
-    return task;
+    if (task) return task;
+    this.missingConditions ??= new Set();
+    if (!this.missingConditions.has(condition)) {
+      this.missingConditions.add(condition);
+      this.log(
+        `官方任务配置里没有完成条件 ${condition}（游戏可能已更新），该步骤跳过`,
+        "warning",
+      );
+    }
+    return {
+      condition,
+      required: 0,
+      progress: 0,
+      remaining: 0,
+      status: "unknown",
+      missing: true,
+    };
   }
 
   /**
