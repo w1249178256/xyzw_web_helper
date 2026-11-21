@@ -28,3 +28,9 @@ Thumbs.db
 /tmp
 coverage
 .env.docker
+
+# 凭据与账号数据：绝不进镜像上下文
+public/accounts_backup.json
+xyzw_data/
+*.token
+xyzw_token.bin

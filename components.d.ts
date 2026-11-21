@@ -51,6 +51,7 @@ declare module 'vue' {
     IdentityCard: typeof import('./src/components/Common/IdentityCard.vue')['default']
     LegionWarMap: typeof import('./src/components/Club/LegionWarMap.vue')['default']
     LegionWarStatistics: typeof import('./src/components/Club/LegionWarStatistics.vue')['default']
+    LocalExtStub: typeof import('./src/components/Common/LocalExtStub.vue')['default']
     MessageTester: typeof import('./src/components/Test/MessageTester.vue')['default']
     MonthlyTasksCard: typeof import('./src/components/cards/MonthlyTasksCard.vue')['default']
     MyCard: typeof import('./src/components/Common/MyCard.vue')['default']

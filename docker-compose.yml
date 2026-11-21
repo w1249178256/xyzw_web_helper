@@ -19,11 +19,12 @@ services:
       context: .
       dockerfile: docker/Dockerfile.web
       args:
-        # 默认关闭私有扩展；需要时在 .env.docker 里覆盖后取消下面注释
+        # 默认关闭私有扩展；本地私有构建在 .env.docker 里覆盖（该文件已被忽略）
         VITE_LOCAL_EXT: ${VITE_LOCAL_EXT:-0}
-        VITE_LOCAL_EXT_ENTRY: ${VITE_LOCAL_EXT_ENTRY:-}
         VITE_LOCAL_EXT_TAB: ${VITE_LOCAL_EXT_TAB:-}
         VITE_LOCAL_EXT_LABEL: ${VITE_LOCAL_EXT_LABEL:-}
+        VITE_LOCAL_EXT_SRC: ${VITE_LOCAL_EXT_SRC:-}
+        VITE_LOCAL_OVERLAY_SRC: ${VITE_LOCAL_OVERLAY_SRC:-}
     image: xyzw-web-helper-web:latest
     ports:
       - "${WEB_PORT:-8080}:80"

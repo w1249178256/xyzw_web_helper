@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 import vue from "@vitejs/plugin-vue";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,7 +21,15 @@ async function safeImport(moduleName, humanName) {
   }
 }
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ mode }) => {
+  const env = loadEnv(mode, __dirname, "");
+  const localExtSrc = process.env.VITE_LOCAL_EXT_SRC || env.VITE_LOCAL_EXT_SRC;
+  const localOverlaySrc =
+    process.env.VITE_LOCAL_OVERLAY_SRC || env.VITE_LOCAL_OVERLAY_SRC;
+  const localExtStub = path.resolve(
+    __dirname,
+    "src/components/Common/LocalExtStub.vue",
+  );
   let basicSsl;
   try {
     ({ default: basicSsl } = await import("@vitejs/plugin-basic-ssl"));
@@ -122,6 +131,23 @@ export default defineConfig(async () => {
         } catch (e) {
           console.error("\n[copy-worker] Error copying worker.js:", e);
         }
+
+        /**
+         * Vite 会把 public/ 整目录复制进 dist，凭据导出文件一旦落入其中
+         * 就会被静态服务器直接对外提供，因此在构建结束时无条件剔除。
+         */
+        const sensitiveArtifacts = ["accounts_backup.json"];
+        for (const name of sensitiveArtifacts) {
+          const target = path.resolve(__dirname, "dist", name);
+          try {
+            if (fs.existsSync(target)) {
+              fs.rmSync(target, { force: true });
+              console.warn(`\n[sensitive-guard] removed dist/${name}`);
+            }
+          } catch (e) {
+            console.error(`\n[sensitive-guard] failed to remove dist/${name}:`, e);
+          }
+        }
       },
     },
   ].filter(Boolean);
@@ -131,6 +157,12 @@ export default defineConfig(async () => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "src"),
+        "@local-ext": localExtSrc
+          ? path.resolve(__dirname, localExtSrc)
+          : localExtStub,
+        "@local-overlay": localOverlaySrc
+          ? path.resolve(__dirname, localOverlaySrc)
+          : localExtStub,
       },
     },
     server: {
