@@ -1,10 +1,37 @@
-import { HERO_DICT } from "@/utils/HeroList";
 import { PEACH_TASKS } from "@/utils/PeachTaskIds";
 
 /**
  * 开箱、钓鱼、招募类任务
  * 包含: batchOpenBox, batchClaimBoxPointReward, batchFish, batchRecruit
  */
+
+/** 升星单次请求间隔（毫秒）：服务端对 hero_/book_ 有节流，太快会触发限流 */
+const STAR_REQUEST_DELAY_MS = 500;
+
+/**
+ * 英雄升星碎片消耗（按阶段）。
+ * 阶段来源：游戏内星级划分（用户提供，2026-11-20 确认）
+ *   黄星 1-5：8/星｜紫星 6-10：40/星｜橙星 11-15：80/星
+ *   红星 16-20：200/星｜皇冠 21-25：400/星｜紫晶 26-30：400/星
+ * 抓包核对：1~4 星 8、5~9 星 40、16~18 星 200，与表一致。
+ */
+const HERO_STAR_TIERS = [
+  { from: 1, to: 5, cost: 8, name: "黄星" },
+  { from: 6, to: 10, cost: 40, name: "紫星" },
+  { from: 11, to: 15, cost: 80, name: "橙星" },
+  { from: 16, to: 20, cost: 200, name: "红星" },
+  { from: 21, to: 25, cost: 400, name: "皇冠" },
+  { from: 26, to: 30, cost: 400, name: "紫晶" },
+];
+
+/** 满星（紫晶 30 星） */
+const HERO_MAX_STAR = 30;
+
+/** 当前星级升下一星需要的碎片；超出表范围返回 undefined（交给服务端判定） */
+function heroStarCost(star) {
+  const tier = HERO_STAR_TIERS.find((t) => star >= t.from && star <= t.to);
+  return tier ? tier.cost : undefined;
+}
 
 /**
  * 创建物品类任务执行器
@@ -38,8 +65,6 @@ export function createTasksItem(deps) {
   };
 
   const fishNames = { 1: "普通鱼竿", 2: "黄金鱼竿" };
-
-  const heroIds = Object.keys(HERO_DICT).map(Number);
 
   const normalizeRedeemCodes = (codes) => {
     const rawCodes = Array.isArray(codes)
@@ -202,11 +227,20 @@ export function createTasksItem(deps) {
   /**
    * 批量英雄升星
    */
+  /**
+   * 批量英雄升星（hero_heroupgradestar）
+   *
+   * 抓包（2026-11-20 12:57）：`hero_heroupgradestar { heroId: 107 }`
+   *   ← syncrewardresp { role: { heroes: { "107": { star: 17, power, ... } } } }
+   * 注意：成功时**没有** `<cmd>resp`，回执是 syncrewardresp（resp=请求 seq）；
+   * 旧实现用 `res.code === 0` 判成功，而 promise 只回 body，导致每次都判失败并静默 break。
+   */
   const batchHeroUpgrade = async () => {
     if (selectedTokens.value.length === 0) return;
-
     isRunning.value = true;
     shouldStop.value = false;
+    const label = "英雄升星";
+    const MAX_PER_HERO = 30; // 覆盖 1 星 → 30 星整段
 
     selectedTokens.value.forEach((id) => {
       tokenStatus.value[id] = "waiting";
@@ -214,70 +248,129 @@ export function createTasksItem(deps) {
 
     const taskPromises = selectedTokens.value.map(async (tokenId) => {
       if (shouldStop.value) return;
-
       tokenStatus.value[tokenId] = "running";
       const token = tokens.value.find((t) => t.id === tokenId);
-
-      try {
+      const log = (text, type = "info") =>
         addLog({
           time: new Date().toLocaleTimeString(),
-          message: `=== 开始英雄升星: ${token.name} ===`,
-          type: "info",
+          message: `${token?.name || tokenId}: ${text}`,
+          type,
         });
 
+      try {
         await ensureConnection(tokenId);
 
-        for (const heroId of heroIds) {
-          if (shouldStop.value) break;
+        // gameData 是全局单份的，批量时必须按账号重新拉一次，否则会拿别人的英雄表
+        let roleInfo = null;
+        try {
+          roleInfo = await tokenStore.sendGetRoleInfo(tokenId);
+        } catch (error) {
+          log(`读取角色信息失败：${error.message || error}`, "warning");
+        }
+        const role =
+          roleInfo?.role || tokenStore.gameData?.roleInfo?.role || {};
+        const heroes = role.heroes || {};
+        const items = role.items || {};
+        const ids = Object.keys(heroes)
+          .map(Number)
+          .filter((id) => Number.isFinite(id) && id > 0);
+        if (!ids.length) {
+          tokenStatus.value[tokenId] = "completed";
+          log("没有读取到英雄数据，请先刷新角色信息", "warning");
+          return;
+        }
+        log(`共 ${ids.length} 个英雄，开始升星`);
 
-          // 每个英雄尝试最多10次升星（只要成功就继续，失败则跳过该英雄）
-          for (let i = 1; i <= 10; i++) {
+        let totalUp = 0;
+        let skippedByShard = 0;
+        let cappedCount = 0;
+        let errorCount = 0;
+
+        for (const heroId of ids) {
+          if (shouldStop.value) break;
+          let star = Number(heroes[heroId]?.star) || 0;
+          let shards = Number(items[String(heroId)]?.quantity) || 0;
+          let up = 0;
+          let reason = "";
+
+          if (star >= HERO_MAX_STAR) {
+            // 已经满星，一个请求都不用发
+            skippedByShard += 1;
+            continue;
+          }
+
+          for (let i = 0; i < MAX_PER_HERO; i++) {
             if (shouldStop.value) break;
+
+            // 先本地判断碎片够不够：够才发请求，不够直接跳到下一个英雄
+            const cost = heroStarCost(star);
+            if (cost !== undefined && shards < cost) {
+              reason = "shard";
+              break;
+            }
 
             try {
               const res = await tokenStore.sendMessageWithPromise(
                 tokenId,
                 "hero_heroupgradestar",
                 { heroId },
-                5000,
+                8000,
               );
-              const ok =
-                res &&
-                (res.code === 0 || res.success === true || res.result === 0);
-
-              if (ok) {
-                addLog({
-                  time: new Date().toLocaleTimeString(),
-                  message: `${token.name} 英雄ID:${heroId} 升星成功 (第${i}次)`,
-                  type: "success",
-                });
-                // 成功了继续尝试下一级，直到失败或达到10次
+              up += 1;
+              totalUp += 1;
+              const nextStar = Number(res?.role?.heroes?.[heroId]?.star);
+              const nextShard = Number(
+                res?.role?.items?.[String(heroId)]?.quantity,
+              );
+              if (nextStar > 0) star = nextStar;
+              if (Number.isFinite(nextShard)) shards = nextShard;
+              else if (cost !== undefined) shards = Math.max(0, shards - cost);
+            } catch (error) {
+              const text = String(error.message || error);
+              if (/不足|满星|已满|上限|满级|材料|碎片/.test(text)) {
+                reason = "shard";
+                cappedCount += 1;
               } else {
-                // 失败说明无法继续升星（碎片不足或满星），跳出循环处理下一个英雄
-                throw new Error("升星失败");
+                errorCount += 1;
+                log(
+                  `英雄 ${heroId} 升星失败：${text.replace(/^服务器错误:\s*\d+\s*-\s*/, "")}`,
+                  "warning",
+                );
               }
-            } catch (err) {
-              // 失败则停止当前英雄的升星尝试
               break;
             }
-            await new Promise((r) => setTimeout(r, delayConfig.action));
+            await new Promise((r) =>
+              setTimeout(
+                r,
+                Math.max(delayConfig.action, STAR_REQUEST_DELAY_MS),
+              ),
+            );
+          }
+
+          if (up > 0) {
+            log(`英雄 ${heroId} 升星 +${up} → ${star} 星`, "success");
+          } else if (reason === "shard") {
+            const cost = heroStarCost(star);
+            // 未走请求就判定不够的，单独计数，避免日志刷屏
+            if (up === 0 && cost !== undefined && shards < cost) {
+              skippedByShard += 1;
+            }
           }
         }
 
-        tokenStatus.value[tokenId] = "completed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} === 英雄升星完成 ===`,
-          type: "success",
-        });
+        tokenStatus.value[tokenId] = totalUp ? "completed" : "pending";
+        const skipText = skippedByShard
+          ? `，${skippedByShard} 个英雄碎片不足已跳过`
+          : "";
+        log(
+          totalUp
+            ? `完成：升星 ${totalUp} 次${skipText}`
+            : `没有可升星的英雄（${skippedByShard} 个碎片不足${cappedCount ? `，${cappedCount} 个已满/不足` : ""}${errorCount ? `，${errorCount} 个异常` : ""}）`,
+          totalUp ? "success" : "warning",
+        );
       } catch (error) {
-        console.error(error);
         tokenStatus.value[tokenId] = "failed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `英雄升星失败: ${error.message}`,
-          type: "error",
-        });
+        log(`${label}失败: ${error.message || "未知错误"}`, "error");
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
@@ -287,17 +380,24 @@ export function createTasksItem(deps) {
     await Promise.all(taskPromises);
     isRunning.value = false;
     currentRunningTokenId.value = null;
-    message.success("批量英雄升星结束");
+    message.success(`批量${label}结束`);
   };
 
   /**
    * 批量图鉴升星
    */
+  /**
+   * 批量图鉴升星（book_batchupgrade）
+   *
+   * 抓包（2026-11-20 13:01）：`book_batchupgrade { club: 1, isArtifact: false, isSkin: false }`
+   *   ← book_batchupgraderesp { role: { book: { bookPoint }, heroes: { "101": { bookStar: 6 } ... } } }
+   * 一条命令就是"把这批能升的都升掉"，返回里带所有被提升的英雄，需要循环到没有提升为止。
+   */
   const batchBookUpgrade = async () => {
     if (selectedTokens.value.length === 0) return;
-
     isRunning.value = true;
     shouldStop.value = false;
+    const label = "图鉴升星";
 
     selectedTokens.value.forEach((id) => {
       tokenStatus.value[id] = "waiting";
@@ -305,70 +405,63 @@ export function createTasksItem(deps) {
 
     const taskPromises = selectedTokens.value.map(async (tokenId) => {
       if (shouldStop.value) return;
-
       tokenStatus.value[tokenId] = "running";
       const token = tokens.value.find((t) => t.id === tokenId);
+      const log = (text, type = "info") =>
+        addLog({
+          time: new Date().toLocaleTimeString(),
+          message: `${token?.name || tokenId}: ${text}`,
+          type,
+        });
 
       try {
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `=== 开始图鉴升星: ${token.name} ===`,
-          type: "info",
-        });
-
         await ensureConnection(tokenId);
 
-        for (const heroId of heroIds) {
+        let rounds = 0;
+        let heroTouched = 0;
+        for (let i = 0; i < 50; i++) {
           if (shouldStop.value) break;
-
-          // 每个英雄尝试最多10次图鉴升星（只要成功就继续，失败则跳过该英雄）
-          for (let i = 1; i <= 10; i++) {
-            if (shouldStop.value) break;
-
-            try {
-              const res = await tokenStore.sendMessageWithPromise(
-                tokenId,
-                "book_upgrade",
-                { heroId },
-                5000,
-              );
-              const ok =
-                res &&
-                (res.code === 0 || res.success === true || res.result === 0);
-
-              if (ok) {
-                addLog({
-                  time: new Date().toLocaleTimeString(),
-                  message: `${token.name} 英雄ID:${heroId} 图鉴升星成功 (第${i}次)`,
-                  type: "success",
-                });
-                // 成功了继续尝试下一级，直到失败或达到10次
-              } else {
-                // 失败说明无法继续图鉴升星（碎片不足或满星），跳出循环处理下一个英雄
-                throw new Error("图鉴升星失败");
-              }
-            } catch (err) {
-              // 失败则停止当前英雄的图鉴升星尝试
-              break;
+          try {
+            const res = await tokenStore.sendMessageWithPromise(
+              tokenId,
+              "book_batchupgrade",
+              { club: 1, isArtifact: false, isSkin: false },
+              8000,
+            );
+            rounds += 1;
+            const heroes = res?.role?.heroes || {};
+            let changed = 0;
+            for (const hero of Object.values(heroes)) {
+              if (hero && hero.bookStar !== undefined) changed += 1;
             }
-            await new Promise((r) => setTimeout(r, delayConfig.action));
+            heroTouched += changed;
+            if (!changed) break; // 没有提升，说明没材料了
+            log(`第 ${rounds} 轮：${changed} 个英雄图鉴星级提升`, "success");
+          } catch (error) {
+            const text = String(error.message || error);
+            if (rounds === 0) {
+              log(
+                `图鉴升星失败：${text.replace(/^服务器错误:\s*\d+\s*-\s*/, "")}`,
+                "warning",
+              );
+            } else {
+              log(`图鉴升星结束（已进行 ${rounds} 轮）`);
+            }
+            break;
           }
+          await new Promise((r) => setTimeout(r, delayConfig.action));
         }
 
-        tokenStatus.value[tokenId] = "completed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `${token.name} === 图鉴升星完成 ===`,
-          type: "success",
-        });
+        tokenStatus.value[tokenId] = rounds ? "completed" : "pending";
+        log(
+          rounds
+            ? `完成：${rounds} 轮，累计提升 ${heroTouched} 次`
+            : "没有可升星的图鉴",
+          rounds ? "success" : "warning",
+        );
       } catch (error) {
-        console.error(error);
         tokenStatus.value[tokenId] = "failed";
-        addLog({
-          time: new Date().toLocaleTimeString(),
-          message: `图鉴升星失败: ${error.message}`,
-          type: "error",
-        });
+        log(`${label}失败: ${error.message || "未知错误"}`, "error");
       } finally {
         tokenStore.closeWebSocketConnection(tokenId);
         releaseConnectionSlot();
@@ -378,7 +471,7 @@ export function createTasksItem(deps) {
     await Promise.all(taskPromises);
     isRunning.value = false;
     currentRunningTokenId.value = null;
-    message.success("批量图鉴升星结束");
+    message.success(`批量${label}结束`);
   };
 
   /**
