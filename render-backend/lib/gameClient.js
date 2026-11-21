@@ -170,7 +170,15 @@ class GameClient {
 
       let socket;
       try {
-        socket = new WebSocket(this._wsUrl);
+        // 浏览器建 WS 会自动带 Origin / User-Agent，服务端会校验；
+        // Node 的 ws 默认不带，会被握手后立刻关闭（表现为连上 100ms 就断）。
+        socket = new WebSocket(this._wsUrl, {
+          headers: {
+            Origin: "https://xxz-xyzw.hortorgames.com",
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+          },
+        });
       } catch (err) {
         reject(err);
         return;

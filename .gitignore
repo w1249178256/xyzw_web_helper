@@ -135,3 +135,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+# ===== render-backend 运行时日志 =====
+# 前端埋点与后端日志按天写入，内含浏览器 UA / 页面路径，不入库
+render-backend/logs/
+
+# Windows 保留名文件（bash 里误写 >nul 重定向会生成）
+nul

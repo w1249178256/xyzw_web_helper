@@ -1,4 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import cors from "cors";
 /**
@@ -9,8 +12,11 @@ import express from "express";
 import cron from "node-cron";
 import { createApiKeyMiddleware } from "./lib/apiKeyAuth.js";
 import { GameClient } from "./lib/gameClient.js";
+import { PushingRunner } from "./lib/pushingRunner.js";
 
 dotenv.config();
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ==================== 工具函数 ====================
 function sleep(ms) {
@@ -22,10 +28,12 @@ app.use(cors());
 app.use(express.json());
 
 // ==================== Supabase 客户端 ====================
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
-);
+// 本地只跑「前端埋点日志」时不需要 Supabase；缺配置时置空，
+// 相关路由统一返回 503，而不是让整个进程起不来。
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const supabase =
+  SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // ==================== 任务定义 ====================
 const TASK_DEFINITIONS = {
@@ -140,6 +148,34 @@ const TASK_DEFINITIONS = {
 const LOG_MAX = 500;
 const logs = [];
 
+// ==================== 日志落盘 ====================
+// 全部日志按天写到 render-backend/logs/ 下，方便本地排查：
+//   backend-YYYY-MM-DD.log   后端自身日志（JSONL）
+//   frontend-YYYY-MM-DD.log  前端埋点日志（JSONL）
+const LOG_DIR = process.env.LOG_DIR || path.join(__dirname, "logs");
+const FILE_LOG_ENABLED = process.env.FILE_LOG !== "0";
+
+function todayStr() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function appendFileLine(name, payload) {
+  if (!FILE_LOG_ENABLED) return;
+  try {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+    fs.appendFileSync(
+      path.join(LOG_DIR, `${name}-${todayStr()}.log`),
+      `${JSON.stringify(payload)}\n`,
+      "utf8",
+    );
+  } catch (err) {
+    // 写文件失败不能影响主流程，只在控制台提示
+    console.error("[log] 写入日志文件失败:", err.message);
+  }
+}
+
 function addLog(level, category, message, meta = {}) {
   const entry = {
     ts: new Date().toISOString(),
@@ -151,6 +187,7 @@ function addLog(level, category, message, meta = {}) {
   logs.unshift(entry);
   if (logs.length > LOG_MAX) logs.pop();
   console.log(`[${level}] [${category}] ${message}`, meta);
+  appendFileLine("backend", entry);
 }
 
 // ==================== Token 加载 ====================
@@ -378,7 +415,19 @@ function registerCron(task) {
 
 async function init() {
   addLog("INFO", "server", "服务器启动中...");
-  addLog("INFO", "server", `Supabase: ${process.env.SUPABASE_URL}`);
+  addLog(
+    "INFO",
+    "server",
+    supabase
+      ? `Supabase: ${process.env.SUPABASE_URL}`
+      : "Supabase: 未配置（仅启用前端日志与本地接口）",
+  );
+  addLog("INFO", "server", `日志目录: ${LOG_DIR}`);
+
+  if (!supabase) {
+    addLog("WARN", "server", "跳过定时任务注册（需要 Supabase）");
+    return;
+  }
 
   await registerAllCrons();
 
@@ -429,8 +478,61 @@ app.get("/health", (req, res) => {
   });
 });
 
+// ==================== 前端埋点日志（公开，不需要 API Key）====================
+// 前端 src/utils/frontendLog.js 批量上报到这里，落盘为 logs/frontend-YYYY-MM-DD.log
+const FRONTEND_LOG_MAX_BATCH = 50;
+const FRONTEND_LOG_MAX_LEN = 2000;
+
+// 前端埋点：公开接口，不放 /api 下（/api 全部要求 x-api-key，浏览器端没有）
+app.post("/frontend-log", (req, res) => {
+  const items = Array.isArray(req.body?.logs) ? req.body.logs : [req.body];
+  if (!items.length || items.length > FRONTEND_LOG_MAX_BATCH) {
+    return res.status(400).json({ error: "logs 需为 1~50 条的数组" });
+  }
+
+  const receivedAt = new Date().toISOString();
+  let written = 0;
+  for (const item of items) {
+    if (!item || typeof item !== "object") continue;
+    appendFileLine("frontend", {
+      receivedAt,
+      ts: typeof item.ts === "string" ? item.ts : receivedAt,
+      level: String(item.level || "info").slice(0, 10),
+      message: String(item.message ?? "").slice(0, FRONTEND_LOG_MAX_LEN),
+      page: item.page ? String(item.page).slice(0, 300) : undefined,
+      sessionId: item.sessionId ? String(item.sessionId).slice(0, 64) : undefined,
+      userAgent: item.userAgent ? String(item.userAgent).slice(0, 300) : undefined,
+      meta: item.meta ?? undefined,
+    });
+    written += 1;
+  }
+  res.json({ ok: true, written });
+});
+
 // Every API route uses the same credentials; /health remains public.
+/**
+ * 后台推关执行器：循环跑在 Node 里，浏览器只负责展示。
+ * 状态全部在内存，进程重启即清空，不自动续推。
+ */
+const pushingRunner = new PushingRunner({
+  log: (level, source, message, meta) => addLog(level, source, message, meta),
+  loadTokens,
+});
+
 app.use("/api", createApiKeyMiddleware());
+
+// 未配置 Supabase 时（例如本地只想收前端日志），业务接口直接给出明确原因。
+// 不依赖数据库的接口（内存日志、任务定义、前端日志文件）放行。
+const NO_DB_ROUTES = ["/logs", "/task-definitions", "/pushing"];
+app.use("/api", (req, res, next) => {
+  if (supabase) return next();
+  if (NO_DB_ROUTES.some((p) => req.path === p || req.path.startsWith(`${p}/`))) {
+    return next();
+  }
+  return res
+    .status(503)
+    .json({ error: "未配置 SUPABASE_URL / SUPABASE_KEY，该接口不可用" });
+});
 
 app.get("/api/tokens", async (req, res) => {
   const { data, error } = await supabase
@@ -517,7 +619,44 @@ app.get("/api/logs", (req, res) => {
   res.json(logs.slice(0, limit));
 });
 
+/**
+ * 读取落盘的日志文件，便于不开服务器也能在页面/终端排查。
+ * GET /api/logs/file?type=frontend|backend&date=YYYY-MM-DD&limit=200&q=关键字
+ */
+app.get("/api/logs/file", (req, res) => {
+  const type = req.query.type === "backend" ? "backend" : "frontend";
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date || "")
+    ? req.query.date
+    : todayStr();
+  const limit = Math.min(Number.parseInt(req.query.limit) || 200, 2000);
+  const keyword = (req.query.q || "").toString();
+  const file = path.join(LOG_DIR, `${type}-${date}.log`);
+
+  if (!fs.existsSync(file)) {
+    return res.json({ type, date, total: 0, lines: [] });
+  }
+  try {
+    const raw = fs.readFileSync(file, "utf8").split("\n").filter(Boolean);
+    const filtered = keyword
+      ? raw.filter((line) => line.includes(keyword))
+      : raw;
+    const tail = filtered.slice(-limit).map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return { raw: line };
+      }
+    });
+    res.json({ type, date, total: filtered.length, lines: tail });
+  } catch (err) {
+    res.status(500).json({ error: `读取日志失败: ${err.message}` });
+  }
+});
+
 app.get("/api/logs/db", async (req, res) => {
+  if (!supabase) {
+    return res.status(503).json({ error: "未配置 Supabase，该接口不可用" });
+  }
   const limit = Math.min(Number.parseInt(req.query.limit) || 100, 500);
   const { data, error } = await supabase
     .from("task_logs")
@@ -537,7 +676,51 @@ app.get("/api/task-definitions", (req, res) => {
   res.json(list);
 });
 
-const PORT = process.env.PORT || 3000;
+// ============ 后台推关 ============
+
+/** 开始推关：{ tokenIds: [], options: { maxRetries, maxLevel, maxConsecutiveErrors } } */
+app.post("/api/pushing/start", async (req, res) => {
+  const { tokenIds, tokens, options } = req.body || {};
+  const hasIds = Array.isArray(tokenIds) && tokenIds.length > 0;
+  const hasTokens = Array.isArray(tokens) && tokens.length > 0;
+  if (!hasIds && !hasTokens) {
+    return res.status(400).json({ error: "tokenIds 或 tokens 至少要传一个" });
+  }
+  try {
+    const result = await pushingRunner.start({ tokenIds, tokens, options });
+    addLog("INFO", "pushing", `后台推关启动：${hasTokens ? tokens.length : tokenIds.length} 个账号`);
+    res.json(result);
+  } catch (error) {
+    addLog("ERROR", "pushing", `启动后台推关失败: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/** 推关状态：账户列表（运行中的排前面） */
+app.get("/api/pushing/status", (req, res) => {
+  res.json({ rows: pushingRunner.getStatus() });
+});
+
+/** 停止推关：{ tokenId } 或 { all: true } */
+app.post("/api/pushing/stop", (req, res) => {
+  const { tokenId, all } = req.body || {};
+  const result = all
+    ? pushingRunner.stopAll()
+    : pushingRunner.stop(String(tokenId || ""));
+  addLog("INFO", "pushing", all ? "停止全部后台推关" : `停止后台推关: ${tokenId}`);
+  res.json(result);
+});
+
+/** 增量日志：?tokenId=xxx&after=<上次最大 seq> */
+app.get("/api/pushing/logs", (req, res) => {
+  const tokenId = String(req.query.tokenId || "");
+  const after = Number(req.query.after) || 0;
+  if (!tokenId) return res.status(400).json({ error: "缺少 tokenId" });
+  res.json(pushingRunner.getLogs(tokenId, after));
+});
+
+// 本地默认 3001：3000 被 Vite dev server 占用（见 vite.config.js）
+const PORT = process.env.PORT || 3001;
 init().then(() => {
   app.listen(PORT, () => {
     addLog("INFO", "server", `监听端口 ${PORT}`);

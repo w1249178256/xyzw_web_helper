@@ -18,6 +18,19 @@
               </n-icon>
               <span>{{ connectionStatusText }}</span>
             </div>
+            <n-button
+              class="enter-game-btn"
+              type="primary"
+              size="small"
+              :loading="launching"
+              :disabled="!tokenStore.selectedToken"
+              @click="openGame"
+            >
+              <template #icon>
+                <n-icon><GameController /></n-icon>
+              </template>
+              进入游戏
+            </n-button>
           </div>
         </div>
       </div>
@@ -64,19 +77,57 @@
 </template>
 
 <script setup>
-import { CloudDone } from "@vicons/ionicons5";
+import { CloudDone, GameController } from "@vicons/ionicons5";
 import { useMessage } from "naive-ui";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import useIndexedDB from "@/hooks/useIndexedDB";
 import { useTokenStore } from "@/stores/tokenStore";
+import { launchSingleGame } from "@/utils/gameLauncher";
 
 const router = useRouter();
 const message = useMessage();
 const tokenStore = useTokenStore();
+const { getArrayBuffer } = useIndexedDB();
 
 // 响应式数据
 const showFeedback = ref(true);
 const lastActivity = ref(null);
+const launching = ref(false);
+
+/**
+ * 进入游戏：和首页「快速操作 → 打开游戏」同一套逻辑
+ * （把 BIN 写进 localStorage，再跳到 /game 的 cocos 壳）
+ */
+async function openGame() {
+  const token = tokenStore.selectedToken;
+  if (!token) {
+    message.warning("请先选择一个Token");
+    return;
+  }
+  if (launching.value) return;
+
+  launching.value = true;
+  try {
+    const result = await launchSingleGame({ token, getArrayBuffer });
+    if (!result.ok) {
+      const text =
+        {
+          "no-token": "请先选择一个Token",
+          "missing-bin": "未找到该 Token 的 BIN 数据，请重新导入",
+          "read-failed": "读取 BIN 数据失败",
+          "convert-failed": "BIN 数据转换失败",
+        }[result.reason] || "进入游戏失败";
+      message.error(text);
+      return;
+    }
+    router.push("/game");
+  } catch (error) {
+    message.error(`进入游戏失败：${error?.message || error}`);
+  } finally {
+    launching.value = false;
+  }
+}
 
 // 计算属性
 const connectionStatus = computed(() => {
@@ -291,6 +342,14 @@ onUnmounted(() => {
 
 .header-left {
   flex: 1;
+}
+
+/* 右侧：连接状态 + 进入游戏 */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
 }
 
 .page-title {

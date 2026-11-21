@@ -14,6 +14,19 @@
         <img src="/icons/xiaoyugan.png" alt="小鱼干" class="energy-icon" />
         <span class="energy-count">{{ towerEnergy }}</span>
         <button
+          class="refresh-tower-button"
+          :class="{ spinning: isRefreshing }"
+          :disabled="isRefreshing"
+          title="刷新怪异塔信息"
+          @click="refreshTowerInfo"
+        >
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <path
+              d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"
+            />
+          </svg>
+        </button>
+        <button
           class="buy-energy-button"
           :class="{
             disabled: isBuying || isClimbing || isUsingItems || isMerging,
@@ -224,6 +237,8 @@ const message = useMessage();
 
 // 响应式数据
 const isClimbing = ref(false);
+/** 手动刷新怪异塔信息中（防重复点击 + 转圈动画） */
+const isRefreshing = ref(false);
 const isUsingItems = ref(false);
 const isMerging = ref(false);
 const isBuying = ref(false); // 购买小鱼干状态
@@ -844,6 +859,17 @@ const startTowerClimb = async () => {
   isClimbing.value = false;
 };
 
+/** 手动刷新：拉一次 tower_getinfo，不影响正在进行的爬塔/合成 */
+const refreshTowerInfo = async () => {
+  if (isRefreshing.value) return;
+  isRefreshing.value = true;
+  try {
+    await getTowerInfo();
+  } finally {
+    isRefreshing.value = false;
+  }
+};
+
 const getTowerInfo = async () => {
   if (!tokenStore.selectedToken) {
     return;
@@ -1023,6 +1049,45 @@ onMounted(() => {
 }
 
 /* ==================== 购买小鱼干按钮 ==================== */
+.refresh-tower-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  margin-left: 6px;
+  color: #86909c;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    background 0.2s;
+  flex-shrink: 0;
+}
+
+.refresh-tower-button:hover:not(:disabled) {
+  color: #18a058;
+  background: rgba(24, 160, 88, 0.1);
+}
+
+.refresh-tower-button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.refresh-tower-button.spinning svg {
+  animation: tower-refresh-spin 0.8s linear infinite;
+}
+
+@keyframes tower-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .buy-energy-button {
   padding: 2px 10px;
   margin-left: 4px;
