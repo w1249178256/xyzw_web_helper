@@ -164,6 +164,34 @@ test("failed config reads can be retried and unsafe versions are rejected", asyn
   );
 });
 
+test("missing server configuration falls back to the official latest version", async () => {
+  const requestedUrls = [];
+  const store = {
+    async sendMessageWithPromise() {
+      return { dataBundleVer: "missing-server-version" };
+    },
+  };
+  const fetchConfig = async (url) => {
+    requestedUrls.push(url);
+    if (url.includes("missing-server-version"))
+      return { ok: false, status: 404 };
+    if (url.endsWith("/data/version.json"))
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ version: "latest-version" }),
+      };
+    return { ok: true, status: 200, json: async () => officialConfig() };
+  };
+  const config = await loadDailyTaskConfig(store, "a", fetchConfig);
+  assert.equal(config.tasks.length, 3);
+  assert.deepEqual(requestedUrls, [
+    "https://xxz-xyzw-res.hortorgames.com/data/missing-server-version/config.json",
+    "https://xxz-xyzw-res.hortorgames.com/data/version.json",
+    "https://xxz-xyzw-res.hortorgames.com/data/latest-version/config.json",
+  ]);
+});
+
 test("duplicate point-reward IDs are rejected before duplicate claims can be scheduled", () => {
   for (const name of ["DayLimitConf", "WeekLimitConf"]) {
     const config = officialConfig();
