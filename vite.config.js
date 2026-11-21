@@ -5,6 +5,24 @@ import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+/**
+ * 读取 render-backend/.env 里的 API_KEY。
+ * 代理头必须和后端密钥一致，之前写死成 "xyzw-local-dev"、后端是
+ * "xyzw-local-dev-key"，所有 /api/pushing 请求都被 401 拒绝。
+ */
+function readBackendApiKey() {
+  try {
+    const envPath = path.resolve(__dirname, "render-backend/.env");
+    const raw = fs.readFileSync(envPath, "utf8");
+    const match = raw.match(/^\s*API_KEY\s*=\s*(.+?)\s*$/m);
+    if (match) return match[1];
+  } catch {
+    // 没有 .env（比如首次 clone）就退回本地默认值
+  }
+  return "xyzw-local-dev-key";
+}
+
+const backendApiKey = readBackendApiKey();
 
 async function safeImport(moduleName, humanName) {
   try {
@@ -138,12 +156,12 @@ export default defineConfig(async () => {
       open: true,
       host: true,
       proxy: {
-        // 后台推关：转发到本地 render-backend。x-api-key 需与 render-backend/.env 的 API_KEY 一致
+        // 后台推关：转发到本地 render-backend，x-api-key 自动取 render-backend/.env 的 API_KEY
         "/api/pushing": {
           target: "http://127.0.0.1:3001",
           changeOrigin: true,
           headers: {
-            "x-api-key": "xyzw-local-dev",
+            "x-api-key": backendApiKey,
           },
         },
         // 前端埋点日志：转发到本地 render-backend（默认 3001），由后端写入 logs/

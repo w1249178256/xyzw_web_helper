@@ -197,6 +197,12 @@ function addLog(level, category, message, meta = {}) {
 
 // ==================== Token 加载 ====================
 async function loadTokens() {
+  // 本地只跑前端日志/推关时没有配置 Supabase，这里直接返回空表，
+  // 否则 supabase 为 null 会在 .from() 上抛 TypeError，/api/pushing/start 变成 500
+  if (!supabase) {
+    addLog("WARN", "supabase", "未配置数据库，跳过 token 库加载");
+    return [];
+  }
   const { data, error } = await supabase
     .from("tokens")
     .select("*")
@@ -746,7 +752,11 @@ app.post("/api/pushing/start", async (req, res) => {
   }
   try {
     const result = await pushingRunner.start({ tokenIds, tokens, options });
-    addLog("INFO", "pushing", `后台推关启动：${hasTokens ? tokens.length : tokenIds.length} 个账号`);
+    addLog(
+      "INFO",
+      "pushing",
+      `后台推关启动：${hasTokens ? tokens.length : tokenIds.length} 个账号`,
+    );
     res.json(result);
   } catch (error) {
     addLog("ERROR", "pushing", `启动后台推关失败: ${error.message}`);
@@ -765,7 +775,11 @@ app.post("/api/pushing/stop", (req, res) => {
   const result = all
     ? pushingRunner.stopAll()
     : pushingRunner.stop(String(tokenId || ""));
-  addLog("INFO", "pushing", all ? "停止全部后台推关" : `停止后台推关: ${tokenId}`);
+  addLog(
+    "INFO",
+    "pushing",
+    all ? "停止全部后台推关" : `停止后台推关: ${tokenId}`,
+  );
   res.json(result);
 });
 
