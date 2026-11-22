@@ -135,3 +135,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Docker 部署环境变量（含密钥，勿入库）
+.env.docker
