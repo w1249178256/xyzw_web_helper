@@ -752,6 +752,23 @@
                 的（taskProgress）直接跳过，只领真正可领的任务。
               </div>
             </n-tab-pane>
+            <n-tab-pane name="nightmare" tab="十殿">
+              <n-space>
+                <n-button
+                  size="small"
+                  @click="batchNightmareReward"
+                  :disabled="isRunning || selectedTokens.length === 0"
+                >
+                  一键领取十殿奖励
+                </n-button>
+              </n-space>
+              <div class="pkroom-hint">
+                流程：领铃铛（`nightmare_claimweekreward`）→ 把剩余次数全部
+                roll（`nightmare_clickturntable`，每次间隔 1 秒）→
+                尝试领取额外次数（`nightmare_claimturnrewardtimes`）→ 领到就继续
+                roll，领不到就结束。周上限 8 次，每通一关多 1 次。
+              </div>
+            </n-tab-pane>
           </n-tabs>
         </n-card>
       </div>
@@ -3119,6 +3136,7 @@ import {
   createTasksHangUp,
   createTasksItem,
   createTasksLegacy,
+  createTasksNightmareReward,
   createTasksPkRoom,
   createTasksStore,
   createTasksTower,
@@ -4728,6 +4746,7 @@ function getScheduledTask(taskName) {
     batchAppointPkRoom,
     batchApexClaimTasks,
     batchApexVote,
+    batchNightmareReward,
     claimHangUpRewards,
     batchAddHangUpTime,
     resetBottles,
@@ -6236,6 +6255,9 @@ const { batchFootballBet } = tasksFootball;
 
 const tasksPkRoom = createTasksPkRoom(createTaskDeps());
 const { batchAppointPkRoom } = tasksPkRoom;
+
+const tasksNightmareReward = createTasksNightmareReward(createTaskDeps());
+const { batchNightmareReward } = tasksNightmareReward;
 
 const tasksApex = createTasksApex(createTaskDeps());
 const { batchApexGuess, batchApexClaimTasks, batchApexVote } = tasksApex;

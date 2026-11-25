@@ -56,6 +56,7 @@ export const availableTasks = [
   { label: "赛事-一键预约赛事活动", value: "batchAppointPkRoom" },
   { label: "赛事-一键领取赛事每日奖励", value: "batchApexClaimTasks" },
   { label: "赛事-一键助威", value: "batchApexVote" },
+  { label: "十殿-一键领取十殿奖励", value: "batchNightmareReward" },
   { label: "一键钓鱼补齐", value: "batchTopUpFish" },
   { label: "一键竞技场补齐", value: "batchTopUpArena" },
   { label: "一键领取怪异塔免费道具", value: "batchClaimFreeEnergy" },

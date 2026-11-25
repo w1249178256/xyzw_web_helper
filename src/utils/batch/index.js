@@ -20,6 +20,7 @@ export { createTasksFootball } from "./tasksFootball.js";
 export { createTasksHangUp } from "./tasksHangUp.js";
 export { createTasksItem } from "./tasksItem.js";
 export { createTasksLegacy } from "./tasksLegacy.js";
+export { createTasksNightmareReward } from "./tasksNightmareReward.js";
 export { createTasksPkRoom } from "./tasksPkRoom.js";
 export { createTasksStore } from "./tasksStore.js";
 export { createTasksTower } from "./tasksTower.js";
