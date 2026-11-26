@@ -4,9 +4,19 @@ import { createApp } from "vue";
 
 import App from "./App.vue";
 import router from "./router";
+import { startBgTicker } from "./utils/bgTicker";
+import { initFrontendLog, logInfo } from "./utils/frontendLog";
 import "@arco-design/web-vue/dist/arco.css";
 import "virtual:uno.css";
 import "./assets/styles/global.scss";
+
+// 前端埋点：异常 + 关键事件上报到本地后端（render-backend/logs/）
+initFrontendLog();
+
+// 记录页面访问路径，便于按会话还原操作轨迹
+router.afterEach((to, from) => {
+  logInfo("路由切换", { to: to.fullPath, from: from.fullPath });
+});
 
 // 创建应用实例
 const app = createApp(App);
@@ -50,4 +60,5 @@ const applyTheme = () => {
 applyTheme();
 
 // 挂载应用
+startBgTicker();
 app.mount("#app");

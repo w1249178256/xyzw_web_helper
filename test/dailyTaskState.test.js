@@ -140,10 +140,18 @@ test("failed config reads can be retried and unsafe versions are rejected", asyn
       return { dataBundleVer: "test-config-retry" };
     },
   };
-  const fetchConfig = async () => ({
-    ok: ++attempt > 1,
-    json: async () => officialConfig(),
-  });
+  // 新版 loader 在 config.json 失败时会再读一次 version.json 做版本回退，
+  // 这里让 version.json 直接失败，确保计数只落在 config.json 上。
+  const fetchConfig = async (url) => {
+    if (String(url).endsWith("/version.json"))
+      return { ok: false, status: 404 };
+    attempt += 1;
+    return {
+      ok: attempt > 1,
+      status: attempt > 1 ? 200 : 404,
+      json: async () => officialConfig(),
+    };
+  };
   await assert.rejects(
     loadDailyTaskConfig(store, "a", fetchConfig),
     /读取失败/,
