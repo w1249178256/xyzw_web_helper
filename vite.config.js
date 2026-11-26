@@ -14,7 +14,7 @@ function readBackendApiKey() {
   try {
     const envPath = path.resolve(__dirname, "render-backend/.env");
     const raw = fs.readFileSync(envPath, "utf8");
-    const match = raw.match(/^\s*API_KEY\s*=\s*(.+?)\s*$/m);
+    const match = raw.match(/^API_KEY\s*=\s*(\S+)/m);
     if (match) return match[1];
   } catch {
     // 没有 .env（比如首次 clone）就退回本地默认值
