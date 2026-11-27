@@ -35,6 +35,8 @@ async function createClient(file, exportName) {
     "./bonProtocol.js": { g_utils: utils },
     "./logger.js": { gameLogger: logger, wsLogger: logger },
     "./helperTaskRunner.js": { sleep: async () => {} },
+    // Worker 节拍器在测试里不存在，返回一个空的取消函数即可
+    "./bgTicker.js": { onBgTick: () => () => {} },
   };
   const globals = {
     WebSocket: { OPEN: 1 },

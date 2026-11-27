@@ -4,6 +4,7 @@ import { createApp } from "vue";
 
 import App from "./App.vue";
 import router from "./router";
+import { startBgTicker } from "./utils/bgTicker";
 import "@arco-design/web-vue/dist/arco.css";
 import "virtual:uno.css";
 import "./assets/styles/global.scss";
@@ -48,6 +49,9 @@ const applyTheme = () => {
 };
 
 applyTheme();
+
+// 后台节拍器：让 WebSocket 心跳在标签页切到后台时仍能按时发送
+startBgTicker();
 
 // 挂载应用
 app.mount("#app");
