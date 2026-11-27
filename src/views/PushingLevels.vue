@@ -277,11 +277,27 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
-  reactive,
   ref,
   watch,
 } from "vue";
 import { useTokenStore } from "@/stores/tokenStore";
+import {
+  bgSleep,
+  startAudioKeepAlive,
+  startBgTicker,
+  stopAudioKeepAlive,
+} from "@/utils/bgTicker";
+import {
+  autoContinue,
+  logs,
+  maxRetries,
+  runningStates,
+  selectedGroupIds,
+  selectedTokenIds,
+  torchItemId,
+  torchQuantity,
+  torchRunning,
+} from "@/utils/pushingState";
 import { BOSS_NAMES } from "./boss_names.js";
 
 const MAX_LOGS = 2000;
@@ -292,19 +308,10 @@ const TORCH_REFRESH_INTERVAL = 30000;
 const message = useMessage();
 const tokenStore = useTokenStore();
 
-const selectedTokenIds = ref([]);
-const selectedGroupIds = ref([]);
 const searchKeyword = ref("");
-const autoContinue = ref(true);
-const maxRetries = ref(999999);
 const autoScroll = ref(true);
 const onlyErrors = ref(false);
 const logsContainer = ref(null);
-const logs = ref([]);
-const runningStates = reactive({});
-const torchRunning = ref(false);
-const torchItemId = ref(1008);
-const torchQuantity = ref(150);
 const logFilterTokenId = ref(null);
 // 倒计时刷新（用于火把时间），每秒更新一次显示
 const tickNow = ref(Date.now());
@@ -378,6 +385,13 @@ const hasAnyRunning = computed(() => {
     (state) => state?.running && !state.stopFlag,
   );
 });
+
+/** 运行时判断（不依赖组件 computed）：组件卸载后异步循环仍可继续使用 */
+function hasRunningStates() {
+  return Object.values(runningStates).some(
+    (state) => state?.running && !state.stopFlag,
+  );
+}
 
 function getTorchLabel(state) {
   if (!state) return "火把 无";
@@ -470,7 +484,7 @@ watch(
 );
 
 function getToken(tokenId) {
-  return tokens.value.find((token) => token.id === tokenId);
+  return (tokenStore.gameTokens || []).find((token) => token.id === tokenId);
 }
 
 function getTokenName(tokenId) {
@@ -750,8 +764,13 @@ function progressPercent(card) {
   );
 }
 
+/**
+ * 等待指定毫秒。
+ * 用 bgSleep 而不是原生 setTimeout：切到后台时原生定时器会被压到每分钟一次，
+ * 推关循环就会卡死；bgSleep 由 Worker 节拍驱动，后台依旧按秒唤醒。
+ */
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return bgSleep(ms);
 }
 
 async function waitConnected(tokenId, timeoutMs = 3000) {
@@ -1183,6 +1202,20 @@ async function startOne(tokenId) {
   initState(tokenId, tokenName);
   addLog(tokenId, tokenName, "开始推图", "success");
 
+  // 后台保活：Worker 节拍器保证定时器不被节流；静音音频让浏览器放宽节流策略。
+  // 必须在用户点击的同步上下文里调用，否则 AudioContext 会被拦截。
+  startBgTicker();
+  startAudioKeepAlive().then((ok) => {
+    addLog(
+      tokenId,
+      tokenName,
+      ok
+        ? "已开启后台保活，可放心切到其它窗口"
+        : "后台保活未生效（浏览器拦截了静音音频），切后台仍可能断线",
+      ok ? "success" : "warning",
+    );
+  });
+
   if (!(await ensureConnected(tokenId))) {
     runningStates[tokenId].running = false;
     runningStates[tokenId].lastError = "WebSocket 未连接";
@@ -1276,6 +1309,8 @@ async function startOne(tokenId) {
     if (state) {
       state.running = false;
       state.countdown = 0;
+      // 所有账号都停了就关掉静音音频，避免一直占着音频输出
+      if (!hasRunningStates()) stopAudioKeepAlive();
       const elapsed = Math.round((Date.now() - state.startTime) / 1000);
       addLog(
         tokenId,
@@ -1407,14 +1442,9 @@ onBeforeUnmount(() => {
     clearInterval(tickTimer);
     tickTimer = null;
   }
-  Object.values(runningStates).forEach((state) => {
-    if (state?.running) {
-      state.stopFlag = true;
-      try {
-        tokenStore.closeWebSocketConnection(state.tokenId);
-      } catch {}
-    }
-  });
+  // 站内切到其它页签时组件会卸载，但推图循环必须继续跑（状态在 pushingState 里）。
+  // 只有确实没有运行中的任务时才关闭静音音频，避免一直占着音频输出。
+  if (!hasRunningStates()) stopAudioKeepAlive();
 });
 </script>
 
